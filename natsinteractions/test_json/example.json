@@ -1,0 +1,2140 @@
+
+{
+"source": "gcm",
+"event": {
+    "operation": "update",
+    "details": {
+        "endDate": 1636622316490,
+        "customFields": {
+            "class-attack": {
+                "order": 1,
+                "string": "Exploit"
+            },
+            "first-time": {
+                "date": 1630543560000,
+                "order": 0
+            },
+            "last-time": {
+                "date": 1630543560000,
+                "order": 0
+            },
+            "misp-event-id": {
+                "order": 2,
+                "string": "7481"
+            },
+            "ncircc-bulletine-id": {
+                "order": 0,
+                "string": "21-09-45"
+            },
+            "ncircc-class-attack": {
+                "order": 1,
+                "string": "Попытки эксплуатации уязвимости;attack"
+            }
+        },
+        "resolutionStatus": "TruePositive",
+        "summary": "Попытка эксплуатации уязвимости CVE-2019-11043 ",
+        "status": "Resolved",
+        "impactStatus": "NoImpact"
+    },
+    "objectType": "case",
+    "objectId": "~1938194504",
+    "base": true,
+    "startDate": 1636622316515,
+    "rootId": "~1938194504",
+    "requestId": "821288ed2fe50017: -5dad3d10: 17d0da95f31: -8000: 12615",
+    "object": {
+        "_id": "~1938194504",
+        "id": "~1938194504",
+        "createdBy": "i.monahov@cloud.gcm",
+        "updatedBy": "m.miroshnichenko@cloud.gcm",
+        "createdAt": 1630597296241,
+        "updatedAt": 1636622316508,
+        "_type": "case",
+        "caseId": 9018,
+        "title": "Попытка эксплуатации уязвимости CVE-2019-11043 (Распределенная атака)",
+        "description": "Попытка эксплуатации уязвимости CVE-2019-11043 (Распределенная атака)\n  \n#### Merged with alert #TSK-CENTER-2-ZPM-210902-136913 Зафиксирована подозрительная активность по признакам НКЦКИ с 68.183.207.206\n\n**Задача переданная из смежной системы: Заслон-Пост-Модерн**\n\nВ формате ГЦМ: **`TSK-CENTER-2-ZPM-210902-136913`** ID: `136913`\n\n[http: //siem.cloud.gcm:3000/tasks/card/TSK-CENTER-2-ZPM-210902-136913](http://siem.cloud.gcm:3000/tasks/card/TSK-CENTER-2-ZPM-210902-136913)\n\nАвтор задачи: **`admin`**\n\nТип: **`snort_alert`**\n\n**Причина по которой создана задача**\n\nНазвание: `Зафиксирована подозрительная активность по признакам НКЦКИ с 68.183.207.206`\n\nОписание: `## Данная задача создана автоматически\n Время начала: 2021-09-02 06:08:30\n Время окончания: 2021-09-02 06:08:40\n Продолжительность воздействий: 0:00:10`\n\nОтработало на СОА: \n- **`1052`**   ФАС, Установлен: г. Москва, IP адрес: 10.20.0.52\n\n\n\n**Полное описаие события IDS:**\n\n- Время начала: **`02.09.2021 06:08:30`**\n- Время окончания: **`02.09.2021 06:08:40`**\n- **IP из домашней подсети**\n\n1. **`194.226.26.252`**\n- **IP из внешней подсети**\n\n1. **`68.183.207.206`**\n\n\n**Сигнатуры на которых отработал анализатор сетевого трафика:**\n\n1. РП: **`3005391`**, Сообщение: AM Exploit Apache HTTP Server mod-status Race Condition Heap Buffer Overflow, Добавлена: 10.05.2021 10:32:33\n2. РП: **`3005422`**, Сообщение: AM Exploit HTTP Apache mod_mylo Module Possible Buffer Overflow, Добавлена: 10.05.2021 10:32:33\n3. РП: **`3066221`**, Сообщение: AM Exploit Possible RCE in PHP-fpm, Добавлена: 10.05.2021 10:32:33\n4. РП: **`99010424`**, Сообщение: NCIRCC PHP-RCE check (D-Pisos: 8=D), Добавлена: 10.05.2021 10:27:52\n\n\n\n\n\n**Фильтрация и выгрузка от** Thu Sep 02 2021 18:31:58 GMT+0300 \n\nРазмер: **`171.4 KB`**, [Скачать файл](ftp://ftp.cloud.gcm//traffic/1052/1630596715_2021_09_02____18_31_55_492399.pcap)\n\nКонтент: Фильтрация успешно завершена. Включена автоматическая выгрузка\n\nФайл на СОА: `/opt/zaslon/zmanager/data/pfilter_storage/1630596715_2021_09_02____18_31_55_492399.pcap`\n  \n#### Merged with alert #TSK-CENTER-2-ZPM-210902-136777 Зафиксирована подозрительная активность по признакам НКЦКИ с 68.183.207.206\n\n**Задача переданная из смежной системы: Заслон-Пост-Модерн**\n\nВ формате ГЦМ: **`TSK-CENTER-2-ZPM-210902-136777`** ID: `136777`\n\n[http://siem.cloud.gcm:3000/tasks/card/TSK-CENTER-2-ZPM-210902-136777](http://siem.cloud.gcm:3000/tasks/card/TSK-CENTER-2-ZPM-210902-136777)\n\nАвтор задачи: **`admin`**\n\nТип: **`snort_alert`**\n\n**Причина по которой создана задача**\n\nНазвание: `Зафиксирована подозрительная активность по признакам НКЦКИ с 68.183.207.206`\n\nОписание: `## Данная задача создана автоматически\n Время начала: 2021-09-02 05:37:38\n Время окончания: 2021-09-02 05:38:44\n Продолжительность воздействий: 0:01:06`\n\nОтработало на СОА: \n- **`1052`**   ФАС, Установлен: г. Москва, IP адрес: 10.20.0.52\n\n\n\n**Полное описаие события IDS:**\n\n- Время начала: **`02.09.2021 05:37:38`**\n- Время окончания: **`02.09.2021 05:38:44`**\n- **IP из домашней подсети**\n\n1. **`194.226.26.127`**\n- **IP из внешней подсети**\n\n1. **`68.183.207.206`**\n\n\n**Сигнатуры на которых отработал анализатор сетевого трафика:**\n\n1. РП: **`3005422`**, Сообщение: AM Exploit HTTP Apache mod_mylo Module Possible Buffer Overflow, Добавлена: 10.05.2021 10:32:33\n2. РП: **`3066221`**, Сообщение: AM Exploit Possible RCE in PHP-fpm, Добавлена: 10.05.2021 10:32:33\n3. РП: **`99010424`**, Сообщение: NCIRCC PHP-RCE check (D-Pisos: 8=D), Добавлена: 10.05.2021 10:27:52\n4. РП: **`99010425`**, Сообщение: NCIRCC PHP-RCE Target is probably vulnerable (Status code 502, adding as a candidate), Добавлена: 10.05.2021 10:27:52\n\n\n\n\n\n**Фильтрация и выгрузка от** Thu Sep 02 2021 16:59:35 GMT+0300 \n\nРазмер: **`231.6 KB`**, [Скачать файл](ftp://ftp.cloud.gcm//traffic/1052/1630591171_2021_09_02____16_59_31_905897.pcap)\n\nКонтент: Фильтрация успешно завершена. Включена автоматическая выгрузка\n\nФайл на СОА: `/opt/zaslon/zmanager/data/pfilter_storage/1630591171_2021_09_02____16_59_31_905897.pcap`\n  \n#### Merged with alert #TSK-CENTER-2-ZPM-210902-136758 Зафиксирована подозрительная активность по признакам НКЦКИ с 68.183.207.206\n\n**Задача переданная из смежной системы: Заслон-Пост-Модерн**\n\nВ формате ГЦМ: **`TSK-CENTER-2-ZPM-210902-136758`** ID: `136758`\n\n[http://siem.cloud.gcm:3000/tasks/card/TSK-CENTER-2-ZPM-210902-136758](http://siem.cloud.gcm:3000/tasks/card/TSK-CENTER-2-ZPM-210902-136758)\n\nАвтор задачи: **`admin`**\n\nТип: **`snort_alert`**\n\n**Причина по которой создана задача**\n\nНазвание: `Зафиксирована подозрительная активность по признакам НКЦКИ с 68.183.207.206`\n\nОписание: `## Данная задача создана автоматически\n Время начала: 2021-09-02 06:30:39\n Время окончания: 2021-09-02 06:30:50\n Продолжительность воздействий: 0:00:11`\n\nОтработало на СОА: \n- **`1052`**   ФАС, Установлен: г. Москва, IP адрес: 10.20.0.52\n\n\n\n**Полное описаие события IDS:**\n\n- Время начала: **`02.09.2021 06:30:39`**\n- Время окончания: **`02.09.2021 06:30:50`**\n- **IP из домашней подсети**\n\n1. **`194.226.26.250`**\n- **IP из внешней подсети**\n\n1. **`68.183.207.206`**\n\n\n**Сигнатуры на которых отработал анализатор сетевого трафика:**\n\n1. РП: **`3005391`**, Сообщение: AM Exploit Apache HTTP Server mod-status Race Condition Heap Buffer Overflow, Добавлена: 10.05.2021 10:32:33\n2. РП: **`3005422`**, Сообщение: AM Exploit HTTP Apache mod_mylo Module Possible Buffer Overflow, Добавлена: 10.05.2021 10:32:33\n3. РП: **`3066221`**, Сообщение: AM Exploit Possible RCE in PHP-fpm, Добавлена: 10.05.2021 10:32:33\n4. РП: **`99010424`**, Сообщение: NCIRCC PHP-RCE check (D-Pisos: 8=D), Добавлена: 10.05.2021 10:27:52\n\n\n\n\n\n**Фильтрация и выгрузка от** Thu Sep 02 2021 15:51:37 GMT+0300 \n\nРазмер: **`192.7 KB`**, [Скачать файл](ftp://ftp.cloud.gcm//traffic/1052/1630587093_2021_09_02____15_51_33_911281.pcap)\n\nКонтент: Фильтрация успешно завершена. Включена автоматическая выгрузка\n\nФайл на СОА: `/opt/zaslon/zmanager/data/pfilter_storage/1630587093_2021_09_02____15_51_33_911281.pcap`\n  \n#### Merged with alert #TSK-CENTER-2-ZPM-210902-136735 Зафиксирована подозрительная активность по признакам НКЦКИ с 68.183.207.206\n\n**Задача переданная из смежной системы: Заслон-Пост-Модерн**\n\nВ формате ГЦМ: **`TSK-CENTER-2-ZPM-210902-136735`** ID: `136735`\n\n[http://siem.cloud.gcm:3000/tasks/card/TSK-CENTER-2-ZPM-210902-136735](http://siem.cloud.gcm:3000/tasks/card/TSK-CENTER-2-ZPM-210902-136735)\n\nАвтор задачи: **`admin`**\n\nТип: **`snort_alert`**\n\n**Причина по которой создана задача**\n\nНазвание: `Зафиксирована подозрительная активность по признакам НКЦКИ с 68.183.207.206`\n\nОписание: `## Данная задача создана автоматически\n Время начала: 2021-09-02 03:46:48\n Время окончания: 2021-09-02 05:17:57\n Продолжительность воздействий: 1:31:09`\n\nОтработало на СОА: \n- **`1052`**   ФАС, Установлен: г. Москва, IP адрес: 10.20.0.52\n\n\n\n**Полное описаие события IDS:**\n\n- Время начала: **`02.09.2021 03:46:48`**\n- Время окончания: **`02.09.2021 05:17:57`**\n- **IP из домашней подсети**\n\n1. **`194.226.26.115`**\n2. **`194.226.26.68`**\n3. **`194.226.26.185`**\n4. **`194.226.26.36`**\n5. **`194.226.26.120`**\n- **IP из внешней подсети**\n\n1. **`68.183.207.206`**\n\n\n**Сигнатуры на которых отработал анализатор сетевого трафика:**\n\n1. РП: **`3005391`**, Сообщение: AM Exploit Apache HTTP Server mod-status Race Condition Heap Buffer Overflow, Добавлена: 10.05.2021 10:32:33\n2. РП: **`3005422`**, Сообщение: AM Exploit HTTP Apache mod_mylo Module Possible Buffer Overflow, Добавлена: 10.05.2021 10:32:33\n3. РП: **`3066221`**, Сообщение: AM Exploit Possible RCE in PHP-fpm, Добавлена: 10.05.2021 10:32:33\n4. РП: **`99010424`**, Сообщение: NCIRCC PHP-RCE check (D-Pisos: 8=D), Добавлена: 10.05.2021 10:27:52\n\n\n\n\n\n**Фильтрация и выгрузка от** Thu Sep 02 2021 15:00:31 GMT+0300 \n\nРазмер: **`1.3 MB`**, [Скачать файл](ftp://ftp.cloud.gcm//traffic/1052/1630584012_2021_09_02____15_00_12_719724.pcap)\n\nКонтент: Фильтрация успешно завершена. Включена автоматическая выгрузка\n\nФайл на СОА: `/opt/zaslon/zmanager/data/pfilter_storage/1630584012_2021_09_02____15_00_12_719724.pcap`\n  \n#### Merged with alert #TSK-CENTER-2-ZPM-210902-136682 Редко встречающиеся признаки ВПО, Зафиксирована подозрительная активность по признакам НКЦКИ с 68.183.207.206\n\n**Задача переданная из смежной системы: Заслон-Пост-Модерн**\n\nВ формате ГЦМ: **`TSK-CENTER-2-ZPM-210902-136682`** ID: `136682`\n\n[http://siem.cloud.gcm:3000/tasks/card/TSK-CENTER-2-ZPM-210902-136682](http://siem.cloud.gcm:3000/tasks/card/TSK-CENTER-2-ZPM-210902-136682)\n\nАвтор задачи: **`admin`**\n\nТип: **`snort_alert`**\n\n**Причина по которой создана задача**\n\nНазвание: `Редко встречающиеся признаки ВПО, Зафиксирована подозрительная активность по признакам НКЦКИ с 68.183.207.206`\n\nОписание: `## Данная задача создана автоматически\n Время начала: 2021-09-02 03:46:48\n Время окончания: 2021-09-02 03:46:59\n Продолжительность воздействий: 0:00:11`\n\nОтработало на СОА: \n- **`1052`**   ФАС, Установлен: г. Москва, IP адрес: 10.20.0.52\n\n\n\n**Полное описаие события IDS:**\n\n- Время начала: **`02.09.2021 03:46:48`**\n- Время окончания: **`02.09.2021 03:46:59`**\n- **IP из домашней подсети**\n\n1. **`194.226.26.185`**\n- **IP из внешней подсети**\n\n1. **`68.183.207.206`**\n\n\n**Сигнатуры на которых отработал анализатор сетевого трафика:**\n\n1. РП: **`99010424`**, Сообщение: NCIRCC PHP-RCE check (D-Pisos: 8=D), Добавлена: 10.05.2021 10:27:52\n\n\n\n\n\n**Фильтрация и выгрузка от** Thu Sep 02 2021 11:31:42 GMT+0300 \n\nРазмер: **`404.6 KB`**, [Скачать файл](ftp://ftp.cloud.gcm//traffic/1052/1630571500_2021_09_02____11_31_40_570968.pcap)\n\nКонтент: Фильтрация успешно завершена. Включена автоматическая выгрузка\n\nФайл на СОА: `/opt/zaslon/zmanager/data/pfilter_storage/1630571500_2021_09_02____11_31_40_570968.pcap`",
+        "severity": 2,
+        "startDate": 1630597260000,
+        "endDate": 1636622316490,
+        "impactStatus": "NoImpact",
+        "resolutionStatus": "TruePositive",
+        "tags": [
+            "ATs:geoip=Канада",
+            "ATs:reason=Редко встречающиеся признаки ВПО",
+            "Webhook:MISP",
+            "Sensor_id=1052",
+            "WebHook:send=ATD",
+            "ZK:send",
+            "WebHook:send=NCIRCC",
+            "Webhook:ES",
+            "WebHook:send=PCAP",
+            "ATs:reason=Зафиксирована подозрительная активность по признакам НКЦКИ"
+        ],
+        "flag": false,
+        "tlp": 2,
+        "pap": 2,
+        "status": "Resolved",
+        "summary": "Попытка эксплуатации уязвимости CVE-2019-11043 ",
+        "owner": "i.monahov@cloud.gcm",
+        "customFields": {
+            "class-attack": {
+                "order": 1,
+                "string": "Exploit"
+            },
+            "first-time": {
+                "date": 1630543560000,
+                "order": 0
+            },
+            "last-time": {
+                "date": 1630543560000,
+                "order": 0
+            },
+            "misp-event-id": {
+                "order": 2,
+                "string": "7481"
+            },
+            "ncircc-bulletine-id": {
+                "order": 0,
+                "string": "21-09-45"
+            },
+            "ncircc-class-attack": {
+                "order": 1,
+                "string": "Попытки эксплуатации уязвимости;attack"
+            }
+        },
+        "stats": {},
+        "permissions": []
+    },
+    "organisationId": "~4192",
+    "organisation": "GCM"
+},
+"observables": [
+    {
+        "_createdAt": 1630597296500,
+        "_createdBy": "i.monahov@cloud.gcm",
+        "_id": "~1937707168",
+        "_type": "Observable",
+        "_updatedAt": 1630597519562,
+        "_updatedBy": "i.monahov@cloud.gcm",
+        "data": "ftp://ftp.cloud.gcm/traffic/1052/1630587093_2021_09_02____15_51_33_911281.pcap",
+        "dataType": "url_pcap",
+        "extraData": {},
+        "ioc": true,
+        "message": "Download a piece of traffic",
+        "reports": {
+            "Drill_1_2": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "Drill",
+                        "predicate": "Score",
+                        "value": 0
+                    }
+                ]
+            },
+            "Moloch_1_7": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "Moloch",
+                        "predicate": "Uploading",
+                        "value": "1 pcap(s)"
+                    }
+                ]
+            }
+        },
+        "sighted": false,
+        "startDate": 1630597296500,
+        "tags": [],
+        "tlp": 2
+    },
+    {
+        "_createdAt": 1630597296435,
+        "_createdBy": "i.monahov@cloud.gcm",
+        "_id": "~2716184704",
+        "_type": "Observable",
+        "data": "ftp://ftp.cloud.gcm/traffic/1052/1630591171_2021_09_02____16_59_31_905897.pcap",
+        "dataType": "url_pcap",
+        "extraData": {},
+        "ioc": false,
+        "message": "Download a piece of traffic",
+        "reports": {
+            "Drill_1_2": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "Drill",
+                        "predicate": "Score",
+                        "value": 0
+                    }
+                ]
+            },
+            "Moloch_1_7": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "Moloch",
+                        "predicate": "Uploading",
+                        "value": "1 pcap(s)"
+                    }
+                ]
+            }
+        },
+        "sighted": false,
+        "startDate": 1630597296435,
+        "tags": [],
+        "tlp": 2
+    },
+    {
+        "_createdAt": 1630597296365,
+        "_createdBy": "i.monahov@cloud.gcm",
+        "_id": "~2511491304",
+        "_type": "Observable",
+        "_updatedAt": 1630597531628,
+        "_updatedBy": "i.monahov@cloud.gcm",
+        "data": "ftp://ftp.cloud.gcm/traffic/1052/1630596715_2021_09_02____18_31_55_492399.pcap",
+        "dataType": "url_pcap",
+        "extraData": {},
+        "ioc": true,
+        "message": "Download a piece of traffic",
+        "reports": {
+            "Drill_1_2": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "Drill",
+                        "predicate": "Score",
+                        "value": 0
+                    }
+                ]
+            },
+            "Moloch_1_7": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "Moloch",
+                        "predicate": "Uploading",
+                        "value": "1 pcap(s)"
+                    }
+                ]
+            }
+        },
+        "sighted": false,
+        "startDate": 1630597296365,
+        "tags": [],
+        "tlp": 2
+    },
+    {
+        "_createdAt": 1630597296647,
+        "_createdBy": "i.monahov@cloud.gcm",
+        "_id": "~1827561528",
+        "_type": "Observable",
+        "_updatedAt": 1630597470953,
+        "_updatedBy": "i.monahov@cloud.gcm",
+        "data": "ftp://ftp.cloud.gcm/traffic/1052/1630571500_2021_09_02____11_31_40_570968.pcap",
+        "dataType": "url_pcap",
+        "extraData": {},
+        "ioc": true,
+        "message": "Download a piece of traffic",
+        "reports": {
+            "Drill_1_2": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "Drill",
+                        "predicate": "Score",
+                        "value": 0
+                    }
+                ]
+            },
+            "Moloch_1_7": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "Moloch",
+                        "predicate": "Uploading",
+                        "value": "1 pcap(s)"
+                    }
+                ]
+            }
+        },
+        "sighted": false,
+        "startDate": 1630597296647,
+        "tags": [],
+        "tlp": 2
+    },
+    {
+        "_createdAt": 1630597480754,
+        "_createdBy": "i.monahov@cloud.gcm",
+        "_id": "~1938346056",
+        "_type": "Observable",
+        "data": "http://194.226.26.185/index.php/path",
+        "dataType": "url",
+        "extraData": {},
+        "ignoreSimilarity": false,
+        "ioc": false,
+        "message": "### Discovered from:\n- Observable: **[url_pcap] - ftp://ftp[.]cloud[.]gcm/traffic/1052/1630571500_2021_09_02____11_31_40_570968[.]pcap**\n- Analyzer: **Moloch_1_7**",
+        "reports": {
+            "CyberCrime-Tracker_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "CCT",
+                        "predicate": "C2 Search",
+                        "value": "0 hits"
+                    }
+                ]
+            },
+            "MISP_2_1": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "MISP",
+                        "predicate": "Search",
+                        "value": "0 events"
+                    }
+                ]
+            },
+            "URLhaus_2_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "URLhaus",
+                        "predicate": "Search",
+                        "value": "No results"
+                    }
+                ]
+            },
+            "Urlscan_io_Scan_0_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "urlscan.io",
+                        "predicate": "Scan",
+                        "value": "Overall Score:0"
+                    }
+                ]
+            },
+            "Urlscan_io_Search_0_1_1": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "urlscan.io",
+                        "predicate": "Search",
+                        "value": "0 result"
+                    }
+                ]
+            },
+            "VirusTotal_GetReport_3_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "VT",
+                        "predicate": "GetReport",
+                        "value": "0"
+                    }
+                ]
+            }
+        },
+        "sighted": false,
+        "startDate": 1630597480754,
+        "tags": [
+            "src:Moloch_1_7"
+        ],
+        "tlp": 2
+    },
+    {
+        "_createdAt": 1630597502763,
+        "_createdBy": "i.monahov@cloud.gcm",
+        "_id": "~1937821856",
+        "_type": "Observable",
+        "data": "http://194.226.26.36/index.php/path",
+        "dataType": "url",
+        "extraData": {},
+        "ignoreSimilarity": false,
+        "ioc": false,
+        "message": "### Discovered from:\n- Observable: **[url_pcap] - ftp://ftp[.]cloud[.]gcm/traffic/1052/1630584012_2021_09_02____15_00_12_719724[.]pcap**\n- Analyzer: **Moloch_1_7**",
+        "reports": {
+            "CyberCrime-Tracker_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "CCT",
+                        "predicate": "C2 Search",
+                        "value": "0 hits"
+                    }
+                ]
+            },
+            "MISP_2_1": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "MISP",
+                        "predicate": "Search",
+                        "value": "0 events"
+                    }
+                ]
+            },
+            "URLhaus_2_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "URLhaus",
+                        "predicate": "Search",
+                        "value": "No results"
+                    }
+                ]
+            },
+            "Urlscan_io_Scan_0_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "urlscan.io",
+                        "predicate": "Scan",
+                        "value": "Overall Score:0"
+                    }
+                ]
+            },
+            "Urlscan_io_Search_0_1_1": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "urlscan.io",
+                        "predicate": "Search",
+                        "value": "0 result"
+                    }
+                ]
+            },
+            "VirusTotal_GetReport_3_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "VT",
+                        "predicate": "GetReport",
+                        "value": "0"
+                    }
+                ]
+            }
+        },
+        "sighted": false,
+        "startDate": 1630597502763,
+        "tags": [
+            "src:Moloch_1_7"
+        ],
+        "tlp": 2
+    },
+    {
+        "_createdAt": 1630597480647,
+        "_createdBy": "i.monahov@cloud.gcm",
+        "_id": "~1651208216",
+        "_type": "Observable",
+        "data": "http://194.226.26.185/index.php/PHP",
+        "dataType": "url",
+        "extraData": {},
+        "ignoreSimilarity": false,
+        "ioc": false,
+        "message": "### Discovered from:\n- Observable: **[url_pcap] - ftp://ftp[.]cloud[.]gcm/traffic/1052/1630571500_2021_09_02____11_31_40_570968[.]pcap**\n- Analyzer: **Moloch_1_7**",
+        "reports": {
+            "CyberCrime-Tracker_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "CCT",
+                        "predicate": "C2 Search",
+                        "value": "0 hits"
+                    }
+                ]
+            },
+            "MISP_2_1": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "MISP",
+                        "predicate": "Search",
+                        "value": "0 events"
+                    }
+                ]
+            },
+            "Urlscan_io_Search_0_1_1": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "urlscan.io",
+                        "predicate": "Search",
+                        "value": "0 result"
+                    }
+                ]
+            },
+            "VirusTotal_GetReport_3_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "VT",
+                        "predicate": "GetReport",
+                        "value": "0"
+                    }
+                ]
+            }
+        },
+        "sighted": false,
+        "startDate": 1630597480647,
+        "tags": [
+            "src:Moloch_1_7"
+        ],
+        "tlp": 2
+    },
+    {
+        "_createdAt": 1630597480702,
+        "_createdBy": "i.monahov@cloud.gcm",
+        "_id": "~2716340352",
+        "_type": "Observable",
+        "data": "is_the_shittiest_lang.php",
+        "dataType": "url",
+        "extraData": {},
+        "ignoreSimilarity": false,
+        "ioc": false,
+        "message": "### Discovered from:\n- Observable: **[url_pcap] - ftp://ftp[.]cloud[.]gcm/traffic/1052/1630571500_2021_09_02____11_31_40_570968[.]pcap**\n- Analyzer: **Moloch_1_7**",
+        "reports": {
+            "CyberCrime-Tracker_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "CCT",
+                        "predicate": "C2 Search",
+                        "value": "0 hits"
+                    }
+                ]
+            },
+            "MISP_2_1": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "MISP",
+                        "predicate": "Search",
+                        "value": "0 events"
+                    }
+                ]
+            },
+            "Urlscan_io_Search_0_1_1": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "urlscan.io",
+                        "predicate": "Search",
+                        "value": "0 result"
+                    }
+                ]
+            },
+            "VirusTotal_GetReport_3_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "VT",
+                        "predicate": "GetReport",
+                        "value": "0"
+                    }
+                ]
+            }
+        },
+        "sighted": false,
+        "startDate": 1630597480702,
+        "tags": [
+            "src:Moloch_1_7"
+        ],
+        "tlp": 2
+    },
+    {
+        "_createdAt": 1630597480807,
+        "_createdBy": "i.monahov@cloud.gcm",
+        "_id": "~1827881016",
+        "_type": "Observable",
+        "data": "info.php",
+        "dataType": "url",
+        "extraData": {},
+        "ignoreSimilarity": false,
+        "ioc": false,
+        "message": "### Discovered from:\n- Observable: **[url_pcap] - ftp://ftp[.]cloud[.]gcm/traffic/1052/1630571500_2021_09_02____11_31_40_570968[.]pcap**\n- Analyzer: **Moloch_1_7**",
+        "reports": {
+            "CyberCrime-Tracker_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "malicious",
+                        "namespace": "CCT",
+                        "predicate": "C2 Search",
+                        "value": "2 hits"
+                    }
+                ]
+            },
+            "MISP_2_1": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "MISP",
+                        "predicate": "Search",
+                        "value": "0 events"
+                    }
+                ]
+            },
+            "Urlscan_io_Search_0_1_1": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "urlscan.io",
+                        "predicate": "Search",
+                        "value": "0 result"
+                    }
+                ]
+            },
+            "VirusTotal_GetReport_3_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "VT",
+                        "predicate": "GetReport",
+                        "value": "0"
+                    }
+                ]
+            }
+        },
+        "sighted": false,
+        "startDate": 1630597480807,
+        "tags": [
+            "src:Moloch_1_7"
+        ],
+        "tlp": 2
+    },
+    {
+        "_createdAt": 1630597482538,
+        "_createdBy": "i.monahov@cloud.gcm",
+        "_id": "~1938350152",
+        "_type": "Observable",
+        "data": "Mozilla/5.0",
+        "dataType": "user-agent",
+        "extraData": {},
+        "ignoreSimilarity": false,
+        "ioc": false,
+        "message": "### Discovered from:\n- Observable: **[url_pcap] - ftp://ftp[.]cloud[.]gcm/traffic/1052/1630571500_2021_09_02____11_31_40_570968[.]pcap**\n- Analyzer: **Moloch_1_7**",
+        "reports": {
+            "MISP_2_1": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "MISP",
+                        "predicate": "Search",
+                        "value": "0 events"
+                    }
+                ]
+            }
+        },
+        "sighted": false,
+        "startDate": 1630597482538,
+        "tags": [
+            "src:Moloch_1_7"
+        ],
+        "tlp": 2
+    },
+    {
+        "_createdAt": 1630597483286,
+        "_createdBy": "i.monahov@cloud.gcm",
+        "_id": "~1651212312",
+        "_type": "Observable",
+        "data": "194.226.26.185",
+        "dataType": "domain",
+        "extraData": {},
+        "ignoreSimilarity": false,
+        "ioc": false,
+        "message": "### Discovered from:\n- Observable: **[url_pcap] - ftp://ftp[.]cloud[.]gcm/traffic/1052/1630571500_2021_09_02____11_31_40_570968[.]pcap**\n- Analyzer: **Moloch_1_7**",
+        "reports": {
+            "Crt_sh_Transparency_Logs_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "crt.sh",
+                        "predicate": "Certificates",
+                        "value": "0"
+                    }
+                ]
+            },
+            "CyberCrime-Tracker_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "CCT",
+                        "predicate": "C2 Search",
+                        "value": "0 hits"
+                    }
+                ]
+            },
+            "Cyberprotect_ThreatScore_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "Cyberprotect",
+                        "predicate": "ThreatScore",
+                        "value": "not in database"
+                    }
+                ]
+            },
+            "MISP_2_1": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "MISP",
+                        "predicate": "Search",
+                        "value": "0 events"
+                    }
+                ]
+            },
+            "Maltiverse_Report_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "safe",
+                        "namespace": "Maltiverse",
+                        "predicate": "Report",
+                        "value": "-"
+                    }
+                ]
+            },
+            "Shodan_DNSResolve_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "Shodan",
+                        "predicate": "DNS resolutions",
+                        "value": "1"
+                    }
+                ]
+            },
+            "SpamhausDBL_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "SpamhausDBL",
+                        "predicate": "return_code",
+                        "value": "NXDOMAIN"
+                    },
+                    {
+                        "level": "info",
+                        "namespace": "SpamhausDBL",
+                        "predicate": "classification",
+                        "value": "Clean"
+                    }
+                ]
+            },
+            "Threatcrowd_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "Threatcrowd",
+                        "predicate": "votes",
+                        "value": "None"
+                    }
+                ]
+            },
+            "URLhaus_2_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "URLhaus",
+                        "predicate": "Search",
+                        "value": "No results"
+                    }
+                ]
+            },
+            "Urlscan_io_Scan_0_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "urlscan.io",
+                        "predicate": "Scan",
+                        "value": "Overall Score:0"
+                    }
+                ]
+            },
+            "Urlscan_io_Search_0_1_1": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "urlscan.io",
+                        "predicate": "Search",
+                        "value": "0 result"
+                    }
+                ]
+            },
+            "VirusTotal_GetReport_3_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "VT",
+                        "predicate": "GetReport",
+                        "value": "0"
+                    }
+                ]
+            }
+        },
+        "sighted": false,
+        "startDate": 1630597483286,
+        "tags": [
+            "src:Moloch_1_7"
+        ],
+        "tlp": 2
+    },
+    {
+        "_createdAt": 1630597502852,
+        "_createdBy": "i.monahov@cloud.gcm",
+        "_id": "~1938354248",
+        "_type": "Observable",
+        "data": "http://194.226.26.36/index.php/PHP",
+        "dataType": "url",
+        "extraData": {},
+        "ignoreSimilarity": false,
+        "ioc": false,
+        "message": "### Discovered from:\n- Observable: **[url_pcap] - ftp://ftp[.]cloud[.]gcm/traffic/1052/1630584012_2021_09_02____15_00_12_719724[.]pcap**\n- Analyzer: **Moloch_1_7**",
+        "reports": {
+            "CyberCrime-Tracker_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "CCT",
+                        "predicate": "C2 Search",
+                        "value": "0 hits"
+                    }
+                ]
+            },
+            "MISP_2_1": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "MISP",
+                        "predicate": "Search",
+                        "value": "0 events"
+                    }
+                ]
+            },
+            "URLhaus_2_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "URLhaus",
+                        "predicate": "Search",
+                        "value": "No results"
+                    }
+                ]
+            },
+            "Urlscan_io_Scan_0_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "urlscan.io",
+                        "predicate": "Scan",
+                        "value": "Overall Score:0"
+                    }
+                ]
+            },
+            "Urlscan_io_Search_0_1_1": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "urlscan.io",
+                        "predicate": "Search",
+                        "value": "0 result"
+                    }
+                ]
+            },
+            "VirusTotal_GetReport_3_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "VT",
+                        "predicate": "GetReport",
+                        "value": "0"
+                    }
+                ]
+            }
+        },
+        "sighted": false,
+        "startDate": 1630597502852,
+        "tags": [
+            "src:Moloch_1_7"
+        ],
+        "tlp": 2
+    },
+    {
+        "_createdAt": 1630597504783,
+        "_createdBy": "i.monahov@cloud.gcm",
+        "_id": "~1937825952",
+        "_type": "Observable",
+        "data": "194.226.26.120",
+        "dataType": "domain",
+        "extraData": {},
+        "ignoreSimilarity": false,
+        "ioc": false,
+        "message": "### Discovered from:\n- Observable: **[url_pcap] - ftp://ftp[.]cloud[.]gcm/traffic/1052/1630584012_2021_09_02____15_00_12_719724[.]pcap**\n- Analyzer: **Moloch_1_7**",
+        "reports": {
+            "Crt_sh_Transparency_Logs_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "crt.sh",
+                        "predicate": "Certificates",
+                        "value": "0"
+                    }
+                ]
+            },
+            "CyberCrime-Tracker_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "CCT",
+                        "predicate": "C2 Search",
+                        "value": "0 hits"
+                    }
+                ]
+            },
+            "Cyberprotect_ThreatScore_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "Cyberprotect",
+                        "predicate": "ThreatScore",
+                        "value": "not in database"
+                    }
+                ]
+            },
+            "MISP_2_1": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "MISP",
+                        "predicate": "Search",
+                        "value": "0 events"
+                    }
+                ]
+            },
+            "Maltiverse_Report_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "safe",
+                        "namespace": "Maltiverse",
+                        "predicate": "Report",
+                        "value": "-"
+                    }
+                ]
+            },
+            "Shodan_DNSResolve_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "Shodan",
+                        "predicate": "DNS resolutions",
+                        "value": "1"
+                    }
+                ]
+            },
+            "SpamhausDBL_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "SpamhausDBL",
+                        "predicate": "return_code",
+                        "value": "NXDOMAIN"
+                    },
+                    {
+                        "level": "info",
+                        "namespace": "SpamhausDBL",
+                        "predicate": "classification",
+                        "value": "Clean"
+                    }
+                ]
+            },
+            "Threatcrowd_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "Threatcrowd",
+                        "predicate": "votes",
+                        "value": "None"
+                    }
+                ]
+            },
+            "URLhaus_2_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "URLhaus",
+                        "predicate": "Search",
+                        "value": "No results"
+                    }
+                ]
+            },
+            "Urlscan_io_Scan_0_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "urlscan.io",
+                        "predicate": "Scan",
+                        "value": "Overall Score:0"
+                    }
+                ]
+            },
+            "Urlscan_io_Search_0_1_1": {
+                "taxonomies": [
+                    {
+                        "level": "suspicious",
+                        "namespace": "urlscan.io",
+                        "predicate": "Search",
+                        "value": "1 result"
+                    }
+                ]
+            },
+            "VirusTotal_GetReport_3_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "VT",
+                        "predicate": "GetReport",
+                        "value": "0"
+                    }
+                ]
+            }
+        },
+        "sighted": false,
+        "startDate": 1630597504783,
+        "tags": [
+            "src:Moloch_1_7"
+        ],
+        "tlp": 2
+    },
+    {
+        "_createdAt": 1630597504915,
+        "_createdBy": "i.monahov@cloud.gcm",
+        "_id": "~2716344448",
+        "_type": "Observable",
+        "data": "194.226.26.115",
+        "dataType": "domain",
+        "extraData": {},
+        "ignoreSimilarity": false,
+        "ioc": false,
+        "message": "### Discovered from:\n- Observable: **[url_pcap] - ftp://ftp[.]cloud[.]gcm/traffic/1052/1630584012_2021_09_02____15_00_12_719724[.]pcap**\n- Analyzer: **Moloch_1_7**",
+        "reports": {
+            "Crt_sh_Transparency_Logs_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "crt.sh",
+                        "predicate": "Certificates",
+                        "value": "0"
+                    }
+                ]
+            },
+            "CyberCrime-Tracker_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "CCT",
+                        "predicate": "C2 Search",
+                        "value": "0 hits"
+                    }
+                ]
+            },
+            "Cyberprotect_ThreatScore_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "Cyberprotect",
+                        "predicate": "ThreatScore",
+                        "value": "not in database"
+                    }
+                ]
+            },
+            "MISP_2_1": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "MISP",
+                        "predicate": "Search",
+                        "value": "0 events"
+                    }
+                ]
+            },
+            "Maltiverse_Report_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "safe",
+                        "namespace": "Maltiverse",
+                        "predicate": "Report",
+                        "value": "-"
+                    }
+                ]
+            },
+            "Robtex_Forward_PDNS_Query_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "suspicious",
+                        "namespace": "Robtex",
+                        "predicate": "ForwardPassiveDNS",
+                        "value": "9 entries"
+                    }
+                ]
+            },
+            "Shodan_DNSResolve_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "Shodan",
+                        "predicate": "DNS resolutions",
+                        "value": "1"
+                    }
+                ]
+            },
+            "SpamhausDBL_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "SpamhausDBL",
+                        "predicate": "classification",
+                        "value": "Clean"
+                    },
+                    {
+                        "level": "info",
+                        "namespace": "SpamhausDBL",
+                        "predicate": "return_code",
+                        "value": "NXDOMAIN"
+                    }
+                ]
+            },
+            "Threatcrowd_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "Threatcrowd",
+                        "predicate": "votes",
+                        "value": "None"
+                    }
+                ]
+            },
+            "URLhaus_2_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "URLhaus",
+                        "predicate": "Search",
+                        "value": "No results"
+                    }
+                ]
+            },
+            "Urlscan_io_Scan_0_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "urlscan.io",
+                        "predicate": "Scan",
+                        "value": "Overall Score:0"
+                    }
+                ]
+            },
+            "Urlscan_io_Search_0_1_1": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "urlscan.io",
+                        "predicate": "Search",
+                        "value": "0 result"
+                    }
+                ]
+            },
+            "VirusTotal_GetReport_3_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "VT",
+                        "predicate": "GetReport",
+                        "value": "0"
+                    }
+                ]
+            }
+        },
+        "sighted": false,
+        "startDate": 1630597504915,
+        "tags": [
+            "src:Moloch_1_7"
+        ],
+        "tlp": 2
+    },
+    {
+        "_createdAt": 1630597504998,
+        "_createdBy": "i.monahov@cloud.gcm",
+        "_id": "~1827901496",
+        "_type": "Observable",
+        "data": "194.226.26.68",
+        "dataType": "domain",
+        "extraData": {},
+        "ignoreSimilarity": false,
+        "ioc": false,
+        "message": "### Discovered from:\n- Observable: **[url_pcap] - ftp://ftp[.]cloud[.]gcm/traffic/1052/1630584012_2021_09_02____15_00_12_719724[.]pcap**\n- Analyzer: **Moloch_1_7**",
+        "reports": {
+            "Crt_sh_Transparency_Logs_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "crt.sh",
+                        "predicate": "Certificates",
+                        "value": "0"
+                    }
+                ]
+            },
+            "CyberCrime-Tracker_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "CCT",
+                        "predicate": "C2 Search",
+                        "value": "0 hits"
+                    }
+                ]
+            },
+            "Cyberprotect_ThreatScore_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "Cyberprotect",
+                        "predicate": "ThreatScore",
+                        "value": "not in database"
+                    }
+                ]
+            },
+            "MISP_2_1": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "MISP",
+                        "predicate": "Search",
+                        "value": "0 events"
+                    }
+                ]
+            },
+            "Maltiverse_Report_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "safe",
+                        "namespace": "Maltiverse",
+                        "predicate": "Report",
+                        "value": "-"
+                    }
+                ]
+            },
+            "Shodan_DNSResolve_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "Shodan",
+                        "predicate": "DNS resolutions",
+                        "value": "1"
+                    }
+                ]
+            },
+            "SpamhausDBL_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "SpamhausDBL",
+                        "predicate": "return_code",
+                        "value": "NXDOMAIN"
+                    },
+                    {
+                        "level": "info",
+                        "namespace": "SpamhausDBL",
+                        "predicate": "classification",
+                        "value": "Clean"
+                    }
+                ]
+            },
+            "Threatcrowd_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "Threatcrowd",
+                        "predicate": "votes",
+                        "value": "None"
+                    }
+                ]
+            },
+            "URLhaus_2_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "URLhaus",
+                        "predicate": "Search",
+                        "value": "No results"
+                    }
+                ]
+            },
+            "Urlscan_io_Scan_0_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "urlscan.io",
+                        "predicate": "Scan",
+                        "value": "Overall Score:0"
+                    }
+                ]
+            },
+            "Urlscan_io_Search_0_1_1": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "urlscan.io",
+                        "predicate": "Search",
+                        "value": "0 result"
+                    }
+                ]
+            },
+            "VirusTotal_GetReport_3_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "VT",
+                        "predicate": "GetReport",
+                        "value": "0"
+                    }
+                ]
+            }
+        },
+        "sighted": false,
+        "startDate": 1630597504998,
+        "tags": [
+            "src:Moloch_1_7"
+        ],
+        "tlp": 2
+    },
+    {
+        "_createdAt": 1630597504854,
+        "_createdBy": "i.monahov@cloud.gcm",
+        "_id": "~2265620496",
+        "_type": "Observable",
+        "data": "194.226.26.36",
+        "dataType": "domain",
+        "extraData": {},
+        "ignoreSimilarity": false,
+        "ioc": false,
+        "message": "### Discovered from:\n- Observable: **[url_pcap] - ftp://ftp[.]cloud[.]gcm/traffic/1052/1630584012_2021_09_02____15_00_12_719724[.]pcap**\n- Analyzer: **Moloch_1_7**",
+        "reports": {
+            "Crt_sh_Transparency_Logs_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "crt.sh",
+                        "predicate": "Certificates",
+                        "value": "0"
+                    }
+                ]
+            },
+            "CyberCrime-Tracker_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "CCT",
+                        "predicate": "C2 Search",
+                        "value": "0 hits"
+                    }
+                ]
+            },
+            "Cyberprotect_ThreatScore_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "Cyberprotect",
+                        "predicate": "ThreatScore",
+                        "value": "not in database"
+                    }
+                ]
+            },
+            "MISP_2_1": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "MISP",
+                        "predicate": "Search",
+                        "value": "0 events"
+                    }
+                ]
+            },
+            "Maltiverse_Report_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "safe",
+                        "namespace": "Maltiverse",
+                        "predicate": "Report",
+                        "value": "-"
+                    }
+                ]
+            },
+            "Shodan_DNSResolve_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "Shodan",
+                        "predicate": "DNS resolutions",
+                        "value": "1"
+                    }
+                ]
+            },
+            "SpamhausDBL_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "SpamhausDBL",
+                        "predicate": "classification",
+                        "value": "Clean"
+                    },
+                    {
+                        "level": "info",
+                        "namespace": "SpamhausDBL",
+                        "predicate": "return_code",
+                        "value": "NXDOMAIN"
+                    }
+                ]
+            },
+            "Threatcrowd_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "Threatcrowd",
+                        "predicate": "votes",
+                        "value": "None"
+                    }
+                ]
+            },
+            "URLhaus_2_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "URLhaus",
+                        "predicate": "Search",
+                        "value": "No results"
+                    }
+                ]
+            },
+            "Urlscan_io_Scan_0_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "urlscan.io",
+                        "predicate": "Scan",
+                        "value": "Overall Score:0"
+                    }
+                ]
+            },
+            "Urlscan_io_Search_0_1_1": {
+                "taxonomies": [
+                    {
+                        "level": "suspicious",
+                        "namespace": "urlscan.io",
+                        "predicate": "Search",
+                        "value": "5 results"
+                    }
+                ]
+            },
+            "VirusTotal_GetReport_3_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "VT",
+                        "predicate": "GetReport",
+                        "value": "0"
+                    }
+                ]
+            }
+        },
+        "sighted": false,
+        "startDate": 1630597504854,
+        "tags": [
+            "src:Moloch_1_7"
+        ],
+        "tlp": 2
+    },
+    {
+        "_createdAt": 1630597296611,
+        "_createdBy": "i.monahov@cloud.gcm",
+        "_id": "~1528086720",
+        "_type": "Observable",
+        "data": "1052:194.226.26.120",
+        "dataType": "ip_home",
+        "extraData": {},
+        "ioc": false,
+        "reports": {
+            "Ivre_0_1": {
+                "taxonomies": [
+                    {
+                        "level": "safe",
+                        "namespace": "Ivre",
+                        "predicate": "count",
+                        "value": "open 0 ports"
+                    }
+                ]
+            },
+            "NCIRCC_GeoIP_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "safe",
+                        "namespace": "GeoIP",
+                        "predicate": "Country",
+                        "value": "Россия , ГосСОПКА"
+                    }
+                ]
+            },
+            "ZPMSig_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "safe",
+                        "namespace": "ZPM_Sensor",
+                        "predicate": "Status",
+                        "value": "online"
+                    }
+                ]
+            }
+        },
+        "sighted": false,
+        "startDate": 1630597296611,
+        "tags": [
+            "home"
+        ],
+        "tlp": 2
+    },
+    {
+        "_createdAt": 1630597296463,
+        "_createdBy": "i.monahov@cloud.gcm",
+        "_id": "~1651068952",
+        "_type": "Observable",
+        "data": "3005422, 3066221, 99010424, 99010425",
+        "dataType": "snort_sid",
+        "extraData": {},
+        "ioc": false,
+        "reports": {
+            "ZPMSig_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "zpmSig",
+                        "predicate": "Precision",
+                        "value": "unknown"
+                    }
+                ]
+            }
+        },
+        "sighted": false,
+        "startDate": 1630597296463,
+        "tags": [
+            "snort"
+        ],
+        "tlp": 2
+    },
+    {
+        "_createdAt": 1630597296327,
+        "_createdBy": "i.monahov@cloud.gcm",
+        "_id": "~1651064856",
+        "_type": "Observable",
+        "data": "1052:194.226.26.252",
+        "dataType": "ip_home",
+        "extraData": {},
+        "ioc": false,
+        "reports": {
+            "Ivre_0_1": {
+                "taxonomies": [
+                    {
+                        "level": "safe",
+                        "namespace": "Ivre",
+                        "predicate": "count",
+                        "value": "open 0 ports"
+                    }
+                ]
+            },
+            "NCIRCC_GeoIP_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "safe",
+                        "namespace": "GeoIP",
+                        "predicate": "Country",
+                        "value": "Россия , ГосСОПКА"
+                    }
+                ]
+            },
+            "ZPMSig_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "safe",
+                        "namespace": "ZPM_Sensor",
+                        "predicate": "Status",
+                        "value": "online"
+                    }
+                ]
+            }
+        },
+        "sighted": false,
+        "startDate": 1630597296327,
+        "tags": [
+            "home"
+        ],
+        "tlp": 2
+    },
+    {
+        "_createdAt": 1630597296580,
+        "_createdBy": "i.monahov@cloud.gcm",
+        "_id": "~1896870096",
+        "_type": "Observable",
+        "data": "1052:194.226.26.115",
+        "dataType": "ip_home",
+        "extraData": {},
+        "ioc": false,
+        "reports": {
+            "Ivre_0_1": {
+                "taxonomies": [
+                    {
+                        "level": "safe",
+                        "namespace": "Ivre",
+                        "predicate": "count",
+                        "value": "open 0 ports"
+                    }
+                ]
+            },
+            "NCIRCC_GeoIP_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "safe",
+                        "namespace": "GeoIP",
+                        "predicate": "Country",
+                        "value": "Россия , ГосСОПКА"
+                    }
+                ]
+            },
+            "ZPMSig_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "safe",
+                        "namespace": "ZPM_Sensor",
+                        "predicate": "Status",
+                        "value": "online"
+                    }
+                ]
+            }
+        },
+        "sighted": false,
+        "startDate": 1630597296580,
+        "tags": [
+            "home"
+        ],
+        "tlp": 2
+    },
+    {
+        "_createdAt": 1630597296346,
+        "_createdBy": "i.monahov@cloud.gcm",
+        "_id": "~1896861904",
+        "_type": "Observable",
+        "data": "3005391, 3005422, 3066221, 99010424",
+        "dataType": "snort_sid",
+        "extraData": {},
+        "ioc": false,
+        "reports": {
+            "ZPMSig_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "zpmSig",
+                        "predicate": "Precision",
+                        "value": "unknown"
+                    }
+                ]
+            }
+        },
+        "sighted": false,
+        "startDate": 1630597296346,
+        "tags": [
+            "snort"
+        ],
+        "tlp": 2
+    },
+    {
+        "_createdAt": 1630597296449,
+        "_createdBy": "i.monahov@cloud.gcm",
+        "_id": "~1937703072",
+        "_type": "Observable",
+        "data": "1052:194.226.26.127",
+        "dataType": "ip_home",
+        "extraData": {},
+        "ioc": false,
+        "reports": {
+            "Ivre_0_1": {
+                "taxonomies": [
+                    {
+                        "level": "safe",
+                        "namespace": "Ivre",
+                        "predicate": "count",
+                        "value": "open 0 ports"
+                    }
+                ]
+            },
+            "NCIRCC_GeoIP_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "safe",
+                        "namespace": "GeoIP",
+                        "predicate": "Country",
+                        "value": "Россия , ГосСОПКА"
+                    }
+                ]
+            },
+            "ZPMSig_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "safe",
+                        "namespace": "ZPM_Sensor",
+                        "predicate": "Status",
+                        "value": "online"
+                    }
+                ]
+            }
+        },
+        "sighted": false,
+        "startDate": 1630597296449,
+        "tags": [
+            "home"
+        ],
+        "tlp": 2
+    },
+    {
+        "_createdAt": 1630597296380,
+        "_createdBy": "i.monahov@cloud.gcm",
+        "_id": "~1528078528",
+        "_type": "Observable",
+        "data": "68.183.207.206",
+        "dataType": "ip",
+        "extraData": {},
+        "ioc": true,
+        "reports": {
+            "AbuseIPDB_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "malicious",
+                        "namespace": "AbuseIPDB",
+                        "predicate": "Records",
+                        "value": 3
+                    }
+                ]
+            },
+            "CyberCrime-Tracker_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "CCT",
+                        "predicate": "C2 Search",
+                        "value": "0 hits"
+                    }
+                ]
+            },
+            "Cyberprotect_ThreatScore_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "Cyberprotect",
+                        "predicate": "ThreatScore",
+                        "value": "not in database"
+                    }
+                ]
+            },
+            "MISP_2_1": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "MISP",
+                        "predicate": "Search",
+                        "value": "0 events"
+                    }
+                ]
+            },
+            "Maltiverse_Report_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "safe",
+                        "namespace": "Maltiverse",
+                        "predicate": "Report",
+                        "value": "-"
+                    }
+                ]
+            },
+            "NCIRCC_GeoIP_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "GeoIP",
+                        "predicate": "Country",
+                        "value": "Канада "
+                    }
+                ]
+            },
+            "Robtex_IP_Query_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "suspicious",
+                        "namespace": "Robtex",
+                        "predicate": "ActiveDNS",
+                        "value": "1 entries"
+                    },
+                    {
+                        "level": "suspicious",
+                        "namespace": "Robtex",
+                        "predicate": "PassiveDNS",
+                        "value": "1 entries"
+                    }
+                ]
+            },
+            "Robtex_Reverse_PDNS_Query_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "suspicious",
+                        "namespace": "Robtex",
+                        "predicate": "ReversePassiveDNS",
+                        "value": "1 entries"
+                    }
+                ]
+            },
+            "Threatcrowd_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "Threatcrowd",
+                        "predicate": "votes",
+                        "value": "None"
+                    }
+                ]
+            },
+            "URLhaus_2_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "URLhaus",
+                        "predicate": "Search",
+                        "value": "No results"
+                    }
+                ]
+            },
+            "Urlscan_io_Search_0_1_1": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "urlscan.io",
+                        "predicate": "Search",
+                        "value": "0 result"
+                    }
+                ]
+            },
+            "VirusTotal_GetReport_3_0": {
+                "taxonomies": [
+                    {
+                        "level": "safe",
+                        "namespace": "VT",
+                        "predicate": "GetReport",
+                        "value": "0 detected_url(s)"
+                    }
+                ]
+            },
+            "ZPMSig_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "ZPM_Sensor",
+                        "predicate": "IP",
+                        "value": "NotFound"
+                    }
+                ]
+            }
+        },
+        "sighted": false,
+        "startDate": 1630597296380,
+        "tags": [
+            "external"
+        ],
+        "tlp": 2
+    },
+    {
+        "_createdAt": 1630597296529,
+        "_createdBy": "i.monahov@cloud.gcm",
+        "_id": "~2511495400",
+        "_type": "Observable",
+        "data": "1052:194.226.26.250",
+        "dataType": "ip_home",
+        "extraData": {},
+        "ioc": false,
+        "reports": {
+            "Ivre_0_1": {
+                "taxonomies": [
+                    {
+                        "level": "safe",
+                        "namespace": "Ivre",
+                        "predicate": "count",
+                        "value": "open 0 ports"
+                    }
+                ]
+            },
+            "NCIRCC_GeoIP_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "safe",
+                        "namespace": "GeoIP",
+                        "predicate": "Country",
+                        "value": "Россия , ГосСОПКА"
+                    }
+                ]
+            },
+            "ZPMSig_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "safe",
+                        "namespace": "ZPM_Sensor",
+                        "predicate": "Status",
+                        "value": "online"
+                    }
+                ]
+            }
+        },
+        "sighted": false,
+        "startDate": 1630597296529,
+        "tags": [
+            "home"
+        ],
+        "tlp": 2
+    },
+    {
+        "_createdAt": 1630597296637,
+        "_createdBy": "i.monahov@cloud.gcm",
+        "_id": "~2511499496",
+        "_type": "Observable",
+        "data": "99010424",
+        "dataType": "snort_sid",
+        "extraData": {},
+        "ioc": false,
+        "reports": {
+            "ZPMSig_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "zpmSig",
+                        "predicate": "Precision",
+                        "value": "unknown"
+                    }
+                ]
+            }
+        },
+        "sighted": false,
+        "startDate": 1630597296637,
+        "tags": [
+            "snort"
+        ],
+        "tlp": 2
+    },
+    {
+        "_createdAt": 1630597296589,
+        "_createdBy": "i.monahov@cloud.gcm",
+        "_id": "~1896874192",
+        "_type": "Observable",
+        "data": "1052:194.226.26.185",
+        "dataType": "ip_home",
+        "extraData": {},
+        "ioc": false,
+        "reports": {
+            "Ivre_0_1": {
+                "taxonomies": [
+                    {
+                        "level": "safe",
+                        "namespace": "Ivre",
+                        "predicate": "count",
+                        "value": "open 0 ports"
+                    }
+                ]
+            },
+            "NCIRCC_GeoIP_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "safe",
+                        "namespace": "GeoIP",
+                        "predicate": "Country",
+                        "value": "Россия , ГосСОПКА"
+                    }
+                ]
+            },
+            "ZPMSig_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "safe",
+                        "namespace": "ZPM_Sensor",
+                        "predicate": "Status",
+                        "value": "online"
+                    }
+                ]
+            }
+        },
+        "sighted": false,
+        "startDate": 1630597296589,
+        "tags": [
+            "home"
+        ],
+        "tlp": 2
+    },
+    {
+        "_createdAt": 1630597296572,
+        "_createdBy": "i.monahov@cloud.gcm",
+        "_id": "~2716188800",
+        "_type": "Observable",
+        "data": "1052:194.226.26.68",
+        "dataType": "ip_home",
+        "extraData": {},
+        "ioc": false,
+        "reports": {
+            "Ivre_0_1": {
+                "taxonomies": [
+                    {
+                        "level": "safe",
+                        "namespace": "Ivre",
+                        "predicate": "count",
+                        "value": "open 0 ports"
+                    }
+                ]
+            },
+            "NCIRCC_GeoIP_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "safe",
+                        "namespace": "GeoIP",
+                        "predicate": "Country",
+                        "value": "Россия , ГосСОПКА"
+                    }
+                ]
+            },
+            "ZPMSig_1_0": {
+                "taxonomies": [
+                    {
+                        "level": "safe",
+                        "namespace": "ZPM_Sensor",
+                        "predicate": "Status",
+                        "value": "online"
+                    }
+                ]
+            }
+        },
+        "sighted": false,
+        "startDate": 1630597296572,
+        "tags": [
+            "home"
+        ],
+        "tlp": 2
+    },
+    {
+        "_createdAt": 1630597296602,
+        "_createdBy": "i.monahov@cloud.gcm",
+        "_id": "~2265456656",
+        "_type": "Observable",
+        "_updatedAt": 1630597509233,
+        "_updatedBy": "i.monahov@cloud.gcm",
+        "data": "ftp://ftp.cloud.gcm/traffic/1052/1630584012_2021_09_02____15_00_12_719724.pcap",
+        "dataType": "url_pcap",
+        "extraData": {},
+        "ioc": true,
+        "message": "Download a piece of traffic",
+        "reports": {
+            "Drill_1_2": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "Drill",
+                        "predicate": "Score",
+                        "value": 0
+                    }
+                ]
+            },
+            "Moloch_1_7": {
+                "taxonomies": [
+                    {
+                        "level": "info",
+                        "namespace": "Moloch",
+                        "predicate": "Uploading",
+                        "value": "1 pcap(s)"
+                    }
+                ]
+            }
+        },
+        "sighted": false,
+        "startDate": 1630597296602,
+        "tags": [],
+        "tlp": 2
+    }
+],
+"ttp": [
+    {
+        "_createdAt": 1630597436184,
+        "_createdBy": "i.monahov@cloud.gcm",
+        "_id": "~2716336256",
+        "extraData": {
+            "pattern": {
+                "_createdAt": 1616761481332,
+                "_createdBy": "architector@33c.rcm",
+                "_id": "~632606920",
+                "_type": "Pattern",
+                "dataSources": [
+                    "Packet capture",
+                    "Network device logs"
+                ],
+                "defenseBypassed": [],
+                "description": "Before compromising a victim, adversaries may scan victims for vulnerabilities that can be used during targeting. Vulnerability scans typically check if the configuration of a target host/application (ex: software and version) potentially aligns with the target of a specific exploit the adversary may seek to use.\n\nThese scans may also include more broad attempts to [Gather Victim Host Information](https://attack.mitre.org/techniques/T1592) that can be used to identify more commonly known, exploitable vulnerabilities. Vulnerability scans typically harvest running software and version numbers via server banners, listening ports, or other network artifacts.(Citation: OWASP Vuln Scanning) Information from these scans may reveal opportunities for other forms of reconnaissance (ex: [Search Open Websites/Domains](https://attack.mitre.org/techniques/T1593) or [Search Open Technical Databases](https://attack.mitre.org/techniques/T1596)), establishing operational resources (ex: [Develop Capabilities](https://attack.mitre.org/techniques/T1587) or [Obtain Capabilities](https://attack.mitre.org/techniques/T1588)), and/or initial access (ex: [Exploit Public-Facing Application](https://attack.mitre.org/techniques/T1190)).",
+                "detection": "Monitor for suspicious network traffic that could be indicative of scanning, such as large quantities originating from a single source (especially if the source is known to be associated with an adversary/botnet). Analyzing web metadata may also reveal artifacts that can be attributed to potentially malicious activity, such as referer or user-agent string HTTP/S fields.\n\nMuch of this activity may have a very high occurrence and associated false positive rate, as well as potentially taking place outside the visibility of the target organization, making detection difficult for defenders.\n\nDetection efforts may be focused on related stages of the adversary lifecycle, such as during Initial Access.",
+                "extraData": {},
+                "name": "Vulnerability Scanning",
+                "patternId": "T1595.002",
+                "patternType": "attack-pattern",
+                "permissionsRequired": [],
+                "platforms": [
+                    "PRE"
+                ],
+                "remoteSupport": false,
+                "revoked": false,
+                "systemRequirements": [],
+                "tactics": [
+                    "reconnaissance"
+                ],
+                "url": "https://attack.mitre.org/techniques/T1595/002",
+                "version": "1.0"
+            },
+            "patternParent": {
+                "_createdAt": 1616761464630,
+                "_createdBy": "architector@33c.rcm",
+                "_id": "~632316104",
+                "_type": "Pattern",
+                "dataSources": [
+                    "Packet capture",
+                    "Network device logs"
+                ],
+                "defenseBypassed": [],
+                "description": "Before compromising a victim, adversaries may execute active reconnaissance scans to gather information that can be used during targeting. Active scans are those where the adversary probes victim infrastructure via network traffic, as opposed to other forms of reconnaissance that do not involve direct interaction.\n\nAdversaries may perform different forms of active scanning depending on what information they seek to gather. These scans can also be performed in various ways, including using native features of network protocols such as ICMP.(Citation: Botnet Scan)(Citation: OWASP Fingerprinting) Information from these scans may reveal opportunities for other forms of reconnaissance (ex: [Search Open Websites/Domains](https://attack.mitre.org/techniques/T1593) or [Search Open Technical Databases](https://attack.mitre.org/techniques/T1596)), establishing operational resources (ex: [Develop Capabilities](https://attack.mitre.org/techniques/T1587) or [Obtain Capabilities](https://attack.mitre.org/techniques/T1588)), and/or initial access (ex: [External Remote Services](https://attack.mitre.org/techniques/T1133) or [Exploit Public-Facing Application](https://attack.mitre.org/techniques/T1190)).",
+                "detection": "Monitor for suspicious network traffic that could be indicative of scanning, such as large quantities originating from a single source (especially if the source is known to be associated with an adversary/botnet). Analyzing web metadata may also reveal artifacts that can be attributed to potentially malicious activity, such as referer or user-agent string HTTP/S fields.\n\nMuch of this activity may have a very high occurrence and associated false positive rate, as well as potentially taking place outside the visibility of the target organization, making detection difficult for defenders.\n\nDetection efforts may be focused on related stages of the adversary lifecycle, such as during Initial Access.",
+                "extraData": {},
+                "name": "Active Scanning",
+                "patternId": "T1595",
+                "patternType": "attack-pattern",
+                "permissionsRequired": [],
+                "platforms": [
+                    "PRE"
+                ],
+                "remoteSupport": false,
+                "revoked": false,
+                "systemRequirements": [],
+                "tactics": [
+                    "reconnaissance"
+                ],
+                "url": "https://attack.mitre.org/techniques/T1595",
+                "version": "1.0"
+            }
+        },
+        "occurDate": 1630597380000,
+        "patternId": "T1595.002",
+        "tactic": "reconnaissance"
+    }
+]
+}

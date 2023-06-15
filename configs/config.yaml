@@ -1,0 +1,8 @@
+LOGGING:
+  stdout: true
+  filesPath: "/logs"
+  fileType: [
+    "error",
+    "information"
+  ]
+  maxSize: 1024
