@@ -1,5 +1,5 @@
 NATS:
-  host: 192.168.9.201
+  host: nats.cloud.gcm
   port: 4222
 MISP:
   host: 192.168.9.202

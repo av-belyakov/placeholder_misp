@@ -19,14 +19,19 @@ type ConfigApp struct {
 }
 
 type CommonAppConfig struct {
-	Logging
+	LogList []LogSet
 }
 
-type Logging struct {
-	Stdout   bool
-	FilePath string
-	MaxSize  int
-	FileType []string
+type Logs struct {
+	Logging []LogSet
+}
+
+type LogSet struct {
+	MsgTypeName   string
+	WritingFile   bool
+	PathDirectory string
+	WritingStdout bool
+	MaxFileSize   int
 }
 
 type AppConfigNATS struct {
@@ -49,16 +54,25 @@ func NewConfig() (ConfigApp, error) {
 		"GO_PHMISP_NPORT": "",
 	}
 
-	getRootPath := func() (string, error) {
+	getRootPath := func(rootDir string) (string, error) {
 		currentDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 		if err != nil {
 			return "", err
 		}
 
 		tmp := strings.Split(currentDir, "/")
-		var path string = "/"
-		for i := 0; i < len(tmp)-1; i++ {
-			path += tmp[i] + "/"
+
+		if tmp[len(tmp)-1] == rootDir {
+			return currentDir, nil
+		}
+
+		var path string = ""
+		for _, v := range tmp {
+			path += v + "/"
+
+			if v == rootDir {
+				return path, nil
+			}
 		}
 
 		return path, nil
@@ -81,20 +95,14 @@ func NewConfig() (ConfigApp, error) {
 			return err
 		}
 
-		if viper.IsSet("LOGGING.stdout") {
-			conf.CommonAppConfig.Logging.Stdout = viper.GetBool("LOGGING.stdout")
-		}
+		ls := Logs{}
 
-		if viper.IsSet("LOGGING.filesPath") {
-			conf.CommonAppConfig.Logging.FilePath = viper.GetString("LOGGING.filesPath")
-		}
+		if ok := viper.IsSet("LOGGING"); ok {
+			if err := viper.GetViper().Unmarshal(&ls); err != nil {
+				return err
+			}
 
-		if viper.IsSet("LOGGING.maxSize") {
-			conf.CommonAppConfig.Logging.MaxSize = viper.GetInt("LOGGING.maxSize")
-		}
-
-		if viper.IsSet("LOGGING.fileType") {
-			conf.CommonAppConfig.Logging.FileType = viper.GetViper().GetStringSlice("LOGGING.fileType")
+			conf.CommonAppConfig.LogList = ls.Logging
 		}
 
 		return nil
@@ -132,7 +140,7 @@ func NewConfig() (ConfigApp, error) {
 		}
 	}
 
-	rootPath, err := getRootPath()
+	rootPath, err := getRootPath("placeholder_misp")
 	if err != nil {
 		return conf, err
 	}
@@ -150,7 +158,9 @@ func NewConfig() (ConfigApp, error) {
 	}
 
 	//читаем общий конфигурационный файл
-	setCommonSettings(fileNameCommon)
+	if err := setCommonSettings(fileNameCommon); err != nil {
+		return conf, err
+	}
 
 	var fn string
 	if envList["GO_PHMISP_MAIN"] == "development" {

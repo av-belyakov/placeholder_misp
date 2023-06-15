@@ -138,23 +138,23 @@ type ObservablesMessage struct {
 // Tlp - tlp
 // Reports - список отчетов
 type ObservableMessage struct {
-	CreatedAt        uint64                              `json:"_createdAt"`
-	CreatedBy        string                              `json:"_createdBy"`
-	UnderliningId    string                              `json:"_id"`
-	UnderliningType  string                              `json:"_type"`
-	UpdatedAt        uint64                              `json:"_updatedAt"`
-	UpdatedBy        string                              `json:"_updatedBy"`
-	Data             string                              `json:"data"`
-	DataType         string                              `json:"dataType"`
-	IgnoreSimilarity bool                                `json:"ignoreSimilarity"`
-	ExtraData        map[string]interface{}              `json:"extraData"`
-	Ioc              bool                                `json:"ioc"`
-	Message          string                              `json:"message"`
-	Sighted          bool                                `json:"sighted"`
-	StartDate        uint64                              `json:"startDate"`
-	Tags             []string                            `json:"tags"`
-	Tlp              int                                 `json:"tlp"`
-	Reports          map[string]map[string][]interface{} `json:"reports"`
+	CreatedAt        uint64                                         `json:"_createdAt"`
+	CreatedBy        string                                         `json:"_createdBy"`
+	UnderliningId    string                                         `json:"_id"`
+	UnderliningType  string                                         `json:"_type"`
+	UpdatedAt        uint64                                         `json:"_updatedAt"`
+	UpdatedBy        string                                         `json:"_updatedBy"`
+	Data             string                                         `json:"data"`
+	DataType         string                                         `json:"dataType"`
+	IgnoreSimilarity bool                                           `json:"ignoreSimilarity"`
+	ExtraData        map[string]interface{}                         `json:"extraData"`
+	Ioc              bool                                           `json:"ioc"`
+	Message          string                                         `json:"message"`
+	Sighted          bool                                           `json:"sighted"`
+	StartDate        uint64                                         `json:"startDate"`
+	Tags             []string                                       `json:"tags"`
+	Tlp              int                                            `json:"tlp"`
+	Reports          map[string]map[string][]map[string]interface{} `json:"reports"`
 }
 
 // TtpsMessage список TTP сообщений

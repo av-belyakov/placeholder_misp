@@ -39,34 +39,27 @@ func NewClientNATS(ctx context.Context, conf confighandler.AppConfigNATS) (*Enum
 
 	nc, err := nats.Connect(fmt.Sprintf("%s:%d", conf.Host, conf.Port))
 	if err != nil {
-
-		fmt.Println("func 'NewClientNATS', 111 ERROR...", err)
-
 		return &enumChannels, err
 	}
 
 	fmt.Println("func 'NewClientNATS', STATUS:", nc.Stats())
 
+	// Simple Async Subscriber
+	/*nc.Subscribe("foo", func(msg *nats.Msg) {
+		fmt.Printf("Received a message: %s\n", string(msg.Data))
+	})
+
 	// Simple Publisher
 	nc.Publish("foo", []byte("Hello World"))
+	time.Sleep(900 * time.Millisecond)
+	nc.Publish("foo", []byte("Send messgae after sleep 2s"))
 
-	// Simple Async Subscriber
-	nc.Subscribe("foo", func(msg *nats.Msg) {
-		fmt.Printf("Received a message: %s\n", string(msg.Data))
+	fmt.Println("func 'NewClientNATS', END")*/
+
+	nc.Subscribe("main_caseupdate" /*"nkcki.notification.feedback"*/, func(msg *nats.Msg) {
+		//fmt.Printf("Received a message: %s\n", string(msg.Data))
+		enumChannels.chanOutput <- msg.Data
 	})
-
-	/*nc.Subscribe("nkcki.notification.feedback", func(msg *nats.Msg) {
-		fmt.Printf("Received a message: %s\n", string(msg.Data))
-	})
-
-	//msg, err := nc.RequestWithContext(ctx, "foo", []byte("bar"))
-	/*go func(nc *nats.Conn) {
-		for {
-			nc.Subscribe("nkcki.notification.feedback", func(msg *nats.Msg) {
-				fmt.Printf("Received a message: %s\n", string(msg.Data))
-			})
-		}
-	}(nc)*/
 
 	return &enumChannels, nil
 }

@@ -21,7 +21,8 @@ func NewCore(
 	for {
 		select {
 		case data := <-natsChanReception:
-			fmt.Println("func 'NewCore', NATS reseived message from chanOutNATS: ", data)
+			//fmt.Println("func 'NewCore', NATS reseived message from chanOutNATS: ", data)
+			_ = sl.WriteLoggingData(fmt.Sprintln(data), "info")
 
 		case data := <-mispChanReception:
 			fmt.Println("func 'NewCore', MISP reseived message from chanOutMISP: ", data)

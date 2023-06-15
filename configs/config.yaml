@@ -1,8 +1,3 @@
-LOGGING:
-  stdout: true
-  filesPath: "/logs"
-  fileType: [
-    "error",
-    "information"
-  ]
-  maxSize: 1024
+LOGGING: 
+  - { msgTypeName: "error", writingFile: true, pathDirectory: "logs", writingStdout: false, maxFileSize: 1024 }
+  - { msgTypeName: "info", writingFile: true, pathDirectory: "logs", writingStdout: true, maxFileSize: 1024 }
