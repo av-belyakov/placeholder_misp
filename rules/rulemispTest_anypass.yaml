@@ -1,0 +1,12 @@
+RULLES:
+  - { 
+      fieldName: "dataType", 
+      actionType: "anypass", 
+      requiredValue: 
+        {valueType: "string", value: ""}, 
+      desiredValue: 
+        {valueType: "string", value: ""}, 
+      replacedValue: 
+        {valueType: "string", value: ""},
+      listRelatedFields:
+        {}}

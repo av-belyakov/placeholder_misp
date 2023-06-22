@@ -5,39 +5,87 @@ import (
 	"fmt"
 
 	"placeholder_misp/confighandler"
+	"placeholder_misp/datamodels"
 )
 
-var enumChannels EnumChannelsMISP
+var mmisp ModuleMISP
 
-// enumChannelsMISP перечень каналов для взаимодействия с модулем
-// chanInput - канал для отправки данных в модуль
-// chanOutput - канал для принятия данных из модуля
-type EnumChannelsMISP struct {
-	chanInput  chan interface{}
-	chanOutput chan interface{}
+// ModuleMISP инициализированный модуль
+// chanInputMISP - канал для отправки данных в модуль
+// chanOutputMISP - канал для принятия данных из модуля
+// ChanLogging - канал для отправки логов
+type ModuleMISP struct {
+	chanInputMISP  chan interface{}
+	chanOutputMISP chan interface{}
+	ChanLogging    chan<- datamodels.MessageLoging
 }
 
 func init() {
-	enumChannels = EnumChannelsMISP{
-		chanInput:  make(chan interface{}),
-		chanOutput: make(chan interface{}),
+	mmisp = ModuleMISP{
+		chanInputMISP:  make(chan interface{}),
+		chanOutputMISP: make(chan interface{}),
 	}
 }
 
-func NewClientMISP(ctx context.Context, conf confighandler.AppConfigMISP) (*EnumChannelsMISP, error) {
+func NewClientMISP(
+	ctx context.Context,
+	conf confighandler.AppConfigMISP,
+	chanLog chan<- datamodels.MessageLoging) (*ModuleMISP, error) {
 	fmt.Println("func 'NewClientMISP', START...")
 
-	return &enumChannels, nil
+	mmisp.ChanLogging = chanLog
+
+	/*
+		Здесь нужно написать инициализацию подключения к MISP
+	*/
+
+	return &mmisp, nil
 }
 
-func (ecmisp EnumChannelsMISP) GetDataReceptionChannel() <-chan interface{} {
-	return ecmisp.chanOutput
+func (mmisp ModuleMISP) GetDataReceptionChannel() <-chan interface{} {
+	/*
+		для формирование правильного сообщения об ошибке
+		if err != nil {
+			_, f, l, _ := runtime.Caller(0)
+
+			mmisp.ChanLogging <- datamodels.MessageLoging{
+				MsgData: fmt.Sprintf("%s %s:%d", fmt.Sprint(err), f, l-2),
+				MsgType: "error",
+			}
+		}
+	*/
+
+	return mmisp.chanOutputMISP
 }
 
-func (ecmisp EnumChannelsMISP) GettingData() interface{} {
-	return <-ecmisp.chanOutput
+func (mmisp ModuleMISP) GettingData() interface{} {
+	/*
+		для формирование правильного сообщения об ошибке
+		if err != nil {
+			_, f, l, _ := runtime.Caller(0)
+
+			mmisp.ChanLogging <- datamodels.MessageLoging{
+				MsgData: fmt.Sprintf("%s %s:%d", fmt.Sprint(err), f, l-2),
+				MsgType: "error",
+			}
+		}
+	*/
+
+	return <-mmisp.chanOutputMISP
 }
 
-func (ecmisp EnumChannelsMISP) SendingData(data interface{}) {
-	ecmisp.chanInput <- data
+func (mmisp ModuleMISP) SendingData(data interface{}) {
+	/*
+		для формирование правильного сообщения об ошибке
+		if err != nil {
+			_, f, l, _ := runtime.Caller(0)
+
+			mmisp.ChanLogging <- datamodels.MessageLoging{
+				MsgData: fmt.Sprintf("%s %s:%d", fmt.Sprint(err), f, l-2),
+				MsgType: "error",
+			}
+		}
+	*/
+
+	mmisp.chanInputMISP <- data
 }

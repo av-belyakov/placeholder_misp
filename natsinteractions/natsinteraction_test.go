@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -13,123 +13,33 @@ import (
 	. "github.com/onsi/gomega"
 
 	"placeholder_misp/confighandler"
+	"placeholder_misp/coremodule"
 	"placeholder_misp/datamodels"
 	"placeholder_misp/natsinteractions"
+	"placeholder_misp/rules"
+	"placeholder_misp/supportingfunctions"
 	"placeholder_misp/tmpdata"
 )
 
-func readReflectAnyType(name, anyType interface{}) string {
-	var str, nameStr string
-	r := reflect.TypeOf(anyType)
-
-	if n, ok := name.(int); ok {
-		nameStr = fmt.Sprintf("%v.", n)
-	} else if n, ok := name.(string); ok {
-		name = fmt.Sprintln(n, ": ")
-	}
-
-	if r == nil {
-		return str
-	}
-
-	switch r.Kind() {
-	case reflect.String:
-		str += fmt.Sprintf("\t - %s %s\n", nameStr, reflect.ValueOf(anyType).String())
-
-	case reflect.Int, reflect.Int16, reflect.Int32, reflect.Int64:
-		str += fmt.Sprintf("\t - %s %d\n", nameStr, reflect.ValueOf(anyType).Int())
-
-	case reflect.Uint, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		str += fmt.Sprintf("\t - %s %d\n", nameStr, reflect.ValueOf(anyType).Uint())
-
-	case reflect.Float32, reflect.Float64:
-		str += fmt.Sprintf("\t - %s %v\n", nameStr, reflect.ValueOf(anyType).Float())
-
-	case reflect.Bool:
-		str += fmt.Sprintf("\t - %s %v\n", nameStr, reflect.ValueOf(anyType).Bool())
-	}
-
-	return str
-}
-
-func readReflectMap(list map[string]interface{}) string {
-	var str string
-
-	for k, v := range list {
-		r := reflect.TypeOf(v)
-
-		if r == nil {
-			return str
-		}
-
-		str += readReflectAnyType(k, v)
-
-		switch r.Kind() {
-		case reflect.Map:
-			if v, ok := v.(map[string]interface{}); ok {
-				str += readReflectMap(v)
-			}
-
-		case reflect.Slice:
-			if v, ok := v.([]interface{}); ok {
-				str += redReflectSlice(v)
-			}
-
-		case reflect.Array:
-			str += fmt.Sprintf("%s: %s (it is array)\n", k, reflect.ValueOf(v).String())
-		}
-	}
-
-	return str
-}
-
-func redReflectSlice(list []interface{}) string {
-	var str string
-
-	for k, v := range list {
-		r := reflect.TypeOf(v)
-
-		if r == nil {
-			return str
-		}
-
-		str += readReflectAnyType(k, v)
-
-		switch r.Kind() {
-		case reflect.Map:
-			if v, ok := v.(map[string]interface{}); ok {
-				str += readReflectMap(v)
-			}
-
-		case reflect.Slice:
-			if v, ok := v.([]interface{}); ok {
-				str += redReflectSlice(v)
-			}
-
-		case reflect.Array:
-			str += fmt.Sprintf("%d. %s (it is array)\n", k, reflect.ValueOf(v).String())
-		}
-	}
-
-	return str
-}
-
 var _ = Describe("Natsinteraction", Ordered, func() {
 	var (
-		ctx          context.Context
-		errConn      error
-		closeCtx     context.CancelFunc
-		enumChannels *natsinteractions.EnumChannelsNATS
+		ctx      context.Context
+		errConn  error
+		closeCtx context.CancelFunc
+		mnats    *natsinteractions.ModuleNATS
+		chanLog  chan<- datamodels.MessageLoging
 	)
 
 	BeforeAll(func() {
+		chanLog = make(chan<- datamodels.MessageLoging)
+
 		ctx, closeCtx = context.WithTimeout(context.Background(), 2*time.Second)
 
-		enumChannels, errConn = natsinteractions.NewClientNATS(ctx, confighandler.AppConfigNATS{
+		mnats, errConn = natsinteractions.NewClientNATS(ctx, confighandler.AppConfigNATS{
 			//Host: "nats.cloud.gcm",
 			Host: "127.0.0.1",
 			Port: 4222,
-		})
+		}, chanLog)
 	})
 
 	Context("Тест 1.1. Проверка декадирования тестовых данных из файла 'binaryDataOne'", func() {
@@ -205,41 +115,123 @@ var _ = Describe("Natsinteraction", Ordered, func() {
 			mm := datamodels.MainMessage{}
 			err := json.Unmarshal(exampleByte, &mm)
 
-			fmt.Println("---- ExampleDataThree ----")
-			fmt.Println(mm.ToStringBeautiful(0))
-			fmt.Println("--------------------------")
+			//fmt.Println("---- ExampleDataThree ----")
+			//fmt.Println(mm.ToStringBeautiful(0))
+			//fmt.Println("--------------------------")
+
+			/*
+				Почему то свойство event в известном типе пустое, хотя методом reflection оно полное
+				свойство observables типа соответствует результатам reflection
+
+				!!!!!!!!!!!!!!!!!
+				Похоже методом рефлексии получается больше полей и данных (во всяком случае со свойством event)
+				1. Можно написать функцию сравнени, которая методом рефлексии приводит данные из описанного типа datamodels.MainMessage{}
+				и сравнивает их с сырыми данными обработанными методом рефлексии.
+				2. Возможно пользовательский тип event не заполняется из-за каких нибудь ошибок реализации типа EventMessage.
+				3. САМОЕ ГЛАВНОЕ. Может вообще не стоит приводить данные к каким либо типам, а методом рефлексии парсить сырые данные,
+				искать в них попутно те поля данные которых нужно заменить или получить, выполнять данные действия и отправлять объект
+				через JSON.Marshling в MISP
+
+				Для отправки логов в zabbix см. https://habr.com/ru/companies/nixys/news/503104/
+				!!!!!!!!!!!!!!!!!
+			*/
 
 			Expect(err).ShouldNot(HaveOccurred())
 		})
 
 		It("При анмаршалинге в НЕИЗВЕСТНЫЙ тип ошибки быть не должно", func() {
-			result := map[string]interface{}{}
-
-			err := json.Unmarshal(exampleByte, &result)
 
 			/*
-				Можно попробовать описать все типы для объектов сообщений из примера,
-				потом путем определения наименования поля подставлять типы формируя итоговый тип.
-				Все наименования полей для которых нет типа записывать в отдельный файл для их дольнейшго
-				анализа.
-				Вопрос, как формировать итоговый тип который должен состоять из переменного числа объектов?
+				Теперь для вывода данных из JSON сообщения используется функция
 			*/
 
-			fmt.Println("---- REFLECTION MAPPING ExampleDataThree ----")
-			fmt.Println(fmt.Println(readReflectMap(result)))
-			fmt.Println("---------------------------------------------")
+			_, err := supportingfunctions.NewReadReflectJSONSprint(exampleByte)
 
-			/* сделал но надо облагородить с пробелами и нет наименование полей почему то */
+			/*
+				!!!!!!
+				В coremodule.decodeMessageReflect тестово реализованна возможность замены
+				строковых данных в определенных полях, подробнее смотреть в функции readReflectAnyTypeSprint
+				надо написать для других типов, таких как int, bool. И сделать замену на основе правил из
+				пакета rules
+				!!!!!!
+
+				result := map[string]interface{}{}
+				err := json.Unmarshal(exampleByte, &result)
+				Expect(err).ShouldNot(HaveOccurred())
+
+				strData := coremodule.ReadReflectMapSprint(result, rules.ListRulesProcessedMISPMessage{}, 0)
+				Expect(err).ShouldNot(HaveOccurred())
+			*/
+
+			//fmt.Println("---- REFLECTION MAPPING ExampleDataThree ----")
+			//fmt.Println(strData)
+			//fmt.Println("---------------------------------------------")
 
 			Expect(err).ShouldNot(HaveOccurred())
 		})
 	})
 
-	Context("Тест 2. Проверка инициализации соединения с NATS", func() {
+	Context("Тест 2. Проверка замены некоторых значений в json файле", func() {
+		var eb []byte
+
+		for _, v := range strings.Split(tmpdata.GetExampleDataThree(), " ") {
+			i, err := strconv.Atoi(v)
+			if err != nil {
+				continue
+			}
+
+			eb = append(eb, uint8(i))
+		}
+
+		It("Должны быть заменены все поля dataType содержащие значение 'snort'", func() {
+			strData, err := supportingfunctions.NewReadReflectJSONSprint(eb)
+			Expect(err).ShouldNot(HaveOccurred())
+
+			reg := regexp.MustCompile(`dataType: \'[a-z_]+\'`)
+			fmt.Println("____BEFORE refflect modify____ strData:", strData)
+			bl := reg.FindAllString(strData, 10)
+			for k, v := range bl {
+				fmt.Printf("%d. %s\n", k+1, v)
+			}
+
+			//
+			// Далее модифицируем поле dataType содержащие значение 'snort'
+			//
+			// Прям сразу тест не пройдет, надо переписать функцию coremodule.ReadReflectMapSprint что бы она возвращала
+			// не строку, а []byte (а еще лучьше делать замену по ссылке), которые потом можно было бы передать в
+			// supportingfunctions.NewReadReflectJSONSprint(eb) для просмотра успешности замены
+			//
+
+			//err = coremodule.NewProcessingInputMessageFromHive(&eb, rules.ListRulesProcessedMISPMessage{})
+			newByte, err := coremodule.NewProcessingInputMessageFromHiveTest(eb, rules.ListRulesProcessedMISPMessage{})
+			Expect(err).ShouldNot(HaveOccurred())
+
+			sd, err := supportingfunctions.NewReadReflectJSONSprint(newByte)
+			Expect(err).ShouldNot(HaveOccurred())
+
+			fmt.Println("____AFTER refflect modify____:")
+			al := reg.FindAllString(sd, 10)
+			for k, v := range al {
+				fmt.Printf("%d. %s\n", k+1, v)
+			}
+
+			/*strData = coremodule.ReadReflectMapSprint(result, rules.ListRulesProcessedMISPMessage{}, 0)
+			fmt.Println("")
+			fmt.Println("|||||||", strData, "|||||||")
+			al = reg.FindAllString(strData, 10)
+			for k, v := range al {
+				fmt.Printf("%d. %s\n", k+1, v)
+			}
+
+			Expect(err).ShouldNot(HaveOccurred())*/
+		})
+	})
+
+	Context("Тест 3. Проверка инициализации соединения с NATS", func() {
 		It("При инициализации соединения с NATS не должно быть ошибки", func() {
 			Expect(errConn).ShouldNot(HaveOccurred())
 
-			fmt.Println("Resevid message = ", <-enumChannels.GetDataReceptionChannel())
+			fmt.Println("Resevid message = ", <-mnats.GetDataReceptionChannel())
 		})
 	})
 
@@ -247,3 +239,119 @@ var _ = Describe("Natsinteraction", Ordered, func() {
 		closeCtx()
 	})
 })
+
+/*
+	Извесный тип
+ttps:
+  ttp:
+    1.
+      _createdAt: '1686652917436'
+      _createdBy: 'p.delyukin@cloud.rcm'
+      _id: '~248369200'
+        _createdAt: '1679910385644'
+        _createdBy: 'admin@thehive.local'
+        _id: '~282632'
+        _type: 'Pattern'
+        dataSources:
+          1. 'User Account: User Account Authentication'
+          2. 'Command: Command Execution'
+          3. 'Application Log: Application Log Content'
+        defenseBypassed:
+        description: 'Adversaries may use brute force techniques to gain access to accounts when passwords are unknown or when password hashes are obtained. Without knowledge of the password for an account or set of accounts, an adversary may systematically guess the password using a repetitive or iterative mechanism. Brute forcing passwords can take place via interaction with a service that will check the validity of those credentials or offline against previously acquired credential data, such as password hashes.
+
+Brute forcing credentials may take place at various points during a breach. For example, adversaries may attempt to brute force access to [Valid Accounts](https://attack.mitre.org/techniques/T1078) within a victim environment leveraging knowledge gathered from other post-compromise behaviors such as [OS Credential Dumping](https://attack.mitre.org/techniques/T1003), [Account Discovery](https://attack.mitre.org/techniques/T1087), or [Password Policy Discovery](https://attack.mitre.org/techniques/T1201). Adversaries may also combine brute forcing activity with behaviors such as [External Remote Services](https://attack.mitre.org/techniques/T1133) as part of Initial Access.'
+        extraData:
+        name: 'Brute Force'
+        patternId: 'T1110'
+        patternType: 'attack-pattern'
+        permissionsRequired:
+        platforms:
+          1. 'Windows'
+          2. 'Azure AD'
+          3. 'Office 365'
+          4. 'SaaS'
+          5. 'IaaS'
+          6. 'Linux'
+          7. 'macOS'
+          8. 'Google Workspace'
+          9. 'Containers'
+          10. 'Network'
+        remoteSupport: 'false'
+        revoked: 'false'
+        systemRequirements:
+        tactics:
+          1. 'credential-access'
+        URL: 'https://attack.mitre.org/techniques/T1110'
+        version: '2.4'
+        _createdAt: '0'
+        _createdBy: ''
+        _id: ''
+        _type: ''
+        dataSources:
+        defenseBypassed:
+        description: ''
+        extraData:
+        name: ''
+        patternId: ''
+        patternType: ''
+        permissionsRequired:
+        platforms:
+        remoteSupport: 'false'
+        revoked: 'false'
+        systemRequirements:
+        tactics:
+        URL: ''
+        version: ''
+      occurDate: '1686652860000'
+      patternId: 'T1110'
+      tactic: 'credential-access'
+
+	REFLECTION MAPPING
+	ttp:
+    occurDate: 1686652860000
+    patternId: 'T1110'
+    tactic: 'credential-access'
+    _createdAt: 1686652917436
+    _createdBy: 'p.delyukin@cloud.rcm'
+    _id: '~248369200'
+    extraData:
+      pattern:
+        platforms:
+          1. 'Windows'
+          2. 'Azure AD'
+          3. 'Office 365'
+          4. 'SaaS'
+          5. 'IaaS'
+          6. 'Linux'
+          7. 'macOS'
+          8. 'Google Workspace'
+          9. 'Containers'
+          10. 'Network'
+        remoteSupport: false
+        url: 'https://attack.mitre.org/techniques/T1110'
+        version: '2.4'
+        capecId: 'CAPEC-49'
+        _createdBy: 'admin@thehive.local'
+        _id: '~282632'
+        dataSources:
+          1. 'User Account: User Account Authentication'
+          2. 'Command: Command Execution'
+          3. 'Application Log: Application Log Content'
+        description: 'Adversaries may use brute force techniques to gain access to accounts when passwords are unknown or when password hashes are obtained. Without knowledge of the password for an account or set of accounts, an adversary may systematically guess the password using a repetitive or iterative mechanism. Brute forcing passwords can take place via interaction with a service that will check the validity of those credentials or offline against previously acquired credential data, such as password hashes.
+
+Brute forcing credentials may take place at various points during a breach. For example, adversaries may attempt to brute force access to [Valid Accounts](https://attack.mitre.org/techniques/T1078) within a victim environment leveraging knowledge gathered from other post-compromise behaviors such as [OS Credential Dumping](https://attack.mitre.org/techniques/T1003), [Account Discovery](https://attack.mitre.org/techniques/T1087), or [Password Policy Discovery](https://attack.mitre.org/techniques/T1201). Adversaries may also combine brute forcing activity with behaviors such as [External Remote Services](https://attack.mitre.org/techniques/T1133) as part of Initial Access.'
+        extraData:
+        name: 'Brute Force'
+        patternType: 'attack-pattern'
+        _createdAt: 1679910385644
+        revoked: false
+        capecUrl: 'https://capec.mitre.org/data/definitions/49.html'
+        defenseBypassed:
+        detection: 'Monitor authentication logs for system and application login failures of [Valid Accounts](https://attack.mitre.org/techniques/T1078). If authentication failures are high, then there may be a brute force attempt to gain access to a system using legitimate credentials. Also monitor for many failed authentication attempts across various accounts that may result from password spraying attempts. It is difficult to detect when hashes are cracked, since this is generally done outside the scope of the target network.'
+        patternId: 'T1110'
+        systemRequirements:
+        _type: 'Pattern'
+        tactics:
+          1. 'credential-access'
+        permissionsRequired:
+*/

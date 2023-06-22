@@ -5,11 +5,11 @@ import (
 	"io/fs"
 	"os"
 	"path"
-	"path/filepath"
 	"strconv"
-	"strings"
 
 	"github.com/spf13/viper"
+
+	"placeholder_misp/supportingfunctions"
 )
 
 type ConfigApp struct {
@@ -52,30 +52,6 @@ func NewConfig() (ConfigApp, error) {
 		"GO_PHMISP_MPORT": "",
 		"GO_PHMISP_NHOST": "",
 		"GO_PHMISP_NPORT": "",
-	}
-
-	getRootPath := func(rootDir string) (string, error) {
-		currentDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-		if err != nil {
-			return "", err
-		}
-
-		tmp := strings.Split(currentDir, "/")
-
-		if tmp[len(tmp)-1] == rootDir {
-			return currentDir, nil
-		}
-
-		var path string = ""
-		for _, v := range tmp {
-			path += v + "/"
-
-			if v == rootDir {
-				return path, nil
-			}
-		}
-
-		return path, nil
 	}
 
 	getFileName := func(sf, confPath string, lfs []fs.DirEntry) (string, error) {
@@ -140,7 +116,7 @@ func NewConfig() (ConfigApp, error) {
 		}
 	}
 
-	rootPath, err := getRootPath("placeholder_misp")
+	rootPath, err := supportingfunctions.GetRootPath("placeholder_misp")
 	if err != nil {
 		return conf, err
 	}
