@@ -1,14 +1,13 @@
 package coremodule
 
 import (
-	"encoding/json"
 	"fmt"
 	"runtime"
 
 	"placeholder_misp/datamodels"
 	"placeholder_misp/mispinteractions"
 	"placeholder_misp/natsinteractions"
-	"placeholder_misp/rules"
+	"placeholder_misp/supportingfunctions"
 )
 
 func NewCore(
@@ -23,10 +22,7 @@ func NewCore(
 	for {
 		select {
 		case data := <-natsChanReception:
-			//fmt.Println("func 'NewCore', NATS reseived message from chanOutNATS: ", data)
-			result := map[string]interface{}{}
-
-			err := json.Unmarshal(data, &result)
+			strMsg, err := supportingfunctions.NewReadReflectJSONSprint(data)
 			if err != nil {
 				_, f, l, _ := runtime.Caller(0)
 
@@ -37,9 +33,6 @@ func NewCore(
 
 				continue
 			}
-
-			strMsg := ReadReflectMapSprint(result, rules.ListRulesProcessedMISPMessage{}, 0)
-			//_ = sl.WriteLoggingData(strMsg, "info")
 
 			msgOutChan <- datamodels.MessageLoging{
 				MsgData: strMsg,

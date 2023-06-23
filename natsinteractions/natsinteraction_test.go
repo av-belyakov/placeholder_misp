@@ -187,43 +187,36 @@ var _ = Describe("Natsinteraction", Ordered, func() {
 			strData, err := supportingfunctions.NewReadReflectJSONSprint(eb)
 			Expect(err).ShouldNot(HaveOccurred())
 
-			reg := regexp.MustCompile(`dataType: \'[a-z_]+\'`)
-			fmt.Println("____BEFORE refflect modify____ strData:", strData)
+			reg := regexp.MustCompile(`dataType: \'[a-zA-Z_]+\'`)
+			fmt.Println("____BEFORE reflect modify____ strData:", strData)
 			bl := reg.FindAllString(strData, 10)
 			for k, v := range bl {
 				fmt.Printf("%d. %s\n", k+1, v)
 			}
 
-			//
-			// Далее модифицируем поле dataType содержащие значение 'snort'
-			//
-			// Прям сразу тест не пройдет, надо переписать функцию coremodule.ReadReflectMapSprint что бы она возвращала
-			// не строку, а []byte (а еще лучьше делать замену по ссылке), которые потом можно было бы передать в
-			// supportingfunctions.NewReadReflectJSONSprint(eb) для просмотра успешности замены
-			//
+			listRules, err := rules.GetRuleProcessedMISPMsg("rules", "processedmispmsg.yaml")
+			Expect(err).ShouldNot(HaveOccurred())
 
-			//err = coremodule.NewProcessingInputMessageFromHive(&eb, rules.ListRulesProcessedMISPMessage{})
-			newByte, err := coremodule.NewProcessingInputMessageFromHiveTest(eb, rules.ListRulesProcessedMISPMessage{})
+			newByte, err := coremodule.NewProcessingInputMessageFromHive(eb, listRules)
 			Expect(err).ShouldNot(HaveOccurred())
 
 			sd, err := supportingfunctions.NewReadReflectJSONSprint(newByte)
 			Expect(err).ShouldNot(HaveOccurred())
 
-			fmt.Println("____AFTER refflect modify____:")
+			fmt.Println("____AFTER reflect modify____:")
+			//fmt.Println(sd)
+
+			var dataIsExist bool
 			al := reg.FindAllString(sd, 10)
 			for k, v := range al {
+				if strings.Contains(v, "TEST_SNORT_ID") {
+					dataIsExist = true
+				}
+
 				fmt.Printf("%d. %s\n", k+1, v)
 			}
 
-			/*strData = coremodule.ReadReflectMapSprint(result, rules.ListRulesProcessedMISPMessage{}, 0)
-			fmt.Println("")
-			fmt.Println("|||||||", strData, "|||||||")
-			al = reg.FindAllString(strData, 10)
-			for k, v := range al {
-				fmt.Printf("%d. %s\n", k+1, v)
-			}
-
-			Expect(err).ShouldNot(HaveOccurred())*/
+			Expect(dataIsExist).Should(BeTrue())
 		})
 	})
 

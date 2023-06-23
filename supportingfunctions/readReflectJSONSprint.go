@@ -69,7 +69,7 @@ func readReflectMapSprint(list map[string]interface{}, num int) string {
 			return str
 		}
 
-		str += readReflectAnyTypeSprint(k, v, num)
+		//str += readReflectAnyTypeSprint(k, v, num)
 
 		switch r.Kind() {
 		case reflect.Map:
@@ -87,6 +87,9 @@ func readReflectMapSprint(list map[string]interface{}, num int) string {
 
 		case reflect.Array:
 			str += fmt.Sprintf("%s: %s (it is array)\n", k, reflect.ValueOf(v).String())
+
+		default:
+			str += readReflectAnyTypeSprint(k, v, num)
 		}
 	}
 
@@ -95,6 +98,7 @@ func readReflectMapSprint(list map[string]interface{}, num int) string {
 
 func readReflectSliceSprint(list []interface{}, num int) string {
 	var str string
+	ws := GetWhitespace(num)
 
 	for k, v := range list {
 		r := reflect.TypeOf(v)
@@ -103,21 +107,26 @@ func readReflectSliceSprint(list []interface{}, num int) string {
 			return str
 		}
 
-		str += readReflectAnyTypeSprint(k, v, num)
+		//str += readReflectAnyTypeSprint(k, v, num)
 
 		switch r.Kind() {
 		case reflect.Map:
 			if v, ok := v.(map[string]interface{}); ok {
+				str += fmt.Sprintf("%s%d.\n", ws, k+1)
 				str += readReflectMapSprint(v, num+1)
 			}
 
 		case reflect.Slice:
 			if v, ok := v.([]interface{}); ok {
+				str += fmt.Sprintf("%s%d.\n", ws, k+1)
 				str += readReflectSliceSprint(v, num+1)
 			}
 
 		case reflect.Array:
 			str += fmt.Sprintf("%d. %s (it is array)\n", k, reflect.ValueOf(v).String())
+
+		default:
+			str += readReflectAnyTypeSprint(k, v, num)
 		}
 	}
 
