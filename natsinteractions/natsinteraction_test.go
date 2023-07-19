@@ -16,7 +16,7 @@ import (
 	"placeholder_misp/coremodule"
 	"placeholder_misp/datamodels"
 	"placeholder_misp/natsinteractions"
-	"placeholder_misp/rules"
+	rules "placeholder_misp/rulesinteraction"
 	"placeholder_misp/supportingfunctions"
 	"placeholder_misp/tmpdata"
 )
@@ -30,6 +30,10 @@ var _ = Describe("Natsinteraction", Ordered, func() {
 		chanLog  chan<- datamodels.MessageLoging
 	)
 
+	/*
+		Для отправки логов в zabbix см. https://habr.com/ru/companies/nixys/news/503104/
+	*/
+
 	BeforeAll(func() {
 		chanLog = make(chan<- datamodels.MessageLoging)
 
@@ -42,7 +46,7 @@ var _ = Describe("Natsinteraction", Ordered, func() {
 		}, chanLog)
 	})
 
-	Context("Тест 1.1. Проверка декадирования тестовых данных из файла 'binaryDataOne'", func() {
+	Context("Тест 1.1. Проверка декодирования тестовых данных из файла 'binaryDataOne'", func() {
 		var exampleByte []byte
 
 		for _, v := range strings.Split(tmpdata.GetExampleDataOne(), " ") {
@@ -75,7 +79,7 @@ var _ = Describe("Natsinteraction", Ordered, func() {
 		})
 	})
 
-	Context("Тест 1.2. Проверка декадирования тестовых данных из файла 'binaryDataTwo'", func() {
+	Context("Тест 1.2. Проверка декодирования тестовых данных из файла 'binaryDataTwo'", func() {
 		var exampleByte []byte
 
 		for _, v := range strings.Split(tmpdata.GetExampleDataTwo(), " ") {
@@ -99,7 +103,7 @@ var _ = Describe("Natsinteraction", Ordered, func() {
 		})
 	})
 
-	Context("Тест 1.3. Проверка декадирования тестовых данных из файла 'binaryDataThree'", func() {
+	Context("Тест 1.3. Проверка декодирования тестовых данных из файла 'binaryDataThree'", func() {
 		var exampleByte []byte
 
 		for _, v := range strings.Split(tmpdata.GetExampleDataThree(), " ") {
@@ -114,27 +118,6 @@ var _ = Describe("Natsinteraction", Ordered, func() {
 		It("При анмаршалинге данных в ИЗВЕСТНЫЙ ТИП ошибки быть не должно", func() {
 			mm := datamodels.MainMessage{}
 			err := json.Unmarshal(exampleByte, &mm)
-
-			//fmt.Println("---- ExampleDataThree ----")
-			//fmt.Println(mm.ToStringBeautiful(0))
-			//fmt.Println("--------------------------")
-
-			/*
-				Почему то свойство event в известном типе пустое, хотя методом reflection оно полное
-				свойство observables типа соответствует результатам reflection
-
-				!!!!!!!!!!!!!!!!!
-				Похоже методом рефлексии получается больше полей и данных (во всяком случае со свойством event)
-				1. Можно написать функцию сравнени, которая методом рефлексии приводит данные из описанного типа datamodels.MainMessage{}
-				и сравнивает их с сырыми данными обработанными методом рефлексии.
-				2. Возможно пользовательский тип event не заполняется из-за каких нибудь ошибок реализации типа EventMessage.
-				3. САМОЕ ГЛАВНОЕ. Может вообще не стоит приводить данные к каким либо типам, а методом рефлексии парсить сырые данные,
-				искать в них попутно те поля данные которых нужно заменить или получить, выполнять данные действия и отправлять объект
-				через JSON.Marshling в MISP
-
-				Для отправки логов в zabbix см. https://habr.com/ru/companies/nixys/news/503104/
-				!!!!!!!!!!!!!!!!!
-			*/
 
 			Expect(err).ShouldNot(HaveOccurred())
 		})
@@ -187,18 +170,24 @@ var _ = Describe("Natsinteraction", Ordered, func() {
 			strData, err := supportingfunctions.NewReadReflectJSONSprint(eb)
 			Expect(err).ShouldNot(HaveOccurred())
 
+			fmt.Println("____ strData: ______", strData)
+
 			reg := regexp.MustCompile(`dataType: \'[a-zA-Z_]+\'`)
-			fmt.Println("____BEFORE reflect modify____ strData:", strData)
+			fmt.Println("____BEFORE reflect modify____")
 			bl := reg.FindAllString(strData, 10)
 			for k, v := range bl {
 				fmt.Printf("%d. %s\n", k+1, v)
 			}
 
-			listRules, err := rules.GetRuleProcessedMISPMsg("rules", "processedmispmsg.yaml")
+			listRules, listWarning, err := rules.GetRuleProcessedMISPMsg("rules", "procmispmsg.yaml")
 			Expect(err).ShouldNot(HaveOccurred())
 
-			newByte, err := coremodule.NewProcessingInputMessageFromHive(eb, listRules)
+			newByte, listOk, err := coremodule.NewProcessingInputMessageFromHive(eb, listRules)
+
+			fmt.Println("ok = ", listOk, " listWarning = ", listWarning)
+
 			Expect(err).ShouldNot(HaveOccurred())
+			//			Expect(ok).Should(BeTrue())
 
 			sd, err := supportingfunctions.NewReadReflectJSONSprint(newByte)
 			Expect(err).ShouldNot(HaveOccurred())

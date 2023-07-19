@@ -1,0 +1,23 @@
+# Тестовый YAML файл 1
+# Правило с actionType: "pass" стоит первым, следующее правило actionType: "replace" не будет использоватся
+
+RULLES:
+  - actionType: "pass"
+    listRequiredValues:
+      - fieldName: "impactStatus"
+        typeValue: "string"
+        value: "WithImpact"
+      - fieldName: "resolutionStatus"
+        typeValue: "string"
+        value: "TruePositive"
+  - actionType: "replace"
+    listRequiredValues:
+      - fieldName: "dataType"
+        typeValue: "string"
+        value: "arkime"
+        replaceValue: ""
+      - fieldName: "dataType"
+        typeValue: "string"
+        value: "snort"
+        replaceValue: "TEST_SNORT_ID"
+#  - actionType: "passany"

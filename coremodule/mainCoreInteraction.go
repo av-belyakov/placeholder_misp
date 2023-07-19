@@ -22,6 +22,10 @@ func NewCore(
 	for {
 		select {
 		case data := <-natsChanReception:
+			//вот здесь будет основной обработчик
+			//newByte, listOk, err := coremodule.NewProcessingInputMessageFromHive(eb, listRules)
+
+			//это только вывод данных по сообщению
 			strMsg, err := supportingfunctions.NewReadReflectJSONSprint(data)
 			if err != nil {
 				_, f, l, _ := runtime.Caller(0)

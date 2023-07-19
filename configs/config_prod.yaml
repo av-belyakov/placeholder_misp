@@ -1,3 +1,6 @@
+RULES_PROC_MSG:
+  directory: rules
+  file: procmispmsg.yaml
 NATS:
   host: nats.cloud.gcm
   port: 4222

@@ -16,6 +16,7 @@ type ConfigApp struct {
 	CommonAppConfig
 	AppConfigNATS
 	AppConfigMISP
+	RulesProcMsg
 }
 
 type CommonAppConfig struct {
@@ -44,14 +45,20 @@ type AppConfigMISP struct {
 	Port int
 }
 
+type RulesProcMsg struct {
+	Directory, File string
+}
+
 func NewConfig() (ConfigApp, error) {
 	conf := ConfigApp{}
 	var envList map[string]string = map[string]string{
-		"GO_PHMISP_MAIN":  "",
-		"GO_PHMISP_MHOST": "",
-		"GO_PHMISP_MPORT": "",
-		"GO_PHMISP_NHOST": "",
-		"GO_PHMISP_NPORT": "",
+		"GO_PHMISP_MAIN":       "",
+		"GO_PHMISP_MHOST":      "",
+		"GO_PHMISP_MPORT":      "",
+		"GO_PHMISP_NHOST":      "",
+		"GO_PHMISP_NPORT":      "",
+		"GO_PHMISP_RULES_DIR":  "",
+		"GO_PHMISP_RULES_FILE": "",
 	}
 
 	getFileName := func(sf, confPath string, lfs []fs.DirEntry) (string, error) {
@@ -105,6 +112,14 @@ func NewConfig() (ConfigApp, error) {
 
 		if viper.IsSet("MISP.port") {
 			conf.AppConfigMISP.Port = viper.GetInt("MISP.port")
+		}
+
+		if viper.IsSet("RULES_PROC_MSG.directory") {
+			conf.RulesProcMsg.Directory = viper.GetString("RULES_PROC_MSG.directory")
+		}
+
+		if viper.IsSet("RULES_PROC_MSG.file") {
+			conf.RulesProcMsg.Directory = viper.GetString("RULES_PROC_MSG.file")
 		}
 
 		return nil
@@ -173,6 +188,14 @@ func NewConfig() (ConfigApp, error) {
 		if p, err := strconv.Atoi(envList["GO_PHMISP_NPORT"]); err == nil {
 			conf.AppConfigNATS.Port = p
 		}
+	}
+
+	if envList["GO_PHMISP_RULES_DIR"] != "" {
+		conf.RulesProcMsg.Directory = envList["GO_PHMISP_RULES_DIR"]
+	}
+
+	if envList["GO_PHMISP_NPORT"] != "" {
+		conf.RulesProcMsg.File = envList["GO_PHMISP_RULES_FILE"]
 	}
 
 	return conf, nil

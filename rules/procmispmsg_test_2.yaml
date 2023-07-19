@@ -1,0 +1,20 @@
+# Тестовый YAML файл 2
+# Правило с actionType: "reject" стоит первым, следующее правило actionType: "replace" не будет использоватся
+
+RULLES:
+  - actionType: "reject" 
+    listRequiredValues:
+      - fieldName: "namespace"
+        typeValue: "string"
+        value: "IP-API"
+  - actionType: "replace"
+    listRequiredValues:
+      - fieldName: "dataType"
+        typeValue: "string"
+        value: "arkime"
+        replaceValue: ""
+      - fieldName: "dataType"
+        typeValue: "string"
+        value: "snort"
+        replaceValue: "TEST_SNORT_ID"
+#  - actionType: "passany"

@@ -1,0 +1,42 @@
+# Тестовый файл procmispmsg_test_error содержит логические ошибки реализации конфигурационного YAML файла
+
+RULLES:
+  - actionType: "replace"
+    listRequiredValues:
+      - fieldName: "dataType"
+        typeValue: "string"
+        value: "arkime" # не хватает replaceValue
+      - fieldName: "dataType"
+        typeValue: "string"
+        value: "snort"
+        replaceValue: "TEST_SNORT_ID"
+  - actionType: "ereplacce" # неверный тип действия
+    listRequiredValues:
+      - fieldName: "dataType"
+        typeValue: "string"
+        value: "arkime" # не хватает replaceValue
+      - fieldName: "dataType"
+        typeValue: "string"
+        value: "snort"
+        replaceValue: "TEST_SNORT_ID"
+  - actionType: "pass"
+    listRequiredValues:
+      - typeValue: "string" # не хватает fieldName: ""
+        value: "WithImpact"
+      - fieldName: "my status" # не хватает typeValue: ""
+        value: "WithImpact"
+      - fieldName: "impactStatus" # не хватает value: ""
+        typeValue: "string"
+      - fieldName: "impactStatus"
+        typeValue: "string"
+        value: "WithImpact"
+      - fieldName: "resolutionStatus"
+        typeValue: "string"
+        value: "TruePositive"
+  - actionType: "reject" 
+    listRequiredValues:
+      - fieldName: "namespace"
+        typeValue: "singd2" # некорректное значение
+        value: "IP-API"
+  - actionType: "passany"
+  - actionType: "pass"

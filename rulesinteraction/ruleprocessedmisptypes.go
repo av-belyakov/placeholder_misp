@@ -33,6 +33,7 @@ type GetterReplacedValue interface {
 	GetReplacedValueBool() bool
 }
 
+/*
 type ValueParameters struct {
 	ValueType string
 	Value     interface{}
@@ -56,13 +57,35 @@ type RuleProcessedMISPMessageFields struct {
 	ReplacedValue     ValueParameters
 	ListRelatedFields map[string]interface{}
 }
+*/
+
+// ListRequiredValue описание полей содержащихся в свойстве listRequiredValues
+// FieldName - наименование искомого поля
+// TypeValue - тип значения искомого поля, должно содержать одно из значений string, int, bool
+// Value - значение искомого поля
+// ReplaceValue - значение на которое нужно заменить (может быть в том числе и пустым)
+type ListRequiredValue struct {
+	FieldName    string
+	TypeValue    string
+	Value        string
+	ReplaceValue string
+}
+
+// RuleProcMISPMessageFields описание обрабатываемых полей misp сообщения
+// ActionType - тип действия (обрабатывать, обрабатывать все, заменить, очистить значение поля)
+// ListRequiredValues требуемые значения для обработки правила
+type RuleProcMISPMessageField struct {
+	ActionType         string
+	ListRequiredValues []ListRequiredValue
+}
 
 // ListRulesProcessedMISPMessage список обрабатываемых полей misp сообщения
 // где свойство map есть имя поля
-type ListRulesProcessedMISPMessage struct {
-	Rulles []RuleProcessedMISPMessageFields
+type ListRulesProcMISPMessage struct {
+	Rulles []RuleProcMISPMessageField
 }
 
+/*
 func (rp RuleProcessedMISPMessageFields) GetActionType() string {
 	return rp.ActionType
 }
@@ -154,3 +177,4 @@ func (rp RuleProcessedMISPMessageFields) GetReplacedValueBool() bool {
 func (rf RuleProcessedMISPMessageFields) GetListRelatedFields() map[string]interface{} {
 	return rf.ListRelatedFields
 }
+*/

@@ -14,14 +14,15 @@ import (
 	"placeholder_misp/datamodels"
 	"placeholder_misp/mispinteractions"
 	"placeholder_misp/natsinteractions"
-	"placeholder_misp/rules"
+	rules "placeholder_misp/rulesinteraction"
 )
 
 var (
 	err                  error
 	sl                   simplelogger.SimpleLoggerSettings
 	confApp              confighandler.ConfigApp
-	listRulesProcMISPMsg rules.ListRulesProcessedMISPMessage
+	listRulesProcMISPMsg rules.ListRulesProcMISPMessage
+	listWarning          []string
 	msgOutChan           chan datamodels.MessageLoging
 )
 
@@ -47,6 +48,13 @@ func init() {
 			MaxFileSize:   1024,
 		},
 		{
+			MsgTypeName:   "warning",
+			WritingFile:   true,
+			PathDirectory: "logs",
+			WritingStdout: false,
+			MaxFileSize:   1024,
+		},
+		{
 			MsgTypeName:   "info",
 			WritingFile:   true,
 			PathDirectory: "logs",
@@ -67,12 +75,33 @@ func init() {
 		log.Fatalf("error module 'confighandler': %v\n", err)
 	}
 
-	listRulesProcMISPMsg, err = rules.GetRuleProcessedMISPMsg("rules", "processedmispmsg.yaml")
+	listRulesProcMISPMsg, listWarning, err = rules.GetRuleProcessedMISPMsg(confApp.RulesProcMsg.Directory, confApp.RulesProcMsg.File)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 		_ = sl.WriteLoggingData(fmt.Sprintf("%v %s:%d", err, f, l-2), "error")
 
-		log.Fatalf("error module 'simplelogger': %v\n", err)
+		log.Fatalf("error module 'rulesinteraction': %v\n", err)
+	}
+
+	//если есть какие либо логические ошибки в файле с YAML правилами для обработки сообщений поступающих от NATS
+	if len(listWarning) > 0 {
+		var warningStr string
+
+		for _, v := range listWarning {
+			warningStr += fmt.Sprintln(v)
+		}
+
+		_, f, l, _ := runtime.Caller(0)
+		_ = sl.WriteLoggingData(fmt.Sprintf("%s:%d\n%v", f, l, warningStr), "warning")
+	}
+
+	// проверяем наличие вообще каких либо правил
+	if len(listRulesProcMISPMsg.Rulles) == 0 {
+		msg := "there are no rules for processing messages received from NATS or have not been verified"
+		_, f, l, _ := runtime.Caller(0)
+		_ = sl.WriteLoggingData(fmt.Sprintf("%s %s:%d", msg, f, l-3), "error")
+
+		log.Fatalf("%s\n", msg)
 	}
 }
 
