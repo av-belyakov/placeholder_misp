@@ -12,7 +12,7 @@
 # 
 # 2. Поле 'listRequiredValues' используется для поиска полей и их значений, а так же содержит значения, на которые стоит заменить найденное значение 
 # в поле (если 'actionType' содержит тип 'replace'). Поле 'listRequiredValues' содержит следующий перечень свойств:
-#   - fieldName, наименование искомого поля
+#   - fieldName, наименование искомого поля (данное поле НЕ ОБЯЗАТЕЛЬНО для заполнения при 'actionType' = 'replace')
 #   - typeValue, тип значения искомого поля, должно содержать одно из значений string, int, bool
 #   - value, значение искомого поля, для обозначения пустого значения этого свойства (если тип значения искомого поля равен string) используйте
 #     значение 'null'
@@ -21,45 +21,53 @@
 # Если в 'actionType' установленно значение 'replace', то 'listRequiredValues' на ряду со свойствами 'name', 'typeValue', 'value' должно
 # содержать еще и свойство 'replaceValue'
 #
-# ВНИМАНИЕ! 
+#   ВНИМАНИЕ! 
 # Правило, со значением 'replace' в поле 'actionType' само по себе не выполняет пропуск сообщения. После этого правила или их набора, 
 # всегда должно идти правило, выполняющее пропуск сообщения. То есть правило со значением 'pass' или 'passany' в поле 'actionType'.
+# Для правила со значением 'replace' в поле 'actionType' поле listRequiredValues.fieldName НЕ ОБЯЗАТЕЛЬНО для заполнение, если оно пустое
+# то замена значения будет выполнятся в ЛЮБОМ поле, значение которого совпадает со значение в listRequiredValues.value.
+#
 #
 # Правило, со значением 'reject' в поле 'actionType' отклоняет только те сообщения, которые совпадаю с искомым значением. Однако сообщения, которые
 # не совпадают передаются на следующий уровень обработки и если в конце этой цепочки нет правила с типом 'pass' или 'passany' то сообщение так же
 # будет отброшено.
 # 
+#   ВНИМАНИЕ!
+# Логика обработки правил следующая:
+# - для основных правил, где есть поле actionType применяется "ИЛИ"
+# - для правил находящихся в списке listRequiredValues используется "И"
+#
 
 RULLES:
   - actionType: "replace"
     listRequiredValues:
-      - fieldName: "dataType"
+      - fieldSearchName: "dataType"
         typeValue: "string"
-        value: "arkime"
+        findValue: "arkime"
         replaceValue: ""
-      - fieldName: "dataType"
+      - fieldSearchName: "dataType"
         typeValue: "string"
-        value: "snort"
+        findValue: "snort"
         replaceValue: "TEST_SNORT_ID"
-      - fieldName: "extraData"
+      - fieldSearchName: "extraData"
         typeValue: "string"
-        value: "null"
+        findValue: "null"
         replaceValue: "DATA EXTRACTION"
-      - fieldName: "patternId"
+      - fieldSearchName: "patternId"
         typeValue: "string"
-        value: "T1110"
+        findValue: "T1110"
         replaceValue: "null"
   - actionType: "pass"
     listRequiredValues:
-      - fieldName: "impactStatus"
+      - fieldSearchName: "impactStatus"
         typeValue: "string"
-        value: "WithImpact"
-      - fieldName: "resolutionStatus"
+        findValue: "WithImpact"
+      - fieldSearchName: "resolutionStatus"
         typeValue: "string"
-        value: "TruePositive"
+        findValue: "TruePositive"
   - actionType: "reject" 
     listRequiredValues:
-      - fieldName: "namespace"
+      - fieldSearchName: "namespace"
         typeValue: "string"
-        value: "IP-API"
+        findValue: "IP-API"
 #  - actionType: "passany"

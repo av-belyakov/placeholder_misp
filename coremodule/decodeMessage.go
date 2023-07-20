@@ -12,7 +12,7 @@ import (
 // ProcessMessageFromHive содержит информацию необходимую для обработки сообщений
 // Message - сообщение полученное от Hive
 // ListRules - список правил для обработки
-// ListConfirmRules - список подтвержденных правил
+// ListConfirmRules - список подтвержденных правил (ЗДЕСЬ НАДО ПОДУМАТЬ В КАКОМ ВИДЕ ЛУЧШЕ УЧИТЫВАТЬ ПРАВИЛА)
 type ProcessMessageFromHive struct {
 	Message          map[string]interface{}
 	ListRules        []rules.RuleProcMISPMessageField
@@ -61,7 +61,24 @@ func (pm *ProcessMessageFromHive) ProcessMessage() bool {
 		return true
 	}
 
-	return false
+	/*
+
+		единственная точка обработки всех правил это функция processingReflectAnySimpleType
+		там стоит разделить типы действий для каждого правила
+
+		нужно как то помечать какое правило для какого значения сработало
+
+		reject (если совпадает, помечаем сообщение как отбрасываемое)
+		pass (если совпадает, то помечаем как разрешонное к пропуску)
+		replase (если совпадает, выполняем замену)
+
+	*/
+
+	newList, skipMsg := processingReflectMap(pm.Message, pm.ListRules, 0)
+
+	pm.Message = newList
+
+	return skipMsg
 }
 
 func (pm *ProcessMessageFromHive) GetMessage() ([]byte, error) {
@@ -69,7 +86,7 @@ func (pm *ProcessMessageFromHive) GetMessage() ([]byte, error) {
 }
 
 // NewProcessingInputMessageFromHive выполняет обработку сообщений на основе правил
-func NewProcessingInputMessageFromHive(b []byte, listRule rules.ListRulesProcMISPMessage) ([]byte, []bool, error) {
+/*func NewProcessingInputMessageFromHive(b []byte, listRule rules.ListRulesProcMISPMessage) ([]byte, []bool, error) {
 	//информирует, какие правила сработали, а какие нет (правила учитываются по их порядковому номеру)
 	listConfirmRules := make([]bool, len(listRule.Rulles))
 	list := map[string]interface{}{}
@@ -82,13 +99,13 @@ func NewProcessingInputMessageFromHive(b []byte, listRule rules.ListRulesProcMIS
 		return []byte{}, listConfirmRules, fmt.Errorf("error decoding the json file, it may be empty")
 	}
 
-	/*
-		Если правило есть,
-		   2. Проверить, если есть наличие правила где 'actionType' = 'anypass', то пропускаем обработку всех правил после данного правила,
-		   а json объект пропускаем если в правиле 'requiredValue.value' пустое или если оно соответствует указанному значению
-		   которое должно находится в поле json объекта с именем хранящемся в 'fieldName'
-		   3. Обработать правила 'pass', 'passany', 'replace', 'reject'
-	*/
+	//
+	//	Если правило есть,
+	//	   2. Проверить, если есть наличие правила где 'actionType' = 'anypass', то пропускаем обработку всех правил после данного правила,
+	//	   а json объект пропускаем если в правиле 'requiredValue.value' пустое или если оно соответствует указанному значению
+	//	   которое должно находится в поле json объекта с именем хранящемся в 'fieldName'
+	//	   3. Обработать правила 'pass', 'passany', 'replace', 'reject'
+	//
 
 	fmt.Println("---------- func 'NewProcessingInputMessageFromHive', Read list rules -----------")
 	for k, v := range listRule.Rulles {
@@ -112,20 +129,65 @@ func NewProcessingInputMessageFromHive(b []byte, listRule rules.ListRulesProcMIS
 		return result, listConfirmRules, err
 	}
 
-	/*
-		1.
-	*/
-
 	newList := processingReflectMap(list, listRule, 0)
 	result, err := json.Marshal(newList)
 
 	return result, listConfirmRules, err
+}*/
+
+/*func processingRules(
+	listRule []rules.RuleProcMISPMessageField,
+	currentValueType, currentField string,
+	currentValue interface{}) (interface{}, bool) {
+
+	var skipMsg bool
+	newValue := currentValue
+
+listField := map[string][2]int{}
+
+	for kr, vr := range listRule {
+
+	}
+
+
+	//А если заполнять поля правил по мере обработки сообщения?? ПО крайне мере для сообщений типа pass и reject
+//Если разделить правила типа pass и reject и правило с replace (потеряется последовательность) ну тогда обработчик для
+//них будет разный а набор правил один, сначало выполнится обработчик для replace, а потом для pass и reject
+
+	//это все очень сложно
+	for kr, vr := range listRule {
+		switch vr.ActionType {
+		case "pass":
+			switch currentValueType {
+			case "string":
+				listIsSuccess := []bool{}
+for krv, vrv := range vr.ListRequiredValues {
+//if vrv.FieldName ==
 }
+
+//				if currentField == vr.ListRequiredValues.
+				//еще читать в цикле ListRequiredValues
+
+			case "int":
+
+			case "bool":
+			}
+
+		case "reject":
+
+		case "replace":
+
+		}
+
+	}
+
+	return newValue, skipMsg
+}*/
 
 func processingReflectAnySimpleType(
 	name interface{},
 	anyType interface{},
-	listRule rules.ListRulesProcMISPMessage,
+	listRule []rules.RuleProcMISPMessageField,
 	num int) interface{} {
 
 	var str, nameStr string
@@ -185,32 +247,43 @@ func processingReflectAnySimpleType(
 	return ""
 }
 
-func processingReflectMap(list map[string]interface{}, listRule rules.ListRulesProcMISPMessage, num int) map[string]interface{} {
-	l := map[string]interface{}{}
+func processingReflectMap(
+	l map[string]interface{},
+	lr []rules.RuleProcMISPMessageField,
+	num int) (map[string]interface{}, bool) {
 
-	for k, v := range list {
+	var (
+		newMap  map[string]interface{}
+		newList []interface{}
+		skipMsg bool
+	)
+	nl := map[string]interface{}{}
+
+	for k, v := range l {
 		r := reflect.TypeOf(v)
 
 		if r == nil {
-			return l
+			return nl, skipMsg
 		}
 
 		switch r.Kind() {
 		case reflect.Map:
 			if v, ok := v.(map[string]interface{}); ok {
-				l[k] = processingReflectMap(v, listRule, num+1)
+				newMap, skipMsg = processingReflectMap(v, lr, num+1)
+				nl[k] = newMap
 			}
 
 		case reflect.Slice:
 			if v, ok := v.([]interface{}); ok {
-				l[k] = processingReflectSlice(v, listRule, num+1)
+				newList, skipMsg = processingReflectSlice(v, lr, num+1)
+				nl[k] = newList
 			}
 
 		case reflect.Array:
 			//str += fmt.Sprintf("%s: %s (it is array)\n", k, reflect.ValueOf(v).String())
 
 		default:
-			l[k] = processingReflectAnySimpleType(k, v, listRule, num)
+			nl[k] = processingReflectAnySimpleType(k, v, lr, num)
 		}
 
 		if k == "dataType" {
@@ -218,17 +291,26 @@ func processingReflectMap(list map[string]interface{}, listRule rules.ListRulesP
 		}
 	}
 
-	return l
+	return nl, skipMsg
 }
 
-func processingReflectSlice(list []interface{}, listRule rules.ListRulesProcMISPMessage, num int) []interface{} {
-	l := make([]interface{}, 0, len(list))
+func processingReflectSlice(
+	l []interface{},
+	lr []rules.RuleProcMISPMessageField,
+	num int) ([]interface{}, bool) {
 
-	for k, v := range list {
+	var (
+		newMap  map[string]interface{}
+		newList []interface{}
+		skipMsg bool
+	)
+	nl := make([]interface{}, 0, len(l))
+
+	for k, v := range l {
 		r := reflect.TypeOf(v)
 
 		if r == nil {
-			return l
+			return nl, skipMsg
 		}
 
 		//l = append(l, processingReflectAnySimpleTypeTest(k, v, listRule, num))
@@ -236,21 +318,25 @@ func processingReflectSlice(list []interface{}, listRule rules.ListRulesProcMISP
 		switch r.Kind() {
 		case reflect.Map:
 			if v, ok := v.(map[string]interface{}); ok {
-				l = append(l, processingReflectMap(v, listRule, num+1))
+				newMap, skipMsg = processingReflectMap(v, lr, num+1)
+
+				nl = append(nl, newMap)
 			}
 
 		case reflect.Slice:
 			if v, ok := v.([]interface{}); ok {
-				l = append(l, processingReflectSlice(v, listRule, num+1))
+				newList, skipMsg = processingReflectSlice(v, lr, num+1)
+
+				nl = append(nl, newList...)
 			}
 
 		case reflect.Array:
 			//str += fmt.Sprintf("%d. %s (it is array)\n", k, reflect.ValueOf(v).String())
 
 		default:
-			l = append(l, processingReflectAnySimpleType(k, v, listRule, num))
+			nl = append(nl, processingReflectAnySimpleType(k, v, lr, num))
 		}
 	}
 
-	return l
+	return nl, skipMsg
 }

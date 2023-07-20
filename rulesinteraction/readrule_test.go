@@ -19,9 +19,9 @@ var _ = Describe("Readrule", func() {
 
 			for key, value := range v.ListRequiredValues {
 				resultPrint += fmt.Sprintf("   %d.\n", key)
-				resultPrint += fmt.Sprintf("    fieldName: %s.\n", value.FieldName)
+				resultPrint += fmt.Sprintf("    fieldSearchName: %s.\n", value.FieldSearchName)
 				resultPrint += fmt.Sprintf("    typeValue: %s.\n", value.TypeValue)
-				resultPrint += fmt.Sprintf("    value: %s.\n", value.Value)
+				resultPrint += fmt.Sprintf("    fieldValue: %s.\n", value.FindValue)
 				resultPrint += fmt.Sprintf("    replaceValue: %s.\n", value.ReplaceValue)
 			}
 		}
@@ -91,6 +91,52 @@ var _ = Describe("Readrule", func() {
 			fmt.Println("4. _________ RULE procmispmsg_test_error.yaml.")
 			fmt.Println("new result:")
 			fmt.Println(printRuleResult(lrp.Rulles))
+
+			//создаем список из типов искомых полей
+			lf := map[string][][2]int{}
+
+			for k, v := range lrp.Rulles {
+				for i, j := range v.ListRequiredValues {
+					if j.FieldSearchName == "" {
+						continue
+					}
+
+					if _, ok := lf[j.FieldSearchName]; !ok {
+						lf[j.FieldSearchName] = [][2]int{}
+					}
+
+					lf[j.FieldSearchName] = append(lf[j.FieldSearchName], [2]int{k, i})
+				}
+			}
+
+			fmt.Println("TEST LIST FIELD ::: ")
+			for fn, fv := range lf {
+				fmt.Println("field name = ", fn, " - ", fv)
+
+				fmt.Println("------- test data resolv ------")
+				for _, n := range fv {
+					fmt.Println("||||| ActionType: ", lrp.Rulles[n[0]].ActionType, " ____ ", lrp.Rulles[n[0]].ListRequiredValues[n[1]])
+				}
+				fmt.Println("-------------------------------")
+			}
+
+			/*
+				Если сделать два типа списков lf (список названий свойств) b lv (список названий искомых значений). Так как оба
+				списка будут в виде map[string][][2]int{} где свойство map будет наименование свойства или искомого значения, то
+				выполняем поиск наименования свойства (из сообщения) и значения (из сообщения) по спискам lf, lv. Для actionType
+				pass, reject должны совпасть оба, для replace можно только lv. Дальше можно найти исходное правило по полученным
+				номерам и выполнить дальнейшую обработку.
+
+
+						тольк для правли типа pass и reject
+				   1. создать отдельные списки полей и значений в которые занести порядковый номер правила где они есть по типу 0.1. список map[string] где
+				      свойство map будет имя поля или само искомое значение
+				   2. сравнивать поле и значение по мере обработке элементов списка
+				   2.1 ищем имя поля в списке lf
+				   2.2 при совпадении сравниваем значение из общего правила с значением поля в списке
+
+				   			для правила типа replace
+			*/
 
 			fmt.Println("list verification warning:")
 			fmt.Println(printVerificationWarning(lvw))

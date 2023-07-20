@@ -68,21 +68,21 @@ func verificationRules(lrp ListRulesProcMISPMessage) (ListRulesProcMISPMessage, 
 
 		lrv := []ListRequiredValue{}
 		for key, value := range v.ListRequiredValues {
-			if value.FieldName == "" {
-				vr = append(vr, fmt.Sprintf("warning: number rule '%d.%d', the 'fieldName' property should not be empty", k, key))
+			if value.FieldSearchName == "" && v.ActionType != "replace" {
+				vr = append(vr, fmt.Sprintf("warning: number rule '%d.%d', the 'fieldSearchName' property should not be empty", k, key))
 
 				continue
 			}
 
 			_, ok := searchStr(ltv, value.TypeValue)
 			if !ok {
-				vr = append(vr, fmt.Sprintf("warning: number rule '%d.%d', the 'TypeValue' property contains an invalid value '%s'", k, key, value.TypeValue))
+				vr = append(vr, fmt.Sprintf("warning: number rule '%d.%d', the 'typeValue' property contains an invalid value '%s'", k, key, value.TypeValue))
 
 				continue
 			}
 
-			if value.Value == "" {
-				vr = append(vr, fmt.Sprintf("warning: number rule '%d.%d', missing 'value' property, to indicate an empty value for this property, use the value 'null'", k, key))
+			if value.FindValue == "" {
+				vr = append(vr, fmt.Sprintf("warning: number rule '%d.%d', missing 'findValue' property, to indicate an empty value for this property, use the value 'null'", k, key))
 
 				continue
 			}
@@ -94,10 +94,10 @@ func verificationRules(lrp ListRulesProcMISPMessage) (ListRulesProcMISPMessage, 
 			}
 
 			lrv = append(lrv, ListRequiredValue{
-				FieldName:    value.FieldName,
-				TypeValue:    value.TypeValue,
-				Value:        value.Value,
-				ReplaceValue: value.ReplaceValue,
+				FieldSearchName: value.FieldSearchName,
+				TypeValue:       value.TypeValue,
+				FindValue:       value.FindValue,
+				ReplaceValue:    value.ReplaceValue,
 			})
 		}
 

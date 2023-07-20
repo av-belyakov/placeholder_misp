@@ -3,40 +3,43 @@
 RULLES:
   - actionType: "replace"
     listRequiredValues:
-      - fieldName: "dataType"
+      - fieldSearchName: "dataType"
         typeValue: "string"
-        value: "arkime" # не хватает replaceValue
-      - fieldName: "dataType"
+        findValue: "arkime" # не хватает replaceValue
+      - fieldSearchName: "dataType"
         typeValue: "string"
-        value: "snort"
+        findValue: "snort"
         replaceValue: "TEST_SNORT_ID"
+      - typeValue: "string"
+        findValue: "my country"
+        replaceValue: "TEST_COUNTRY"
   - actionType: "ereplacce" # неверный тип действия
     listRequiredValues:
-      - fieldName: "dataType"
+      - fieldSearchName: "dataType"
         typeValue: "string"
-        value: "arkime" # не хватает replaceValue
-      - fieldName: "dataType"
+        findValue: "arkime" # не хватает replaceValue
+      - fieldSearchName: "dataType"
         typeValue: "string"
-        value: "snort"
+        findValue: "snort"
         replaceValue: "TEST_SNORT_ID"
   - actionType: "pass"
     listRequiredValues:
       - typeValue: "string" # не хватает fieldName: ""
-        value: "WithImpact"
-      - fieldName: "my status" # не хватает typeValue: ""
-        value: "WithImpact"
-      - fieldName: "impactStatus" # не хватает value: ""
+        findValue: "WithImpact"
+      - fieldSearchName: "my status" # не хватает typeValue: ""
+        findValue: "WithImpact"
+      - fieldSearchName: "impactStatus" # не хватает value: ""
         typeValue: "string"
-      - fieldName: "impactStatus"
+      - fieldSearchName: "impactStatus"
         typeValue: "string"
-        value: "WithImpact"
-      - fieldName: "resolutionStatus"
+        findValue: "WithImpact"
+      - fieldSearchName: "resolutionStatus"
         typeValue: "string"
-        value: "TruePositive"
+        findValue: "TruePositive"
   - actionType: "reject" 
     listRequiredValues:
-      - fieldName: "namespace"
+      - fieldSearchName: "namespace"
         typeValue: "singd2" # некорректное значение
-        value: "IP-API"
+        findValue: "IP-API"
   - actionType: "passany"
   - actionType: "pass"

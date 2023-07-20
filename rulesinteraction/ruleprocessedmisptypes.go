@@ -60,15 +60,17 @@ type RuleProcessedMISPMessageFields struct {
 */
 
 // ListRequiredValue описание полей содержащихся в свойстве listRequiredValues
-// FieldName - наименование искомого поля
+// FieldSearchName - наименование искомого поля
 // TypeValue - тип значения искомого поля, должно содержать одно из значений string, int, bool
-// Value - значение искомого поля
+// SearchValue - значение искомого поля
+// FindValue - найденное значение
 // ReplaceValue - значение на которое нужно заменить (может быть в том числе и пустым)
 type ListRequiredValue struct {
-	FieldName    string
-	TypeValue    string
-	Value        string
-	ReplaceValue string
+	FieldSearchName string
+	TypeValue       string //может это и не надо
+	SearchValue     string
+	FindValue       string
+	ReplaceValue    string
 }
 
 // RuleProcMISPMessageFields описание обрабатываемых полей misp сообщения
@@ -84,97 +86,3 @@ type RuleProcMISPMessageField struct {
 type ListRulesProcMISPMessage struct {
 	Rulles []RuleProcMISPMessageField
 }
-
-/*
-func (rp RuleProcessedMISPMessageFields) GetActionType() string {
-	return rp.ActionType
-}
-
-func (rp RuleProcessedMISPMessageFields) GetRequiredType() string {
-	return rp.RequiredValue.ValueType
-}
-
-func (rp RuleProcessedMISPMessageFields) GetRequiredValueString() string {
-	if str, ok := rp.RequiredValue.Value.(string); ok {
-		return str
-	}
-
-	return ""
-}
-
-func (rp RuleProcessedMISPMessageFields) GetRequiredValueInt() int {
-	if num, ok := rp.RequiredValue.Value.(int); ok {
-		return num
-	}
-
-	return 0
-}
-
-func (rp RuleProcessedMISPMessageFields) GetRequiredValueBool() bool {
-	if b, ok := rp.RequiredValue.Value.(bool); ok {
-		return b
-	}
-
-	return false
-}
-
-func (rp RuleProcessedMISPMessageFields) GetDesiredType() string {
-	return rp.DesiredValue.ValueType
-}
-
-func (rp RuleProcessedMISPMessageFields) GetDesiredValueString() string {
-	if str, ok := rp.DesiredValue.Value.(string); ok {
-		return str
-	}
-
-	return ""
-}
-
-func (rp RuleProcessedMISPMessageFields) GetDesiredValueInt() int {
-	if num, ok := rp.DesiredValue.Value.(int); ok {
-		return num
-	}
-
-	return 0
-}
-
-func (rp RuleProcessedMISPMessageFields) GetDesiredValueBool() bool {
-	if b, ok := rp.DesiredValue.Value.(bool); ok {
-		return b
-	}
-
-	return false
-}
-
-func (rp RuleProcessedMISPMessageFields) GetReplacedType() string {
-	return rp.DesiredValue.ValueType
-}
-
-func (rp RuleProcessedMISPMessageFields) GetReplacedValueString() string {
-	if str, ok := rp.ReplacedValue.Value.(string); ok {
-		return str
-	}
-
-	return ""
-}
-
-func (rp RuleProcessedMISPMessageFields) GetReplacedValueInt() int {
-	if num, ok := rp.ReplacedValue.Value.(int); ok {
-		return num
-	}
-
-	return 0
-}
-
-func (rp RuleProcessedMISPMessageFields) GetReplacedValueBool() bool {
-	if b, ok := rp.ReplacedValue.Value.(bool); ok {
-		return b
-	}
-
-	return false
-}
-
-func (rf RuleProcessedMISPMessageFields) GetListRelatedFields() map[string]interface{} {
-	return rf.ListRelatedFields
-}
-*/

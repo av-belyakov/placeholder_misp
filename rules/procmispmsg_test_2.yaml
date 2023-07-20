@@ -4,17 +4,17 @@
 RULLES:
   - actionType: "reject" 
     listRequiredValues:
-      - fieldName: "namespace"
+      - fieldSearchName: "namespace"
         typeValue: "string"
-        value: "IP-API"
+        findValue: "IP-API"
   - actionType: "replace"
     listRequiredValues:
-      - fieldName: "dataType"
+      - fieldSearchName: "dataType"
         typeValue: "string"
-        value: "arkime"
+        findValue: "arkime"
         replaceValue: ""
-      - fieldName: "dataType"
+      - fieldSearchName: "dataType"
         typeValue: "string"
-        value: "snort"
+        findValue: "snort"
         replaceValue: "TEST_SNORT_ID"
 #  - actionType: "passany"
