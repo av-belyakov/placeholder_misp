@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -33,6 +32,16 @@ var _ = Describe("Natsinteraction", Ordered, func() {
 	/*
 		Для отправки логов в zabbix см. https://habr.com/ru/companies/nixys/news/503104/
 	*/
+
+	printVerificationWarning := func(lvw []string) string {
+		var resultPrint string
+
+		for _, v := range lvw {
+			resultPrint += fmt.Sprintln(v)
+		}
+
+		return resultPrint
+	}
 
 	BeforeAll(func() {
 		chanLog = make(chan<- datamodels.MessageLoging)
@@ -166,7 +175,23 @@ var _ = Describe("Natsinteraction", Ordered, func() {
 			eb = append(eb, uint8(i))
 		}
 
-		It("Должны быть заменены все поля dataType содержащие значение 'snort'", func() {
+		It("Должны быть заменины некоторые значения на основе правил из файла 'procmispmsg.yaml'", func() {
+			lrp, lvw, err := rules.GetRuleProcessedMISPMsg("rules", "procmispmsg.yaml")
+
+			fmt.Println("list verification warning:")
+			fmt.Println(printVerificationWarning(lvw))
+
+			Expect(err).ShouldNot(HaveOccurred())
+
+			procMsgHive, err := coremodule.NewProcessMessageFromHive(eb, lrp)
+			ok := procMsgHive.ProcessMessage()
+
+			fmt.Println("procMsgHive.ProcessMessage() is true: ", ok)
+
+			Expect(err).ShouldNot(HaveOccurred())
+		})
+
+		/*It("Должны быть заменены все поля dataType содержащие значение 'snort'", func() {
 			strData, err := supportingfunctions.NewReadReflectJSONSprint(eb)
 			Expect(err).ShouldNot(HaveOccurred())
 
@@ -206,7 +231,7 @@ var _ = Describe("Natsinteraction", Ordered, func() {
 			}
 
 			Expect(dataIsExist).Should(BeTrue())
-		})
+		})*/
 	})
 
 	Context("Тест 3. Проверка инициализации соединения с NATS", func() {

@@ -15,7 +15,7 @@ import (
 // ListConfirmRules - список подтвержденных правил (ЗДЕСЬ НАДО ПОДУМАТЬ В КАКОМ ВИДЕ ЛУЧШЕ УЧИТЫВАТЬ ПРАВИЛА)
 type ProcessMessageFromHive struct {
 	Message          map[string]interface{}
-	ListRules        []rules.RuleProcMISPMessageField
+	ListRules        rules.ListRulesProcMISPMessage
 	ListConfirmRules []bool
 }
 
@@ -34,10 +34,10 @@ func NewProcessMessageFromHive(b []byte, listRule rules.ListRulesProcMISPMessage
 	pmfh.Message = list
 
 	var isStop bool
-	newListRule := make([]rules.RuleProcMISPMessageField, 0, len(listRule.Rulles))
+	newListRule := make([]rules.RuleProcMISPMessageField, 0, len(listRule.Rules))
 
 	//обрабатываем список правил для исключения правил, которые заведомо не будут использоватся, то есть все правила после 'pass' и 'passany'
-	for _, v := range listRule.Rulles {
+	for _, v := range listRule.Rules {
 		if isStop {
 			break
 		}
@@ -49,15 +49,15 @@ func NewProcessMessageFromHive(b []byte, listRule rules.ListRulesProcMISPMessage
 		}
 	}
 
-	pmfh.ListRules = newListRule
-	pmfh.ListConfirmRules = make([]bool, 0, len(listRule.Rulles))
+	pmfh.ListRules.Rules = newListRule
+	pmfh.ListConfirmRules = make([]bool, 0, len(listRule.Rules))
 
 	return pmfh, nil
 }
 
 func (pm *ProcessMessageFromHive) ProcessMessage() bool {
 	//пропускаем сообщение без какой либо обработки
-	if len(pm.ListRules) > 0 && pm.ListRules[0].ActionType == "passany" {
+	if len(pm.ListRules.Rules) > 0 && pm.ListRules.Rules[0].ActionType == "passany" {
 		return true
 	}
 
@@ -85,109 +85,10 @@ func (pm *ProcessMessageFromHive) GetMessage() ([]byte, error) {
 	return json.Marshal(pm.Message)
 }
 
-// NewProcessingInputMessageFromHive выполняет обработку сообщений на основе правил
-/*func NewProcessingInputMessageFromHive(b []byte, listRule rules.ListRulesProcMISPMessage) ([]byte, []bool, error) {
-	//информирует, какие правила сработали, а какие нет (правила учитываются по их порядковому номеру)
-	listConfirmRules := make([]bool, len(listRule.Rulles))
-	list := map[string]interface{}{}
-
-	if err := json.Unmarshal(b, &list); err != nil {
-		return []byte{}, listConfirmRules, err
-	}
-
-	if len(list) == 0 {
-		return []byte{}, listConfirmRules, fmt.Errorf("error decoding the json file, it may be empty")
-	}
-
-	//
-	//	Если правило есть,
-	//	   2. Проверить, если есть наличие правила где 'actionType' = 'anypass', то пропускаем обработку всех правил после данного правила,
-	//	   а json объект пропускаем если в правиле 'requiredValue.value' пустое или если оно соответствует указанному значению
-	//	   которое должно находится в поле json объекта с именем хранящемся в 'fieldName'
-	//	   3. Обработать правила 'pass', 'passany', 'replace', 'reject'
-	//
-
-	fmt.Println("---------- func 'NewProcessingInputMessageFromHive', Read list rules -----------")
-	for k, v := range listRule.Rulles {
-		fmt.Println(k, ". ")
-		fmt.Println("  actionType: ", v.ActionType)
-		for i, j := range v.ListRequiredValues {
-			fmt.Println("    ", i, ". ")
-			fmt.Println("      fieldName: ", j.FieldName)
-			fmt.Println("      typeValue: ", j.TypeValue)
-			fmt.Println("      value: ", j.Value)
-			fmt.Println("      replaceValue: ", j.ReplaceValue)
-		}
-	}
-	fmt.Println("--------------------------------------------------------------------------------")
-
-	// если первое правило типа 'passany'
-	if len(listRule.Rulles) > 0 && listRule.Rulles[0].ActionType == "passany" {
-		listConfirmRules = append(listConfirmRules, true)
-		result, err := json.Marshal(list)
-
-		return result, listConfirmRules, err
-	}
-
-	newList := processingReflectMap(list, listRule, 0)
-	result, err := json.Marshal(newList)
-
-	return result, listConfirmRules, err
-}*/
-
-/*func processingRules(
-	listRule []rules.RuleProcMISPMessageField,
-	currentValueType, currentField string,
-	currentValue interface{}) (interface{}, bool) {
-
-	var skipMsg bool
-	newValue := currentValue
-
-listField := map[string][2]int{}
-
-	for kr, vr := range listRule {
-
-	}
-
-
-	//А если заполнять поля правил по мере обработки сообщения?? ПО крайне мере для сообщений типа pass и reject
-//Если разделить правила типа pass и reject и правило с replace (потеряется последовательность) ну тогда обработчик для
-//них будет разный а набор правил один, сначало выполнится обработчик для replace, а потом для pass и reject
-
-	//это все очень сложно
-	for kr, vr := range listRule {
-		switch vr.ActionType {
-		case "pass":
-			switch currentValueType {
-			case "string":
-				listIsSuccess := []bool{}
-for krv, vrv := range vr.ListRequiredValues {
-//if vrv.FieldName ==
-}
-
-//				if currentField == vr.ListRequiredValues.
-				//еще читать в цикле ListRequiredValues
-
-			case "int":
-
-			case "bool":
-			}
-
-		case "reject":
-
-		case "replace":
-
-		}
-
-	}
-
-	return newValue, skipMsg
-}*/
-
 func processingReflectAnySimpleType(
 	name interface{},
 	anyType interface{},
-	listRule []rules.RuleProcMISPMessageField,
+	listRule rules.ListRulesProcMISPMessage,
 	num int) interface{} {
 
 	var str, nameStr string
@@ -202,6 +103,17 @@ func processingReflectAnySimpleType(
 	if r == nil {
 		return ""
 	}
+
+	/*
+	   1. Проверяем совпадение reflect.ValueOf(anyType).String() или другого типа со значениями из listRule.SearchValuesName
+	   2. Проверяем совпадение reflect.ValueOf(anyType).String() или другого типа со значениями из listRul.SearchFieldsName
+	   3. Сравниваем индексы типа [0,0]
+	   4. Если совпадает то получаем по этим индексам ActionType
+	   5. Если не совпадает то получаем только по индексу из listRule.SearchValuesName и проверяем ActionType на равенство replace
+
+	   для ActionType = pass, reject, RuleProcMISPMessageField.ListRequiredValues работает как 'И'
+	   а для ActionType = replace ????
+	*/
 
 	switch r.Kind() {
 	case reflect.String:
@@ -249,7 +161,7 @@ func processingReflectAnySimpleType(
 
 func processingReflectMap(
 	l map[string]interface{},
-	lr []rules.RuleProcMISPMessageField,
+	lr rules.ListRulesProcMISPMessage,
 	num int) (map[string]interface{}, bool) {
 
 	var (
@@ -296,7 +208,7 @@ func processingReflectMap(
 
 func processingReflectSlice(
 	l []interface{},
-	lr []rules.RuleProcMISPMessageField,
+	lr rules.ListRulesProcMISPMessage,
 	num int) ([]interface{}, bool) {
 
 	var (

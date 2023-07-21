@@ -63,13 +63,11 @@ type RuleProcessedMISPMessageFields struct {
 // FieldSearchName - наименование искомого поля
 // TypeValue - тип значения искомого поля, должно содержать одно из значений string, int, bool
 // SearchValue - значение искомого поля
-// FindValue - найденное значение
 // ReplaceValue - значение на которое нужно заменить (может быть в том числе и пустым)
 type ListRequiredValue struct {
 	FieldSearchName string
 	TypeValue       string //может это и не надо
 	SearchValue     string
-	FindValue       string
 	ReplaceValue    string
 }
 
@@ -82,7 +80,36 @@ type RuleProcMISPMessageField struct {
 }
 
 // ListRulesProcessedMISPMessage список обрабатываемых полей misp сообщения
-// где свойство map есть имя поля
+// Rules - описание основных правил
+// SearchFieldsName - список полей по которым осуществляется поиск
+// SearchValuesName - список значений по которым осуществляется поиск
 type ListRulesProcMISPMessage struct {
-	Rulles []RuleProcMISPMessageField
+	Rules            []RuleProcMISPMessageField
+	SearchFieldsName map[string][][2]int
+	SearchValuesName map[string][][2]int
+}
+
+type ListRulesProcessingMsgMISP struct {
+	Rules RuleSetProcessingMsgMISP
+}
+
+type RuleSetProcessingMsgMISP struct {
+	Passany bool
+	Pass    []RulePass
+	Replace []RuleReplace
+}
+
+type RulePassany struct {
+	IsPass bool
+}
+
+type RulePass struct {
+	FieldSearchName string
+	SearchValue     string
+}
+
+type RuleReplace struct {
+	FieldSearchName string
+	SearchValue     string
+	ReplaceValue    string
 }

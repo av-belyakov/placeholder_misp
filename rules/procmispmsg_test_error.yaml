@@ -1,45 +1,45 @@
 # Тестовый файл procmispmsg_test_error содержит логические ошибки реализации конфигурационного YAML файла
 
-RULLES:
+RULES:
   - actionType: "replace"
     listRequiredValues:
       - fieldSearchName: "dataType"
         typeValue: "string"
-        findValue: "arkime" # не хватает replaceValue
+        searchValue: "arkime" # не хватает replaceValue
       - fieldSearchName: "dataType"
         typeValue: "string"
-        findValue: "snort"
+        searchValue: "snort"
         replaceValue: "TEST_SNORT_ID"
       - typeValue: "string"
-        findValue: "my country"
+        searchValue: "my country"
         replaceValue: "TEST_COUNTRY"
   - actionType: "ereplacce" # неверный тип действия
     listRequiredValues:
       - fieldSearchName: "dataType"
         typeValue: "string"
-        findValue: "arkime" # не хватает replaceValue
+        searchValue: "arkime" # не хватает replaceValue
       - fieldSearchName: "dataType"
         typeValue: "string"
-        findValue: "snort"
+        searchValue: "snort"
         replaceValue: "TEST_SNORT_ID"
   - actionType: "pass"
     listRequiredValues:
       - typeValue: "string" # не хватает fieldName: ""
-        findValue: "WithImpact"
+        searchValue: "WithImpact"
       - fieldSearchName: "my status" # не хватает typeValue: ""
-        findValue: "WithImpact"
+        searchValue: "WithImpact"
       - fieldSearchName: "impactStatus" # не хватает value: ""
         typeValue: "string"
       - fieldSearchName: "impactStatus"
         typeValue: "string"
-        findValue: "WithImpact"
+        searchValue: "WithImpact"
       - fieldSearchName: "resolutionStatus"
         typeValue: "string"
-        findValue: "TruePositive"
+        searchValue: "TruePositive"
   - actionType: "reject" 
     listRequiredValues:
       - fieldSearchName: "namespace"
         typeValue: "singd2" # некорректное значение
-        findValue: "IP-API"
+        searchValue: "IP-API"
   - actionType: "passany"
   - actionType: "pass"

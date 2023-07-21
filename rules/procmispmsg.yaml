@@ -14,7 +14,7 @@
 # в поле (если 'actionType' содержит тип 'replace'). Поле 'listRequiredValues' содержит следующий перечень свойств:
 #   - fieldName, наименование искомого поля (данное поле НЕ ОБЯЗАТЕЛЬНО для заполнения при 'actionType' = 'replace')
 #   - typeValue, тип значения искомого поля, должно содержать одно из значений string, int, bool
-#   - value, значение искомого поля, для обозначения пустого значения этого свойства (если тип значения искомого поля равен string) используйте
+#   - searchValue, значение искомого поля, для обозначения пустого значения этого свойства (если тип значения искомого поля равен string) используйте
 #     значение 'null'
 #   - replaceValue, значение на которое нужно заменить, для обозначения пустого значения этого свойства (если тип значения искомого поля равен 
 #     string) используйте значение 'null'
@@ -38,36 +38,36 @@
 # - для правил находящихся в списке listRequiredValues используется "И"
 #
 
-RULLES:
+RULES:
   - actionType: "replace"
     listRequiredValues:
       - fieldSearchName: "dataType"
         typeValue: "string"
-        findValue: "arkime"
+        searchValue: "arkime"
         replaceValue: ""
       - fieldSearchName: "dataType"
         typeValue: "string"
-        findValue: "snort"
+        searchValue: "snort"
         replaceValue: "TEST_SNORT_ID"
       - fieldSearchName: "extraData"
         typeValue: "string"
-        findValue: "null"
+        searchValue: "null"
         replaceValue: "DATA EXTRACTION"
       - fieldSearchName: "patternId"
         typeValue: "string"
-        findValue: "T1110"
+        searchValue: "T1110"
         replaceValue: "null"
   - actionType: "pass"
     listRequiredValues:
       - fieldSearchName: "impactStatus"
         typeValue: "string"
-        findValue: "WithImpact"
+        searchValue: "WithImpact"
       - fieldSearchName: "resolutionStatus"
         typeValue: "string"
-        findValue: "TruePositive"
+        searchValue: "TruePositive"
   - actionType: "reject" 
     listRequiredValues:
       - fieldSearchName: "namespace"
         typeValue: "string"
-        findValue: "IP-API"
+        searchValue: "IP-API"
 #  - actionType: "passany"

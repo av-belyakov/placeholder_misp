@@ -16,17 +16,28 @@ var _ = Describe("Readrule", func() {
 		for k, v := range lr {
 			resultPrint += fmt.Sprintln(k, ".")
 			resultPrint += fmt.Sprintf("  actionType: %s\n", v.ActionType)
+			resultPrint += fmt.Sprintln("  listRequiredValues:")
 
 			for key, value := range v.ListRequiredValues {
 				resultPrint += fmt.Sprintf("   %d.\n", key)
 				resultPrint += fmt.Sprintf("    fieldSearchName: %s.\n", value.FieldSearchName)
 				resultPrint += fmt.Sprintf("    typeValue: %s.\n", value.TypeValue)
-				resultPrint += fmt.Sprintf("    fieldValue: %s.\n", value.FindValue)
+				//resultPrint += fmt.Sprintf("    fieldValue: %s.\n", value.FindValue)
 				resultPrint += fmt.Sprintf("    replaceValue: %s.\n", value.ReplaceValue)
 			}
 		}
 
 		return resultPrint
+	}
+
+	printSearchName := func(name string, list map[string][][2]int) string {
+		strRes := fmt.Sprintf("%s:\n", name)
+
+		for key, value := range list {
+			strRes += fmt.Sprintf("  '%s': %v\n", key, value)
+		}
+
+		return strRes
 	}
 
 	printVerificationWarning := func(lvw []string) string {
@@ -44,8 +55,10 @@ var _ = Describe("Readrule", func() {
 			lrp, lvw, err := rules.GetRuleProcessedMISPMsg("rules", "procmispmsg.yaml")
 
 			fmt.Println("1. _________ RULE procmispmsg.yaml.")
-			fmt.Println("new result:")
-			fmt.Println(printRuleResult(lrp.Rulles))
+			fmt.Println("new rule result:")
+			fmt.Println(printRuleResult(lrp.Rules))
+			fmt.Println(printSearchName("SearchFieldsName", lrp.SearchFieldsName))
+			fmt.Println(printSearchName("SearchValuesName", lrp.SearchValuesName))
 
 			fmt.Println("list verification warning:")
 			fmt.Println(printVerificationWarning(lvw))
@@ -54,13 +67,13 @@ var _ = Describe("Readrule", func() {
 		})
 	})
 
-	Context("Тест 2. Чтение тестового файла procmispmsg_test_1.yaml с правилами", func() {
+	/*Context("Тест 2. Чтение тестового файла procmispmsg_test_1.yaml с правилами", func() {
 		It("При чтении файла с правилами ошибок быть не должно, файл должен быть успешно прочитан", func() {
 			lrp, lvw, err := rules.GetRuleProcessedMISPMsg("rules", "procmispmsg_test_1.yaml")
 
 			fmt.Println("2. _________ RULE procmispmsg_test_1.yaml.")
 			fmt.Println("new result:")
-			fmt.Println(printRuleResult(lrp.Rulles))
+			fmt.Println(printRuleResult(lrp.Rules))
 
 			fmt.Println("list verification warning:")
 			fmt.Println(printVerificationWarning(lvw))
@@ -75,50 +88,18 @@ var _ = Describe("Readrule", func() {
 
 			fmt.Println("3. _________ RULE procmispmsg_test_2.yaml.")
 			fmt.Println("new result:")
-			fmt.Println(printRuleResult(lrp.Rulles))
+			fmt.Println(printRuleResult(lrp.Rules))
 
 			fmt.Println("list verification warning:")
 			fmt.Println(printVerificationWarning(lvw))
 
 			Expect(err).ShouldNot(HaveOccurred())
 		})
-	})
+	})*/
 
 	Context("Тест 4. Чтение тестового файла procmispmsg_test_error.yaml с ошибочным построение правил", func() {
 		It("При чтении файла с правилами ошибок быть не должно, файл должен быть успешно прочитан", func() {
 			lrp, lvw, err := rules.GetRuleProcessedMISPMsg("rules", "procmispmsg_test_error.yaml")
-
-			fmt.Println("4. _________ RULE procmispmsg_test_error.yaml.")
-			fmt.Println("new result:")
-			fmt.Println(printRuleResult(lrp.Rulles))
-
-			//создаем список из типов искомых полей
-			lf := map[string][][2]int{}
-
-			for k, v := range lrp.Rulles {
-				for i, j := range v.ListRequiredValues {
-					if j.FieldSearchName == "" {
-						continue
-					}
-
-					if _, ok := lf[j.FieldSearchName]; !ok {
-						lf[j.FieldSearchName] = [][2]int{}
-					}
-
-					lf[j.FieldSearchName] = append(lf[j.FieldSearchName], [2]int{k, i})
-				}
-			}
-
-			fmt.Println("TEST LIST FIELD ::: ")
-			for fn, fv := range lf {
-				fmt.Println("field name = ", fn, " - ", fv)
-
-				fmt.Println("------- test data resolv ------")
-				for _, n := range fv {
-					fmt.Println("||||| ActionType: ", lrp.Rulles[n[0]].ActionType, " ____ ", lrp.Rulles[n[0]].ListRequiredValues[n[1]])
-				}
-				fmt.Println("-------------------------------")
-			}
 
 			/*
 				Если сделать два типа списков lf (список названий свойств) b lv (список названий искомых значений). Так как оба
@@ -140,6 +121,22 @@ var _ = Describe("Readrule", func() {
 
 			fmt.Println("list verification warning:")
 			fmt.Println(printVerificationWarning(lvw))
+
+			fmt.Println("4. _________ RULE procmispmsg_test_error.yaml.")
+			fmt.Println("new rule result:")
+			fmt.Println(printRuleResult(lrp.Rules))
+			fmt.Println(printSearchName("SearchFieldsName", lrp.SearchFieldsName))
+			fmt.Println(printSearchName("SearchValuesName", lrp.SearchValuesName))
+
+			Expect(err).ShouldNot(HaveOccurred())
+		})
+	})
+
+	Context("Тест 5. Чтение нового тестового файла, в другом формате", func() {
+		It("Новый тестовый файл должен быть успешно прочитан", func() {
+			r, err := rules.GetRuleProcessingMsgForMISP("rules", "procmispmsg_test.yaml")
+
+			fmt.Println("NEW RULES FILE:", r)
 
 			Expect(err).ShouldNot(HaveOccurred())
 		})

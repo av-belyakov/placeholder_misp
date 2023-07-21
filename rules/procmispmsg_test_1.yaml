@@ -1,7 +1,7 @@
 # Тестовый YAML файл 1
 # Правило с actionType: "pass" стоит первым, следующее правило actionType: "replace" не будет использоватся
 
-RULLES:
+RULES:
   - actionType: "pass"
     listRequiredValues:
       - fieldSearchName: "impactStatus"
@@ -9,15 +9,15 @@ RULLES:
         value: "WithImpact"
       - fieldSearchName: "resolutionStatus"
         typeValue: "string"
-        findValue: "TruePositive"
+        searchValue: "TruePositive"
   - actionType: "replace"
     listRequiredValues:
       - fieldSearchName: "dataType"
         typeValue: "string"
-        findValue: "arkime"
+        searchValue: "arkime"
         replaceValue: ""
       - fieldSearchName: "dataType"
         typeValue: "string"
-        findValue: "snort"
+        searchValue: "snort"
         replaceValue: "TEST_SNORT_ID"
 #  - actionType: "passany"

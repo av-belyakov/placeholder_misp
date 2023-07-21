@@ -96,7 +96,7 @@ func init() {
 	}
 
 	// проверяем наличие вообще каких либо правил
-	if len(listRulesProcMISPMsg.Rulles) == 0 {
+	if len(listRulesProcMISPMsg.Rules) == 0 {
 		msg := "there are no rules for processing messages received from NATS or have not been verified"
 		_, f, l, _ := runtime.Caller(0)
 		_ = sl.WriteLoggingData(fmt.Sprintf("%s %s:%d", msg, f, l-3), "error")

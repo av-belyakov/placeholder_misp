@@ -1,0 +1,28 @@
+#При обработке сообщения для MISP алгоритм такой:
+# 1. Проверяется статус PASSANY, если он true тогда сообщение пропускается, по умолчанию сообщение ОТБРАСЫВАЕТСЯ
+# 2. По мере обработки сообщения в функции processingReflectAnySimpleType проверяется следующее:
+#    - сначало совпадение значений, свойств (fieldSearchName, searchValue) из подраздела REPLACE правил, при наличии
+# совпадении выполняется замена, при этом если fieldSearchName со значением null то учитывается только searchValue
+#    - затем совпадение в подразделе PASS, где между правилами действует логика 'И'
+#
+#
+#
+#
+#
+
+RULES:
+  REPLACE:
+    - fieldSearchName: "patternId"
+      searchValue: "T1110"
+      replaceValue: "null"
+    - fieldSearchName: "country"
+      searchValue: "EN"
+      replaceValue: "FR"
+  PASS:
+    - fieldSearchName: "impactStatus"
+      searchValue: "WithImpact"
+    - fieldSearchName: "resolutionStatus"
+      searchValue: "TruePositive"
+  PASSANY: true
+
+  
