@@ -1,45 +1,26 @@
 # Тестовый файл procmispmsg_test_error содержит логические ошибки реализации конфигурационного YAML файла
 
 RULES:
-  - actionType: "replace"
-    listRequiredValues:
-      - fieldSearchName: "dataType"
-        typeValue: "string"
-        searchValue: "arkime" # не хватает replaceValue
-      - fieldSearchName: "dataType"
-        typeValue: "string"
-        searchValue: "snort"
-        replaceValue: "TEST_SNORT_ID"
-      - typeValue: "string"
-        searchValue: "my country"
-        replaceValue: "TEST_COUNTRY"
-  - actionType: "ereplacce" # неверный тип действия
-    listRequiredValues:
-      - fieldSearchName: "dataType"
-        typeValue: "string"
-        searchValue: "arkime" # не хватает replaceValue
-      - fieldSearchName: "dataType"
-        typeValue: "string"
-        searchValue: "snort"
-        replaceValue: "TEST_SNORT_ID"
-  - actionType: "pass"
-    listRequiredValues:
-      - typeValue: "string" # не хватает fieldName: ""
-        searchValue: "WithImpact"
-      - fieldSearchName: "my status" # не хватает typeValue: ""
-        searchValue: "WithImpact"
-      - fieldSearchName: "impactStatus" # не хватает value: ""
-        typeValue: "string"
-      - fieldSearchName: "impactStatus"
-        typeValue: "string"
-        searchValue: "WithImpact"
-      - fieldSearchName: "resolutionStatus"
-        typeValue: "string"
-        searchValue: "TruePositive"
-  - actionType: "reject" 
-    listRequiredValues:
-      - fieldSearchName: "namespace"
-        typeValue: "singd2" # некорректное значение
-        searchValue: "IP-API"
-  - actionType: "passany"
-  - actionType: "pass"
+  REPLACE:
+    - searchField: "patternId"
+      searchValue: "" # ошибка пустое значение
+      replaceValue: "null"
+    - searchField: "country"
+      searchValue: "EN"
+      replaceValue: "FR"
+    - searchField: ""
+      searchValue: "T1110"
+      replaceValue: "null"
+    - searchField: "patternId"
+      searchValue: "" # ошибка пустое значение
+      replaceValue: "" # ошибка пустое значение  
+  PASS:
+    - searchField: "impactStatus"
+      searchValue: "WithImpact"
+    - searchField: "" # ошибка пустое значение
+      searchValue: "TruePositive"
+    - searchField: "impactStatus"
+      searchValue: "" # ошибка пустое значение
+    - searchField: "resolutionStatus"
+      searchValue: "null"
+  PASSANY: false  

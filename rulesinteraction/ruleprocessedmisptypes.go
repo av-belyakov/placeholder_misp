@@ -89,27 +89,60 @@ type ListRulesProcMISPMessage struct {
 	SearchValuesName map[string][][2]int
 }
 
+/*
+
+Ниже основное описание типов полей правил
+
+*/
+
+// ListRulesProcessingMsgMISP содержит список правил обработки сообщений предназначенных для MISP
+// Rules основной список правил полученный из конфигурационного файла
+// RulesIndex список индексированных правил для более удобной обработки
 type ListRulesProcessingMsgMISP struct {
-	Rules RuleSetProcessingMsgMISP
+	Rules      RuleSetProcessingMsgMISP
+	RulesIndex map[string][]RuleIndex
 }
 
+// RuleSetProcessingMsgMISP содержит правила обработки сообщений
+// Passany тип правила для пропуска всех сообщений
+// Pass тип правила для пропуска сообщений подходящих под определенные критерии
+// Replace тип правила для замены определенных значений подходящих под определенные критерии
 type RuleSetProcessingMsgMISP struct {
-	Passany bool
-	Pass    []RulePass
-	Replace []RuleReplace
+	Passany  bool
+	Pass     []RulePass
+	Replace  []RuleReplace
+	Passtest []PasstestListAnd
 }
 
+type PasstestListAnd struct {
+	ListAnd []RulePass
+}
+
+// RulePassany содержит тип правила для пропуска всех сообщений
+// IsPass разрешен ли пропуск всех сообщений
 type RulePassany struct {
 	IsPass bool
 }
 
+// RulePass содержит тип правила для пропуска сообщений подходящих под определенные критерии
+// SearchField искомое поле
+// SearchValue искомое значение
 type RulePass struct {
-	FieldSearchName string
-	SearchValue     string
+	SearchField, SearchValue string
 }
 
+// RuleReplace содержит тип правила для замены определенных значений
+// SearchField искомое поле
+// SearchValue искомое значение
+// ReplaceValue заменяемое значение
 type RuleReplace struct {
-	FieldSearchName string
-	SearchValue     string
-	ReplaceValue    string
+	SearchField, SearchValue, ReplaceValue string
+}
+
+// RuleIndex содержит список индексированных правил для более удобной обработки
+// RuleType тип правила
+// SearchField искомое поле
+// ReplaceValue заменяемое значение
+type RuleIndex struct {
+	RuleType, SearchField, ReplaceValue string
 }

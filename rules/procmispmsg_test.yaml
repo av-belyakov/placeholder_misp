@@ -1,28 +1,82 @@
-#При обработке сообщения для MISP алгоритм такой:
-# 1. Проверяется статус PASSANY, если он true тогда сообщение пропускается, по умолчанию сообщение ОТБРАСЫВАЕТСЯ
-# 2. По мере обработки сообщения в функции processingReflectAnySimpleType проверяется следующее:
-#    - сначало совпадение значений, свойств (fieldSearchName, searchValue) из подраздела REPLACE правил, при наличии
-# совпадении выполняется замена, при этом если fieldSearchName со значением null то учитывается только searchValue
-#    - затем совпадение в подразделе PASS, где между правилами действует логика 'И'
+#     Общее описание правил.
 #
+#   Все используемые правила делятся на три типа: REPLACE, PASSANY и PASS. Правила типа REPLACE и PASS реализованы 
+# в виде списка объектов с параметрами. 
 #
+#   Правило типа PASSANY имеет только один единственный параметр 'true' или 'false'.
 #
+#   Правила из раздела REPLACE должны содержать список объектов состоящих из определенных свойств и отвечают за замену 
+# значений определенных полей, либо просто совпадающих полей, если наименование искомого поле не заполняется. 
+# Правило данного типа выполняется ВСЕГДА. Для данного типа правил обязательными являются поля 'searchValue' и 'replaceValue'. 
+# Свойство 'searchField' может быть пустым или отсутствовать, тогда поиск будет осуществлятся только по значению из свойства 'searchValue'.
+# ЛОГИКА обработки списка объектов данного правила "ИЛИ".
 #
+#   Правила из раздела PASS должны содержать список объектов состоящих из определенных свойств. Они отвечают за пропуск сообщения, 
+# при совпадении полей и значений в обрабатываемом сообщении. Для данного типа правил обязательными являются поля 'searchField' 
+# и 'searchValue'. ЛОГИКА обработки списка объектов данного правила "И". 
+# 
+#   Список параметров правил:
+# - searchField - поле поиска (обязательно для правил REPLACE и PASS)
+# - searchValue - значение поиска (обязательно для правил REPLACE и PASS)
+# - replaceValue - значение для замены (обязательно для правила REPLACE)
 #
+#   Для указания пустого значения в свойствах 'searchValue' и 'replaceValue', необходимо использовать специальное
+# значение 'null'. Правила с пустыми значениями для свойств 'searchValue' и 'replaceValue' будут считатся не
+# корректными и исключатся из обработки. 
+#
+# Пример правил:
+#
+# RULES:
+#  REPLACE:
+#    - searchField: "example_field_1"
+#      searchValue: "example_value"
+#      replaceValue: "null"
+#    - searchField: "example_field_2"
+#      searchValue: "example_value_one"
+#      replaceValue: "example_value_two"
+#    - searchValue: "example_1"
+#      replaceValue: "EXAMPLE_2"
+#  PASS:
+#    - searchField: "field-ex-1"
+#      searchValue: "value_123"
+#    - searchField: "fiels-ex-two"
+#      searchValue: "123_value"
+#  PASSANY: true
+#
+
+# Правила из раздела PASSTEST. Логика, первый вложенный список "ИЛИ", второй в listAnd "И"
+# Что то нужно делать с пустыми значениями. Использовать ли null?
 
 RULES:
   REPLACE:
-    - fieldSearchName: "patternId"
+    - searchField: "patternId"
       searchValue: "T1110"
       replaceValue: "null"
-    - fieldSearchName: "country"
+    - searchField: "country"
       searchValue: "EN"
       replaceValue: "FR"
+    - searchField: "_createdBy"
+      searchValue: "admin@thehive.local"
+      replaceValue: "Admin@TheHivE.local"
+    - searchField: "_createdBy"
+      searchValue: "p.delyukin@cloud.rcm"
+      replaceValue: "P.Delyukin@CLOUD.RCM"
+    - searchField: "caseId"
+      searchValue: "831"
+      replaceValue: "9451"
   PASS:
-    - fieldSearchName: "impactStatus"
+    - searchField: "impactStatus"
       searchValue: "WithImpact"
-    - fieldSearchName: "resolutionStatus"
+    - searchField: "resolutionStatus"
       searchValue: "TruePositive"
-  PASSANY: true
-
-  
+  PASSTEST:
+    - listAnd:
+      - searchField: "impactStatus"
+        searchValue: "WithImpact"
+      - searchField: "resolutionStatus"
+        searchValue: "TruePositive"
+    - listAnd:
+      - searchField: "status"
+        searchValue: "ElementStatus"
+    - listAnd:
+  PASSANY: true  
