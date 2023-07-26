@@ -9,38 +9,47 @@
 # значений определенных полей, либо просто совпадающих полей, если наименование искомого поле не заполняется. 
 # Правило данного типа выполняется ВСЕГДА. Для данного типа правил обязательными являются поля 'searchValue' и 'replaceValue'. 
 # Свойство 'searchField' может быть пустым или отсутствовать, тогда поиск будет осуществлятся только по значению из свойства 'searchValue'.
+# Одно из свойств 'searchField' или 'searchValue' должно быть заполнено. Если свойство 'searchValue' пустое, а свойство 'searchField'
+# заполнено то выполняется поиск поля с именем из 'searchField' и пустым значением. Если свойство 'replaceValue' пустое, то найденное
+# значение будет заменено пустым.
 # ЛОГИКА обработки списка объектов данного правила "ИЛИ".
 #
-#   Правила из раздела PASS должны содержать список объектов состоящих из определенных свойств. Они отвечают за пропуск сообщения, 
-# при совпадении полей и значений в обрабатываемом сообщении. Для данного типа правил обязательными являются поля 'searchField' 
-# и 'searchValue'. ЛОГИКА обработки списка объектов данного правила "И". 
+#   Правила из раздела PASS должны содержать список из вложенных объектов, состоящих из определенных свойств. Они отвечают за пропуск сообщения, 
+# при совпадении полей и значений в обрабатываемом сообщении. Для данного типа правил обязательными являются свойства 'searchField' 
+# и 'searchValue'. Свойство 'searchValue' может быть пустым, тогда поиск будет выполнятся по наименаванию поля из свойства 'searchField' и
+# пустому значению. ЛОГИКА обработки списка объектов "ИЛИ" для первого уровня вложения и логика "И" для второго уровня вложения. 
 # 
 #   Список параметров правил:
-# - searchField - поле поиска (обязательно для правил REPLACE и PASS)
-# - searchValue - значение поиска (обязательно для правил REPLACE и PASS)
+# - searchField - поле поиска (обязательно для правил PASS)
+# - searchValue - значение поиска (обязательно для правил PASS)
 # - replaceValue - значение для замены (обязательно для правила REPLACE)
-#
-#   Для указания пустого значения в свойствах 'searchValue' и 'replaceValue', необходимо использовать специальное
-# значение 'null'. Правила с пустыми значениями для свойств 'searchValue' и 'replaceValue' будут считатся не
-# корректными и исключатся из обработки. 
 #
 # Пример правил:
 #
 # RULES:
 #  REPLACE:
-#    - searchField: "example_field_1"
-#      searchValue: "example_value"
-#      replaceValue: "null"
-#    - searchField: "example_field_2"
-#      searchValue: "example_value_one"
-#      replaceValue: "example_value_two"
-#    - searchValue: "example_1"
-#      replaceValue: "EXAMPLE_2"
+#    - searchField: "capecId"
+#      searchValue: "CAPEC-49"
+#      replaceValue: ""
+#    - searchField: "_createdBy"
+#      searchValue: "admin@thehive.local"
+#      replaceValue: "Admin@TheHivE.local"
+#    - searchField: "caseId"
+#      searchValue: "831"
+#      replaceValue: "9451"
+#    - searchField: "revoked"
+#      searchValue: "false"
+#      replaceValue: "true"
 #  PASS:
-#    - searchField: "field-ex-1"
-#      searchValue: "value_123"
-#    - searchField: "fiels-ex-two"
-#      searchValue: "123_value"
+#    - listAnd:
+#      - searchField: "impactStatus"
+#        searchValue: "WithImpact"
+#      - searchField: "resolutionStatus"
+#        searchValue: "TruePositive"
+#    - listAnd:
+#      - searchField: "status"
+#        searchValue: "ElementStatus"
+#    - listAnd:
 #  PASSANY: true
 #
 
@@ -49,9 +58,9 @@
 
 RULES:
   REPLACE:
-    - searchField: "patternId"
-      searchValue: "T1110"
-      replaceValue: "null"
+    - searchField: "capecId"
+      searchValue: "CAPEC-49"
+      replaceValue: ""
     - searchField: "country"
       searchValue: "EN"
       replaceValue: "FR"
@@ -64,19 +73,17 @@ RULES:
     - searchField: "caseId"
       searchValue: "831"
       replaceValue: "9451"
+    - searchField: "revoked"
+      searchValue: "false"
+      replaceValue: "true"
   PASS:
-    - searchField: "impactStatus"
-      searchValue: "WithImpact"
-    - searchField: "resolutionStatus"
-      searchValue: "TruePositive"
-  PASSTEST:
     - listAnd:
-      - searchField: "impactStatus"
-        searchValue: "WithImpact"
-      - searchField: "resolutionStatus"
-        searchValue: "TruePositive"
+      - searchField: "organisation"
+        searchValue: "RCM"
+      - searchField: "dataType"
+        searchValue: "ip_home"
     - listAnd:
-      - searchField: "status"
-        searchValue: "ElementStatus"
+      - searchField: "predicate"
+        searchValue: "precision"
     - listAnd:
-  PASSANY: true  
+  PASSANY: false  

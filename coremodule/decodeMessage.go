@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
-	"strings"
 
 	rules "placeholder_misp/rulesinteraction"
 )
@@ -42,53 +41,66 @@ func NewHandleMessageFromHive(b []byte, listRule rules.ListRulesProcessingMsgMIS
 
 func (pm *ProcessMessageFromHive) HandleMessage() (bool, []string) {
 	var skipMsg bool
-
 	warningMsg := []string{}
-	listMissed := [][]bool{}
 	chanWarningMsg := make(chan string)
-
-	fmt.Println("func 'HandleMessage', START")
-
-	//если правило PASSANY false, а совпадений в PASS нет то сообщение отбрасывается
-
-	for _, v := range pm.ListRules.Rules.Passtest {
-		listMissed = append(listMissed, make([]bool, len(v.ListAnd)))
-	}
 
 	go func(cwmsg <-chan string, wmsg *[]string) {
 		*wmsg = append(*wmsg, <-cwmsg)
 	}(chanWarningMsg, &warningMsg)
 
-	fmt.Println("func 'HandleMessage', 11111")
-
 	pm.Message = processingReflectMap(chanWarningMsg, pm.Message, pm.ListRules, 0)
 	close(chanWarningMsg)
 
-	fmt.Println("func 'HandleMessage', 22222")
+	/* ДЛЯ ТЕСТА */
+	fmt.Println("func 'HandleMessage', 22222 pm.ListRules.Rules.Passtest = ", pm.ListRules.Rules.Pass)
+	fmt.Println("func 'HandleMessage', pm.Rules.Pass: ")
+	for key, value := range pm.ListRules.Rules.Pass {
+		fmt.Printf("%d.\n", key)
+		for k, v := range value.ListAnd {
+			fmt.Printf("  %d.\n", k)
+			fmt.Printf("  SearchField: %s\n", v.SearchField)
+			fmt.Printf("  SearchValue: %s\n", v.SearchValue)
+			fmt.Printf("  StatementExpression: %t\n", v.StatementExpression)
+		}
+	}
 
 	//сообщение пропускается в независимости от результата обработки правил PASS
 	if pm.ListRules.Rules.Passany {
 		skipMsg = true
 	}
 
-	for _, l := range listMissed {
-		var isTrue bool = true
+	skipMsg = true
+	//проверяем соответствие сообщения правилам из раздела Pass
+	for _, v := range pm.ListRules.Rules.Pass {
+		for _, value := range v.ListAnd {
+			if !value.StatementExpression {
+				skipMsg = false
 
-		for _, v := range l {
-			if !v {
-				isTrue = false
+				break
 			}
 		}
 
-		if isTrue {
-			skipMsg = true
-
+		if skipMsg {
 			break
 		}
 	}
 
+	/*
+		   Протестировал pm.ListRules.Rules.Pass, если
+		   					SearchField: dataType
+		     				SearchValue: i2p_111home
+
+		   				то получаем skipMsg так как нет совпадения, если
+		         			SearchField: "dataType"
+		         			SearchValue: "ip_home"
+
+					Вроде все работает
+	*/
+
+	fmt.Println("")
 	fmt.Println("___________________func 'HandleMessage' ____________________")
-	fmt.Println("test listMissed: ", listMissed, " skipMsg:", skipMsg)
+	fmt.Println("-------- TEST skipMsg:", skipMsg, " ---------------")
+	fmt.Println("____________________________________________________________")
 
 	return skipMsg, warningMsg
 }
@@ -97,85 +109,75 @@ func (pm *ProcessMessageFromHive) GetMessage() ([]byte, error) {
 	return json.Marshal(pm.Message)
 }
 
-func ReplacementRuleHandler(svt, rv string, sv, cv interface{}) (interface{}, error) {
-	searchValue, ok := sv.(string)
-	if !ok {
-		return cv, fmt.Errorf("unable to convert value 'searchValue'")
+func PassRuleHandler(rulePass []rules.PassListAnd, fn string, cv interface{}) {
+	cvstr := fmt.Sprint(cv)
+
+	for key, value := range rulePass {
+		for k, v := range value.ListAnd {
+			if fn != v.SearchField {
+				continue
+			}
+
+			if cvstr != v.SearchValue {
+				continue
+			}
+
+			/*
+				с strings.Contains не работает почему то
+				зато с if cvstr != v.SearchValue работае
+
+				if !strings.Contains(v.SearchValue, cvstr) {
+					continue
+				}*/
+
+			rulePass[key].ListAnd[k].StatementExpression = true
+		}
 	}
+}
 
-	switch svt {
-	case "string":
-		cv, ok := cv.(string)
-		if !ok {
-			break
-		}
-
-		if sv == cv {
+func ReplacementRuleHandler(lr rules.ListRulesProcessingMsgMISP, svt, fn string, cv interface{}) (interface{}, int, error) {
+	getReplaceValue := func(svt, rv string) (interface{}, error) {
+		switch svt {
+		case "string":
 			return rv, nil
-		}
 
-	case "int":
-		cv, ok := cv.(int64)
-		if !ok {
-			break
-		}
-
-		sv, err := strconv.ParseInt(rv, 10, 64)
-		if err != nil {
-			return cv, err
-		}
-
-		if sv == cv {
+		case "int":
 			return strconv.ParseInt(rv, 10, 64)
-		}
 
-	case "uint":
-		cv, ok := cv.(uint64)
-		if !ok {
-			break
-		}
-
-		sv, err := strconv.ParseUint(searchValue, 10, 64)
-		if err != nil {
-			return cv, err
-		}
-
-		if sv == cv {
+		case "uint":
 			return strconv.ParseUint(rv, 10, 64)
-		}
 
-	case "float":
-		cv, ok := cv.(float64)
-		if !ok {
-			break
-		}
-
-		sv, err := strconv.ParseFloat(searchValue, 64)
-		if err != nil {
-			return cv, err
-		}
-
-		if sv == cv {
+		case "float":
 			return strconv.ParseFloat(rv, 64)
-		}
 
-	case "bool":
-		cv, ok := cv.(bool)
-		if !ok {
-			break
-		}
-
-		sv, err := strconv.ParseBool(searchValue)
-		if err != nil {
-			return cv, err
-		}
-
-		if sv == cv {
+		case "bool":
 			return strconv.ParseBool(rv)
 		}
+
+		return rv, nil
 	}
 
-	return cv, nil
+	for k, v := range lr.Rules.Replace {
+		if v.SearchValue != fmt.Sprint(cv) {
+			continue
+		}
+
+		if v.SearchField != "" {
+			if v.SearchField == fn {
+				nv, err := getReplaceValue(svt, v.ReplaceValue)
+
+				return nv, k, err
+			}
+
+			continue
+		}
+
+		nv, err := getReplaceValue(svt, v.ReplaceValue)
+
+		return nv, k, err
+	}
+
+	return cv, 0, nil
 }
 
 func processingReflectAnySimpleType(
@@ -185,10 +187,7 @@ func processingReflectAnySimpleType(
 	listRule rules.ListRulesProcessingMsgMISP,
 	num int) interface{} {
 
-	var (
-		err     error
-		nameStr string
-	)
+	var nameStr string
 	r := reflect.TypeOf(anyType)
 
 	if n, ok := name.(int); ok {
@@ -201,255 +200,76 @@ func processingReflectAnySimpleType(
 		return anyType
 	}
 
-	fmt.Println("func 'processingReflectAnySimpleType' nameStr: ", nameStr, " AnyType: ", anyType, " TypeOf: ", reflect.TypeOf(anyType))
+	//fmt.Printf("func 'processingReflectAnySimpleType' nameStr: '%s', AnyType: '%v', TypeOf: %s\n", nameStr, anyType, reflect.TypeOf(anyType))
 
 	switch r.Kind() {
 	case reflect.String:
 		result := reflect.ValueOf(anyType).String()
 
-		/*
-
-			Похоже все числовые значения преобразовываются в FLOAT32, FLOAT64
-			с индексами как доп. список правил нельзя использовать null и поиск
-			пустых значений
-
-			Надо все же попробовать обрабатывать обычный список правил REPLACE
-			и сделать обработку правил PASS по образу PASSTEST
-		*/
-
-		//может так надо попробовать обрабатыват правила из раздела REPLACE???
-		for k, v := range listRule.Rules.Replace {
-			if result != v.SearchValue {
-				continue
-			}
-
-			var t interface{}
-			if v.SearchField != "" {
-				if strings.Contains(v.SearchField, nameStr) {
-					t, err = ReplacementRuleHandler("string", v.ReplaceValue, v.SearchValue, result)
-				}
-			} else {
-				t, err = ReplacementRuleHandler("string", v.ReplaceValue, v.SearchValue, result)
-			}
-
-			if err != nil {
-				wmsg <- fmt.Sprintf("search value '%s' from rule number '%d' of section 'REPLACE' is not fulfilled", result, k)
-			}
-
-			if s, ok := t.(string); ok {
-				result = s
-
-				//при совпадении искомого значения стоит ли продалжать поиск и повторную замену
-				//или выйти из цикла???
-				break
-			}
+		ncv, num, err := ReplacementRuleHandler(listRule, "string", nameStr, result)
+		if err != nil {
+			wmsg <- fmt.Sprintf("search value '%s' from rule number '%d' of section 'REPLACE' is not fulfilled", result, num)
 		}
 
-		/*indexs, ok := listRule.RulesIndex[result]
-		if !ok {
-			return result
-		}
+		PassRuleHandler(listRule.Rules.Pass, nameStr, ncv)
 
-		fmt.Println("func 'processingReflectAnySimpleType' STRING searchValue: ", result, " added settings: ", indexs)
-
-		for k, index := range indexs {
-			//if index.RuleType == "PASS" {}
-
-			if index.RuleType == "REPLACE" {
-				var t interface{}
-
-				if index.SearchField != "" {
-					if strings.Contains(nameStr, index.SearchField) {
-						t, err = ReplacementRuleHandler("string", index.ReplaceValue, result, result)
-					}
-				} else {
-					t, err = ReplacementRuleHandler("string", index.ReplaceValue, result, result)
-				}
-
-				if err != nil {
-					//ВОТ ТУТ НАДО ПОДУМАТЬ КАК ОБРАБАТЫВАТЬ ОШИБКУ
-					wmsg <- fmt.Sprintf("search value '%s' from rule number '%d' of section '%s' is not fulfilled", result, k, index.RuleType)
-				}
-
-				if s, ok := t.(string); ok {
-					result = s
-				}
-			}
-		}*/
-
-		return result
+		return ncv
 
 	case reflect.Int, reflect.Int16, reflect.Int32, reflect.Int64:
-
-		fmt.Println("func 'processingReflectAnySimpleType' INT, INT16, INT32, INT64 searchValue: |||||||||||||||||||||")
-
 		result := reflect.ValueOf(anyType).Int()
-		indexs, ok := listRule.RulesIndex[fmt.Sprintln(result)]
-		if !ok {
-			return result
+
+		//fmt.Println("func 'processingReflectAnySimpleType' INT, INT16, INT32, INT64 searchValue: ||||||||||||||||||||| result = ", result)
+
+		ncv, num, err := ReplacementRuleHandler(listRule, "int", nameStr, result)
+		if err != nil {
+			wmsg <- fmt.Sprintf("search value '%v' from rule number '%d' of section 'REPLACE' is not fulfilled", result, num)
 		}
 
-		fmt.Println("func 'processingReflectAnySimpleType' INT, INT16, INT32, INT64 searchValue: ", result, " added settings: ", indexs)
+		PassRuleHandler(listRule.Rules.Pass, nameStr, ncv)
 
-		for k, index := range indexs {
-			//if index.RuleType == "PASS" {}
-
-			if index.RuleType == "REPLACE" {
-				var t interface{}
-
-				if index.SearchField != "" {
-					if strings.Contains(nameStr, index.SearchField) {
-						t, err = ReplacementRuleHandler("int", index.ReplaceValue, fmt.Sprintln(result), result)
-					}
-				} else {
-					t, err = ReplacementRuleHandler("int", index.ReplaceValue, fmt.Sprintln(result), result)
-				}
-
-				if err != nil {
-					//ВОТ ТУТ НАДО ПОДУМАТЬ КАК ОБРАБАТЫВАТЬ ОШИБКУ
-					wmsg <- fmt.Sprintf("search value '%v' from rule number '%d' of section '%s' is not fulfilled", result, k, index.RuleType)
-				}
-
-				if s, ok := t.(int64); ok {
-					result = s
-				}
-			}
-		}
-
-		return result
+		return ncv
 
 	case reflect.Uint, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		result := reflect.ValueOf(anyType).Uint()
 
-		fmt.Println("func 'processingReflectAnySimpleType' UINT, UINT16, UINT32, UINT64 searchValue: |||||||||||||||||||||")
+		//fmt.Println("func 'processingReflectAnySimpleType' UINT, UINT16, UINT32, UINT64 searchValue: ||||||||||||||||||||| result = ", result)
 
-		indexs, ok := listRule.RulesIndex[fmt.Sprintln(result)]
-		if !ok {
-			return result
+		ncv, num, err := ReplacementRuleHandler(listRule, "uint", nameStr, result)
+		if err != nil {
+			wmsg <- fmt.Sprintf("search value '%v' from rule number '%d' of section 'REPLACE' is not fulfilled", result, num)
 		}
 
-		fmt.Println("func 'processingReflectAnySimpleType' UINT, UINT16, UINT32, UINT64 searchValue: ", result, " added settings: ", indexs)
+		PassRuleHandler(listRule.Rules.Pass, nameStr, ncv)
 
-		for k, index := range indexs {
-			//if index.RuleType == "PASS" {}
-
-			if index.RuleType == "REPLACE" {
-				var t interface{}
-
-				if index.SearchField != "" {
-					if strings.Contains(nameStr, index.SearchField) {
-						t, err = ReplacementRuleHandler("uint", index.ReplaceValue, fmt.Sprintln(result), result)
-					}
-				} else {
-					t, err = ReplacementRuleHandler("uint", index.ReplaceValue, fmt.Sprintln(result), result)
-				}
-
-				if err != nil {
-					//ВОТ ТУТ НАДО ПОДУМАТЬ КАК ОБРАБАТЫВАТЬ ОШИБКУ
-					wmsg <- fmt.Sprintf("search value '%v' from rule number '%d' of section '%s' is not fulfilled", result, k, index.RuleType)
-				}
-
-				if s, ok := t.(uint64); ok {
-					result = s
-				}
-			}
-		}
-
-		return result
+		return ncv
 
 	case reflect.Float32, reflect.Float64:
 		result := reflect.ValueOf(anyType).Float()
 
-		fmt.Println("func 'processingReflectAnySimpleType' FLOAT32, FLOAT64 searchValue: ||||||||||||||||||||| listRule.RulesIndex = ", listRule.RulesIndex)
-		fmt.Println("float value: ", fmt.Sprintln(result))
+		//fmt.Println("func 'processingReflectAnySimpleType' FLOAT32, FLOAT64 searchValue: ||||||||||||||||||||| result = ", result)
 
-		/*
-
-			Похоже все числовые значения преобразовываются в FLOAT32, FLOAT64
-			с индексами как доп. список правил нельзя использовать null и поиск
-			пустых значений
-
-			Надо все же попробовать обрабатывать обычный список правил REPLACE
-			и сделать обработку правил PASS по образу PASSTEST
-		*/
-
-		indexs, ok := listRule.RulesIndex[fmt.Sprintln(result)]
-		if !ok {
-
-			fmt.Println("OOOOOOOOOOOOOOOOoo")
-
-			return result
+		ncv, num, err := ReplacementRuleHandler(listRule, "float", nameStr, result)
+		if err != nil {
+			wmsg <- fmt.Sprintf("search value '%v' from rule number '%d' of section 'REPLACE' is not fulfilled", result, num)
 		}
 
-		fmt.Println("func 'processingReflectAnySimpleType' FLOAT32, FLOAT64 searchValue: ", result, " added settings: ", indexs)
+		PassRuleHandler(listRule.Rules.Pass, nameStr, ncv)
 
-		for k, index := range indexs {
-			//if index.RuleType == "PASS" {}
+		return ncv
 
-			if index.RuleType == "REPLACE" {
-				var t interface{}
-
-				if index.SearchField != "" {
-					if strings.Contains(nameStr, index.SearchField) {
-						t, err = ReplacementRuleHandler("float", index.ReplaceValue, fmt.Sprintln(result), result)
-					}
-				} else {
-					t, err = ReplacementRuleHandler("float", index.ReplaceValue, fmt.Sprintln(result), result)
-				}
-
-				if err != nil {
-					//ВОТ ТУТ НАДО ПОДУМАТЬ КАК ОБРАБАТЫВАТЬ ОШИБКУ
-					wmsg <- fmt.Sprintf("search value '%v' from rule number '%d' of section '%s' is not fulfilled", result, k, index.RuleType)
-				}
-
-				if s, ok := t.(float64); ok {
-					result = s
-				}
-			}
-		}
-
-		return result
-
-		/*case reflect.Bool:
+	case reflect.Bool:
 		result := reflect.ValueOf(anyType).Bool()
 
-		sv, err := strconv.ParseBool(searchValue)
+		//fmt.Println("func 'processingReflectAnySimpleType' BOOL searchValue: ||||||||||||||||||||| result = ", result)
+
+		ncv, num, err := ReplacementRuleHandler(listRule, "bool", nameStr, result)
 		if err != nil {
-			wmsg <- fmt.Sprintf("rule error, search value '%s' of section 'Replace', %v", searchValue, err)
-
-			return result
+			wmsg <- fmt.Sprintf("search value '%v' from rule number '%d' of section 'REPLACE' is not fulfilled", result, num)
 		}
 
-		if result != sv {
-			return result
-		}
+		PassRuleHandler(listRule.Rules.Pass, nameStr, ncv)
 
-		for k, index := range indexs {
-			//if index.RuleType == "PASS" {}
-
-			if index.RuleType == "REPLACE" {
-				var t interface{}
-
-				if index.SearchField != "" {
-					if strings.Contains(nameStr, index.SearchField) {
-						t, err = ReplacementRuleHandler("bool", index.ReplaceValue, searchValue, result)
-					}
-				} else {
-					t, err = ReplacementRuleHandler("bool", index.ReplaceValue, searchValue, result)
-				}
-
-				if err != nil {
-					//ВОТ ТУТ НАДО ПОДУМАТЬ КАК ОБРАБАТЫВАТЬ ОШИБКУ
-					wmsg <- fmt.Sprintf("search value '%s' from rule number '%d' of section '%s' is not fulfilled", searchValue, k, index.RuleType)
-				}
-
-				if s, ok := t.(bool); ok {
-					result = s
-				}
-			}
-		}
-
-		return result*/
+		return ncv
 	}
 
 	/*switch r.Kind() {
@@ -651,10 +471,6 @@ func processingReflectMap(
 
 		default:
 			nl[k] = processingReflectAnySimpleType(wmsg, k, v, lr, num)
-		}
-
-		if k == "dataType" {
-			fmt.Println("func 'processingReflectMapTest', KKKK = ", k, " VVVV = ", l[k])
 		}
 	}
 

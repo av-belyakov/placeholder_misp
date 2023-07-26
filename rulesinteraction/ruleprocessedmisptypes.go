@@ -97,10 +97,8 @@ type ListRulesProcMISPMessage struct {
 
 // ListRulesProcessingMsgMISP содержит список правил обработки сообщений предназначенных для MISP
 // Rules основной список правил полученный из конфигурационного файла
-// RulesIndex список индексированных правил для более удобной обработки
 type ListRulesProcessingMsgMISP struct {
-	Rules      RuleSetProcessingMsgMISP
-	RulesIndex map[string][]RuleIndex
+	Rules RuleSetProcessingMsgMISP
 }
 
 // RuleSetProcessingMsgMISP содержит правила обработки сообщений
@@ -108,13 +106,13 @@ type ListRulesProcessingMsgMISP struct {
 // Pass тип правила для пропуска сообщений подходящих под определенные критерии
 // Replace тип правила для замены определенных значений подходящих под определенные критерии
 type RuleSetProcessingMsgMISP struct {
-	Passany  bool
-	Pass     []RulePass
-	Replace  []RuleReplace
-	Passtest []PasstestListAnd
+	Passany bool
+	Pass    []PassListAnd
+	Replace []RuleReplace
 }
 
-type PasstestListAnd struct {
+// PassListAnd список правил
+type PassListAnd struct {
 	ListAnd []RulePass
 }
 
@@ -127,8 +125,11 @@ type RulePassany struct {
 // RulePass содержит тип правила для пропуска сообщений подходящих под определенные критерии
 // SearchField искомое поле
 // SearchValue искомое значение
+// StatementExpression утверждение выражения
 type RulePass struct {
-	SearchField, SearchValue string
+	SearchField         string
+	SearchValue         string
+	StatementExpression bool
 }
 
 // RuleReplace содержит тип правила для замены определенных значений
@@ -137,12 +138,4 @@ type RulePass struct {
 // ReplaceValue заменяемое значение
 type RuleReplace struct {
 	SearchField, SearchValue, ReplaceValue string
-}
-
-// RuleIndex содержит список индексированных правил для более удобной обработки
-// RuleType тип правила
-// SearchField искомое поле
-// ReplaceValue заменяемое значение
-type RuleIndex struct {
-	RuleType, SearchField, ReplaceValue string
 }

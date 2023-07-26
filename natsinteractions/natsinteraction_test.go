@@ -190,9 +190,11 @@ var _ = Describe("Natsinteraction", Ordered, func() {
 
 			Expect(err).ShouldNot(HaveOccurred())
 
-			//reg := regexp.MustCompile(`dataType: \'[a-zA-Z_]+\'`)
 			reg := regexp.MustCompile(`_createdBy: \'[a-zA-Z_.@0-9]+\'`)
 			regCaseId := regexp.MustCompile(`caseId: [0-9]+`)
+			regRevoked := regexp.MustCompile(`revoked: [a-zA-Z]+`)
+			regStartDate := regexp.MustCompile(`startDate: [a-zA-Z_.@0-9]+`)
+			regPatternId := regexp.MustCompile(`capecId: \'[a-zA-Z0-9\-]+\'`)
 
 			fmt.Println("____BEFORE reflect modify____")
 			strData, err = supportingfunctions.NewReadReflectJSONSprint(eb)
@@ -200,9 +202,16 @@ var _ = Describe("Natsinteraction", Ordered, func() {
 			for k, v := range bl {
 				fmt.Printf("%d. %s\n", k+1, v)
 			}
-			fmt.Println("_____________________________")
 			cibl := regCaseId.FindAllString(strData, 10)
 			for k, v := range cibl {
+				fmt.Printf("%d. %s\n", k+1, v)
+			}
+			rbl := regRevoked.FindAllString(strData, 10)
+			for k, v := range rbl {
+				fmt.Printf("%d. %s\n", k+1, v)
+			}
+			pidbl := regPatternId.FindAllString(strData, 10)
+			for k, v := range pidbl {
 				fmt.Printf("%d. %s\n", k+1, v)
 			}
 
@@ -218,7 +227,6 @@ var _ = Describe("Natsinteraction", Ordered, func() {
 			Expect(err).ShouldNot(HaveOccurred())
 
 			fmt.Println("____AFTER reflect modify____:")
-			//var dataIsExist bool
 			strData, err = supportingfunctions.NewReadReflectJSONSprint(neb)
 			bl = reg.FindAllString(strData, 10)
 			for k, v := range bl {
@@ -228,111 +236,24 @@ var _ = Describe("Natsinteraction", Ordered, func() {
 			for k, v := range cibl {
 				fmt.Printf("%d. %s\n", k+1, v)
 			}
+			rbl = regRevoked.FindAllString(strData, 10)
+			for k, v := range rbl {
+				fmt.Printf("%d. %s\n", k+1, v)
+			}
+			pidbl = regPatternId.FindAllString(strData, 10)
+			for k, v := range pidbl {
+				fmt.Printf("%d. %s\n", k+1, v)
+			}
+			sdbl := regStartDate.FindAllString(strData, 10)
+			for k, v := range sdbl {
+				fmt.Printf("%d. %s\n", k+1, v)
+			}
 
 			fmt.Println("procMsgHive.ProcessMessage() is true: ", ok)
 			fmt.Println("warningMsg: ", warningMsg)
 			fmt.Println("")
 
 			Expect(err).ShouldNot(HaveOccurred())
-		})
-
-		/*It("Должны быть заменены все поля dataType содержащие значение 'snort'", func() {
-			strData, err := supportingfunctions.NewReadReflectJSONSprint(eb)
-			Expect(err).ShouldNot(HaveOccurred())
-
-			fmt.Println("____ strData: ______", strData)
-
-			reg := regexp.MustCompile(`dataType: \'[a-zA-Z_]+\'`)
-			fmt.Println("____BEFORE reflect modify____")
-			bl := reg.FindAllString(strData, 10)
-			for k, v := range bl {
-				fmt.Printf("%d. %s\n", k+1, v)
-			}
-
-			listRules, listWarning, err := rules.GetRuleProcessedMISPMsg("rules", "procmispmsg.yaml")
-			Expect(err).ShouldNot(HaveOccurred())
-
-			newByte, listOk, err := coremodule.NewProcessingInputMessageFromHive(eb, listRules)
-
-			fmt.Println("ok = ", listOk, " listWarning = ", listWarning)
-
-			Expect(err).ShouldNot(HaveOccurred())
-			//			Expect(ok).Should(BeTrue())
-
-			sd, err := supportingfunctions.NewReadReflectJSONSprint(newByte)
-			Expect(err).ShouldNot(HaveOccurred())
-
-			fmt.Println("____AFTER reflect modify____:")
-			//fmt.Println(sd)
-
-			var dataIsExist bool
-			al := reg.FindAllString(sd, 10)
-			for k, v := range al {
-				if strings.Contains(v, "TEST_SNORT_ID") {
-					dataIsExist = true
-				}
-
-				fmt.Printf("%d. %s\n", k+1, v)
-			}
-
-			Expect(dataIsExist).Should(BeTrue())
-		})*/
-	})
-
-	Context("Тест 2.11. Проверка функции замены данных.", func() {
-		It("При замене строк не должно быть ошибок", func() {
-			testStr, newStr := "test string", "NEW TEST STRING"
-
-			ns, err := coremodule.ReplacementRuleHandler("string", newStr, testStr, testStr)
-
-			fmt.Println("Test 2.11, Replace STRING, current: ", testStr, " result:", ns)
-
-			Expect(err).ShouldNot(HaveOccurred())
-			Expect(ns).Should(Equal(newStr))
-		})
-
-		It("При замене числа типа Int не должно быть ошибок", func() {
-			newInt := "22"
-
-			ns, err := coremodule.ReplacementRuleHandler("int", newInt, "10", 10)
-
-			fmt.Println("Test 2.11, Replace INT, current: ", 10, " result:", ns)
-
-			Expect(err).ShouldNot(HaveOccurred())
-			Expect(ns).Should(Equal(int64(22)))
-		})
-
-		It("При замене числа типа Uint не должно быть ошибок", func() {
-			newUint := "467"
-
-			ns, err := coremodule.ReplacementRuleHandler("uint", newUint, "341", uint64(341))
-
-			fmt.Println("Test 2.11, Replace UINT, current: ", 341, " result:", ns)
-
-			Expect(err).ShouldNot(HaveOccurred())
-			Expect(ns).Should(Equal(uint64(467)))
-		})
-
-		It("При замене числа типа Float не должно быть ошибок", func() {
-			newFloat := "643.53"
-
-			ns, err := coremodule.ReplacementRuleHandler("float", newFloat, "100.23", float64(100.23))
-
-			fmt.Println("Test 2.11, Replace Float, current: ", 100.23, " result:", ns)
-
-			Expect(err).ShouldNot(HaveOccurred())
-			Expect(ns).Should(Equal(float64(643.53)))
-		})
-
-		It("При замене числа типа Bool не должно быть ошибок", func() {
-			newBool := "true"
-
-			ns, err := coremodule.ReplacementRuleHandler("bool", newBool, "false", false)
-
-			fmt.Println("Test 2.11, Replace Bool, current: ", false, " result:", ns)
-
-			Expect(err).ShouldNot(HaveOccurred())
-			Expect(ns).Should(Equal(true))
 		})
 	})
 
