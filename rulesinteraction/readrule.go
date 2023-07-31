@@ -13,6 +13,8 @@ import (
 func GetRuleProcessingMsgForMISP(workDir, fn string) (ListRulesProcessingMsgMISP, []string, error) {
 	lr := ListRulesProcessingMsgMISP{}
 
+	fmt.Println("func 'GetRuleProcessingMsgForMISP', work dir = ", workDir, " file name = ", fn)
+
 	rootPath, err := supportingfunctions.GetRootPath("placeholder_misp")
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)

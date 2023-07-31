@@ -39,16 +39,16 @@ func NewHandleMessageFromHive(b []byte, listRule rules.ListRulesProcessingMsgMIS
 	return pmfh, nil
 }
 
-func (pm *ProcessMessageFromHive) HandleMessage() (bool, []string) {
+func (pm *ProcessMessageFromHive) HandleMessage(chanOutMispFormat chan<- ChanInputCreateMispFormat) (bool, []string) {
 	var skipMsg bool
 	warningMsg := []string{}
 	chanWarningMsg := make(chan string)
 
-	go func(cwmsg <-chan string, wmsg *[]string) {
-		*wmsg = append(*wmsg, <-cwmsg)
-	}(chanWarningMsg, &warningMsg)
+	go func(cwmsg <-chan string, wmsg []string) {
+		wmsg = append(wmsg, <-cwmsg)
+	}(chanWarningMsg, warningMsg)
 
-	pm.Message = processingReflectMap(chanWarningMsg, pm.Message, pm.ListRules, 0)
+	pm.Message = processingReflectMap(chanWarningMsg, chanOutMispFormat, pm.Message, pm.ListRules, 0)
 	close(chanWarningMsg)
 
 	/* ДЛЯ ТЕСТА */
@@ -182,6 +182,7 @@ func ReplacementRuleHandler(lr rules.ListRulesProcessingMsgMISP, svt, fn string,
 
 func processingReflectAnySimpleType(
 	wmsg chan<- string,
+	chanOutMispFormat chan<- ChanInputCreateMispFormat,
 	name interface{},
 	anyType interface{},
 	listRule rules.ListRulesProcessingMsgMISP,
@@ -200,8 +201,6 @@ func processingReflectAnySimpleType(
 		return anyType
 	}
 
-	//fmt.Printf("func 'processingReflectAnySimpleType' nameStr: '%s', AnyType: '%v', TypeOf: %s\n", nameStr, anyType, reflect.TypeOf(anyType))
-
 	switch r.Kind() {
 	case reflect.String:
 		result := reflect.ValueOf(anyType).String()
@@ -213,12 +212,16 @@ func processingReflectAnySimpleType(
 
 		PassRuleHandler(listRule.Rules.Pass, nameStr, ncv)
 
+		chanOutMispFormat <- ChanInputCreateMispFormat{
+			FieldName: nameStr,
+			ValueType: "string",
+			Value:     ncv,
+		}
+
 		return ncv
 
 	case reflect.Int, reflect.Int16, reflect.Int32, reflect.Int64:
 		result := reflect.ValueOf(anyType).Int()
-
-		//fmt.Println("func 'processingReflectAnySimpleType' INT, INT16, INT32, INT64 searchValue: ||||||||||||||||||||| result = ", result)
 
 		ncv, num, err := ReplacementRuleHandler(listRule, "int", nameStr, result)
 		if err != nil {
@@ -227,12 +230,16 @@ func processingReflectAnySimpleType(
 
 		PassRuleHandler(listRule.Rules.Pass, nameStr, ncv)
 
+		chanOutMispFormat <- ChanInputCreateMispFormat{
+			FieldName: nameStr,
+			ValueType: "int",
+			Value:     ncv,
+		}
+
 		return ncv
 
 	case reflect.Uint, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		result := reflect.ValueOf(anyType).Uint()
-
-		//fmt.Println("func 'processingReflectAnySimpleType' UINT, UINT16, UINT32, UINT64 searchValue: ||||||||||||||||||||| result = ", result)
 
 		ncv, num, err := ReplacementRuleHandler(listRule, "uint", nameStr, result)
 		if err != nil {
@@ -241,12 +248,16 @@ func processingReflectAnySimpleType(
 
 		PassRuleHandler(listRule.Rules.Pass, nameStr, ncv)
 
+		chanOutMispFormat <- ChanInputCreateMispFormat{
+			FieldName: nameStr,
+			ValueType: "uint",
+			Value:     ncv,
+		}
+
 		return ncv
 
 	case reflect.Float32, reflect.Float64:
 		result := reflect.ValueOf(anyType).Float()
-
-		//fmt.Println("func 'processingReflectAnySimpleType' FLOAT32, FLOAT64 searchValue: ||||||||||||||||||||| result = ", result)
 
 		ncv, num, err := ReplacementRuleHandler(listRule, "float", nameStr, result)
 		if err != nil {
@@ -255,12 +266,16 @@ func processingReflectAnySimpleType(
 
 		PassRuleHandler(listRule.Rules.Pass, nameStr, ncv)
 
+		chanOutMispFormat <- ChanInputCreateMispFormat{
+			FieldName: nameStr,
+			ValueType: "float",
+			Value:     ncv,
+		}
+
 		return ncv
 
 	case reflect.Bool:
 		result := reflect.ValueOf(anyType).Bool()
-
-		//fmt.Println("func 'processingReflectAnySimpleType' BOOL searchValue: ||||||||||||||||||||| result = ", result)
 
 		ncv, num, err := ReplacementRuleHandler(listRule, "bool", nameStr, result)
 		if err != nil {
@@ -269,173 +284,21 @@ func processingReflectAnySimpleType(
 
 		PassRuleHandler(listRule.Rules.Pass, nameStr, ncv)
 
+		chanOutMispFormat <- ChanInputCreateMispFormat{
+			FieldName: nameStr,
+			ValueType: "bool",
+			Value:     ncv,
+		}
+
 		return ncv
 	}
-
-	/*switch r.Kind() {
-	case reflect.String:
-
-		//
-		// ЭТО тестовая обработка поля "dataType", дальше обработку нужно сделать на основе правил
-		//
-		//if strings.Contains(nameStr, "dataType") && strings.Contains(reflect.ValueOf(anyType).String(), "snort") {
-		//
-		//	fmt.Printf("--- func 'processingReflectAnySimpleType' BEFORE ------%s = '%s'\n", nameStr, reflect.ValueOf(anyType).String())
-		//
-		//	r := reflect.ValueOf(&anyType).Elem()
-		//	fmt.Printf("reflect.ValueOf(&anyType).Elem() = %s\n", r)
-		//	r.Set(reflect.ValueOf("TEST_SNORT_ID"))
-		//
-		//	fmt.Printf("---- func 'processingReflectAnySimpleType' AFTER -----%s = '%s'\n", nameStr, reflect.ValueOf(anyType).String())
-		//
-		//	return reflect.ValueOf(anyType).String()
-		//}
-
-		result := reflect.ValueOf(anyType).String()
-
-		for k, v := range listRule.Rules.Replace {
-			var t interface{}
-
-			if v.SearchField != "" {
-				if strings.Contains(nameStr, v.SearchField) {
-					t, err = ReplacementRuleHandler("string", v.ReplaceValue, v.SearchValue, reflect.ValueOf(anyType).String())
-				}
-			} else {
-				t, err = ReplacementRuleHandler("string", v.ReplaceValue, v.SearchValue, reflect.ValueOf(anyType).String())
-			}
-
-			if err != nil {
-				//ВОТ ТУТ НАДО ПОДУМАТЬ КАК ОБРАБАТЫВАТЬ ОШИБКУ
-				wmsg <- fmt.Sprintf("rule number '%d' of section 'Replace' is not fulfilled", k)
-			}
-
-			if s, ok := t.(string); ok {
-				result = s
-
-				break
-			}
-		}
-
-		// 			!!!!
-		// Надо написать обработку раздела PASS правил и все потестировать
-		// 			!!!!
-
-		return result
-
-	case reflect.Int, reflect.Int16, reflect.Int32, reflect.Int64:
-		result := reflect.ValueOf(anyType).Int()
-
-		for k, v := range listRule.Rules.Replace {
-			var t interface{}
-
-			if v.SearchField != "" {
-				if strings.Contains(nameStr, v.SearchField) {
-					t, err = ReplacementRuleHandler("int", v.ReplaceValue, v.SearchValue, reflect.ValueOf(anyType).Int())
-				}
-			} else {
-				t, err = ReplacementRuleHandler("int", v.ReplaceValue, v.SearchValue, reflect.ValueOf(anyType).Int())
-			}
-
-			if err != nil {
-				wmsg <- fmt.Sprintf("rule number '%d' of section 'Replace' is not fulfilled", k)
-			}
-
-			if s, ok := t.(int64); ok {
-				result = s
-
-				break
-			}
-		}
-
-		return result
-
-	case reflect.Uint, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		result := reflect.ValueOf(anyType).Uint()
-
-		for k, v := range listRule.Rules.Replace {
-			var t interface{}
-
-			if v.SearchField != "" {
-				if strings.Contains(nameStr, v.SearchField) {
-					t, err = ReplacementRuleHandler("uint", v.ReplaceValue, v.SearchValue, reflect.ValueOf(anyType).Uint())
-				}
-			} else {
-				t, err = ReplacementRuleHandler("uint", v.ReplaceValue, v.SearchValue, reflect.ValueOf(anyType).Uint())
-			}
-
-			if err != nil {
-				wmsg <- fmt.Sprintf("rule number '%d' of section 'Replace' is not fulfilled", k)
-			}
-
-			if s, ok := t.(uint64); ok {
-				result = s
-
-				break
-			}
-		}
-
-		return result
-
-	case reflect.Float32, reflect.Float64:
-		result := reflect.ValueOf(anyType).Float()
-
-		for k, v := range listRule.Rules.Replace {
-			var t interface{}
-
-			if v.SearchField != "" {
-				if strings.Contains(nameStr, v.SearchField) {
-					t, err = ReplacementRuleHandler("float", v.ReplaceValue, v.SearchValue, reflect.ValueOf(anyType).Float())
-				}
-			} else {
-				t, err = ReplacementRuleHandler("float", v.ReplaceValue, v.SearchValue, reflect.ValueOf(anyType).Float())
-			}
-
-			if err != nil {
-				wmsg <- fmt.Sprintf("rule number '%d' of section 'Replace' is not fulfilled", k)
-			}
-
-			if s, ok := t.(float64); ok {
-				result = s
-
-				break
-			}
-		}
-
-		return result
-
-	case reflect.Bool:
-		result := reflect.ValueOf(anyType).Bool()
-
-		for k, v := range listRule.Rules.Replace {
-			var t interface{}
-
-			if v.SearchField != "" {
-				if strings.Contains(nameStr, v.SearchField) {
-					t, err = ReplacementRuleHandler("bool", v.ReplaceValue, v.SearchValue, reflect.ValueOf(anyType).Bool())
-				}
-			} else {
-				t, err = ReplacementRuleHandler("bool", v.ReplaceValue, v.SearchValue, reflect.ValueOf(anyType).Bool())
-			}
-
-			if err != nil {
-				wmsg <- fmt.Sprintf("rule number '%d' of section 'Replace' is not fulfilled", k)
-			}
-
-			if s, ok := t.(bool); ok {
-				result = s
-
-				break
-			}
-		}
-
-		return result
-	}*/
 
 	return anyType
 }
 
 func processingReflectMap(
 	wmsg chan<- string,
+	chanOutMispFormat chan<- ChanInputCreateMispFormat,
 	l map[string]interface{},
 	lr rules.ListRulesProcessingMsgMISP,
 	num int) map[string]interface{} {
@@ -456,13 +319,13 @@ func processingReflectMap(
 		switch r.Kind() {
 		case reflect.Map:
 			if v, ok := v.(map[string]interface{}); ok {
-				newMap = processingReflectMap(wmsg, v, lr, num+1)
+				newMap = processingReflectMap(wmsg, chanOutMispFormat, v, lr, num+1)
 				nl[k] = newMap
 			}
 
 		case reflect.Slice:
 			if v, ok := v.([]interface{}); ok {
-				newList = processingReflectSlice(wmsg, v, lr, num+1)
+				newList = processingReflectSlice(wmsg, chanOutMispFormat, v, lr, num+1)
 				nl[k] = newList
 			}
 
@@ -470,7 +333,7 @@ func processingReflectMap(
 			//str += fmt.Sprintf("%s: %s (it is array)\n", k, reflect.ValueOf(v).String())
 
 		default:
-			nl[k] = processingReflectAnySimpleType(wmsg, k, v, lr, num)
+			nl[k] = processingReflectAnySimpleType(wmsg, chanOutMispFormat, k, v, lr, num)
 		}
 	}
 
@@ -479,6 +342,7 @@ func processingReflectMap(
 
 func processingReflectSlice(
 	wmsg chan<- string,
+	chanOutMispFormat chan<- ChanInputCreateMispFormat,
 	l []interface{},
 	lr rules.ListRulesProcessingMsgMISP,
 	num int) []interface{} {
@@ -501,14 +365,14 @@ func processingReflectSlice(
 		switch r.Kind() {
 		case reflect.Map:
 			if v, ok := v.(map[string]interface{}); ok {
-				newMap = processingReflectMap(wmsg, v, lr, num+1)
+				newMap = processingReflectMap(wmsg, chanOutMispFormat, v, lr, num+1)
 
 				nl = append(nl, newMap)
 			}
 
 		case reflect.Slice:
 			if v, ok := v.([]interface{}); ok {
-				newList = processingReflectSlice(wmsg, v, lr, num+1)
+				newList = processingReflectSlice(wmsg, chanOutMispFormat, v, lr, num+1)
 
 				nl = append(nl, newList...)
 			}
@@ -517,7 +381,7 @@ func processingReflectSlice(
 			//str += fmt.Sprintf("%d. %s (it is array)\n", k, reflect.ValueOf(v).String())
 
 		default:
-			nl = append(nl, processingReflectAnySimpleType(wmsg, k, v, lr, num))
+			nl = append(nl, processingReflectAnySimpleType(wmsg, chanOutMispFormat, k, v, lr, num))
 		}
 	}
 

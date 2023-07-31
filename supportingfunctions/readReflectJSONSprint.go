@@ -6,6 +6,9 @@ import (
 	"reflect"
 )
 
+// NewReadReflectJSONSprint функция выполняет вывод JSON сообщения в виде текста
+// Для данной функции не требуется описание текст, так как обработка JSON сообщения
+// осуществляется с помощью пакета reflect
 func NewReadReflectJSONSprint(b []byte) (string, error) {
 	var str string
 	list := map[string]interface{}{}

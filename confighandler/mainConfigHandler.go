@@ -16,7 +16,9 @@ type ConfigApp struct {
 	CommonAppConfig
 	AppConfigNATS
 	AppConfigMISP
-	RulesProcMsg
+	AppConfigElasticSearch
+	AppConfigNKCKI
+	RulesProcMSGMISP
 }
 
 type CommonAppConfig struct {
@@ -45,7 +47,17 @@ type AppConfigMISP struct {
 	Port int
 }
 
-type RulesProcMsg struct {
+type AppConfigElasticSearch struct {
+	Host string
+	Port int
+}
+
+type AppConfigNKCKI struct {
+	Host string
+	Port int
+}
+
+type RulesProcMSGMISP struct {
 	Directory, File string
 }
 
@@ -57,6 +69,10 @@ func NewConfig() (ConfigApp, error) {
 		"GO_PHMISP_MPORT":      "",
 		"GO_PHMISP_NHOST":      "",
 		"GO_PHMISP_NPORT":      "",
+		"GO_PHMISP_ESHOST":     "",
+		"GO_PHMISP_ESPORT":     "",
+		"GO_PHMISP_NKCKIHOST":  "",
+		"GO_PHMISP_NKCKIPORT":  "",
 		"GO_PHMISP_RULES_DIR":  "",
 		"GO_PHMISP_RULES_FILE": "",
 	}
@@ -98,28 +114,44 @@ func NewConfig() (ConfigApp, error) {
 			return err
 		}
 
+		//Настройки для модуля подключения к NATS
 		if viper.IsSet("NATS.host") {
 			conf.AppConfigNATS.Host = viper.GetString("NATS.host")
 		}
-
 		if viper.IsSet("NATS.port") {
 			conf.AppConfigNATS.Port = viper.GetInt("NATS.port")
 		}
 
+		//Настройки для модуля подключения к MISP
 		if viper.IsSet("MISP.host") {
 			conf.AppConfigMISP.Host = viper.GetString("MISP.host")
 		}
-
 		if viper.IsSet("MISP.port") {
 			conf.AppConfigMISP.Port = viper.GetInt("MISP.port")
 		}
 
-		if viper.IsSet("RULES_PROC_MSG.directory") {
-			conf.RulesProcMsg.Directory = viper.GetString("RULES_PROC_MSG.directory")
+		// ПРЕДВАРИТЕЛЬНЫЕ Настройки для модуля подключения к ElasticSearch
+		if viper.IsSet("ElasticSearch.host") {
+			conf.AppConfigElasticSearch.Host = viper.GetString("ElasticSearch.host")
+		}
+		if viper.IsSet("ElasticSearch.port") {
+			conf.AppConfigElasticSearch.Port = viper.GetInt("ElasticSearch.port")
 		}
 
-		if viper.IsSet("RULES_PROC_MSG.file") {
-			conf.RulesProcMsg.Directory = viper.GetString("RULES_PROC_MSG.file")
+		// ПРЕДВАРИТЕЛЬНЫЕ Настройки для модуля подключения к NKCKI
+		if viper.IsSet("NKCKI.host") {
+			conf.AppConfigNKCKI.Host = viper.GetString("NKCKI.host")
+		}
+		if viper.IsSet("NKCKI.port") {
+			conf.AppConfigNKCKI.Port = viper.GetInt("NKCKI.port")
+		}
+
+		//Настройки для модуля правил обработки сообщений
+		if viper.IsSet("RULES_PROC_MSG_FOR_MISP.directory") {
+			conf.RulesProcMSGMISP.Directory = viper.GetString("RULES_PROC_MSG_FOR_MISP.directory")
+		}
+		if viper.IsSet("RULES_PROC_MSG_FOR_MISP.file") {
+			conf.RulesProcMSGMISP.File = viper.GetString("RULES_PROC_MSG_FOR_MISP.file")
 		}
 
 		return nil
@@ -170,32 +202,52 @@ func NewConfig() (ConfigApp, error) {
 		return conf, err
 	}
 
-	if envList["GO_PHMISP_MHOST"] != "" {
-		conf.AppConfigMISP.Host = envList["GO_PHMISP_MHOST"]
-	}
-
-	if envList["GO_PHMISP_MPORT"] != "" {
-		if p, err := strconv.Atoi(envList["GO_PHMISP_MPORT"]); err == nil {
-			conf.AppConfigMISP.Port = p
-		}
-	}
-
+	//Настройки для модуля подключения к NATS
 	if envList["GO_PHMISP_NHOST"] != "" {
 		conf.AppConfigNATS.Host = envList["GO_PHMISP_NHOST"]
 	}
-
 	if envList["GO_PHMISP_NPORT"] != "" {
 		if p, err := strconv.Atoi(envList["GO_PHMISP_NPORT"]); err == nil {
 			conf.AppConfigNATS.Port = p
 		}
 	}
 
-	if envList["GO_PHMISP_RULES_DIR"] != "" {
-		conf.RulesProcMsg.Directory = envList["GO_PHMISP_RULES_DIR"]
+	//Настройки для модуля подключения к MISP
+	if envList["GO_PHMISP_MHOST"] != "" {
+		conf.AppConfigMISP.Host = envList["GO_PHMISP_MHOST"]
+	}
+	if envList["GO_PHMISP_MPORT"] != "" {
+		if p, err := strconv.Atoi(envList["GO_PHMISP_MPORT"]); err == nil {
+			conf.AppConfigMISP.Port = p
+		}
 	}
 
-	if envList["GO_PHMISP_NPORT"] != "" {
-		conf.RulesProcMsg.File = envList["GO_PHMISP_RULES_FILE"]
+	// ПРЕДВАРИТЕЛЬНЫЕ Настройки для модуля подключения к ElasticSearch
+	if envList["GO_PHMISP_ESHOST"] != "" {
+		conf.AppConfigMISP.Host = envList["GO_PHMISP_ESHOST"]
+	}
+	if envList["GO_PHMISP_ESPORT"] != "" {
+		if p, err := strconv.Atoi(envList["GO_PHMISP_ESPORT"]); err == nil {
+			conf.AppConfigMISP.Port = p
+		}
+	}
+
+	// ПРЕДВАРИТЕЛЬНЫЕ Настройки для модуля подключения к NKCKI
+	if envList["GO_PHMISP_NKCKIHOST"] != "" {
+		conf.AppConfigMISP.Host = envList["GO_PHMISP_NKCKIHOST"]
+	}
+	if envList["GO_PHMISP_NKCKIPORT"] != "" {
+		if p, err := strconv.Atoi(envList["GO_PHMISP_NKCKIPORT"]); err == nil {
+			conf.AppConfigMISP.Port = p
+		}
+	}
+
+	//Настройки для модуля правил обработки сообщений
+	if envList["GO_PHMISP_RULES_DIR"] != "" {
+		conf.RulesProcMSGMISP.Directory = envList["GO_PHMISP_RULES_DIR"]
+	}
+	if envList["GO_PHMISP_RULES_FILE"] != "" {
+		conf.RulesProcMSGMISP.File = envList["GO_PHMISP_RULES_FILE"]
 	}
 
 	return conf, nil

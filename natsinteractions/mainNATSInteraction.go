@@ -17,12 +17,13 @@ var mnats ModuleNATS
 // ChanOutputMISP - канал для принятия данных из модуля
 // ChanLogging - канал для отправки логов
 type ModuleNATS struct {
-	ChanOutputNATS chan []byte
+	chanOutputNATS chan []byte
+	chanInputNATS  chan []byte
 	ChanLogging    chan<- datamodels.MessageLoging
 }
 
 func init() {
-	mnats.ChanOutputNATS = make(chan []byte)
+	mnats.chanOutputNATS = make(chan []byte)
 }
 
 func NewClientNATS(
@@ -54,44 +55,16 @@ func NewClientNATS(
 	fmt.Println("func 'NewClientNATS', END")*/
 
 	nc.Subscribe("main_caseupdate", func(msg *nats.Msg) {
-		mnats.ChanOutputNATS <- msg.Data
+		mnats.chanOutputNATS <- msg.Data
 	})
 
 	return &mnats, nil
 }
 
 func (mnats ModuleNATS) GetDataReceptionChannel() <-chan []byte {
-	/*
-		для формирование правильного сообщения об ошибке
-		if err != nil {
-			_, f, l, _ := runtime.Caller(0)
-
-			mnats.ChanLogging <- datamodels.MessageLoging{
-				MsgData: fmt.Sprintf("%s %s:%d", fmt.Sprint(err), f, l-2),
-				MsgType: "error",
-			}
-		}
-	*/
-
-	return mnats.ChanOutputNATS
+	return mnats.chanOutputNATS
 }
 
-func (mnats ModuleNATS) GettingData() interface{} {
-	/*
-		для формирование правильного сообщения об ошибке
-		if err != nil {
-			_, f, l, _ := runtime.Caller(0)
-
-			mnats.ChanLogging <- datamodels.MessageLoging{
-				MsgData: fmt.Sprintf("%s %s:%d", fmt.Sprint(err), f, l-2),
-				MsgType: "error",
-			}
-		}
-	*/
-
-	return <-mnats.ChanOutputNATS
-}
-
-func (cnats ModuleNATS) SendingData(data interface{}) {
-	//ecmisp.chanInput <- data
+func (cnats ModuleNATS) SendingData(data []byte) {
+	cnats.chanInputNATS <- data
 }

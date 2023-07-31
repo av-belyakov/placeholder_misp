@@ -1,0 +1,71 @@
+#     Общее описание правил.
+#
+#   Все используемые правила делятся на три типа: REPLACE, PASSANY и PASS. Правила типа REPLACE и PASS реализованы 
+# в виде списка объектов с параметрами. 
+#
+#   Правило типа PASSANY имеет только один единственный параметр 'true' или 'false'.
+#
+#   Правила из раздела REPLACE должны содержать список объектов состоящих из определенных свойств и отвечают за замену 
+# значений определенных полей, либо просто совпадающих полей, если наименование искомого поле не заполняется. 
+# Правило данного типа выполняется ВСЕГДА. Для данного типа правил обязательными являются поля 'searchValue' и 'replaceValue'. 
+# Свойство 'searchField' может быть пустым или отсутствовать, тогда поиск будет осуществлятся только по значению из свойства 'searchValue'.
+# Одно из свойств 'searchField' или 'searchValue' должно быть заполнено. Если свойство 'searchValue' пустое, а свойство 'searchField'
+# заполнено то выполняется поиск поля с именем из 'searchField' и пустым значением. Если свойство 'replaceValue' пустое, то найденное
+# значение будет заменено пустым.
+# ЛОГИКА обработки списка объектов данного правила "ИЛИ".
+#
+#   Правила из раздела PASS должны содержать список из вложенных объектов, состоящих из определенных свойств. Они отвечают за пропуск сообщения, 
+# при совпадении полей и значений в обрабатываемом сообщении. Для данного типа правил обязательными являются свойства 'searchField' 
+# и 'searchValue'. Свойство 'searchValue' может быть пустым, тогда поиск будет выполнятся по наименаванию поля из свойства 'searchField' и
+# пустому значению. ЛОГИКА обработки списка объектов "ИЛИ" для первого уровня вложения и логика "И" для второго уровня вложения. 
+# 
+#   Список параметров правил:
+# - searchField - поле поиска (обязательно для правил PASS)
+# - searchValue - значение поиска (обязательно для правил PASS)
+# - replaceValue - значение для замены (обязательно для правила REPLACE)
+#
+# Пример правил:
+#
+# RULES:
+#  REPLACE:
+#    - searchField: "capecId"
+#      searchValue: "CAPEC-49"
+#      replaceValue: ""
+#    - searchField: "_createdBy"
+#      searchValue: "admin@thehive.local"
+#      replaceValue: "Admin@TheHivE.local"
+#    - searchField: "caseId"
+#      searchValue: "831"
+#      replaceValue: "9451"
+#    - searchField: "revoked"
+#      searchValue: "false"
+#      replaceValue: "true"
+#  PASS:
+#    - listAnd:
+#      - searchField: "impactStatus"
+#        searchValue: "WithImpact"
+#      - searchField: "resolutionStatus"
+#        searchValue: "TruePositive"
+#    - listAnd:
+#      - searchField: "status"
+#        searchValue: "ElementStatus"
+#    - listAnd:
+#  PASSANY: true
+#
+
+# Правила из раздела PASSTEST. Логика, первый вложенный список "ИЛИ", второй в listAnd "И"
+# Что то нужно делать с пустыми значениями. Использовать ли null?
+
+RULES:
+  REPLACE:
+  PASS:
+    - listAnd:
+      - searchField: "impactStatus"
+        searchValue: "WithImpact"
+      - searchField: "resolutionStatus"
+        searchValue: "TruePositive"
+    - listAnd:
+      - searchField: "predicate"
+        searchValue: "precision"
+    - listAnd:
+  PASSANY: false  

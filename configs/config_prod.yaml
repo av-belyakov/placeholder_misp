@@ -1,9 +1,15 @@
-RULES_PROC_MSG:
+RULES_PROC_MSG_FOR_MISP:
   directory: rules
-  file: procmispmsg.yaml
+  file: mispmsgrule.yaml
 NATS:
   host: nats.cloud.gcm
   port: 4222
 MISP:
-  host: 192.168.9.202
+  host: 192.168.9.37
   port: 8080
+ElasticSearch:
+  host: 192.168.13.3
+  port: 9200
+NKCKI:
+  host: 127.0.0.1
+  port: 12000

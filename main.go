@@ -12,8 +12,10 @@ import (
 	"placeholder_misp/confighandler"
 	"placeholder_misp/coremodule"
 	"placeholder_misp/datamodels"
+	"placeholder_misp/elasticsearchinteractions"
 	"placeholder_misp/mispinteractions"
 	"placeholder_misp/natsinteractions"
+	"placeholder_misp/nkckiinteractions"
 	rules "placeholder_misp/rulesinteraction"
 )
 
@@ -21,22 +23,12 @@ var (
 	err                  error
 	sl                   simplelogger.SimpleLoggerSettings
 	confApp              confighandler.ConfigApp
-	listRulesProcMISPMsg rules.ListRulesProcMISPMessage
+	listRulesProcMISPMsg rules.ListRulesProcessingMsgMISP
 	listWarning          []string
 	msgOutChan           chan datamodels.MessageLoging
 )
 
 func init() {
-
-	// + 1. Прочитать переменные окружения, пока одну
-	// + 2. Инициировать модуль для чтения конфигурационных файлов. При этом сначало читается общий конфиг, а затем
-	// тот конфиг, выбор которого зависит от переменной окружения 'GO_PH_MISP_MAIN'
-	// + 3. Инициализировать обработчик ошибок (запись логов) или отправка их на stdout
-	// + 4. Инициализировать модуль соединения с NATS
-	//5. Инициализировать модуль соединения с MISP
-	//6. Инициализировать модуль обработчик
-	//7. Модуль взаимодействия с Забикс? или он в модуле логах должен быть?
-
 	msgOutChan = make(chan datamodels.MessageLoging)
 
 	sl, err = simplelogger.NewSimpleLogger("simplelogger", []simplelogger.MessageTypeSettings{
@@ -75,7 +67,9 @@ func init() {
 		log.Fatalf("error module 'confighandler': %v\n", err)
 	}
 
-	listRulesProcMISPMsg, listWarning, err = rules.GetRuleProcessedMISPMsg(confApp.RulesProcMsg.Directory, confApp.RulesProcMsg.File)
+	fmt.Println("func 'main', config application = ", confApp)
+
+	listRulesProcMISPMsg, listWarning, err = rules.GetRuleProcessingMsgForMISP(confApp.RulesProcMSGMISP.Directory, confApp.RulesProcMSGMISP.File)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 		_ = sl.WriteLoggingData(fmt.Sprintf("%v %s:%d", err, f, l-2), "error")
@@ -95,9 +89,9 @@ func init() {
 		_ = sl.WriteLoggingData(fmt.Sprintf("%s:%d\n%v", f, l, warningStr), "warning")
 	}
 
-	// проверяем наличие вообще каких либо правил
-	if len(listRulesProcMISPMsg.Rules) == 0 {
-		msg := "there are no rules for processing messages received from NATS or have not been verified"
+	// проверяем наличие правил Pass или Passany
+	if len(listRulesProcMISPMsg.Rules.Pass) == 0 && !listRulesProcMISPMsg.Rules.Passany {
+		msg := "there are no rules for handling messages received from NATS or all rules have failed validation"
 		_, f, l, _ := runtime.Caller(0)
 		_ = sl.WriteLoggingData(fmt.Sprintf("%s %s:%d", msg, f, l-3), "error")
 
@@ -119,6 +113,7 @@ func main() {
 	ctxNATS, ctxCloseNATS := context.WithTimeout(context.Background(), 2*time.Second)
 	defer ctxCloseNATS()
 
+	//инициализация модуля для взаимодействия с NATS (Данный модуль обязателен для взаимодействия)
 	natsModule, err := natsinteractions.NewClientNATS(ctxNATS, confApp.AppConfigNATS, msgOutChan)
 	if err != nil {
 		_ = sl.WriteLoggingData(fmt.Sprintln(err), "error")
@@ -126,15 +121,35 @@ func main() {
 		log.Fatal(err)
 	}
 
+	//инициалиация модуля для взаимодействия с MISP
 	ctxMISP, ctxCloseMISP := context.WithTimeout(context.Background(), 2*time.Second)
 	defer ctxCloseMISP()
 
 	mispModule, err := mispinteractions.NewClientMISP(ctxMISP, confApp.AppConfigMISP, msgOutChan)
 	if err != nil {
 		_ = sl.WriteLoggingData(fmt.Sprintln(err), "error")
-
-		log.Fatal()
 	}
+
+	//инициализация модуля для взаимодействия с ElasticSearch
+	ctxES, ctxCloseES := context.WithTimeout(context.Background(), 2*time.Second)
+	defer ctxCloseES()
+
+	esModule, err := elasticsearchinteractions.NewClientElasticSearch(ctxES, confApp.AppConfigElasticSearch, msgOutChan)
+	if err != nil {
+		_ = sl.WriteLoggingData(fmt.Sprintln(err), "error")
+	}
+
+	// инициализация модуля для взаимодействия с NKCKI
+	ctxNKCKI, ctxCloseNKCKI := context.WithTimeout(context.Background(), 2*time.Second)
+	defer ctxCloseNKCKI()
+
+	nkckiModule, err := nkckiinteractions.NewClientNKCKI(ctxNKCKI, confApp.AppConfigNKCKI, msgOutChan)
+	if err != nil {
+		_ = sl.WriteLoggingData(fmt.Sprintln(err), "error")
+	}
+
+	//Если подключений к API MISP, NKCKI, ElasticSearch нет следует продолжить выполнения программы
+	//а в дальнейшем пытаться установить соединение с данными API
 
 	/*
 			ОБЯЗАТЕЛЬНО К ПРОЧТЕНИЮ
@@ -158,5 +173,5 @@ func main() {
 		}
 	}()
 
-	coremodule.NewCore(*natsModule, *mispModule, msgOutChan)
+	coremodule.NewCore(*natsModule, *mispModule, *esModule, *nkckiModule, listRulesProcMISPMsg, msgOutChan)
 }
