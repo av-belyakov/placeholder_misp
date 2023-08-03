@@ -16,11 +16,12 @@ import (
 
 var _ = Describe("CreateMispFormat", Ordered, func() {
 	var (
-		listRules          rules.ListRulesProcessingMsgMISP
-		listFieldsMispType map[string][]coremodule.FieldsNameMapping
-		eventsMisp         datamodels.EventsMispFormat
-		exampleByte        []byte
-		errGetRule         error
+		listRules       rules.ListRulesProcessingMsgMISP
+		listHandlerMisp map[string][]func(interface{}) bool
+		eventsMisp      datamodels.EventsMispFormat
+		attributesMisp  datamodels.AttributesMispFormat
+		exampleByte     []byte
+		errGetRule      error
 	)
 
 	getExampleByte := func() []byte {
@@ -46,32 +47,27 @@ var _ = Describe("CreateMispFormat", Ordered, func() {
 		exampleByte = getExampleByte()
 		listRules, _, errGetRule = rules.GetRuleProcessingMsgForMISP("rules", "procmispmsg_test.yaml")
 
-		listFieldsMispType = map[string][]coremodule.FieldsNameMapping{
-			"events": {
-				{InputFieldName: "event.object.title", MispFieldName: "info"},
-				{InputFieldName: "event.object.startDate", MispFieldName: "timestamp"},
-				{InputFieldName: "event.object.tlp", MispFieldName: "distribution"},
-				{InputFieldName: "event.object.severity", MispFieldName: "threat_level_id"},
-				{InputFieldName: "event.organisationId", MispFieldName: "org_id"},
-				{InputFieldName: "event.object.updatedAt", MispFieldName: "sighting_timestamp"},
-				{InputFieldName: "event.object.owner", MispFieldName: "event_creator_email"},
-			},
-			"attributes": {
-				{InputFieldName: "event.object.tlp", MispFieldName: "tags"},
-				{InputFieldName: "observables._id", MispFieldName: "object_id"},
-				{InputFieldName: "observables.data", MispFieldName: "value"},
-				{InputFieldName: "observables._createdAt", MispFieldName: "timestamp"},
-				{InputFieldName: "observables.message", MispFieldName: "comment"},
-				{InputFieldName: "observables.startDate", MispFieldName: "first_seen"},
-			},
-		}
-
 		eventsMisp = datamodels.EventsMispFormat{
 			Analysis:          getAnalysis(),
 			Timestamp:         "0",
 			ThreatLevelId:     "4",
 			PublishTimestamp:  "0",
 			SightingTimestamp: "0",
+		}
+
+		listHandlerMisp = map[string][]func(interface{}) bool{
+			"event.object.title":     {eventsMisp.SetValueInfoEventsMisp},
+			"event.object.startDate": {eventsMisp.SetValueTimestampEventsMisp},
+			"event.object.tlp":       {eventsMisp.SetValueDistributionEventsMisp},
+			"event.object.severity":  {eventsMisp.SetValueThreatLevelIdEventsMisp},
+			"event.organisationId":   {eventsMisp.SetValueOrgIdEventsMisp},
+			"event.object.updatedAt": {eventsMisp.SetValueSightingTimestampEventsMisp},
+			"event.object.owner":     {eventsMisp.SetValueEventCreatorEmailEventsMisp},
+			"observables._id":        {attributesMisp.SetValueObjectIdAttributesMisp},
+			"observables.data":       {attributesMisp.SetValueValueAttributesMisp},
+			"observables._createdAt": {attributesMisp.SetValueTimestampAttributesMisp},
+			"observables.message":    {attributesMisp.SetValueCommentAttributesMisp},
+			"observables.startDate":  {attributesMisp.SetValueFirstSeenAttributesMisp},
 		}
 	})
 
@@ -95,48 +91,24 @@ var _ = Describe("CreateMispFormat", Ordered, func() {
 
 			go func() {
 				for v := range chanOutMispFormat {
-					for _, value := range listFieldsMispType["events"] {
-						if v.FieldBranch == value.InputFieldName {
-							fmt.Printf("\nFieldBranch: %s\nFieldName: %s\nValue: %v\n  MispFieldName: %s\n", v.FieldBranch, v.FieldName, v.Value, value.MispFieldName)
 
-							/*
-								Здесь надо продумать возможность использования интерфейса который
-								соответствовал бы методу который будет добавлять значения в поля
-								event тип. Так как в v.Value имеет тип interface{} то метод
-								setValue реализовать не сложно, кроме того можно будет избавится
-								от switch и использовать что то типа map[string]интерфейс
-							*/
+					//fmt.Println("___ v.FieldName = ", v.FieldName, " v.Value = ", v.Value, " ____")
 
-							switch value.MispFieldName {
-							case "info":
-								eventsMisp.Info = v.Value
-							case "timestamp":
-
-							case "distribution":
-
-							case "threat_level_id":
-
-							case "org_id":
-
-							case "sighting_timestamp":
-
-							case "event_creator_email":
-
-							}
-
-						}
+					if v.FieldBranch == "event.object.tlp" {
+						fmt.Println("|||| 'event.object.tlp' |||| FieldBranch: ", v.FieldBranch, " v.Value: ", v.Value, " |||||||||")
 					}
 
-					//что бы не выполнялось
-					//if v.Value == "111" {
-					//	fmt.Printf("\n RESEIVED MESSAGE:\n - FieldName: %s\n - ValueType: %s\n - Value: %v\n - FieldBranch: %s\n", v.FieldName, v.ValueType, v.Value, v.FieldBranch)
-					//}
+					if lf, ok := listHandlerMisp[v.FieldBranch]; ok {
+						for _, f := range lf {
+							_ = f(v.Value)
+						}
+					}
 				}
 			}()
 
 			ok, warningMsg := procMsgHive.HandleMessage(chanOutMispFormat)
 
-			fmt.Println("EventsType: ", eventsMisp)
+			fmt.Println("EventsType: ", eventsMisp, " AttributesType: ", attributesMisp)
 
 			Expect(len(warningMsg)).Should(Equal(0))
 			Expect(ok).Should(BeTrue())

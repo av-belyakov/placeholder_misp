@@ -31,7 +31,7 @@ var (
 func init() {
 	msgOutChan = make(chan datamodels.MessageLoging)
 
-	sl, err = simplelogger.NewSimpleLogger("simplelogger", []simplelogger.MessageTypeSettings{
+	sl, err = simplelogger.NewSimpleLogger("placeholder_misp", []simplelogger.MessageTypeSettings{
 		{
 			MsgTypeName:   "error",
 			WritingFile:   true,

@@ -6,13 +6,14 @@ import (
 )
 
 type ChanInputCreateMispFormat struct {
-	FieldName string
-	ValueType string
-	Value     interface{}
+	FieldName   string
+	ValueType   string
+	Value       interface{}
+	FieldBranch string
 }
 
 type FieldsNameMapping struct {
-	inputFieldName, outputFieldName string
+	InputFieldName, MispFieldName string
 }
 
 var (
@@ -30,19 +31,48 @@ var (
 
 func init() {
 	eventsMisp = datamodels.EventsMispFormat{
-		Analysis: getAnalysis(),
+		Analysis:          getAnalysis(),
+		Timestamp:         "0",
+		ThreatLevelId:     "4",
+		PublishTimestamp:  "0",
+		SightingTimestamp: "0",
 	}
 	attributesMisp = datamodels.AttributesMispFormat{
-		Category: "Other",
-		Type:     "other",
+		Category:     "Other",
+		Type:         "other",
+		Timestamp:    "0",
+		Distribution: "3",
+		FirstSeen:    "0",
+		LastSeen:     "0",
 	}
-	galaxyClustersMisp = datamodels.GalaxyClustersMispFormat{}
-	galaxyElementMisp = datamodels.GalaxyElementMispFormat{}
-	usersMisp = datamodels.UsersMispFormat{}
-	organizationsMisp = datamodels.OrganisationsMispFormat{}
+	galaxyClustersMisp = datamodels.GalaxyClustersMispFormat{
+		Description:   "3",
+		GalaxyElement: []datamodels.GalaxyElementMispFormat{},
+	}
+	usersMisp = datamodels.UsersMispFormat{
+		Newsread:     "0",
+		ChangePw:     "0",
+		CurrentLogin: "0",
+		LastLogin:    "0",
+		DateCreated:  "0",
+		DateModified: "0",
+	}
+	organizationsMisp = datamodels.OrganisationsMispFormat{
+		DateCreated:  "0",
+		DateModified: "0",
+	}
 	serversMisp = datamodels.ServersMispFormat{}
-	feedsMisp = datamodels.FeedsMispFormat{}
-	tagsMisp = datamodels.TagsMispFormat{}
+	feedsMisp = datamodels.FeedsMispFormat{
+		Distribution: "3",
+		SourceFormat: "misp",
+		InputSource:  "network",
+	}
+	tagsMisp = datamodels.TagsMispFormat{
+		Exportable:     true,
+		IsGalaxy:       true,
+		IsCustomGalaxy: true,
+		Inherited:      1,
+	}
 
 	/*
 	   Список полей которые мне не удалось размапить.
@@ -57,15 +87,21 @@ func init() {
 
 	listFieldsMispType = map[string][]FieldsNameMapping{
 		"events": {
-			{inputFieldName: "title", outputFieldName: "info"},
-			{inputFieldName: "startDate", outputFieldName: "timestamp"},
-			{inputFieldName: "tlp", outputFieldName: "distribution"},
-			{inputFieldName: "severity", outputFieldName: "threat_level_id"},
-			{inputFieldName: "organisationId", outputFieldName: "org_id"},
-			//{ inputFieldName: "", outputFieldName: "" },
+			{InputFieldName: "event.object.title", MispFieldName: "info"},
+			{InputFieldName: "event.object.startDate", MispFieldName: "timestamp"},
+			{InputFieldName: "event.object.tlp", MispFieldName: "distribution"},
+			{InputFieldName: "event.object.severity", MispFieldName: "threat_level_id"},
+			{InputFieldName: "event.organisationId", MispFieldName: "org_id"},
+			{InputFieldName: "event.object.updatedAt", MispFieldName: "sighting_timestamp"},
+			{InputFieldName: "event.object.owner", MispFieldName: "event_creator_email"},
 		},
 		"attributes": {
-			{inputFieldName: "tlp", outputFieldName: "tags"},
+			{InputFieldName: "event.object.tlp", MispFieldName: "tags"},
+			{InputFieldName: "observables._id", MispFieldName: "object_id"},
+			{InputFieldName: "observables.data", MispFieldName: "value"},
+			{InputFieldName: "observables._createdAt", MispFieldName: "timestamp"},
+			{InputFieldName: "observables.message", MispFieldName: "comment"},
+			{InputFieldName: "observables.startDate", MispFieldName: "first_seen"},
 		},
 	}
 }

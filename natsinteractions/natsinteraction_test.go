@@ -183,6 +183,8 @@ var _ = Describe("Natsinteraction", Ordered, func() {
 				procMsgHive coremodule.ProcessMessageFromHive
 			)
 
+			chanOutMispFormat := make(chan coremodule.ChanInputCreateMispFormat)
+
 			lr, lw, err := rules.GetRuleProcessingMsgForMISP("rules", "procmispmsg_test.yaml")
 
 			fmt.Println("list verification warning:")
@@ -221,7 +223,16 @@ var _ = Describe("Natsinteraction", Ordered, func() {
 
 			Expect(err).ShouldNot(HaveOccurred())
 
-			ok, warningMsg := procMsgHive.HandleMessage()
+			go func() {
+				for v := range chanOutMispFormat {
+					//что бы не выполнялось
+					if v.Value == "111" {
+						fmt.Printf("\n RESEIVED MESSAGE:\n - FieldName: %s\n - ValueType: %s\n - Value: %v\n - FieldBranch: %s\n", v.FieldName, v.ValueType, v.Value, v.FieldBranch)
+					}
+				}
+			}()
+
+			ok, warningMsg := procMsgHive.HandleMessage(chanOutMispFormat)
 			neb, err := procMsgHive.GetMessage()
 
 			Expect(err).ShouldNot(HaveOccurred())

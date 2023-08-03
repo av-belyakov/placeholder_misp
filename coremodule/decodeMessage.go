@@ -22,7 +22,7 @@ type ProcessMessageFromHive struct {
 func NewHandleMessageFromHive(b []byte, listRule rules.ListRulesProcessingMsgMISP) (ProcessMessageFromHive, error) {
 	pmfh := ProcessMessageFromHive{}
 
-	fmt.Println("func 'NewHandleMessageFromHive', START")
+	//	fmt.Println("func 'NewHandleMessageFromHive', START")
 
 	list := map[string]interface{}{}
 	if err := json.Unmarshal(b, &list); err != nil {
@@ -44,25 +44,12 @@ func (pm *ProcessMessageFromHive) HandleMessage(chanOutMispFormat chan<- ChanInp
 	warningMsg := []string{}
 	chanWarningMsg := make(chan string)
 
-	go func(cwmsg <-chan string, wmsg []string) {
-		wmsg = append(wmsg, <-cwmsg)
-	}(chanWarningMsg, warningMsg)
+	go func() {
+		warningMsg = append(warningMsg, <-chanWarningMsg)
+	}()
 
-	pm.Message = processingReflectMap(chanWarningMsg, chanOutMispFormat, pm.Message, pm.ListRules, 0)
+	pm.Message = processingReflectMap(chanWarningMsg, chanOutMispFormat, pm.Message, pm.ListRules, 0, "")
 	close(chanWarningMsg)
-
-	/* ДЛЯ ТЕСТА */
-	fmt.Println("func 'HandleMessage', 22222 pm.ListRules.Rules.Passtest = ", pm.ListRules.Rules.Pass)
-	fmt.Println("func 'HandleMessage', pm.Rules.Pass: ")
-	for key, value := range pm.ListRules.Rules.Pass {
-		fmt.Printf("%d.\n", key)
-		for k, v := range value.ListAnd {
-			fmt.Printf("  %d.\n", k)
-			fmt.Printf("  SearchField: %s\n", v.SearchField)
-			fmt.Printf("  SearchValue: %s\n", v.SearchValue)
-			fmt.Printf("  StatementExpression: %t\n", v.StatementExpression)
-		}
-	}
 
 	//сообщение пропускается в независимости от результата обработки правил PASS
 	if pm.ListRules.Rules.Passany {
@@ -85,23 +72,6 @@ func (pm *ProcessMessageFromHive) HandleMessage(chanOutMispFormat chan<- ChanInp
 		}
 	}
 
-	/*
-		   Протестировал pm.ListRules.Rules.Pass, если
-		   					SearchField: dataType
-		     				SearchValue: i2p_111home
-
-		   				то получаем skipMsg так как нет совпадения, если
-		         			SearchField: "dataType"
-		         			SearchValue: "ip_home"
-
-					Вроде все работает
-	*/
-
-	fmt.Println("")
-	fmt.Println("___________________func 'HandleMessage' ____________________")
-	fmt.Println("-------- TEST skipMsg:", skipMsg, " ---------------")
-	fmt.Println("____________________________________________________________")
-
 	return skipMsg, warningMsg
 }
 
@@ -121,14 +91,6 @@ func PassRuleHandler(rulePass []rules.PassListAnd, fn string, cv interface{}) {
 			if cvstr != v.SearchValue {
 				continue
 			}
-
-			/*
-				с strings.Contains не работает почему то
-				зато с if cvstr != v.SearchValue работае
-
-				if !strings.Contains(v.SearchValue, cvstr) {
-					continue
-				}*/
 
 			rulePass[key].ListAnd[k].StatementExpression = true
 		}
@@ -186,7 +148,8 @@ func processingReflectAnySimpleType(
 	name interface{},
 	anyType interface{},
 	listRule rules.ListRulesProcessingMsgMISP,
-	num int) interface{} {
+	num int,
+	fieldBranch string) interface{} {
 
 	var nameStr string
 	r := reflect.TypeOf(anyType)
@@ -213,9 +176,10 @@ func processingReflectAnySimpleType(
 		PassRuleHandler(listRule.Rules.Pass, nameStr, ncv)
 
 		chanOutMispFormat <- ChanInputCreateMispFormat{
-			FieldName: nameStr,
-			ValueType: "string",
-			Value:     ncv,
+			FieldName:   nameStr,
+			ValueType:   "string",
+			Value:       ncv,
+			FieldBranch: fieldBranch,
 		}
 
 		return ncv
@@ -231,9 +195,10 @@ func processingReflectAnySimpleType(
 		PassRuleHandler(listRule.Rules.Pass, nameStr, ncv)
 
 		chanOutMispFormat <- ChanInputCreateMispFormat{
-			FieldName: nameStr,
-			ValueType: "int",
-			Value:     ncv,
+			FieldName:   nameStr,
+			ValueType:   "int",
+			Value:       ncv,
+			FieldBranch: fieldBranch,
 		}
 
 		return ncv
@@ -249,9 +214,10 @@ func processingReflectAnySimpleType(
 		PassRuleHandler(listRule.Rules.Pass, nameStr, ncv)
 
 		chanOutMispFormat <- ChanInputCreateMispFormat{
-			FieldName: nameStr,
-			ValueType: "uint",
-			Value:     ncv,
+			FieldName:   nameStr,
+			ValueType:   "uint",
+			Value:       ncv,
+			FieldBranch: fieldBranch,
 		}
 
 		return ncv
@@ -267,9 +233,10 @@ func processingReflectAnySimpleType(
 		PassRuleHandler(listRule.Rules.Pass, nameStr, ncv)
 
 		chanOutMispFormat <- ChanInputCreateMispFormat{
-			FieldName: nameStr,
-			ValueType: "float",
-			Value:     ncv,
+			FieldName:   nameStr,
+			ValueType:   "float",
+			Value:       ncv,
+			FieldBranch: fieldBranch,
 		}
 
 		return ncv
@@ -285,9 +252,10 @@ func processingReflectAnySimpleType(
 		PassRuleHandler(listRule.Rules.Pass, nameStr, ncv)
 
 		chanOutMispFormat <- ChanInputCreateMispFormat{
-			FieldName: nameStr,
-			ValueType: "bool",
-			Value:     ncv,
+			FieldName:   nameStr,
+			ValueType:   "bool",
+			Value:       ncv,
+			FieldBranch: fieldBranch,
 		}
 
 		return ncv
@@ -301,7 +269,8 @@ func processingReflectMap(
 	chanOutMispFormat chan<- ChanInputCreateMispFormat,
 	l map[string]interface{},
 	lr rules.ListRulesProcessingMsgMISP,
-	num int) map[string]interface{} {
+	num int,
+	fieldBranch string) map[string]interface{} {
 
 	var (
 		newMap  map[string]interface{}
@@ -310,22 +279,30 @@ func processingReflectMap(
 	nl := map[string]interface{}{}
 
 	for k, v := range l {
+		var fbTmp string
 		r := reflect.TypeOf(v)
 
 		if r == nil {
 			return nl
 		}
 
+		fbTmp = fieldBranch
+		if fbTmp == "" {
+			fbTmp += k
+		} else {
+			fbTmp += "." + k
+		}
+
 		switch r.Kind() {
 		case reflect.Map:
 			if v, ok := v.(map[string]interface{}); ok {
-				newMap = processingReflectMap(wmsg, chanOutMispFormat, v, lr, num+1)
+				newMap = processingReflectMap(wmsg, chanOutMispFormat, v, lr, num+1, fbTmp)
 				nl[k] = newMap
 			}
 
 		case reflect.Slice:
 			if v, ok := v.([]interface{}); ok {
-				newList = processingReflectSlice(wmsg, chanOutMispFormat, v, lr, num+1)
+				newList = processingReflectSlice(wmsg, chanOutMispFormat, v, lr, num+1, fbTmp)
 				nl[k] = newList
 			}
 
@@ -333,7 +310,7 @@ func processingReflectMap(
 			//str += fmt.Sprintf("%s: %s (it is array)\n", k, reflect.ValueOf(v).String())
 
 		default:
-			nl[k] = processingReflectAnySimpleType(wmsg, chanOutMispFormat, k, v, lr, num)
+			nl[k] = processingReflectAnySimpleType(wmsg, chanOutMispFormat, k, v, lr, num, fbTmp)
 		}
 	}
 
@@ -345,7 +322,8 @@ func processingReflectSlice(
 	chanOutMispFormat chan<- ChanInputCreateMispFormat,
 	l []interface{},
 	lr rules.ListRulesProcessingMsgMISP,
-	num int) []interface{} {
+	num int,
+	fieldBranch string) []interface{} {
 
 	var (
 		newMap  map[string]interface{}
@@ -360,19 +338,17 @@ func processingReflectSlice(
 			return nl
 		}
 
-		//l = append(l, processingReflectAnySimpleTypeTest(k, v, listRule, num))
-
 		switch r.Kind() {
 		case reflect.Map:
 			if v, ok := v.(map[string]interface{}); ok {
-				newMap = processingReflectMap(wmsg, chanOutMispFormat, v, lr, num+1)
+				newMap = processingReflectMap(wmsg, chanOutMispFormat, v, lr, num+1, fieldBranch)
 
 				nl = append(nl, newMap)
 			}
 
 		case reflect.Slice:
 			if v, ok := v.([]interface{}); ok {
-				newList = processingReflectSlice(wmsg, chanOutMispFormat, v, lr, num+1)
+				newList = processingReflectSlice(wmsg, chanOutMispFormat, v, lr, num+1, fieldBranch)
 
 				nl = append(nl, newList...)
 			}
@@ -381,7 +357,7 @@ func processingReflectSlice(
 			//str += fmt.Sprintf("%d. %s (it is array)\n", k, reflect.ValueOf(v).String())
 
 		default:
-			nl = append(nl, processingReflectAnySimpleType(wmsg, chanOutMispFormat, k, v, lr, num))
+			nl = append(nl, processingReflectAnySimpleType(wmsg, chanOutMispFormat, k, v, lr, num, fieldBranch))
 		}
 	}
 
