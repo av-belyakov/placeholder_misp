@@ -2,9 +2,9 @@ package datamodels
 
 type EventsMispFormat struct {
 	OrgId              string `json:"org_id"`
+	OrgcId             string `json:"orgc_id"`
 	Distribution       string `json:"distribution"` //цифры в виде строки из списка
 	Info               string `json:"info"`
-	Orgc_id            string `json:"orgc_id"`
 	Uuid               string `json:"uuid"`
 	Date               string `json:"date"`
 	Analysis           string `json:"analysis"` //цифры в виде строки из списка
