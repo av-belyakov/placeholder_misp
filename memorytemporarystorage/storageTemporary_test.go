@@ -1,8 +1,6 @@
 package memorytemporarystorage_test
 
 import (
-	"fmt"
-
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
@@ -56,23 +54,9 @@ var _ = Describe("StorageTemporary", Ordered, func() {
 			cst.SetRawDataHiveFormatMessage(uuidMsg3, []byte("dfd gfg hfghtg hh"))
 
 			at, ok := cst.GetAllowedTransferHiveFormatMessage(uuidMsg3)
-			pd, _ := cst.GetProcessedDataHiveFormatMessage(uuidMsg3)
-			rd, _ := cst.GetRawDataHiveFormatMessage(uuidMsg3)
-
-			fmt.Println("___=== uuid:", uuidMsg3, " pd: ", pd, " rd: ", rd, " at: ", at)
 
 			Expect(at).ShouldNot(Equal(BeFalse()))
 			Expect(ok).ShouldNot(Equal(BeFalse()))
 		})
 	})
-
-	/*Context("Тест 2. Проверяем возможность автоматического удаления информации", func() {
-			It("Должно быть успешно изменено состояние предназначенное для автоматического удаления временное информации", func(){
-	cst.
-			})
-
-			It("При проверке наличия информации он должна быть удалена", func() {
-
-			})
-		})*/
 })

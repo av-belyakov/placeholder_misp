@@ -58,6 +58,7 @@ var _ = Describe("CreateMispFormat", Ordered, func() {
 		listHandlerMisp = map[string][]func(interface{}) bool{
 			"event.object.title":     {eventsMisp.SetValueInfoEventsMisp},
 			"event.object.startDate": {eventsMisp.SetValueTimestampEventsMisp},
+			"event.details.endDate":  {eventsMisp.SetValueDateEventsMisp},
 			"event.object.tlp":       {eventsMisp.SetValueDistributionEventsMisp},
 			"event.object.severity":  {eventsMisp.SetValueThreatLevelIdEventsMisp},
 			"event.organisationId":   {eventsMisp.SetValueOrgIdEventsMisp},

@@ -6,11 +6,11 @@ import (
 
 	"placeholder_misp/datamodels"
 	"placeholder_misp/elasticsearchinteractions"
+	"placeholder_misp/memorytemporarystorage"
 	"placeholder_misp/mispinteractions"
 	"placeholder_misp/natsinteractions"
 	"placeholder_misp/nkckiinteractions"
 	rules "placeholder_misp/rulesinteraction"
-	//"placeholder_misp/supportingfunctions"
 )
 
 func NewCore(
@@ -19,6 +19,7 @@ func NewCore(
 	elmodule elasticsearchinteractions.ModuleElasticSearch,
 	nkckimodule nkckiinteractions.ModuleNKCKI,
 	listRules rules.ListRulesProcessingMsgMISP,
+	storageApp *memorytemporarystorage.CommonStorageTemporary,
 	msgOutChan chan<- datamodels.MessageLoging) {
 	fmt.Println("func 'NewCore', START...")
 
@@ -30,6 +31,13 @@ func NewCore(
 		case data := <-natsChanReception:
 			//вот здесь будет основной обработчик
 			//newByte, listOk, err := coremodule.NewProcessingInputMessageFromHive(eb, listRules)
+
+			/*
+				!!!!!!
+				   storageApp будет использоватся для временного хранения информации
+				   в данном случае связанных с обработкой сообщений из TheHive
+				!!!!!!
+			*/
 
 			procMsg, err := NewHandleMessageFromHive(data, listRules)
 			if err != nil {

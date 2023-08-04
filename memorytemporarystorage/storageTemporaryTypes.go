@@ -16,13 +16,13 @@ type HiveFormatMessages struct {
 }
 
 // StorageHiveFormatMessages хранит сообщение формата TheHave
-// RawMessage сырые данные
-// ProcessedMessage данные частично разобранные Unmarshal JSON
-// AllowedTransfer указывает, можно ли пропустить сообщение на дальнейшую обработку
+// rawMessage сырые данные
+// processedMessage данные частично разобранные Unmarshal JSON
+// allowedTransfer указывает, можно ли пропустить сообщение на дальнейшую обработку
 // isDelete указывает, можно ли удалить данные
 type StorageHiveFormatMessages struct {
-	RawMessage       []byte
-	ProcessedMessage map[string]interface{}
-	AllowedTransfer  bool
+	rawMessage       []byte
+	processedMessage map[string]interface{}
+	allowedTransfer  bool
 	isDelete         bool
 }

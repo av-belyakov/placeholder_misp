@@ -13,6 +13,7 @@ import (
 	"placeholder_misp/coremodule"
 	"placeholder_misp/datamodels"
 	"placeholder_misp/elasticsearchinteractions"
+	"placeholder_misp/memorytemporarystorage"
 	"placeholder_misp/mispinteractions"
 	"placeholder_misp/natsinteractions"
 	"placeholder_misp/nkckiinteractions"
@@ -25,6 +26,7 @@ var (
 	confApp              confighandler.ConfigApp
 	listRulesProcMISPMsg rules.ListRulesProcessingMsgMISP
 	listWarning          []string
+	storageApp           *memorytemporarystorage.CommonStorageTemporary
 	msgOutChan           chan datamodels.MessageLoging
 )
 
@@ -97,6 +99,8 @@ func init() {
 
 		log.Fatalf("%s\n", msg)
 	}
+
+	storageApp = memorytemporarystorage.NewTemporaryStorage()
 }
 
 func main() {
@@ -173,5 +177,5 @@ func main() {
 		}
 	}()
 
-	coremodule.NewCore(*natsModule, *mispModule, *esModule, *nkckiModule, listRulesProcMISPMsg, msgOutChan)
+	coremodule.NewCore(*natsModule, *mispModule, *esModule, *nkckiModule, listRulesProcMISPMsg, storageApp, msgOutChan)
 }
