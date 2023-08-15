@@ -5,8 +5,9 @@ NATS:
   host: nats.cloud.gcm
   port: 4222
 MISP:
-  host: 192.168.9.104
+  host: misp-world.cloud.gcm
   port: 8181
+  auth: TvHkjH8jVQEIdvAxjxnL4H6wDoKyV7jobDjndvAo
 ElasticSearch:
   host: 192.168.13.3
   port: 9200

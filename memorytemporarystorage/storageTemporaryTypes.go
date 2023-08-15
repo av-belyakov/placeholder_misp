@@ -18,6 +18,7 @@ type HiveFormatMessages struct {
 // StorageHiveFormatMessages хранит сообщение формата TheHave
 // rawMessage сырые данные
 // processedMessage данные частично разобранные Unmarshal JSON
+// // parsingCompleted была ли завершена обработка сообщения
 // allowedTransfer указывает, можно ли пропустить сообщение на дальнейшую обработку
 // isDelete указывает, можно ли удалить данные
 type StorageHiveFormatMessages struct {

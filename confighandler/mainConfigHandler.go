@@ -45,6 +45,7 @@ type AppConfigNATS struct {
 type AppConfigMISP struct {
 	Host string
 	Port int
+	Auth string
 }
 
 type AppConfigElasticSearch struct {
@@ -67,6 +68,7 @@ func NewConfig() (ConfigApp, error) {
 		"GO_PHMISP_MAIN":       "",
 		"GO_PHMISP_MHOST":      "",
 		"GO_PHMISP_MPORT":      "",
+		"GO_PHMISP_MAUTH":      "",
 		"GO_PHMISP_NHOST":      "",
 		"GO_PHMISP_NPORT":      "",
 		"GO_PHMISP_ESHOST":     "",
@@ -128,6 +130,9 @@ func NewConfig() (ConfigApp, error) {
 		}
 		if viper.IsSet("MISP.port") {
 			conf.AppConfigMISP.Port = viper.GetInt("MISP.port")
+		}
+		if viper.IsSet("MISP.auth") {
+			conf.AppConfigMISP.Auth = viper.GetString("MISP.auth")
 		}
 
 		// ПРЕДВАРИТЕЛЬНЫЕ Настройки для модуля подключения к ElasticSearch
@@ -220,6 +225,9 @@ func NewConfig() (ConfigApp, error) {
 		if p, err := strconv.Atoi(envList["GO_PHMISP_MPORT"]); err == nil {
 			conf.AppConfigMISP.Port = p
 		}
+	}
+	if envList["GO_PHMISP_MAUTH"] != "" {
+		conf.AppConfigMISP.Auth = envList["GO_PHMISP_MAUTH"]
 	}
 
 	// ПРЕДВАРИТЕЛЬНЫЕ Настройки для модуля подключения к ElasticSearch

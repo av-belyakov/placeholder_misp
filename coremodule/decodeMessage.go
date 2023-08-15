@@ -4,79 +4,75 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"runtime"
 	"strconv"
 
+	"placeholder_misp/datamodels"
+	"placeholder_misp/memorytemporarystorage"
 	rules "placeholder_misp/rulesinteraction"
 )
 
-// ProcessMessageFromHive содержит информацию необходимую для обработки сообщений
-// Message - сообщение полученное от Hive
-// ListRules - список правил для обработки
-// ListConfirmRules - список подтвержденных правил (ЗДЕСЬ НАДО ПОДУМАТЬ В КАКОМ ВИДЕ ЛУЧШЕ УЧИТЫВАТЬ ПРАВИЛА)
-type ProcessMessageFromHive struct {
-	Message          map[string]interface{}
-	ListRules        rules.ListRulesProcessingMsgMISP
-	ListConfirmRules []bool
-}
+func HandlerMessageFromHive(
+	uuidTask string,
+	storageApp *memorytemporarystorage.CommonStorageTemporary,
+	listRule rules.ListRulesProcessingMsgMISP,
+	cmispf chan<- ChanInputCreateMispFormat,
+	cmispfDone chan<- bool,
+	loging chan<- datamodels.MessageLoging) {
 
-func NewHandleMessageFromHive(b []byte, listRule rules.ListRulesProcessingMsgMISP) (ProcessMessageFromHive, error) {
-	pmfh := ProcessMessageFromHive{}
+	b, _ := storageApp.GetRawDataHiveFormatMessage(uuidTask)
 
-	//	fmt.Println("func 'NewHandleMessageFromHive', START")
+	listTmp := map[string]interface{}{}
+	if err := json.Unmarshal(b, &listTmp); err != nil {
+		_, f, l, _ := runtime.Caller(0)
 
-	list := map[string]interface{}{}
-	if err := json.Unmarshal(b, &list); err != nil {
-		return pmfh, err
+		loging <- datamodels.MessageLoging{
+			MsgData: fmt.Sprintf("%s %s:%d", fmt.Sprint(err), f, l-2),
+			MsgType: "error",
+		}
+
+		return
 	}
 
-	if len(list) == 0 {
-		return pmfh, fmt.Errorf("error decoding the json file, it may be empty")
+	if len(listTmp) == 0 {
+		_, f, l, _ := runtime.Caller(0)
+
+		loging <- datamodels.MessageLoging{
+			MsgData: fmt.Sprintf("%s %s:%d", fmt.Errorf("error decoding the json message, it may be empty"), f, l-2),
+			MsgType: "error",
+		}
+
+		return
 	}
 
-	pmfh.Message = list
-	pmfh.ListRules = listRule
+	nlt := processingReflectMap(loging, cmispf, listTmp, &listRule, 0, "")
+	storageApp.SetProcessedDataHiveFormatMessage(uuidTask, nlt)
 
-	return pmfh, nil
-}
+	if listRule.Rules.Passany {
+		storageApp.SetAllowedTransferTrueHiveFormatMessage(uuidTask)
+	} else {
+		//проверяем соответствие сообщения правилам из раздела Pass
+		for _, v := range listRule.Rules.Pass {
+			skipMsg := true
+			for _, value := range v.ListAnd {
+				if !value.StatementExpression {
+					skipMsg = false
 
-func (pm *ProcessMessageFromHive) HandleMessage(chanOutMispFormat chan<- ChanInputCreateMispFormat) (bool, []string) {
-	var skipMsg bool
-	warningMsg := []string{}
-	chanWarningMsg := make(chan string)
+					break
+				}
+			}
 
-	go func() {
-		warningMsg = append(warningMsg, <-chanWarningMsg)
-	}()
-
-	pm.Message = processingReflectMap(chanWarningMsg, chanOutMispFormat, pm.Message, pm.ListRules, 0, "")
-	close(chanWarningMsg)
-
-	//сообщение пропускается в независимости от результата обработки правил PASS
-	if pm.ListRules.Rules.Passany {
-		skipMsg = true
-	}
-
-	skipMsg = true
-	//проверяем соответствие сообщения правилам из раздела Pass
-	for _, v := range pm.ListRules.Rules.Pass {
-		for _, value := range v.ListAnd {
-			if !value.StatementExpression {
-				skipMsg = false
+			if skipMsg {
+				storageApp.SetAllowedTransferTrueHiveFormatMessage(uuidTask)
 
 				break
 			}
 		}
-
-		if skipMsg {
-			break
-		}
 	}
 
-	return skipMsg, warningMsg
-}
-
-func (pm *ProcessMessageFromHive) GetMessage() ([]byte, error) {
-	return json.Marshal(pm.Message)
+	isAllowed, _ := storageApp.GetAllowedTransferHiveFormatMessage(uuidTask)
+	//останавливаем обработчик формирующий MISP формат
+	cmispfDone <- isAllowed
 }
 
 func PassRuleHandler(rulePass []rules.PassListAnd, fn string, cv interface{}) {
@@ -97,7 +93,7 @@ func PassRuleHandler(rulePass []rules.PassListAnd, fn string, cv interface{}) {
 	}
 }
 
-func ReplacementRuleHandler(lr rules.ListRulesProcessingMsgMISP, svt, fn string, cv interface{}) (interface{}, int, error) {
+func ReplacementRuleHandler(lr *rules.ListRulesProcessingMsgMISP, svt, fn string, cv interface{}) (interface{}, int, error) {
 	getReplaceValue := func(svt, rv string) (interface{}, error) {
 		switch svt {
 		case "string":
@@ -143,11 +139,11 @@ func ReplacementRuleHandler(lr rules.ListRulesProcessingMsgMISP, svt, fn string,
 }
 
 func processingReflectAnySimpleType(
-	wmsg chan<- string,
+	loging chan<- datamodels.MessageLoging,
 	chanOutMispFormat chan<- ChanInputCreateMispFormat,
 	name interface{},
 	anyType interface{},
-	listRule rules.ListRulesProcessingMsgMISP,
+	listRule *rules.ListRulesProcessingMsgMISP,
 	num int,
 	fieldBranch string) interface{} {
 
@@ -170,7 +166,12 @@ func processingReflectAnySimpleType(
 
 		ncv, num, err := ReplacementRuleHandler(listRule, "string", nameStr, result)
 		if err != nil {
-			wmsg <- fmt.Sprintf("search value '%s' from rule number '%d' of section 'REPLACE' is not fulfilled", result, num)
+			_, f, l, _ := runtime.Caller(0)
+
+			loging <- datamodels.MessageLoging{
+				MsgData: fmt.Sprintf("search value '%s' from rule number '%d' of section 'REPLACE' is not fulfilled %s:%d", result, num, f, l-2),
+				MsgType: "warning",
+			}
 		}
 
 		PassRuleHandler(listRule.Rules.Pass, nameStr, ncv)
@@ -189,7 +190,12 @@ func processingReflectAnySimpleType(
 
 		ncv, num, err := ReplacementRuleHandler(listRule, "int", nameStr, result)
 		if err != nil {
-			wmsg <- fmt.Sprintf("search value '%v' from rule number '%d' of section 'REPLACE' is not fulfilled", result, num)
+			_, f, l, _ := runtime.Caller(0)
+
+			loging <- datamodels.MessageLoging{
+				MsgData: fmt.Sprintf("search value '%d' from rule number '%d' of section 'REPLACE' is not fulfilled %s:%d", result, num, f, l-2),
+				MsgType: "warning",
+			}
 		}
 
 		PassRuleHandler(listRule.Rules.Pass, nameStr, ncv)
@@ -208,7 +214,12 @@ func processingReflectAnySimpleType(
 
 		ncv, num, err := ReplacementRuleHandler(listRule, "uint", nameStr, result)
 		if err != nil {
-			wmsg <- fmt.Sprintf("search value '%v' from rule number '%d' of section 'REPLACE' is not fulfilled", result, num)
+			_, f, l, _ := runtime.Caller(0)
+
+			loging <- datamodels.MessageLoging{
+				MsgData: fmt.Sprintf("search value '%d' from rule number '%d' of section 'REPLACE' is not fulfilled %s:%d", result, num, f, l-2),
+				MsgType: "warning",
+			}
 		}
 
 		PassRuleHandler(listRule.Rules.Pass, nameStr, ncv)
@@ -227,7 +238,12 @@ func processingReflectAnySimpleType(
 
 		ncv, num, err := ReplacementRuleHandler(listRule, "float", nameStr, result)
 		if err != nil {
-			wmsg <- fmt.Sprintf("search value '%v' from rule number '%d' of section 'REPLACE' is not fulfilled", result, num)
+			_, f, l, _ := runtime.Caller(0)
+
+			loging <- datamodels.MessageLoging{
+				MsgData: fmt.Sprintf("search value '%v' from rule number '%d' of section 'REPLACE' is not fulfilled %s:%d", result, num, f, l-2),
+				MsgType: "warning",
+			}
 		}
 
 		PassRuleHandler(listRule.Rules.Pass, nameStr, ncv)
@@ -246,7 +262,12 @@ func processingReflectAnySimpleType(
 
 		ncv, num, err := ReplacementRuleHandler(listRule, "bool", nameStr, result)
 		if err != nil {
-			wmsg <- fmt.Sprintf("search value '%v' from rule number '%d' of section 'REPLACE' is not fulfilled", result, num)
+			_, f, l, _ := runtime.Caller(0)
+
+			loging <- datamodels.MessageLoging{
+				MsgData: fmt.Sprintf("search value '%v' from rule number '%d' of section 'REPLACE' is not fulfilled %s:%d", result, num, f, l-2),
+				MsgType: "warning",
+			}
 		}
 
 		PassRuleHandler(listRule.Rules.Pass, nameStr, ncv)
@@ -265,10 +286,10 @@ func processingReflectAnySimpleType(
 }
 
 func processingReflectMap(
-	wmsg chan<- string,
+	loging chan<- datamodels.MessageLoging,
 	chanOutMispFormat chan<- ChanInputCreateMispFormat,
 	l map[string]interface{},
-	lr rules.ListRulesProcessingMsgMISP,
+	lr *rules.ListRulesProcessingMsgMISP,
 	num int,
 	fieldBranch string) map[string]interface{} {
 
@@ -296,13 +317,13 @@ func processingReflectMap(
 		switch r.Kind() {
 		case reflect.Map:
 			if v, ok := v.(map[string]interface{}); ok {
-				newMap = processingReflectMap(wmsg, chanOutMispFormat, v, lr, num+1, fbTmp)
+				newMap = processingReflectMap(loging, chanOutMispFormat, v, lr, num+1, fbTmp)
 				nl[k] = newMap
 			}
 
 		case reflect.Slice:
 			if v, ok := v.([]interface{}); ok {
-				newList = processingReflectSlice(wmsg, chanOutMispFormat, v, lr, num+1, fbTmp)
+				newList = processingReflectSlice(loging, chanOutMispFormat, v, lr, num+1, fbTmp)
 				nl[k] = newList
 			}
 
@@ -310,7 +331,7 @@ func processingReflectMap(
 			//str += fmt.Sprintf("%s: %s (it is array)\n", k, reflect.ValueOf(v).String())
 
 		default:
-			nl[k] = processingReflectAnySimpleType(wmsg, chanOutMispFormat, k, v, lr, num, fbTmp)
+			nl[k] = processingReflectAnySimpleType(loging, chanOutMispFormat, k, v, lr, num, fbTmp)
 		}
 	}
 
@@ -318,10 +339,10 @@ func processingReflectMap(
 }
 
 func processingReflectSlice(
-	wmsg chan<- string,
+	loging chan<- datamodels.MessageLoging,
 	chanOutMispFormat chan<- ChanInputCreateMispFormat,
 	l []interface{},
-	lr rules.ListRulesProcessingMsgMISP,
+	lr *rules.ListRulesProcessingMsgMISP,
 	num int,
 	fieldBranch string) []interface{} {
 
@@ -341,14 +362,14 @@ func processingReflectSlice(
 		switch r.Kind() {
 		case reflect.Map:
 			if v, ok := v.(map[string]interface{}); ok {
-				newMap = processingReflectMap(wmsg, chanOutMispFormat, v, lr, num+1, fieldBranch)
+				newMap = processingReflectMap(loging, chanOutMispFormat, v, lr, num+1, fieldBranch)
 
 				nl = append(nl, newMap)
 			}
 
 		case reflect.Slice:
 			if v, ok := v.([]interface{}); ok {
-				newList = processingReflectSlice(wmsg, chanOutMispFormat, v, lr, num+1, fieldBranch)
+				newList = processingReflectSlice(loging, chanOutMispFormat, v, lr, num+1, fieldBranch)
 
 				nl = append(nl, newList...)
 			}
@@ -357,7 +378,7 @@ func processingReflectSlice(
 			//str += fmt.Sprintf("%d. %s (it is array)\n", k, reflect.ValueOf(v).String())
 
 		default:
-			nl = append(nl, processingReflectAnySimpleType(wmsg, chanOutMispFormat, k, v, lr, num, fieldBranch))
+			nl = append(nl, processingReflectAnySimpleType(loging, chanOutMispFormat, k, v, lr, num, fieldBranch))
 		}
 	}
 

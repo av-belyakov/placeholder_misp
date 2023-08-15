@@ -1,0 +1,21 @@
+{
+    "sharing_group_id": "1",
+    "extends_uuid": "",
+    "published": false,
+    "disable_correlation": false,
+    "org_id": "~20488",
+    "orgc_id": "",
+    "distribution": "3",
+    "info": "BruteForce Credentials с 176.192.244.107 (Россия)",
+    "event_creator_email": "p.delyukin@cloud.rcm",
+    "proposal_email_lock": false,
+    "uuid": "",
+    "date": "",
+    "analysis": "2",
+    "threat_level_id": "4",
+    "timestamp": "0",
+    "publish_timestamp": "0",
+    "sighting_timestamp": "0",
+    "locked": false,
+    "attribute_count": ""
+}

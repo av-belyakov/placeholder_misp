@@ -27,12 +27,13 @@ var (
 	listRulesProcMISPMsg rules.ListRulesProcessingMsgMISP
 	listWarning          []string
 	storageApp           *memorytemporarystorage.CommonStorageTemporary
-	msgOutChan           chan datamodels.MessageLoging
+	loging               chan datamodels.MessageLoging
 )
 
 func init() {
-	msgOutChan = make(chan datamodels.MessageLoging)
+	loging = make(chan datamodels.MessageLoging)
 
+	//инициализируем модуль логирования
 	sl, err = simplelogger.NewSimpleLogger("placeholder_misp", []simplelogger.MessageTypeSettings{
 		{
 			MsgTypeName:   "error",
@@ -61,6 +62,7 @@ func init() {
 		log.Fatalf("error module 'simplelogger': %v %s:%d\n", err, f, l+18)
 	}
 
+	//инициализируем модуль чтения конфигурационного файла
 	confApp, err = confighandler.NewConfig()
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
@@ -69,8 +71,7 @@ func init() {
 		log.Fatalf("error module 'confighandler': %v\n", err)
 	}
 
-	fmt.Println("func 'main', config application = ", confApp)
-
+	//инициализируем модуль чтения правил обработки MISP сообщений
 	listRulesProcMISPMsg, listWarning, err = rules.GetRuleProcessingMsgForMISP(confApp.RulesProcMSGMISP.Directory, confApp.RulesProcMSGMISP.File)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
@@ -100,6 +101,7 @@ func init() {
 		log.Fatalf("%s\n", msg)
 	}
 
+	//инициализируем модуль временного хранения информации
 	storageApp = memorytemporarystorage.NewTemporaryStorage()
 }
 
@@ -116,9 +118,8 @@ func main() {
 
 	ctxNATS, ctxCloseNATS := context.WithTimeout(context.Background(), 2*time.Second)
 	defer ctxCloseNATS()
-
 	//инициализация модуля для взаимодействия с NATS (Данный модуль обязателен для взаимодействия)
-	natsModule, err := natsinteractions.NewClientNATS(ctxNATS, confApp.AppConfigNATS, msgOutChan)
+	natsModule, err := natsinteractions.NewClientNATS(ctxNATS, confApp.AppConfigNATS, loging)
 	if err != nil {
 		_ = sl.WriteLoggingData(fmt.Sprintln(err), "error")
 
@@ -128,8 +129,7 @@ func main() {
 	//инициалиация модуля для взаимодействия с MISP
 	ctxMISP, ctxCloseMISP := context.WithTimeout(context.Background(), 2*time.Second)
 	defer ctxCloseMISP()
-
-	mispModule, err := mispinteractions.NewClientMISP(ctxMISP, confApp.AppConfigMISP, msgOutChan)
+	mispModule, err := mispinteractions.HandlerMISP(ctxMISP, confApp.AppConfigMISP, loging)
 	if err != nil {
 		_ = sl.WriteLoggingData(fmt.Sprintln(err), "error")
 	}
@@ -137,8 +137,7 @@ func main() {
 	//инициализация модуля для взаимодействия с ElasticSearch
 	ctxES, ctxCloseES := context.WithTimeout(context.Background(), 2*time.Second)
 	defer ctxCloseES()
-
-	esModule, err := elasticsearchinteractions.NewClientElasticSearch(ctxES, confApp.AppConfigElasticSearch, msgOutChan)
+	esModule, err := elasticsearchinteractions.NewClientElasticSearch(ctxES, confApp.AppConfigElasticSearch, loging)
 	if err != nil {
 		_ = sl.WriteLoggingData(fmt.Sprintln(err), "error")
 	}
@@ -146,8 +145,7 @@ func main() {
 	// инициализация модуля для взаимодействия с NKCKI
 	ctxNKCKI, ctxCloseNKCKI := context.WithTimeout(context.Background(), 2*time.Second)
 	defer ctxCloseNKCKI()
-
-	nkckiModule, err := nkckiinteractions.NewClientNKCKI(ctxNKCKI, confApp.AppConfigNKCKI, msgOutChan)
+	nkckiModule, err := nkckiinteractions.NewClientNKCKI(ctxNKCKI, confApp.AppConfigNKCKI, loging)
 	if err != nil {
 		_ = sl.WriteLoggingData(fmt.Sprintln(err), "error")
 	}
@@ -168,7 +166,7 @@ func main() {
 	*/
 
 	go func() {
-		for msg := range msgOutChan {
+		for msg := range loging {
 			_ = sl.WriteLoggingData(msg.MsgData, msg.MsgType)
 
 			/*
@@ -177,5 +175,5 @@ func main() {
 		}
 	}()
 
-	coremodule.NewCore(*natsModule, *mispModule, *esModule, *nkckiModule, listRulesProcMISPMsg, storageApp, msgOutChan)
+	coremodule.CoreHandler(natsModule, mispModule, esModule, nkckiModule, listRulesProcMISPMsg, storageApp, loging)
 }

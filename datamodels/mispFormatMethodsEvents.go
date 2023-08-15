@@ -4,6 +4,10 @@ func (emisp EventsMispFormat) GetEventsMisp() EventsMispFormat {
 	return emisp
 }
 
+//func (emisp EventsMispFormat) Read(b []byte) (int, error) {
+
+//}
+
 func (emisp *EventsMispFormat) SetValueOrgIdEventsMisp(v interface{}) bool {
 	var isSuccess bool
 

@@ -34,7 +34,7 @@ func readReflectAnyTypeSprint(name interface{}, anyType interface{}, num int) st
 	if n, ok := name.(int); ok {
 		nameStr = fmt.Sprintf("%s%v.", ws, n+1)
 	} else if n, ok := name.(string); ok {
-		nameStr = fmt.Sprintf("%s%s:", ws, n)
+		nameStr = fmt.Sprintf("%s\"%s\":", ws, n)
 	}
 
 	if r == nil {
@@ -43,7 +43,7 @@ func readReflectAnyTypeSprint(name interface{}, anyType interface{}, num int) st
 
 	switch r.Kind() {
 	case reflect.String:
-		str += fmt.Sprintf("%s '%s'\n", nameStr, reflect.ValueOf(anyType).String())
+		str += fmt.Sprintf("%s \"%s\"\n", nameStr, reflect.ValueOf(anyType).String())
 
 	case reflect.Int, reflect.Int16, reflect.Int32, reflect.Int64:
 		str += fmt.Sprintf("%s %d\n", nameStr, reflect.ValueOf(anyType).Int())

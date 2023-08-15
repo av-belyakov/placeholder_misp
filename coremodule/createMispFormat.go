@@ -3,6 +3,8 @@ package coremodule
 import (
 	"fmt"
 	"placeholder_misp/datamodels"
+	"placeholder_misp/mispinteractions"
+	"runtime"
 )
 
 type ChanInputCreateMispFormat struct {
@@ -17,35 +19,40 @@ type FieldsNameMapping struct {
 }
 
 var (
-	eventsMisp         datamodels.EventsMispFormat
-	attributesMisp     datamodels.AttributesMispFormat
-	galaxyClustersMisp datamodels.GalaxyClustersMispFormat
-	galaxyElementMisp  datamodels.GalaxyElementMispFormat
-	usersMisp          datamodels.UsersMispFormat
-	organizationsMisp  datamodels.OrganisationsMispFormat
-	serversMisp        datamodels.ServersMispFormat
-	feedsMisp          datamodels.FeedsMispFormat
-	tagsMisp           datamodels.TagsMispFormat
-	listFieldsMispType map[string][]FieldsNameMapping
+	eventsMisp     datamodels.EventsMispFormat
+	attributesMisp datamodels.AttributesMispFormat
+
+	//пока не нужны, временно отключаем
+	//galaxyClustersMisp datamodels.GalaxyClustersMispFormat
+	//galaxyElementMisp  datamodels.GalaxyElementMispFormat
+	//usersMisp          datamodels.UsersMispFormat
+	//organizationsMisp  datamodels.OrganisationsMispFormat
+	//serversMisp        datamodels.ServersMispFormat
+	//feedsMisp          datamodels.FeedsMispFormat
+	//tagsMisp           datamodels.TagsMispFormat
+
+	listHandlerMisp map[string][]func(interface{}) bool
 )
 
 func init() {
 	eventsMisp = datamodels.EventsMispFormat{
 		Analysis:          getAnalysis(),
+		Distribution:      getDistributionEvent(),
 		Timestamp:         "0",
-		ThreatLevelId:     "4",
+		ThreatLevelId:     getThreatLevelId(),
 		PublishTimestamp:  "0",
 		SightingTimestamp: "0",
+		SharingGroupId:    getSharingGroupId(),
 	}
 	attributesMisp = datamodels.AttributesMispFormat{
 		Category:     "Other",
 		Type:         "other",
 		Timestamp:    "0",
-		Distribution: "3",
+		Distribution: getDistributionAttribute(),
 		FirstSeen:    "0",
 		LastSeen:     "0",
 	}
-	galaxyClustersMisp = datamodels.GalaxyClustersMispFormat{
+	/*galaxyClustersMisp = datamodels.GalaxyClustersMispFormat{
 		Description:   "3",
 		GalaxyElement: []datamodels.GalaxyElementMispFormat{},
 	}
@@ -72,59 +79,66 @@ func init() {
 		IsGalaxy:       true,
 		IsCustomGalaxy: true,
 		Inherited:      1,
-	}
+	}*/
 
-	/*
-	   Список полей которые мне не удалось размапить.
-	   	Events:
-	   	- in 'непонятно' out 'tags' //однако в спецификации MISP нет такого
-	   	// поля, а по коду на питон оно должно быть срезом
-	   	- in 'непонятно' out 'event_reports' // однако в спецификации MISP
-	   	// нет такого поля, а по коду на питон оно должно быть срезом из некоего
-	   	// объекта типа EventReport
-
-	*/
-
-	listFieldsMispType = map[string][]FieldsNameMapping{
-		"events": {
-			{InputFieldName: "event.object.title", MispFieldName: "info"},
-			{InputFieldName: "event.object.startDate", MispFieldName: "timestamp"},
-			{InputFieldName: "event.object.tlp", MispFieldName: "distribution"},
-			{InputFieldName: "event.object.severity", MispFieldName: "threat_level_id"},
-			{InputFieldName: "event.organisationId", MispFieldName: "org_id"},
-			{InputFieldName: "event.object.updatedAt", MispFieldName: "sighting_timestamp"},
-			{InputFieldName: "event.object.owner", MispFieldName: "event_creator_email"},
-		},
-		"attributes": {
-			{InputFieldName: "event.object.tlp", MispFieldName: "tags"},
-			{InputFieldName: "observables._id", MispFieldName: "object_id"},
-			{InputFieldName: "observables.data", MispFieldName: "value"},
-			{InputFieldName: "observables._createdAt", MispFieldName: "timestamp"},
-			{InputFieldName: "observables.message", MispFieldName: "comment"},
-			{InputFieldName: "observables.startDate", MispFieldName: "first_seen"},
-		},
+	listHandlerMisp = map[string][]func(interface{}) bool{
+		//events
+		"event.object.title":     {eventsMisp.SetValueInfoEventsMisp},
+		"event.object.startDate": {eventsMisp.SetValueTimestampEventsMisp},
+		"event.details.endDate":  {eventsMisp.SetValueDateEventsMisp},
+		"event.object.tlp":       {eventsMisp.SetValueDistributionEventsMisp},
+		"event.object.severity":  {eventsMisp.SetValueThreatLevelIdEventsMisp},
+		"event.organisationId":   {eventsMisp.SetValueOrgIdEventsMisp},
+		"event.object.updatedAt": {eventsMisp.SetValueSightingTimestampEventsMisp},
+		"event.object.owner":     {eventsMisp.SetValueEventCreatorEmailEventsMisp},
+		//attributes
+		"observables._id":        {attributesMisp.SetValueObjectIdAttributesMisp},
+		"observables.data":       {attributesMisp.SetValueValueAttributesMisp},
+		"observables._createdAt": {attributesMisp.SetValueTimestampAttributesMisp},
+		"observables.message":    {attributesMisp.SetValueCommentAttributesMisp},
+		"observables.startDate":  {attributesMisp.SetValueFirstSeenAttributesMisp},
 	}
 }
 
-func NewMispFormat() (chan ChanInputCreateMispFormat, chan struct{}) {
-	fmt.Println("func 'NewMispFormat', START...")
-
+func NewMispFormat(
+	uuidTask string,
+	mispmodule *mispinteractions.ModuleMISP,
+	loging chan<- datamodels.MessageLoging) (chan ChanInputCreateMispFormat, chan bool) {
 	chanInput := make(chan ChanInputCreateMispFormat)
-	chanDone := make(chan struct{})
+	//останавливает обработчик канала chanInput (при завершении декодировании сообщения)
+	chanDone := make(chan bool)
 
-	go func(ci <-chan ChanInputCreateMispFormat, cd <-chan struct{}) {
+	go func() {
 		for {
 			select {
-			case tmf := <-ci:
-				fmt.Println("INPUT ChanInputCreateMispFormat: ", tmf)
-				//Здесь нужно сделать обработкик приема значений от decoderMessage
-				// и формирование типов формата MISP
+			case tmf := <-chanInput:
+				if lf, ok := listHandlerMisp[tmf.FieldBranch]; ok {
+					for _, f := range lf {
+						_ = f(tmf.Value)
+					}
+				}
+			case isAllowed := <-chanDone:
+				if !isAllowed {
+					_, f, l, _ := runtime.Caller(0)
 
-			case <-cd:
+					loging <- datamodels.MessageLoging{
+						MsgData: fmt.Sprintf("the message with %s was not sent to MISP because it does not comply with the rules %s:%d", uuidTask, f, l-2),
+						MsgType: "warning",
+					}
+
+					return
+				}
+
+				//тут отправляем сформированные по формату MISP пользовательские структуры
+				mispmodule.SendingDataInputMisp(map[string]interface{}{
+					"events":     eventsMisp,
+					"attributes": attributesMisp,
+				})
+
 				return
 			}
 		}
-	}(chanInput, chanDone)
+	}()
 
 	return chanInput, chanDone
 }
@@ -133,7 +147,23 @@ func getAnalysis() string {
 	return "2"
 }
 
-func getTagTLP(tlp int) datamodels.TagsMispFormat {
+func getDistributionEvent() string {
+	return "3"
+}
+
+func getDistributionAttribute() string {
+	return "3"
+}
+
+func getThreatLevelId() string {
+	return "4"
+}
+
+func getSharingGroupId() string {
+	return "1"
+}
+
+/*func getTagTLP(tlp int) datamodels.TagsMispFormat {
 	tag := datamodels.TagsMispFormat{Name: "tlp:red", Colour: "#cc0033"}
 
 	switch tlp {
@@ -149,4 +179,4 @@ func getTagTLP(tlp int) datamodels.TagsMispFormat {
 	}
 
 	return tag
-}
+}*/

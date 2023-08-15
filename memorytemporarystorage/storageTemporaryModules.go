@@ -39,11 +39,13 @@ func (cst *CommonStorageTemporary) SetRawDataHiveFormatMessage(uuid string, data
 		cst.HiveFormatMessage.Storages[uuid] = StorageHiveFormatMessages{}
 	}
 
+	storage := cst.HiveFormatMessage.Storages[uuid]
+
 	cst.HiveFormatMessage.Storages[uuid] = StorageHiveFormatMessages{
 		rawMessage:       data,
-		processedMessage: cst.HiveFormatMessage.Storages[uuid].processedMessage,
-		allowedTransfer:  cst.HiveFormatMessage.Storages[uuid].allowedTransfer,
-		isDelete:         cst.HiveFormatMessage.Storages[uuid].isDelete,
+		processedMessage: storage.processedMessage,
+		allowedTransfer:  storage.allowedTransfer,
+		isDelete:         storage.isDelete,
 	}
 
 	cst.HiveFormatMessage.mutex.Unlock()
@@ -66,11 +68,13 @@ func (cst *CommonStorageTemporary) SetProcessedDataHiveFormatMessage(uuid string
 		cst.HiveFormatMessage.Storages[uuid] = StorageHiveFormatMessages{}
 	}
 
+	storage := cst.HiveFormatMessage.Storages[uuid]
+
 	cst.HiveFormatMessage.Storages[uuid] = StorageHiveFormatMessages{
-		rawMessage:       cst.HiveFormatMessage.Storages[uuid].rawMessage,
+		rawMessage:       storage.rawMessage,
 		processedMessage: data,
-		allowedTransfer:  cst.HiveFormatMessage.Storages[uuid].allowedTransfer,
-		isDelete:         cst.HiveFormatMessage.Storages[uuid].isDelete,
+		allowedTransfer:  storage.allowedTransfer,
+		isDelete:         storage.isDelete,
 	}
 
 	cst.HiveFormatMessage.mutex.Unlock()
@@ -93,11 +97,13 @@ func (cst *CommonStorageTemporary) SetAllowedTransferTrueHiveFormatMessage(uuid 
 		cst.HiveFormatMessage.Storages[uuid] = StorageHiveFormatMessages{}
 	}
 
+	storage := cst.HiveFormatMessage.Storages[uuid]
+
 	cst.HiveFormatMessage.Storages[uuid] = StorageHiveFormatMessages{
-		rawMessage:       cst.HiveFormatMessage.Storages[uuid].rawMessage,
-		processedMessage: cst.HiveFormatMessage.Storages[uuid].processedMessage,
+		rawMessage:       storage.rawMessage,
+		processedMessage: storage.processedMessage,
 		allowedTransfer:  true,
-		isDelete:         cst.HiveFormatMessage.Storages[uuid].isDelete,
+		isDelete:         storage.isDelete,
 	}
 
 	cst.HiveFormatMessage.mutex.Unlock()
@@ -109,11 +115,13 @@ func (cst *CommonStorageTemporary) SetAllowedTransferFalseHiveFormatMessage(uuid
 		cst.HiveFormatMessage.Storages[uuid] = StorageHiveFormatMessages{}
 	}
 
+	storage := cst.HiveFormatMessage.Storages[uuid]
+
 	cst.HiveFormatMessage.Storages[uuid] = StorageHiveFormatMessages{
-		rawMessage:       cst.HiveFormatMessage.Storages[uuid].rawMessage,
-		processedMessage: cst.HiveFormatMessage.Storages[uuid].processedMessage,
+		rawMessage:       storage.rawMessage,
+		processedMessage: storage.processedMessage,
 		allowedTransfer:  false,
-		isDelete:         cst.HiveFormatMessage.Storages[uuid].isDelete,
+		isDelete:         storage.isDelete,
 	}
 }
 
@@ -131,10 +139,12 @@ func (cst *CommonStorageTemporary) SetIsDeleteHiveFormatMessage(uuid string) boo
 		return false
 	}
 
+	storage := cst.HiveFormatMessage.Storages[uuid]
+
 	cst.HiveFormatMessage.Storages[uuid] = StorageHiveFormatMessages{
-		rawMessage:       cst.HiveFormatMessage.Storages[uuid].rawMessage,
-		processedMessage: cst.HiveFormatMessage.Storages[uuid].processedMessage,
-		allowedTransfer:  cst.HiveFormatMessage.Storages[uuid].allowedTransfer,
+		rawMessage:       storage.rawMessage,
+		processedMessage: storage.processedMessage,
+		allowedTransfer:  storage.allowedTransfer,
 		isDelete:         true,
 	}
 
