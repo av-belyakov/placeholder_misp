@@ -106,20 +106,12 @@ func init() {
 }
 
 func main() {
-	fmt.Println("func 'main', START...")
-	fmt.Println("config application:", confApp)
-
 	log.Println("Application 'placeholder_misp' is start")
 
-	// i, err := os.Stdout.Write([]byte("test writing to stdout"))
-	// fmt.Println("os.Stdout.Write i = ", i, " error = ", err)
-	//_ = sl.WriteLoggingData("my test message about trable", "error")
-	//_ = sl.WriteLoggingData("my test information message", "info")
-
+	//инициализация модуля для взаимодействия с NATS (Данный модуль обязателен для взаимодействия)
 	ctxNATS, ctxCloseNATS := context.WithTimeout(context.Background(), 2*time.Second)
 	defer ctxCloseNATS()
-	//инициализация модуля для взаимодействия с NATS (Данный модуль обязателен для взаимодействия)
-	natsModule, err := natsinteractions.NewClientNATS(ctxNATS, confApp.AppConfigNATS, loging)
+	natsModule, err := natsinteractions.NewClientNATS(ctxNATS, confApp.AppConfigNATS, storageApp, loging)
 	if err != nil {
 		_ = sl.WriteLoggingData(fmt.Sprintln(err), "error")
 
@@ -129,7 +121,7 @@ func main() {
 	//инициалиация модуля для взаимодействия с MISP
 	ctxMISP, ctxCloseMISP := context.WithTimeout(context.Background(), 2*time.Second)
 	defer ctxCloseMISP()
-	mispModule, err := mispinteractions.HandlerMISP(ctxMISP, confApp.AppConfigMISP, loging)
+	mispModule, err := mispinteractions.HandlerMISP(ctxMISP, confApp.AppConfigMISP, storageApp, loging)
 	if err != nil {
 		_ = sl.WriteLoggingData(fmt.Sprintln(err), "error")
 	}
@@ -137,7 +129,7 @@ func main() {
 	//инициализация модуля для взаимодействия с ElasticSearch
 	ctxES, ctxCloseES := context.WithTimeout(context.Background(), 2*time.Second)
 	defer ctxCloseES()
-	esModule, err := elasticsearchinteractions.NewClientElasticSearch(ctxES, confApp.AppConfigElasticSearch, loging)
+	esModule, err := elasticsearchinteractions.HandlerElasticSearch(ctxES, confApp.AppConfigElasticSearch, storageApp, loging)
 	if err != nil {
 		_ = sl.WriteLoggingData(fmt.Sprintln(err), "error")
 	}
@@ -149,21 +141,6 @@ func main() {
 	if err != nil {
 		_ = sl.WriteLoggingData(fmt.Sprintln(err), "error")
 	}
-
-	//Если подключений к API MISP, NKCKI, ElasticSearch нет следует продолжить выполнения программы
-	//а в дальнейшем пытаться установить соединение с данными API
-
-	/*
-			ОБЯЗАТЕЛЬНО К ПРОЧТЕНИЮ
-		Появилась задача осуществлять подключения к Elasticsearch и к НКЦКИ. И отправлять туда данные
-		из Hive. В ответ с MISP, Elasticsearch и НКЦКИ должны приходить ID принятого сообщения, который
-		нужно отправлять назад в Hive.
-
-		здесь сделать инициализацию подключения к zabbix
-		вообще правильнее основное логирование сделать здесь, а все ошибки кидать
-		из модулей через канал сюда. Тогда можно выполнять логирование и отправлять
-		логи ошибок через модуль подключения к zabbix
-	*/
 
 	go func() {
 		for msg := range loging {

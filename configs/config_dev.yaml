@@ -6,11 +6,16 @@ NATS:
   port: 4222
 MISP:
   host: misp-world.cloud.gcm
-  port: 8181
   auth: TvHkjH8jVQEIdvAxjxnL4H6wDoKyV7jobDjndvAo
 ElasticSearch:
-  host: 192.168.13.3
+  host: datahook.cloud.gcm
   port: 9200
+  prefix: test
+  index: thehive33
+  name: elasticsearch
+  authtype: basic
+  user: writer
+  passwd: 1zex3TvB
 NKCKI:
   host: 127.0.0.1
   port: 12000

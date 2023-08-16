@@ -104,6 +104,7 @@ func NewMispFormat(
 	uuidTask string,
 	mispmodule *mispinteractions.ModuleMISP,
 	loging chan<- datamodels.MessageLoging) (chan ChanInputCreateMispFormat, chan bool) {
+	//канал принимающий данные необходимые для заполнения MISP форматов
 	chanInput := make(chan ChanInputCreateMispFormat)
 	//останавливает обработчик канала chanInput (при завершении декодировании сообщения)
 	chanDone := make(chan bool)

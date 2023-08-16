@@ -22,11 +22,9 @@ func checkTimeDelete(cst *CommonStorageTemporary) {
 
 	for range c {
 		for k, v := range cst.HiveFormatMessage.Storages {
-			if !v.isDelete {
-				continue
+			if v.isProcessedMisp && v.isProcessedElasticsearsh && v.isProcessedNKCKI {
+				deleteHiveFormatMessageElement(k, cst)
 			}
-
-			deleteHiveFormatMessageElement(k, cst)
 		}
 	}
 }
@@ -42,10 +40,12 @@ func (cst *CommonStorageTemporary) SetRawDataHiveFormatMessage(uuid string, data
 	storage := cst.HiveFormatMessage.Storages[uuid]
 
 	cst.HiveFormatMessage.Storages[uuid] = StorageHiveFormatMessages{
-		rawMessage:       data,
-		processedMessage: storage.processedMessage,
-		allowedTransfer:  storage.allowedTransfer,
-		isDelete:         storage.isDelete,
+		rawMessage:               data,
+		processedMessage:         storage.processedMessage,
+		allowedTransfer:          storage.allowedTransfer,
+		isProcessedMisp:          storage.isProcessedMisp,
+		isProcessedElasticsearsh: storage.isProcessedElasticsearsh,
+		isProcessedNKCKI:         storage.isProcessedNKCKI,
 	}
 
 	cst.HiveFormatMessage.mutex.Unlock()
@@ -71,10 +71,12 @@ func (cst *CommonStorageTemporary) SetProcessedDataHiveFormatMessage(uuid string
 	storage := cst.HiveFormatMessage.Storages[uuid]
 
 	cst.HiveFormatMessage.Storages[uuid] = StorageHiveFormatMessages{
-		rawMessage:       storage.rawMessage,
-		processedMessage: data,
-		allowedTransfer:  storage.allowedTransfer,
-		isDelete:         storage.isDelete,
+		rawMessage:               storage.rawMessage,
+		processedMessage:         data,
+		allowedTransfer:          storage.allowedTransfer,
+		isProcessedMisp:          storage.isProcessedMisp,
+		isProcessedElasticsearsh: storage.isProcessedElasticsearsh,
+		isProcessedNKCKI:         storage.isProcessedNKCKI,
 	}
 
 	cst.HiveFormatMessage.mutex.Unlock()
@@ -100,10 +102,12 @@ func (cst *CommonStorageTemporary) SetAllowedTransferTrueHiveFormatMessage(uuid 
 	storage := cst.HiveFormatMessage.Storages[uuid]
 
 	cst.HiveFormatMessage.Storages[uuid] = StorageHiveFormatMessages{
-		rawMessage:       storage.rawMessage,
-		processedMessage: storage.processedMessage,
-		allowedTransfer:  true,
-		isDelete:         storage.isDelete,
+		rawMessage:               storage.rawMessage,
+		processedMessage:         storage.processedMessage,
+		allowedTransfer:          true,
+		isProcessedMisp:          storage.isProcessedMisp,
+		isProcessedElasticsearsh: storage.isProcessedElasticsearsh,
+		isProcessedNKCKI:         storage.isProcessedNKCKI,
 	}
 
 	cst.HiveFormatMessage.mutex.Unlock()
@@ -118,10 +122,12 @@ func (cst *CommonStorageTemporary) SetAllowedTransferFalseHiveFormatMessage(uuid
 	storage := cst.HiveFormatMessage.Storages[uuid]
 
 	cst.HiveFormatMessage.Storages[uuid] = StorageHiveFormatMessages{
-		rawMessage:       storage.rawMessage,
-		processedMessage: storage.processedMessage,
-		allowedTransfer:  false,
-		isDelete:         storage.isDelete,
+		rawMessage:               storage.rawMessage,
+		processedMessage:         storage.processedMessage,
+		allowedTransfer:          false,
+		isProcessedMisp:          storage.isProcessedMisp,
+		isProcessedElasticsearsh: storage.isProcessedElasticsearsh,
+		isProcessedNKCKI:         storage.isProcessedNKCKI,
 	}
 }
 
@@ -134,7 +140,7 @@ func (cst *CommonStorageTemporary) GetAllowedTransferHiveFormatMessage(uuid stri
 	return false, false
 }
 
-func (cst *CommonStorageTemporary) SetIsDeleteHiveFormatMessage(uuid string) bool {
+func (cst *CommonStorageTemporary) SetIsProcessedMispHiveFormatMessage(uuid string) bool {
 	if _, ok := cst.HiveFormatMessage.Storages[uuid]; !ok {
 		return false
 	}
@@ -142,10 +148,50 @@ func (cst *CommonStorageTemporary) SetIsDeleteHiveFormatMessage(uuid string) boo
 	storage := cst.HiveFormatMessage.Storages[uuid]
 
 	cst.HiveFormatMessage.Storages[uuid] = StorageHiveFormatMessages{
-		rawMessage:       storage.rawMessage,
-		processedMessage: storage.processedMessage,
-		allowedTransfer:  storage.allowedTransfer,
-		isDelete:         true,
+		rawMessage:               storage.rawMessage,
+		processedMessage:         storage.processedMessage,
+		allowedTransfer:          storage.allowedTransfer,
+		isProcessedMisp:          true,
+		isProcessedElasticsearsh: storage.isProcessedElasticsearsh,
+		isProcessedNKCKI:         storage.isProcessedNKCKI,
+	}
+
+	return true
+}
+
+func (cst *CommonStorageTemporary) SetIsProcessedElasticsearshHiveFormatMessage(uuid string) bool {
+	if _, ok := cst.HiveFormatMessage.Storages[uuid]; !ok {
+		return false
+	}
+
+	storage := cst.HiveFormatMessage.Storages[uuid]
+
+	cst.HiveFormatMessage.Storages[uuid] = StorageHiveFormatMessages{
+		rawMessage:               storage.rawMessage,
+		processedMessage:         storage.processedMessage,
+		allowedTransfer:          storage.allowedTransfer,
+		isProcessedMisp:          storage.isProcessedMisp,
+		isProcessedElasticsearsh: true,
+		isProcessedNKCKI:         storage.isProcessedNKCKI,
+	}
+
+	return true
+}
+
+func (cst *CommonStorageTemporary) SetIsProcessedNKCKIHiveFormatMessage(uuid string) bool {
+	if _, ok := cst.HiveFormatMessage.Storages[uuid]; !ok {
+		return false
+	}
+
+	storage := cst.HiveFormatMessage.Storages[uuid]
+
+	cst.HiveFormatMessage.Storages[uuid] = StorageHiveFormatMessages{
+		rawMessage:               storage.rawMessage,
+		processedMessage:         storage.processedMessage,
+		allowedTransfer:          storage.allowedTransfer,
+		isProcessedMisp:          storage.isProcessedMisp,
+		isProcessedElasticsearsh: storage.isProcessedElasticsearsh,
+		isProcessedNKCKI:         true,
 	}
 
 	return true

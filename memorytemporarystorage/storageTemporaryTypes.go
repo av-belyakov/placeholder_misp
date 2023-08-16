@@ -20,10 +20,14 @@ type HiveFormatMessages struct {
 // processedMessage данные частично разобранные Unmarshal JSON
 // // parsingCompleted была ли завершена обработка сообщения
 // allowedTransfer указывает, можно ли пропустить сообщение на дальнейшую обработку
-// isDelete указывает, можно ли удалить данные
+// isProcessedMisp указывает обработан ли модулем MISP
+// isProcessedElasticsearsh указывает обработан ли модулем Elasticsearch
+// isProcessedNKCKI указывает обработан ли модулем NKCKI
 type StorageHiveFormatMessages struct {
-	rawMessage       []byte
-	processedMessage map[string]interface{}
-	allowedTransfer  bool
-	isDelete         bool
+	rawMessage               []byte
+	processedMessage         map[string]interface{}
+	allowedTransfer          bool
+	isProcessedMisp          bool
+	isProcessedElasticsearsh bool
+	isProcessedNKCKI         bool
 }

@@ -6,86 +6,59 @@ import (
 
 	"placeholder_misp/confighandler"
 	"placeholder_misp/datamodels"
+	"placeholder_misp/memorytemporarystorage"
 )
 
 var es ModuleElasticSearch
 
+type SettingsInputChan struct {
+	UUID string
+}
+
 // ModuleElasticSearch инициализированный модуль
 // chanInputElasticSearch - канал для отправки данных в модуль
 // chanOutputElasticSearch - канал для принятия данных из модуля
-// ChanLogging - канал для отправки логов
 type ModuleElasticSearch struct {
-	chanInputElasticSearch  chan interface{}
+	chanInputElasticSearch  chan SettingsInputChan
 	chanOutputElasticSearch chan interface{}
-	ChanLogging             chan<- datamodels.MessageLoging
 }
 
 func init() {
 	es = ModuleElasticSearch{
-		chanInputElasticSearch:  make(chan interface{}),
+		chanInputElasticSearch:  make(chan SettingsInputChan),
 		chanOutputElasticSearch: make(chan interface{}),
 	}
 }
 
-func NewClientElasticSearch(
+func HandlerElasticSearch(
 	ctx context.Context,
 	conf confighandler.AppConfigElasticSearch,
-	chanLog chan<- datamodels.MessageLoging) (*ModuleElasticSearch, error) {
-	fmt.Println("func 'NewClientElasticSearch', START...")
+	storageApp *memorytemporarystorage.CommonStorageTemporary,
+	loging chan<- datamodels.MessageLoging) (*ModuleElasticSearch, error) {
+	fmt.Println("func 'HandlerElasticSearch', START...")
 
-	es.ChanLogging = chanLog
+	go func() {
+		for data := range es.chanInputElasticSearch {
+			//Так как пока никакой обработки нет просто устанавливаем
+			//статус для хранилища как 'обработанный модулем'
 
-	/*
-		Здесь нужно написать инициализацию подключения
-	*/
+			storageApp.SetIsProcessedElasticsearshHiveFormatMessage(data.UUID)
+		}
+	}()
 
 	return &es, nil
 }
 
+func (es ModuleElasticSearch) SendingData(data SettingsInputChan) {
+	es.chanInputElasticSearch <- data
+}
+
+/*
 func (es ModuleElasticSearch) GetDataReceptionChannel() <-chan interface{} {
-	/*
-		для формирование правильного сообщения об ошибке
-		if err != nil {
-			_, f, l, _ := runtime.Caller(0)
-
-			mmisp.ChanLogging <- datamodels.MessageLoging{
-				MsgData: fmt.Sprintf("%s %s:%d", fmt.Sprint(err), f, l-2),
-				MsgType: "error",
-			}
-		}
-	*/
-
 	return es.chanOutputElasticSearch
 }
 
 func (es ModuleElasticSearch) GettingData() interface{} {
-	/*
-		для формирование правильного сообщения об ошибке
-		if err != nil {
-			_, f, l, _ := runtime.Caller(0)
-
-			mmisp.ChanLogging <- datamodels.MessageLoging{
-				MsgData: fmt.Sprintf("%s %s:%d", fmt.Sprint(err), f, l-2),
-				MsgType: "error",
-			}
-		}
-	*/
-
 	return <-es.chanOutputElasticSearch
 }
-
-func (es ModuleElasticSearch) SendingData(data interface{}) {
-	/*
-		для формирование правильного сообщения об ошибке
-		if err != nil {
-			_, f, l, _ := runtime.Caller(0)
-
-			mmisp.ChanLogging <- datamodels.MessageLoging{
-				MsgData: fmt.Sprintf("%s %s:%d", fmt.Sprint(err), f, l-2),
-				MsgType: "error",
-			}
-		}
-	*/
-
-	es.chanInputElasticSearch <- data
-}
+*/

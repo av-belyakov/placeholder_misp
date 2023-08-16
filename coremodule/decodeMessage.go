@@ -15,14 +15,14 @@ import (
 func HandlerMessageFromHive(
 	uuidTask string,
 	storageApp *memorytemporarystorage.CommonStorageTemporary,
+	//b []byte,
 	listRule rules.ListRulesProcessingMsgMISP,
 	cmispf chan<- ChanInputCreateMispFormat,
 	cmispfDone chan<- bool,
 	loging chan<- datamodels.MessageLoging) {
-
+	listTmp := map[string]interface{}{}
 	b, _ := storageApp.GetRawDataHiveFormatMessage(uuidTask)
 
-	listTmp := map[string]interface{}{}
 	if err := json.Unmarshal(b, &listTmp); err != nil {
 		_, f, l, _ := runtime.Caller(0)
 
@@ -71,6 +71,10 @@ func HandlerMessageFromHive(
 	}
 
 	isAllowed, _ := storageApp.GetAllowedTransferHiveFormatMessage(uuidTask)
+
+	//устанавливаем параметр информирующий о завершении обработки модулем
+	storageApp.SetIsProcessedMispHiveFormatMessage(uuidTask)
+
 	//останавливаем обработчик формирующий MISP формат
 	cmispfDone <- isAllowed
 }

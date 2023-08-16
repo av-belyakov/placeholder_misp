@@ -40,10 +40,13 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 			conf, err := confighandler.NewConfig()
 
 			Expect(err).ShouldNot(HaveOccurred())
-			Expect(conf.GetAppNATS().Host).Should(Equal("192.168.9.201"))
+			Expect(conf.GetAppNATS().Host).Should(Equal("nats.cloud.gcm"))
 			Expect(conf.GetAppNATS().Port).Should(Equal(4222))
-			Expect(conf.GetAppMISP().Host).Should(Equal("192.168.9.202"))
-			Expect(conf.GetAppMISP().Port).Should(Equal(8080))
+			Expect(conf.GetAppMISP().Host).Should(Equal("misp-center.cloud.gcm"))
+			Expect(conf.GetAppES().Host).Should(Equal("datahook.cloud.gcm"))
+			Expect(conf.GetAppES().Port).Should(Equal(9200))
+			Expect(conf.GetAppES().Index).Should(Equal("thehive33"))
+			Expect(conf.GetAppES().Name).Should(Equal("elasticsearch"))
 		})
 
 		It("Должно быть получено содержимое файла 'config_dev.yaml' при значении переменной GO_PHMISP_MAIN=development", func() {
@@ -52,10 +55,10 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 			conf, err := confighandler.NewConfig()
 
 			Expect(err).ShouldNot(HaveOccurred())
-			Expect(conf.GetAppNATS().Host).Should(Equal("127.0.0.1"))
+			Expect(conf.GetAppNATS().Host).Should(Equal("nats.cloud.gcm"))
 			Expect(conf.GetAppNATS().Port).Should(Equal(4222))
-			Expect(conf.GetAppMISP().Host).Should(Equal("192.168.13.3"))
-			Expect(conf.GetAppMISP().Port).Should(Equal(8181))
+			Expect(conf.GetAppMISP().Host).Should(Equal("misp-world.cloud.gcm"))
+
 		})
 
 		It("Должно быть перезаписанно содержимое некоторых полей полученных с переменных окружения GO_PHMISP_*", func() {

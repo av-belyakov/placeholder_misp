@@ -105,11 +105,11 @@ func (client *ClientMISP) Do(method, path string, data []byte) (*http.Response, 
 func HandlerMISP(
 	ctx context.Context,
 	conf confighandler.AppConfigMISP,
-	testChan chan<- struct {
+	/*testChan chan<- struct {
 		Status     string
 		StatusCode int
 		Body       []byte
-	},
+	},*/
 	loging chan<- datamodels.MessageLoging) (*ModuleMISP, error) {
 
 	client, err := NewClientMISP(conf.Host, conf.Auth, false)

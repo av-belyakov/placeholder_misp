@@ -44,13 +44,18 @@ type AppConfigNATS struct {
 
 type AppConfigMISP struct {
 	Host string
-	Port int
 	Auth string
 }
 
 type AppConfigElasticSearch struct {
-	Host string
-	Port int
+	Host     string
+	Port     int
+	Prefix   string
+	Index    string
+	Name     string
+	Authtype string
+	User     string
+	Passwd   string
 }
 
 type AppConfigNKCKI struct {
@@ -67,12 +72,17 @@ func NewConfig() (ConfigApp, error) {
 	var envList map[string]string = map[string]string{
 		"GO_PHMISP_MAIN":       "",
 		"GO_PHMISP_MHOST":      "",
-		"GO_PHMISP_MPORT":      "",
 		"GO_PHMISP_MAUTH":      "",
 		"GO_PHMISP_NHOST":      "",
 		"GO_PHMISP_NPORT":      "",
 		"GO_PHMISP_ESHOST":     "",
 		"GO_PHMISP_ESPORT":     "",
+		"GO_PHMISP_ESPREFIX":   "",
+		"GO_PHMISP_ESINDEX":    "",
+		"GO_PHMISP_ESNAME":     "",
+		"GO_PHMISP_ESAUTHTYPE": "",
+		"GO_PHMISP_ESUSER":     "",
+		"GO_PHMISP_ESPASSWD":   "",
 		"GO_PHMISP_NKCKIHOST":  "",
 		"GO_PHMISP_NKCKIPORT":  "",
 		"GO_PHMISP_RULES_DIR":  "",
@@ -128,19 +138,34 @@ func NewConfig() (ConfigApp, error) {
 		if viper.IsSet("MISP.host") {
 			conf.AppConfigMISP.Host = viper.GetString("MISP.host")
 		}
-		if viper.IsSet("MISP.port") {
-			conf.AppConfigMISP.Port = viper.GetInt("MISP.port")
-		}
 		if viper.IsSet("MISP.auth") {
 			conf.AppConfigMISP.Auth = viper.GetString("MISP.auth")
 		}
 
-		// ПРЕДВАРИТЕЛЬНЫЕ Настройки для модуля подключения к ElasticSearch
+		// Настройки для модуля подключения к ElasticSearch
 		if viper.IsSet("ElasticSearch.host") {
 			conf.AppConfigElasticSearch.Host = viper.GetString("ElasticSearch.host")
 		}
 		if viper.IsSet("ElasticSearch.port") {
 			conf.AppConfigElasticSearch.Port = viper.GetInt("ElasticSearch.port")
+		}
+		if viper.IsSet("ElasticSearch.prefix") {
+			conf.AppConfigElasticSearch.Prefix = viper.GetString("ElasticSearch.prefix")
+		}
+		if viper.IsSet("ElasticSearch.index") {
+			conf.AppConfigElasticSearch.Index = viper.GetString("ElasticSearch.index")
+		}
+		if viper.IsSet("ElasticSearch.name") {
+			conf.AppConfigElasticSearch.Name = viper.GetString("ElasticSearch.name")
+		}
+		if viper.IsSet("ElasticSearch.authtype") {
+			conf.AppConfigElasticSearch.Authtype = viper.GetString("ElasticSearch.authtype")
+		}
+		if viper.IsSet("ElasticSearch.user") {
+			conf.AppConfigElasticSearch.User = viper.GetString("ElasticSearch.user")
+		}
+		if viper.IsSet("ElasticSearch.passwd") {
+			conf.AppConfigElasticSearch.Passwd = viper.GetString("ElasticSearch.passwd")
 		}
 
 		// ПРЕДВАРИТЕЛЬНЫЕ Настройки для модуля подключения к NKCKI
@@ -221,32 +246,45 @@ func NewConfig() (ConfigApp, error) {
 	if envList["GO_PHMISP_MHOST"] != "" {
 		conf.AppConfigMISP.Host = envList["GO_PHMISP_MHOST"]
 	}
-	if envList["GO_PHMISP_MPORT"] != "" {
-		if p, err := strconv.Atoi(envList["GO_PHMISP_MPORT"]); err == nil {
-			conf.AppConfigMISP.Port = p
-		}
-	}
 	if envList["GO_PHMISP_MAUTH"] != "" {
 		conf.AppConfigMISP.Auth = envList["GO_PHMISP_MAUTH"]
 	}
 
-	// ПРЕДВАРИТЕЛЬНЫЕ Настройки для модуля подключения к ElasticSearch
+	//Настройки для модуля подключения к ElasticSearch
 	if envList["GO_PHMISP_ESHOST"] != "" {
-		conf.AppConfigMISP.Host = envList["GO_PHMISP_ESHOST"]
+		conf.AppConfigElasticSearch.Host = envList["GO_PHMISP_ESHOST"]
 	}
 	if envList["GO_PHMISP_ESPORT"] != "" {
 		if p, err := strconv.Atoi(envList["GO_PHMISP_ESPORT"]); err == nil {
-			conf.AppConfigMISP.Port = p
+			conf.AppConfigElasticSearch.Port = p
 		}
+	}
+	if envList["GO_PHMISP_ESPREFIX"] != "" {
+		conf.AppConfigElasticSearch.Prefix = envList["GO_PHMISP_ESPREFIX"]
+	}
+	if envList["GO_PHMISP_ESINDEX"] != "" {
+		conf.AppConfigElasticSearch.Index = envList["GO_PHMISP_ESINDEX"]
+	}
+	if envList["GO_PHMISP_ESNAME"] != "" {
+		conf.AppConfigElasticSearch.Name = envList["GO_PHMISP_ESNAME"]
+	}
+	if envList["GO_PHMISP_ESAUTHTYPE"] != "" {
+		conf.AppConfigElasticSearch.Authtype = envList["GO_PHMISP_ESAUTHTYPE"]
+	}
+	if envList["GO_PHMISP_ESUSER"] != "" {
+		conf.AppConfigElasticSearch.User = envList["GO_PHMISP_ESUSER"]
+	}
+	if envList["GO_PHMISP_ESPASSWD"] != "" {
+		conf.AppConfigElasticSearch.Passwd = envList["GO_PHMISP_ESPASSWD"]
 	}
 
 	// ПРЕДВАРИТЕЛЬНЫЕ Настройки для модуля подключения к NKCKI
 	if envList["GO_PHMISP_NKCKIHOST"] != "" {
-		conf.AppConfigMISP.Host = envList["GO_PHMISP_NKCKIHOST"]
+		conf.AppConfigNKCKI.Host = envList["GO_PHMISP_NKCKIHOST"]
 	}
 	if envList["GO_PHMISP_NKCKIPORT"] != "" {
 		if p, err := strconv.Atoi(envList["GO_PHMISP_NKCKIPORT"]); err == nil {
-			conf.AppConfigMISP.Port = p
+			conf.AppConfigNKCKI.Port = p
 		}
 	}
 
@@ -271,6 +309,10 @@ func (conf *ConfigApp) GetAppNATS() *AppConfigNATS {
 
 func (conf *ConfigApp) GetAppMISP() *AppConfigMISP {
 	return &conf.AppConfigMISP
+}
+
+func (conf *ConfigApp) GetAppES() *AppConfigElasticSearch {
+	return &conf.AppConfigElasticSearch
 }
 
 func (conf *ConfigApp) Clean() {

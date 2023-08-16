@@ -5,33 +5,41 @@ import (
 	"fmt"
 	"runtime"
 
+	"github.com/google/uuid"
 	"github.com/nats-io/nats.go"
 
 	"placeholder_misp/confighandler"
 	"placeholder_misp/datamodels"
+	"placeholder_misp/memorytemporarystorage"
 )
 
 var mnats ModuleNATS
+
+type SettingsOutputChan struct {
+	UUID string
+}
 
 // ModuleNATS инициализированный модуль
 // ChanOutputMISP - канал для принятия данных из модуля
 // ChanLogging - канал для отправки логов
 type ModuleNATS struct {
-	chanOutputNATS chan []byte
+	//chanOutputNATS chan []byte
+	chanOutputNATS chan SettingsOutputChan
 	chanInputNATS  chan []byte
 	ChanLogging    chan<- datamodels.MessageLoging
 }
 
 func init() {
-	mnats.chanOutputNATS = make(chan []byte)
+	//mnats.chanOutputNATS = make(chan []byte)
+	mnats.chanOutputNATS = make(chan SettingsOutputChan)
+	mnats.chanInputNATS = make(chan []byte)
 }
 
 func NewClientNATS(
 	ctx context.Context,
 	conf confighandler.AppConfigNATS,
+	storageApp *memorytemporarystorage.CommonStorageTemporary,
 	chanLog chan<- datamodels.MessageLoging) (*ModuleNATS, error) {
-	fmt.Println("func 'NewClientNATS', START...")
-
 	mnats.ChanLogging = chanLog
 
 	nc, err := nats.Connect(fmt.Sprintf("%s:%d", conf.Host, conf.Port))
@@ -42,26 +50,20 @@ func NewClientNATS(
 
 	fmt.Println("func 'NewClientNATS', STATUS:", nc.Stats())
 
-	// Simple Async Subscriber
-	/*nc.Subscribe("foo", func(msg *nats.Msg) {
-		fmt.Printf("Received a message: %s\n", string(msg.Data))
-	})
-
-	// Simple Publisher
-	nc.Publish("foo", []byte("Hello World"))
-	time.Sleep(900 * time.Millisecond)
-	nc.Publish("foo", []byte("Send messgae after sleep 2s"))
-
-	fmt.Println("func 'NewClientNATS', END")*/
-
 	nc.Subscribe("main_caseupdate", func(msg *nats.Msg) {
-		mnats.chanOutputNATS <- msg.Data
+		uuidTask := uuid.NewString()
+		storageApp.SetRawDataHiveFormatMessage(uuidTask, msg.Data)
+
+		//mnats.chanOutputNATS <- msg.Data
+		mnats.chanOutputNATS <- SettingsOutputChan{
+			UUID: uuidTask,
+		}
 	})
 
 	return &mnats, nil
 }
 
-func (mnats ModuleNATS) GetDataReceptionChannel() <-chan []byte {
+func (mnats ModuleNATS) GetDataReceptionChannel() <-chan SettingsOutputChan /*[]byte*/ {
 	return mnats.chanOutputNATS
 }
 

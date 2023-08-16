@@ -10,14 +10,12 @@ import (
 	"placeholder_misp/natsinteractions"
 	"placeholder_misp/nkckiinteractions"
 	rules "placeholder_misp/rulesinteraction"
-
-	"github.com/google/uuid"
 )
 
 func CoreHandler(
 	natsmodule *natsinteractions.ModuleNATS,
 	mispmodule *mispinteractions.ModuleMISP,
-	elmodule *elasticsearchinteractions.ModuleElasticSearch,
+	esmodule *elasticsearchinteractions.ModuleElasticSearch,
 	nkckimodule *nkckiinteractions.ModuleNKCKI,
 	listRule rules.ListRulesProcessingMsgMISP,
 	storageApp *memorytemporarystorage.CommonStorageTemporary,
@@ -29,17 +27,17 @@ func CoreHandler(
 	for {
 		select {
 		case data := <-natsChanReception:
-			uuidTask := uuid.NewString()
-			storageApp.SetRawDataHiveFormatMessage(uuidTask, data)
+			//uuidTask := uuid.NewString()
+			//storageApp.SetRawDataHiveFormatMessage(uuidTask, data)
 
 			//формирование итоговых документов в формате MISP
-			chanCreateMispFormat, chanDone := NewMispFormat(uuidTask, mispmodule, loging)
+			chanCreateMispFormat, chanDone := NewMispFormat(data.UUID, mispmodule, loging)
 
 			//обработчик сообщений из TheHive (выполняется разбор сообщения и его разбор на основе правил)
-			go HandlerMessageFromHive(uuidTask, storageApp, listRule, chanCreateMispFormat, chanDone, loging)
+			go HandlerMessageFromHive(data.UUID, storageApp, listRule, chanCreateMispFormat, chanDone, loging)
 
-			// отправка сообщения в Elasticshearch (пока заглушка)
-			//elmodule.SendingData(procMsg.Message)
+			// отправка сообщения в Elasticshearch
+			esmodule.SendingData(elasticsearchinteractions.SettingsInputChan{UUID: data.UUID})
 
 			// отправка сообщения в НКЦКИ (пока заглушка)
 			//nkckimodule.SendingData(procMsg.Message)
