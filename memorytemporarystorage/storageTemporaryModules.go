@@ -1,6 +1,7 @@
 package memorytemporarystorage
 
 import (
+	"sync"
 	"time"
 )
 
@@ -8,7 +9,9 @@ func NewTemporaryStorage() *CommonStorageTemporary {
 	cst := CommonStorageTemporary{
 		HiveFormatMessage: HiveFormatMessages{
 			Storages: make(map[string]StorageHiveFormatMessages),
+			mutex:    sync.Mutex{},
 		},
+		ListUserSettingsMISP: make([]UserSettingsMISP, 0),
 	}
 
 	go checkTimeDelete(&cst)
@@ -195,6 +198,27 @@ func (cst *CommonStorageTemporary) SetIsProcessedNKCKIHiveFormatMessage(uuid str
 	}
 
 	return true
+}
+
+// AddUserSettingsMISP добавляет настройки для пользователя
+func (cst *CommonStorageTemporary) AddUserSettingsMISP(usmisp UserSettingsMISP) {
+	cst.ListUserSettingsMISP = append(cst.ListUserSettingsMISP, usmisp)
+}
+
+// возвращает настройки пользователя по его email
+func (cst *CommonStorageTemporary) GetUserSettingsMISP(email string) (UserSettingsMISP, bool) {
+	for _, v := range cst.ListUserSettingsMISP {
+		if v.Email == email {
+			return v, true
+		}
+	}
+
+	return UserSettingsMISP{}, false
+}
+
+// возвращает весь список настроек пользователей
+func (cst *CommonStorageTemporary) GetListUserSettingsMISP() *CommonStorageTemporary {
+	return cst
 }
 
 func deleteHiveFormatMessageElement(uuid string, cst *CommonStorageTemporary) {

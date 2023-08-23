@@ -1,20 +1,34 @@
 package datamodels
 
-// MainMessage основное сообщение получаемое через NATS
-type MainMessage struct {
-	SourceMessage
-	EventMessage
-	ObservablesMessage
-	TtpsMessage
+// ResponseMessageFromMispToTheHave содержит ответ для TheHive получаемый от MISP
+type ResponseMessageFromMispToTheHave struct {
+	Success  bool   `json:"success"`
+	Service  string `json:"string"`
+	Commands []ResponseCommandForTheHive
 }
 
-// SourceMessage сообщение с информацией об источнике
+// ResponseCommandForTheHive ответы с командами для TheHive
+type ResponseCommandForTheHive struct {
+	Command string `json:"command"`
+	Name    string `json:"name"`
+	String  string `json:"string"`
+}
+
+// MainMessageTheHive основное сообщение получаемое через NATS
+type MainMessageTheHive struct {
+	SourceMessageTheHive
+	EventMessageTheHive
+	ObservablesMessageTheHive
+	TtpsMessageTheHive
+}
+
+// SourceMessageTheHive сообщение с информацией об источнике
 // Source - источник
-type SourceMessage struct {
+type SourceMessageTheHive struct {
 	Source string `json:"source"`
 }
 
-// EventMessage сообщение с информацией о событии
+// EventMessageTheHive сообщение с информацией о событии
 // Operation - операция
 // ObjectId - уникальный идентификатор объекта
 // ObjectType - тип объекта
@@ -26,7 +40,7 @@ type SourceMessage struct {
 // Object - объект события
 // OrganisationId - уникальный идентификатор организации
 // Organisation - наименование организации
-type EventMessage struct {
+type EventMessageTheHive struct {
 	Operation      string       `json:"operation"`
 	ObjectId       string       `json:"objectId"`
 	ObjectType     string       `json:"objectType"`
@@ -113,9 +127,9 @@ type EventObject struct {
 // CustomFields настраиваемые поля
 type CustomFields map[string]map[string]interface{}
 
-// ObservablesMessage список наблюдаемых сообщений
+// ObservablesMessageTheHive список наблюдаемых сообщений
 // Observables - наблюдаемые сообщения
-type ObservablesMessage struct {
+type ObservablesMessageTheHive struct {
 	Observables []ObservableMessage `json:"observables"`
 }
 
@@ -157,8 +171,8 @@ type ObservableMessage struct {
 	Reports          map[string]map[string][]map[string]interface{} `json:"reports"`
 }
 
-// TtpsMessage список TTP сообщений
-type TtpsMessage struct {
+// TtpsMessageTheHive список TTP сообщений
+type TtpsMessageTheHive struct {
 	Ttp []TtpMessage `json:"ttp"`
 }
 

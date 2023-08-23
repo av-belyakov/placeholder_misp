@@ -5,8 +5,20 @@ import (
 )
 
 // CommonStorageTemporary содержит информацию предназначенную для временного хранения
+// HiveFormatMessage временное хранилище для сообщений MISP
+// ListUserSettingsMISP список настроек пользователей MISP
 type CommonStorageTemporary struct {
-	HiveFormatMessage HiveFormatMessages
+	HiveFormatMessage    HiveFormatMessages
+	ListUserSettingsMISP []UserSettingsMISP
+}
+
+type UserSettingsMISP struct {
+	UserId  string
+	OrgId   string
+	Email   string
+	AuthKey string
+	OrgName string
+	Role    string
 }
 
 // HiveFormatMessages содержит временные данные относящиеся к обработки событий из TheHive

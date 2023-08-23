@@ -1,5 +1,7 @@
 package datamodels
 
+import "fmt"
+
 func (emisp EventsMispFormat) GetEventsMisp() EventsMispFormat {
 	return emisp
 }
@@ -8,230 +10,119 @@ func (emisp EventsMispFormat) GetEventsMisp() EventsMispFormat {
 
 //}
 
-func (emisp *EventsMispFormat) SetValueOrgIdEventsMisp(v interface{}) bool {
-	var isSuccess bool
-
+func (emisp *EventsMispFormat) SetValueOrgIdEventsMisp(v interface{}, isNew bool) {
 	if data, ok := v.(string); ok {
 		emisp.OrgId = data
-
-		isSuccess = true
 	}
-
-	return isSuccess
 }
 
-func (emisp *EventsMispFormat) SetValueOrgcIdEventsMisp(v interface{}) bool {
-	var isSuccess bool
-
+func (emisp *EventsMispFormat) SetValueOrgcIdEventsMisp(v interface{}, isNew bool) {
 	if data, ok := v.(string); ok {
 		emisp.OrgcId = data
-
-		isSuccess = true
 	}
-
-	return isSuccess
 }
 
-func (emisp *EventsMispFormat) SetValueDistributionEventsMisp(v interface{}) bool {
-	var isSuccess bool
-
+func (emisp *EventsMispFormat) SetValueDistributionEventsMisp(v interface{}, isNew bool) {
 	if data, ok := v.(string); ok {
 		emisp.Distribution = data
-
-		isSuccess = true
 	}
-
-	return isSuccess
 }
 
-func (emisp *EventsMispFormat) SetValueInfoEventsMisp(v interface{}) bool {
-	var isSuccess bool
-
+func (emisp *EventsMispFormat) SetValueInfoEventsMisp(v interface{}, isNew bool) {
 	if data, ok := v.(string); ok {
 		emisp.Info = data
-
-		isSuccess = true
 	}
-
-	return isSuccess
 }
 
-func (emisp *EventsMispFormat) SetValueUuidEventsMisp(v interface{}) bool {
-	var isSuccess bool
-
+func (emisp *EventsMispFormat) SetValueUuidEventsMisp(v interface{}, isNew bool) {
 	if data, ok := v.(string); ok {
 		emisp.Uuid = data
-
-		isSuccess = true
 	}
-
-	return isSuccess
 }
 
-func (emisp *EventsMispFormat) SetValueDateEventsMisp(v interface{}) bool {
-	var isSuccess bool
-
+func (emisp *EventsMispFormat) SetValueDateEventsMisp(v interface{}, isNew bool) {
 	if data, ok := v.(string); ok {
 		emisp.Date = data
-
-		isSuccess = true
 	}
-
-	return isSuccess
 }
 
-func (emisp *EventsMispFormat) SetValueAnalysisEventsMisp(v interface{}) bool {
-	var isSuccess bool
-
+func (emisp *EventsMispFormat) SetValueAnalysisEventsMisp(v interface{}, isNew bool) {
 	if data, ok := v.(string); ok {
 		emisp.Analysis = data
-
-		isSuccess = true
 	}
-
-	return isSuccess
 }
 
-func (emisp *EventsMispFormat) SetValueAttributeCountEventsMisp(v interface{}) bool {
-	var isSuccess bool
-
+func (emisp *EventsMispFormat) SetValueAttributeCountEventsMisp(v interface{}, isNew bool) {
 	if data, ok := v.(string); ok {
 		emisp.AttributeCount = data
-
-		isSuccess = true
 	}
-
-	return isSuccess
 }
 
-func (emisp *EventsMispFormat) SetValueTimestampEventsMisp(v interface{}) bool {
-	var isSuccess bool
-
-	if data, ok := v.(string); ok {
-		emisp.Timestamp = data
-
-		isSuccess = true
+func (emisp *EventsMispFormat) SetValueTimestampEventsMisp(v interface{}, isNew bool) {
+	if data, ok := v.(float64); ok {
+		//emisp.Timestamp = fmt.Sprintf("%13.f", data)
+		emisp.Timestamp = fmt.Sprintf("%13.f", data)[:10]
 	}
-
-	return isSuccess
 }
 
-func (emisp *EventsMispFormat) SetValueSharingGroupIdEventsMisp(v interface{}) bool {
-	var isSuccess bool
-
+func (emisp *EventsMispFormat) SetValueSharingGroupIdEventsMisp(v interface{}, isNew bool) {
 	if data, ok := v.(string); ok {
 		emisp.SharingGroupId = data
-
-		isSuccess = true
 	}
-
-	return isSuccess
 }
 
-func (emisp *EventsMispFormat) SetValueThreatLevelIdEventsMisp(v interface{}) bool {
-	var isSuccess bool
-
+func (emisp *EventsMispFormat) SetValueThreatLevelIdEventsMisp(v interface{}, isNew bool) {
 	if data, ok := v.(string); ok {
 		emisp.ThreatLevelId = data
-
-		isSuccess = true
 	}
-
-	return isSuccess
 }
 
-func (emisp *EventsMispFormat) SetValuePublishTimestampEventsMisp(v interface{}) bool {
-	var isSuccess bool
-
-	if data, ok := v.(string); ok {
-		emisp.PublishTimestamp = data
-
-		isSuccess = true
+func (emisp *EventsMispFormat) SetValuePublishTimestampEventsMisp(v interface{}, isNew bool) {
+	if data, ok := v.(float64); ok {
+		//emisp.PublishTimestamp = fmt.Sprintf("%13.f", data)
+		emisp.PublishTimestamp = fmt.Sprintf("%13.f", data)[:10]
 	}
-
-	return isSuccess
 }
 
-func (emisp *EventsMispFormat) SetValueSightingTimestampEventsMisp(v interface{}) bool {
-	var isSuccess bool
-
-	if data, ok := v.(string); ok {
-		emisp.SightingTimestamp = data
-
-		isSuccess = true
+func (emisp *EventsMispFormat) SetValueSightingTimestampEventsMisp(v interface{}, isNew bool) {
+	if data, ok := v.(float64); ok {
+		//emisp.SightingTimestamp = fmt.Sprintf("%13.f", data)
+		emisp.SightingTimestamp = fmt.Sprintf("%13.f", data)[:10]
 	}
-
-	return isSuccess
 }
 
-func (emisp *EventsMispFormat) SetValueExtendsUuidEventsMisp(v interface{}) bool {
-	var isSuccess bool
-
+func (emisp *EventsMispFormat) SetValueExtendsUuidEventsMisp(v interface{}, isNew bool) {
 	if data, ok := v.(string); ok {
 		emisp.ExtendsUuid = data
-
-		isSuccess = true
 	}
-
-	return isSuccess
 }
 
-func (emisp *EventsMispFormat) SetValueEventCreatorEmailEventsMisp(v interface{}) bool {
-	var isSuccess bool
-
+func (emisp *EventsMispFormat) SetValueEventCreatorEmailEventsMisp(v interface{}, isNew bool) {
 	if data, ok := v.(string); ok {
 		emisp.EventCreatorEmail = data
-
-		isSuccess = true
 	}
-
-	return isSuccess
 }
 
-func (emisp *EventsMispFormat) SetValuePublishedEventsMisp(v interface{}) bool {
-	var isSuccess bool
-
+func (emisp *EventsMispFormat) SetValuePublishedEventsMisp(v interface{}, isNew bool) {
 	if data, ok := v.(bool); ok {
 		emisp.Published = data
-
-		isSuccess = true
 	}
-
-	return isSuccess
 }
 
-func (emisp *EventsMispFormat) SetValueProposalEmailLockEventsMisp(v interface{}) bool {
-	var isSuccess bool
-
+func (emisp *EventsMispFormat) SetValueProposalEmailLockEventsMisp(v interface{}, isNew bool) {
 	if data, ok := v.(bool); ok {
 		emisp.ProposalEmailLock = data
-
-		isSuccess = true
 	}
-
-	return isSuccess
 }
 
-func (emisp *EventsMispFormat) SetValueLockedEventsMisp(v interface{}) bool {
-	var isSuccess bool
-
+func (emisp *EventsMispFormat) SetValueLockedEventsMisp(v interface{}, isNew bool) {
 	if data, ok := v.(bool); ok {
 		emisp.Locked = data
-
-		isSuccess = true
 	}
-
-	return isSuccess
 }
 
-func (emisp *EventsMispFormat) SetValueDisableCorrelationEventsMisp(v interface{}) bool {
-	var isSuccess bool
-
+func (emisp *EventsMispFormat) SetValueDisableCorrelationEventsMisp(v interface{}, isNew bool) {
 	if data, ok := v.(bool); ok {
 		emisp.DisableCorrelation = data
-
-		isSuccess = true
 	}
-
-	return isSuccess
 }

@@ -6,25 +6,44 @@ import (
 	"placeholder_misp/supportingfunctions"
 )
 
-func (mm MainMessage) ToStringBeautiful(num int) string {
+// NewResponseMessage формирует новый тип ResponseMessageFromMispToTheHave с предустановленными значениями
+func NewResponseMessage() *ResponseMessageFromMispToTheHave {
+	return &ResponseMessageFromMispToTheHave{
+		Success: true,
+		Service: "MISP",
+		Commands: []ResponseCommandForTheHive{
+			{Command: "addtag", String: "Webhook: send=\"MISP\""},
+		},
+	}
+}
+
+func (rm *ResponseMessageFromMispToTheHave) ResponseMessageAddNewCommand(rcm ResponseCommandForTheHive) {
+	rm.Commands = append(rm.Commands, rcm)
+}
+
+func (rm *ResponseMessageFromMispToTheHave) GetResponseMessageFromMispToTheHave() ResponseMessageFromMispToTheHave {
+	return *rm
+}
+
+func (mm MainMessageTheHive) ToStringBeautiful(num int) string {
 	var str string
 
-	str += mm.SourceMessage.ToStringBeautiful(num + 1)
+	str += mm.SourceMessageTheHive.ToStringBeautiful(num + 1)
 	str += fmt.Sprintln("event:")
-	str += mm.EventMessage.ToStringBeautiful(num + 1)
+	str += mm.EventMessageTheHive.ToStringBeautiful(num + 1)
 	str += fmt.Sprintln("observables:")
-	str += mm.ObservablesMessage.ToStringBeautiful(num + 1)
+	str += mm.ObservablesMessageTheHive.ToStringBeautiful(num + 1)
 	str += fmt.Sprintln("ttps:")
-	str += mm.TtpsMessage.ToStringBeautiful(num + 1)
+	str += mm.TtpsMessageTheHive.ToStringBeautiful(num + 1)
 
 	return str
 }
 
-func (sm SourceMessage) ToStringBeautiful(num int) string {
+func (sm SourceMessageTheHive) ToStringBeautiful(num int) string {
 	return fmt.Sprintf("source: '%s'\n", sm.Source)
 }
 
-func (em EventMessage) ToStringBeautiful(num int) string {
+func (em EventMessageTheHive) ToStringBeautiful(num int) string {
 	var str string
 
 	ws := supportingfunctions.GetWhitespace(num)
@@ -134,7 +153,7 @@ func (cf CustomFields) ToStringBeautiful(num int) string {
 	return str
 }
 
-func (om ObservablesMessage) ToStringBeautiful(num int) string {
+func (om ObservablesMessageTheHive) ToStringBeautiful(num int) string {
 	var str string
 
 	for _, v := range om.Observables {
@@ -200,7 +219,7 @@ func (om ObservableMessage) ToStringBeautiful(num int) string {
 	return str
 }
 
-func (tm TtpsMessage) ToStringBeautiful(num int) string {
+func (tm TtpsMessageTheHive) ToStringBeautiful(num int) string {
 	return fmt.Sprintf("%sttp: \n%s", supportingfunctions.GetWhitespace(num), func(l []TtpMessage) string {
 		var str string
 		for k, v := range l {
