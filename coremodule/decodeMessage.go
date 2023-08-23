@@ -15,7 +15,6 @@ import (
 func HandlerMessageFromHive(
 	uuidTask string,
 	storageApp *memorytemporarystorage.CommonStorageTemporary,
-	//b []byte,
 	listRule rules.ListRulesProcessingMsgMISP,
 	cmispf chan<- ChanInputCreateMispFormat,
 	cmispfDone chan<- bool,
@@ -27,7 +26,7 @@ func HandlerMessageFromHive(
 		_, f, l, _ := runtime.Caller(0)
 
 		loging <- datamodels.MessageLoging{
-			MsgData: fmt.Sprintf("%s %s:%d", fmt.Sprint(err), f, l-2),
+			MsgData: fmt.Sprintf("%s %s:%d", err.Error(), f, l-2),
 			MsgType: "error",
 		}
 
@@ -331,9 +330,6 @@ func processingReflectMap(
 				nl[k] = newList
 			}
 
-		case reflect.Array:
-			//str += fmt.Sprintf("%s: %s (it is array)\n", k, reflect.ValueOf(v).String())
-
 		default:
 			nl[k] = processingReflectAnySimpleType(loging, chanOutMispFormat, k, v, lr, num, fbTmp)
 		}
@@ -377,9 +373,6 @@ func processingReflectSlice(
 
 				nl = append(nl, newList...)
 			}
-
-		case reflect.Array:
-			//str += fmt.Sprintf("%d. %s (it is array)\n", k, reflect.ValueOf(v).String())
 
 		default:
 			nl = append(nl, processingReflectAnySimpleType(loging, chanOutMispFormat, k, v, lr, num, fieldBranch))

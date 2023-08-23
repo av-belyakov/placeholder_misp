@@ -5,6 +5,7 @@ import (
 	"placeholder_misp/datamodels"
 	"placeholder_misp/mispinteractions"
 	"runtime"
+	"strings"
 )
 
 type ChanInputCreateMispFormat struct {
@@ -19,8 +20,9 @@ type FieldsNameMapping struct {
 }
 
 var (
-	eventsMisp     datamodels.EventsMispFormat
-	attributesMisp datamodels.AttributesMispFormat
+	eventsMisp datamodels.EventsMispFormat
+	//attributesMisp     datamodels.AttributesMispFormat
+	listAttributesMisp *datamodels.ListAttributesMispFormat
 
 	//пока не нужны, временно отключаем
 	//galaxyClustersMisp datamodels.GalaxyClustersMispFormat
@@ -31,7 +33,7 @@ var (
 	//feedsMisp          datamodels.FeedsMispFormat
 	//tagsMisp           datamodels.TagsMispFormat
 
-	listHandlerMisp map[string][]func(interface{}) bool
+	listHandlerMisp map[string][]func(interface{}, bool)
 )
 
 func init() {
@@ -44,13 +46,17 @@ func init() {
 		SightingTimestamp: "0",
 		SharingGroupId:    getSharingGroupId(),
 	}
-	attributesMisp = datamodels.AttributesMispFormat{
-		Category:     "Other",
-		Type:         "other",
-		Timestamp:    "0",
-		Distribution: getDistributionAttribute(),
-		FirstSeen:    "0",
-		LastSeen:     "0",
+	listAttributesMisp = datamodels.NewListAttributesMispFormat()
+
+	/*attributesMisp = datamodels.AttributesMispFormat{
+		Category:       "Other",
+		Type:           "other",
+		Timestamp:      "0",
+		Distribution:   getDistributionAttribute(),
+		FirstSeen:      "0",
+		LastSeen:       "0",
+		ToIds:          getToIds(),
+		SharingGroupId: getSharingGroupId(),
 	}
 	/*galaxyClustersMisp = datamodels.GalaxyClustersMispFormat{
 		Description:   "3",
@@ -81,7 +87,7 @@ func init() {
 		Inherited:      1,
 	}*/
 
-	listHandlerMisp = map[string][]func(interface{}) bool{
+	listHandlerMisp = map[string][]func(interface{}, bool){
 		//events
 		"event.object.title":     {eventsMisp.SetValueInfoEventsMisp},
 		"event.object.startDate": {eventsMisp.SetValueTimestampEventsMisp},
@@ -92,11 +98,23 @@ func init() {
 		"event.object.updatedAt": {eventsMisp.SetValueSightingTimestampEventsMisp},
 		"event.object.owner":     {eventsMisp.SetValueEventCreatorEmailEventsMisp},
 		//attributes
-		"observables._id":        {attributesMisp.SetValueObjectIdAttributesMisp},
-		"observables.data":       {attributesMisp.SetValueValueAttributesMisp},
-		"observables._createdAt": {attributesMisp.SetValueTimestampAttributesMisp},
-		"observables.message":    {attributesMisp.SetValueCommentAttributesMisp},
-		"observables.startDate":  {attributesMisp.SetValueFirstSeenAttributesMisp},
+
+		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		//observables должно содержать список observable
+		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+		"observables._id":        {listAttributesMisp.SetValueObjectIdAttributesMisp},
+		"observables.data":       {listAttributesMisp.SetValueValueAttributesMisp},
+		"observables._createdAt": {listAttributesMisp.SetValueTimestampAttributesMisp},
+		"observables.message":    {listAttributesMisp.SetValueCommentAttributesMisp},
+		"observables.startDate":  {listAttributesMisp.SetValueFirstSeenAttributesMisp},
+		/*
+			"observables._id":        {attributesMisp.SetValueObjectIdAttributesMisp},
+			"observables.data":       {attributesMisp.SetValueValueAttributesMisp},
+			"observables._createdAt": {attributesMisp.SetValueTimestampAttributesMisp},
+			"observables.message":    {attributesMisp.SetValueCommentAttributesMisp},
+			"observables.startDate":  {attributesMisp.SetValueFirstSeenAttributesMisp},
+		*/
 	}
 }
 
@@ -110,15 +128,52 @@ func NewMispFormat(
 	chanDone := make(chan bool)
 
 	go func() {
+		var currentCount, maxCountObservables int
+
+		for key := range listHandlerMisp {
+			if strings.Contains(key, "observables") {
+				maxCountObservables++
+			}
+		}
+
+		fmt.Println("maxCountObservables = ", maxCountObservables)
+
+		isNew := true
+
 		for {
 			select {
 			case tmf := <-chanInput:
-				if lf, ok := listHandlerMisp[tmf.FieldBranch]; ok {
-					for _, f := range lf {
-						_ = f(tmf.Value)
-					}
+				lf, ok := listHandlerMisp[tmf.FieldBranch]
+				if !ok {
+					continue
 				}
+
+				fmt.Println("currentCount = ", currentCount, " tmf.FieldBranch: ", tmf.FieldBranch)
+
+				if currentCount > 0 {
+					isNew = false
+				}
+
+				for _, f := range lf {
+
+					fmt.Println("----- currentCount: ", currentCount, " isNew = ", isNew, " tmf.Value = ", tmf.Value)
+
+					f(tmf.Value, isNew)
+				}
+
+				if strings.Contains(tmf.FieldBranch, "observables") {
+					currentCount++
+				}
+
+				if currentCount == maxCountObservables {
+					currentCount = 0
+					isNew = true
+				}
+
 			case isAllowed := <-chanDone:
+				fmt.Println("listAttributesMisp.GetListAttributesMisp() = ", listAttributesMisp.GetListAttributesMisp())
+				fmt.Println("func NewMispFormat, <-chanDone: ", isAllowed)
+
 				if !isAllowed {
 					_, f, l, _ := runtime.Caller(0)
 
@@ -126,15 +181,13 @@ func NewMispFormat(
 						MsgData: fmt.Sprintf("the message with %s was not sent to MISP because it does not comply with the rules %s:%d", uuidTask, f, l-2),
 						MsgType: "warning",
 					}
-
-					return
+				} else {
+					//тут отправляем сформированные по формату MISP пользовательские структуры
+					mispmodule.SendingDataInputMisp(map[string]interface{}{
+						"events":     eventsMisp,
+						"attributes": listAttributesMisp.GetListAttributesMisp(),
+					})
 				}
-
-				//тут отправляем сформированные по формату MISP пользовательские структуры
-				mispmodule.SendingDataInputMisp(map[string]interface{}{
-					"events":     eventsMisp,
-					"attributes": attributesMisp,
-				})
 
 				return
 			}
@@ -162,6 +215,10 @@ func getThreatLevelId() string {
 
 func getSharingGroupId() string {
 	return "1"
+}
+
+func getToIds() bool {
+	return true
 }
 
 /*func getTagTLP(tlp int) datamodels.TagsMispFormat {

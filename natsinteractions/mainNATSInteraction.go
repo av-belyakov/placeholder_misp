@@ -45,7 +45,7 @@ func NewClientNATS(
 	nc, err := nats.Connect(fmt.Sprintf("%s:%d", conf.Host, conf.Port))
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
-		return &mnats, fmt.Errorf("%s %s:%d", fmt.Sprint(err), f, l-2)
+		return &mnats, fmt.Errorf("%s %s:%d", err.Error(), f, l-2)
 	}
 
 	fmt.Println("func 'NewClientNATS', STATUS:", nc.Stats())

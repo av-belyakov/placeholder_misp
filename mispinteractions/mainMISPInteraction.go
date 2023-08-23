@@ -1,12 +1,9 @@
 package mispinteractions
 
 import (
-	"bytes"
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"runtime"
@@ -35,6 +32,97 @@ func init() {
 	}
 }
 
+func HandlerMISP(
+	ctx context.Context,
+	conf confighandler.AppConfigMISP,
+	testChan chan<- struct {
+		Status     string
+		StatusCode int
+		Body       []byte
+	},
+	loging chan<- datamodels.MessageLoging) (*ModuleMISP, error) {
+
+	client, err := NewClientMISP(conf.Host, conf.Auth, false)
+	if err != nil {
+		_, f, l, _ := runtime.Caller(0)
+
+		loging <- datamodels.MessageLoging{
+			MsgData: fmt.Sprintf("%s %s:%d", err.Error(), f, l-2),
+			MsgType: "error",
+		}
+	}
+
+	//здесь обрабатываем данные из входного канала модуля MISP
+	go func() {
+		for data := range mmisp.chanInputMISP {
+			//обработка только для события типа 'events'
+			_, resBodyByte, err := sendEventsMispFormat(client, data)
+			if err != nil {
+				_, f, l, _ := runtime.Caller(0)
+
+				fmt.Println("sendEventsMispFormat ERROR: ", err)
+
+				loging <- datamodels.MessageLoging{
+					MsgData: fmt.Sprintf("%s %s:%d", err.Error(), f, l-2),
+					MsgType: "error",
+				}
+
+				continue
+			}
+
+			resMisp := RespMISP{}
+			if err := json.Unmarshal(resBodyByte, &resMisp); err != nil {
+				_, f, l, _ := runtime.Caller(0)
+
+				loging <- datamodels.MessageLoging{
+					MsgData: fmt.Sprintf("%s %s:%d", err.Error(), f, l-2),
+					MsgType: "error",
+				}
+
+				continue
+			}
+
+			var eventId string
+			for key, value := range resMisp.Event {
+				if key == "id" {
+					if str, ok := value.(string); ok {
+						eventId = str
+					}
+				}
+			}
+
+			fmt.Println("EventId '", eventId, "' send to NATS")
+
+			if eventId == "" {
+				_, f, l, _ := runtime.Caller(0)
+
+				loging <- datamodels.MessageLoging{
+					MsgData: fmt.Sprintf("the formation of events of the 'Attributes' type was not performed because the EventID is empty %s:%d", f, l-1),
+					MsgType: "error",
+				}
+
+				continue
+			}
+
+			res, _ := sendAttribytesMispFormat(client, eventId, data, loging)
+
+			//Это тоже только для теста
+			testChan <- struct {
+				Status     string
+				StatusCode int
+				Body       []byte
+			}{
+				Status:     res.Status,
+				StatusCode: res.StatusCode,
+				//Body:       resByte,
+			}
+		}
+	}()
+
+	return &mmisp, nil
+}
+
+// NewClientMISP возвращает ытруктуру типа ClientMISP с предустановленными значениями
 func NewClientMISP(h, a string, v bool) (ClientMISP, error) {
 	urlBase, err := url.Parse("http://" + h)
 	if err != nil {
@@ -49,171 +137,140 @@ func NewClientMISP(h, a string, v bool) (ClientMISP, error) {
 	}, nil
 }
 
-// Get это обертка для функции Do()
-func (client *ClientMISP) Get(path string, data []byte) (*http.Response, error) {
-	return client.Do("GET", path, data)
-}
+// sendEventsMispFormat отправляет в API MISP событие в виде типа Event и возвращает полученный ответ
+func sendEventsMispFormat[T map[string]any](c ClientMISP, d T) (*http.Response, []byte, error) {
+	var (
+		res         *http.Response
+		resBodyByte = make([]byte, 0)
+	)
 
-// Post это обертка для функции Do()
-func (client *ClientMISP) Post(path string, data []byte) (*http.Response, error) {
-	return client.Do("POST", path, data)
-}
+	ed, ok := d["events"]
+	if !ok {
+		_, f, l, _ := runtime.Caller(0)
 
-func (client *ClientMISP) Do(method, path string, data []byte) (*http.Response, error) {
-	dataLen := 0
-
-	httpReq := &http.Request{}
-	reader := bytes.NewReader(data)
-	dataLen = reader.Len()
-	if dataLen > 0 && method == "POST" {
-		httpReq.ContentLength = int64(dataLen)
-		httpReq.Body = io.NopCloser(reader)
+		return nil, resBodyByte, fmt.Errorf("the properties of 'events' were not found in the received data %s:%d", f, l-2)
 	}
 
-	httpTrp := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: !client.Verify},
-	}
+	fmt.Println("func 'sendEventsMispFormat', EVENTS: ", ed)
 
-	httpReq.Method = method
-	httpReq.URL = client.BaseURL
-	httpReq.URL.Path = path
-
-	httpReq.Header = http.Header{}
-	httpReq.Header.Set("Authorization", client.AuthHash)
-	httpReq.Header.Set("Content-type", "application/json")
-	httpReq.Header.Set("Accept", "application/json")
-
-	//fmt.Println("func 'Do', Method: ", method, " client.BaseURL: ", client.BaseURL, " path: ", path)
-	//fmt.Println("REGUEST HEADER: ", httpReq, "httpReq.ContentLength: %d\n\n", httpReq.ContentLength)
-
-	httpClient := http.Client{
-		Transport: httpTrp,
-	}
-	resp, err := httpClient.Do(httpReq)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		return resp, fmt.Errorf("MISP server replied status=%d", resp.StatusCode)
-	}
-
-	return resp, nil
-}
-
-func HandlerMISP(
-	ctx context.Context,
-	conf confighandler.AppConfigMISP,
-	/*testChan chan<- struct {
-		Status     string
-		StatusCode int
-		Body       []byte
-	},*/
-	loging chan<- datamodels.MessageLoging) (*ModuleMISP, error) {
-
-	client, err := NewClientMISP(conf.Host, conf.Auth, false)
+	b, err := json.Marshal(ed)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 
+		return nil, resBodyByte, fmt.Errorf("%s %s:%d", err.Error(), f, l-2)
+	}
+
+	res, resBodyByte, err = c.Post("/events/add", b)
+	if err != nil {
+		_, f, l, _ := runtime.Caller(0)
+
+		return nil, resBodyByte, fmt.Errorf("%s %s:%d", err.Error(), f, l-2)
+	}
+
+	return res, resBodyByte, nil
+}
+
+// sendAttribytesMispFormat отправляет в API MISP список атрибутов в виде среза типов Attribytes и возвращает полученный ответ
+func sendAttribytesMispFormat[T map[string]any](c ClientMISP, eventId string, d T, loging chan<- datamodels.MessageLoging) (*http.Response, []byte) {
+	var (
+		res         *http.Response
+		resBodyByte = make([]byte, 0)
+	)
+
+	ad, ok := d["attributes"]
+	if !ok {
+		_, f, l, _ := runtime.Caller(0)
+
 		loging <- datamodels.MessageLoging{
-			MsgData: fmt.Sprintf("%s %s:%d", fmt.Sprint(err), f, l-2),
+			MsgData: fmt.Sprintf("the properties of 'attributes' were not found in the received data %s:%d", f, l-2),
 			MsgType: "error",
+		}
+
+		return nil, resBodyByte
+	}
+
+	lamf, ok := ad.([]datamodels.AttributesMispFormat)
+	if !ok {
+		_, f, l, _ := runtime.Caller(0)
+
+		loging <- datamodels.MessageLoging{
+			MsgData: fmt.Sprintf("the received data does not match the type 'attributes' %s:%d", f, l-2),
+			MsgType: "error",
+		}
+
+		return nil, resBodyByte
+	}
+
+	for k := range lamf {
+		lamf[k].EventId = eventId
+
+		fmt.Println("func 'sendAttribytesMispFormat', lamf[k] = ", lamf[k])
+
+		b, err := json.Marshal(lamf[k])
+		if err != nil {
+			_, f, l, _ := runtime.Caller(0)
+
+			loging <- datamodels.MessageLoging{
+				MsgData: fmt.Sprintf("%s %s:%d", err.Error(), f, l-2),
+				MsgType: "error",
+			}
+
+			continue
+		}
+
+		fmt.Printf("func 'sendAttribytesMispFormat', AttributesMisp: %v\n", string(b))
+
+		res, resBodyByte, err = c.Post("/attributes/add/"+eventId, b)
+		if err != nil {
+			_, f, l, _ := runtime.Caller(0)
+
+			loging <- datamodels.MessageLoging{
+				MsgData: fmt.Sprintf("%s %s:%d", err.Error(), f, l-2),
+				MsgType: "error",
+			}
+
+			continue
 		}
 	}
 
-	//здесь обрабатываем входной канал
-	go func() {
-		for data := range mmisp.chanInputMISP {
-			//обработка только для события типа 'events'
-			if ed, ok := data["events"]; ok {
-				b, err := json.Marshal(ed)
-				if err != nil {
-					_, f, l, _ := runtime.Caller(0)
-
-					loging <- datamodels.MessageLoging{
-						MsgData: fmt.Sprintf("%s %s:%d", fmt.Sprint(err), f, l-2),
-						MsgType: "error",
-					}
-
-					continue
+	/*
+				{
+					"event_id":"3592",
+					"object_id":"~207683696",
+					"object_relation":"",
+					"category":"Other",
+					"type":"other",
+					"value":"176.192.244.107",
+					"to_ids":true,
+					"uuid":"",
+					"timestamp":"0",
+					"distribution":"3",
+					"sharing_group_id":"",
+					"comment":"Download a piece of traffic",
+					"first_seen":"0", //похоже дело в нуле для этого типа
+					//надо в таком формате 1581984000000000 кол-во символов
+					//должно быть не 13 а больше (16)
+					"last_seen":"0", //похоже дело в нуле для этого типа
+					"deleted":false,
+					"disable_correlation":false
 				}
 
-				/*
-						ТОЛЬКО ДЛЯ ТЕСТОВ
-					str, err := supportingfunctions.NewReadReflectJSONSprint(b)
-					if err != nil {
-						fmt.Println("ERROR NewReadReflectJSONSprint:", err)
-					}
-
-					fmt.Printf("JSON string:\n%v\n", str)
-				*/
-
-				res, err := client.Post("/events/add", b)
-				if err != nil {
-					_, f, l, _ := runtime.Caller(0)
-
-					loging <- datamodels.MessageLoging{
-						MsgData: fmt.Sprintf("%s %s:%d", fmt.Sprint(err), f, l-2),
-						MsgType: "error",
-					}
-
-					continue
-				}
-
-				//fmt.Println("___ RESPONSE HEADER:", res.Header)
-
-				resByte, err := io.ReadAll(res.Body)
-				if err != nil {
-					_, f, l, _ := runtime.Caller(0)
-
-					loging <- datamodels.MessageLoging{
-						MsgData: fmt.Sprintf("%s %s:%d", fmt.Sprint(err), f, l-2),
-						MsgType: "error",
-					}
-
-					continue
-				}
-				res.Body.Close()
-
-				//тут надо получить id сообщения типа 'events'
-				var eventId string
-				resMisp := RespMISP{}
-				if err := json.Unmarshal(resByte, &resMisp); err != nil {
-					fmt.Println("Error create ResponseMISP: ", err)
-				}
-
-				fmt.Println("resMIsp.Event _______________ ")
-				for key, value := range resMisp.Event {
-					//fmt.Printf("Key: '%s' - Value: '%v'\n", key, value)
-
-					if key == "id" {
-						if str, ok := value.(string); ok {
-							eventId = str
-						}
-					}
-				}
-
-				fmt.Println("EventId '", eventId, "' send to NATS")
-
-				//отправляем данные в coremodule
-				//тут надо подумать!!!
-				//mmisp.SendingDataOutputMisp(eventId)
-
-				//Это тоже только для теста
-				testChan <- struct {
-					Status     string
-					StatusCode int
-					Body       []byte
-				}{
-					Status:     res.Status,
-					StatusCode: res.StatusCode,
-					Body:       resByte,
-				}
-
+				Возвращает ошибку 403
+			{
+		    	"saved": false,
+		    	"name": "Could not add Attribute",
+		    	"message": "Could not add Attribute",
+		    	"url": "\/attributes\/add",
+		    	"errors": {
+		        	"first_seen": [
+		            	"Invalid ISO 8601 format"
+		        	],
+		        	"last_seen": [
+		            	"Invalid ISO 8601 format"
+		        	]
+		    	}
 			}
-		}
-	}()
+	*/
 
-	return &mmisp, nil
+	return res, resBodyByte
 }

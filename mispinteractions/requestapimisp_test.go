@@ -3,7 +3,6 @@ package mispinteractions_test
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 	"path"
@@ -55,8 +54,7 @@ var _ = Describe("Requestapimisp", Ordered, func() {
 
 	BeforeAll(func() {
 		clientMisp, errClientMisp = mispinteractions.NewClientMISP("192.168.9.37", "Z2PwRBdP5lFP7rdDJBzxmSahaLEwIvJoeOuwhRYQ", false)
-		res, errRes = clientMisp.Get("/attributes", []byte{})
-		resByte, errReadAll = io.ReadAll(res.Body)
+		res, resByte, errRes = clientMisp.Get("/attributes", []byte{})
 
 		fmt.Println("Root path: ", rootPath)
 

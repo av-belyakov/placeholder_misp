@@ -1,6 +1,7 @@
 package memorytemporarystorage
 
 import (
+	"sync"
 	"time"
 )
 
@@ -8,6 +9,7 @@ func NewTemporaryStorage() *CommonStorageTemporary {
 	cst := CommonStorageTemporary{
 		HiveFormatMessage: HiveFormatMessages{
 			Storages: make(map[string]StorageHiveFormatMessages),
+			mutex:    sync.Mutex{},
 		},
 	}
 

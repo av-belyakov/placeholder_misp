@@ -18,7 +18,7 @@ func GetRuleProcessingMsgForMISP(workDir, fn string) (ListRulesProcessingMsgMISP
 	rootPath, err := supportingfunctions.GetRootPath("placeholder_misp")
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
-		return lr, []string{}, fmt.Errorf("%s %s:%d", fmt.Sprint(err), f, l+1)
+		return lr, []string{}, fmt.Errorf("%s %s:%d", err.Error(), f, l+1)
 	}
 
 	viper.SetConfigFile(path.Join(rootPath, workDir, fn))
@@ -26,7 +26,7 @@ func GetRuleProcessingMsgForMISP(workDir, fn string) (ListRulesProcessingMsgMISP
 	err = viper.ReadInConfig()
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
-		return lr, []string{}, fmt.Errorf("%s %s:%d", fmt.Sprint(err), f, l+1)
+		return lr, []string{}, fmt.Errorf("%s %s:%d", err.Error(), f, l+1)
 	}
 
 	if ok := viper.IsSet("RULES"); !ok {
@@ -37,7 +37,7 @@ func GetRuleProcessingMsgForMISP(workDir, fn string) (ListRulesProcessingMsgMISP
 	err = viper.GetViper().Unmarshal(&lr)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
-		return lr, []string{}, fmt.Errorf("%s %s:%d", fmt.Sprint(err), f, l+1)
+		return lr, []string{}, fmt.Errorf("%s %s:%d", err.Error(), f, l+1)
 	}
 
 	lr, warningCheckRules := verificationRules(lr)

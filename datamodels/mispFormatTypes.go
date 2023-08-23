@@ -1,5 +1,7 @@
 package datamodels
 
+import "sync"
+
 type EventsMispFormat struct {
 	OrgId              string `json:"org_id"`
 	OrgcId             string `json:"orgc_id"`
@@ -20,6 +22,11 @@ type EventsMispFormat struct {
 	ProposalEmailLock  bool   `json:"proposal_email_lock"`
 	Locked             bool   `json:"locked"`
 	DisableCorrelation bool   `json:"disable_correlation"`
+}
+
+type ListAttributesMispFormat struct {
+	attributes []AttributesMispFormat
+	mutex      sync.Mutex
 }
 
 type AttributesMispFormat struct {
