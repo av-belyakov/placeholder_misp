@@ -250,29 +250,25 @@ func sendAttribytesMispFormat(host, authKey string, eventId string, d SettingsCh
 			MsgType: "error",
 		}
 
-		return nil, resBodyByte
+		return res, resBodyByte
 	}
 
-	ad, ok := d.MajorData["attributes"]
-	if !ok {
-		_, f, l, _ := runtime.Caller(0)
+	//здесь обрабатываем входной канал
+	go func() {
+		for data := range mmisp.chanInputMISP {
+			//обработка только для события типа 'events'
+			if ed, ok := data["events"]; ok {
+				b, err := json.Marshal(ed)
+				if err != nil {
+					_, f, l, _ := runtime.Caller(0)
 
-		loging <- datamodels.MessageLoging{
-			MsgData: fmt.Sprintf("the properties of 'attributes' were not found in the received data %s:%d", f, l-2),
-			MsgType: "error",
-		}
+					loging <- datamodels.MessageLoging{
+						MsgData: fmt.Sprintf("%s %s:%d", fmt.Sprint(err), f, l-2),
+						MsgType: "error",
+					}
 
-		return nil, resBodyByte
-	}
-
-	lamf, ok := ad.([]datamodels.AttributesMispFormat)
-	if !ok {
-		_, f, l, _ := runtime.Caller(0)
-
-		loging <- datamodels.MessageLoging{
-			MsgData: fmt.Sprintf("the received data does not match the type 'attributes' %s:%d", f, l-2),
-			MsgType: "error",
-		}
+					continue
+				}
 
 		return nil, resBodyByte
 	}
