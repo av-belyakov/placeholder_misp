@@ -158,9 +158,6 @@ func NewMispFormat(
 				}
 
 			case isAllowed := <-chanDone:
-				fmt.Println("listAttributesMisp.GetListAttributesMisp() = ", listAttributesMisp.GetListAttributesMisp())
-				fmt.Println("func NewMispFormat, <-chanDone: ", isAllowed)
-
 				if !isAllowed {
 					_, f, l, _ := runtime.Caller(0)
 

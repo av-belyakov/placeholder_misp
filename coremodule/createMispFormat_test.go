@@ -110,6 +110,7 @@ var _ = Describe("CreateMispFormat", Ordered, func() {
 		})
 
 		ca, _ := confighandler.NewConfig()
+		mts := memorytemporarystorage.NewTemporaryStorage()
 
 		loging = make(chan datamodels.MessageLoging)
 		exampleByte = getExampleByte()
@@ -118,7 +119,7 @@ var _ = Describe("CreateMispFormat", Ordered, func() {
 		//инициализируем модуль временного хранения информации
 		storageApp = memorytemporarystorage.NewTemporaryStorage()
 		ctxMISP, _ := context.WithTimeout(context.Background(), 2*time.Second)
-		moduleMisp, _ = mispinteractions.HandlerMISP(ctxMISP, *ca.GetAppMISP(), testChan, loging)
+		moduleMisp, _ = mispinteractions.HandlerMISP(ctxMISP, *ca.GetAppMISP(), mts, testChan, loging)
 
 		/*
 			eventsMisp = datamodels.EventsMispFormat{
