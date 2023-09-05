@@ -204,32 +204,36 @@ type UsersSettingsMispFormat struct {
 	Role         RoleSettingsMispFormat         `json:"Role"`
 }
 
+// описание формата сообщения типа 'User' приходящего от MISP на запрос /admin/users
+// так как весь перечень информации о пользователе в настоящее время не нужен
+// 'лишние' свойства отключены
 type UserSettingsMispFormat struct {
-	Id            string `json:"id"`
-	OrgId         string `json:"org_id"`
-	ServerId      string `json:"server_id"`
-	Email         string `json:"email"`
-	Authkey       string `json:"authkey"`
-	InvitedBy     string `json:"invited_by"`
-	Gpgkey        string `json:"gpgkey"`
-	CertifPublic  string `json:"certif_public"`
-	NidsSid       string `json:"nids_sid"`
-	Newsread      string `json:"newsread"`
-	RoleId        string `json:"role_id"`
-	Expiration    string `json:"expiration"`
-	CurrentLogin  string `json:"current_login"`
-	LastLogin     string `json:"last_login"`
-	LastApiAccess string `json:"last_api_access"`
-	DateCreated   string `json:"date_created"`
-	DateModified  string `json:"date_modified"`
-	Autoalert     bool   `json:"autoalert"`
-	Termsaccepted bool   `json:"termsaccepted"`
-	ChangePw      bool   `json:"change_pw"`
-	Contactalert  bool   `json:"contactalert"`
-	Disabled      bool   `json:"disabled"`
-	ForceLogout   bool   `json:"force_logout"`
+	Id       string `json:"id"`
+	OrgId    string `json:"org_id"`
+	ServerId string `json:"server_id"`
+	Email    string `json:"email"`
+	Authkey  string `json:"authkey"`
+	//InvitedBy     string `json:"invited_by"`
+	//Gpgkey        string `json:"gpgkey"`
+	//CertifPublic  string `json:"certif_public"`
+	//NidsSid       string `json:"nids_sid"`
+	//Newsread      string `json:"newsread"`
+	RoleId string `json:"role_id"`
+	//Expiration    string `json:"expiration"`
+	CurrentLogin string `json:"current_login"`
+	//LastLogin     string `json:"last_login"`
+	//LastApiAccess string `json:"last_api_access"`
+	//DateCreated   string `json:"date_created"`
+	//DateModified  string `json:"date_modified"`
+	//ChangePw      string `json:"change_pw"`
+	//Autoalert     bool   `json:"autoalert"`
+	//Termsaccepted bool   `json:"termsaccepted"`
+	//Contactalert  bool   `json:"contactalert"`
+	//Disabled      bool   `json:"disabled"`
+	//ForceLogout   bool   `json:"force_logout"`
 }
 
+// описание формата сообщения типа 'Role' приходящего от MISP на запрос /admin/users
 type RoleSettingsMispFormat struct {
 	Id           string `json:"id"`
 	Name         string `json:"name"`
@@ -237,6 +241,7 @@ type RoleSettingsMispFormat struct {
 	PermSiteAmin bool   `json:"perm_site_admin"`
 }
 
+// описание формата сообщения типа 'Organisation' приходящего от MISP на запрос /admin/users
 type OrganisationSettingsMispFormat struct {
 	Id   string `json:"id"`
 	Name string `json:"name"`

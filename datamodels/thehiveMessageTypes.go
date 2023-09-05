@@ -2,9 +2,9 @@ package datamodels
 
 // ResponseMessageFromMispToTheHave содержит ответ для TheHive получаемый от MISP
 type ResponseMessageFromMispToTheHave struct {
-	Success  bool   `json:"success"`
-	Service  string `json:"string"`
-	Commands []ResponseCommandForTheHive
+	Success  bool                        `json:"success"`
+	Service  string                      `json:"string"`
+	Commands []ResponseCommandForTheHive `json:"commands"`
 }
 
 // ResponseCommandForTheHive ответы с командами для TheHive

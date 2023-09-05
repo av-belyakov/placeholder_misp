@@ -29,7 +29,7 @@ type RespMISP struct {
 func init() {
 	mmisp = ModuleMISP{
 		chanInputMISP:  make(chan SettingsChanInputMISP),
-		chanOutputMISP: make(chan interface{}),
+		chanOutputMISP: make(chan SettingChanOutputMISP),
 	}
 }
 
@@ -37,11 +37,6 @@ func HandlerMISP(
 	ctx context.Context,
 	conf confighandler.AppConfigMISP,
 	storageApp *memorytemporarystorage.CommonStorageTemporary,
-	testChan chan<- struct {
-		Status     string
-		StatusCode int
-		Body       []byte
-	},
 	loging chan<- datamodels.MessageLoging) (*ModuleMISP, error) {
 
 	//выполнеяем запрос для получения настроек пользователей через API MISP
@@ -56,10 +51,15 @@ func HandlerMISP(
 		}
 	}
 
+	//fmt.Println("func 'HandlerMISP', START")
+	//fmt.Println("func 'HandlerMISP', user MISP: ", storageApp.ListUserSettingsMISP)
+
 	//здесь обрабатываем данные из входного канала модуля MISP
 	go func() {
 		for data := range mmisp.chanInputMISP {
 			authKey := conf.Auth
+
+			fmt.Println("func 'HandlerMISP', 111 user email = ", data.UserEmail)
 
 			// получаем авторизационный ключ пользователя по его email
 			if us, ok := storageApp.GetUserSettingsMISP(data.UserEmail); ok {
@@ -71,8 +71,6 @@ func HandlerMISP(
 			if err != nil {
 				_, f, l, _ := runtime.Caller(0)
 
-				fmt.Println("sendEventsMispFormat ERROR: ", err)
-
 				loging <- datamodels.MessageLoging{
 					MsgData: fmt.Sprintf("%s %s:%d", err.Error(), f, l-2),
 					MsgType: "error",
@@ -80,6 +78,8 @@ func HandlerMISP(
 
 				continue
 			}
+
+			fmt.Println("func 'HandlerMISP', 222")
 
 			resMisp := RespMISP{}
 			if err := json.Unmarshal(resBodyByte, &resMisp); err != nil {
@@ -98,11 +98,13 @@ func HandlerMISP(
 				if key == "id" {
 					if str, ok := value.(string); ok {
 						eventId = str
+
+						break
 					}
 				}
 			}
 
-			fmt.Println("EventId '", eventId, "' send to NATS")
+			fmt.Println("func 'HandlerMISP', EventId '", eventId, "' send to NATS")
 
 			if eventId == "" {
 				_, f, l, _ := runtime.Caller(0)
@@ -115,30 +117,15 @@ func HandlerMISP(
 				continue
 			}
 
-			res, _ := sendAttribytesMispFormat(conf.Host, authKey, eventId, data, loging)
+			_, _ = sendAttribytesMispFormat(conf.Host, authKey, eventId, data, loging)
 
-			/*
-				/ !!!!!! тут нужно отправить EventId через канал в модуль NATS !!!
-				/ отправляем id добавленного в MISP события модулю NATS для передачи в TheHive
+			fmt.Println("func 'HandlerMISP', отправляем в ядро информацию по event Id")
 
-				сделал получения списка пользователей через API MISP и
-				отправку json сообщений в формате Events, Attributes
-				от имени пользователя сгенерирувавшего case в The Hive
-
-				НО НАДо выполнить отладку и ПОТЕСТРОВАТЬ
-
-			*/
-
-			//Это тоже только для теста
-			testChan <- struct {
-				Status     string
-				StatusCode int
-				Body       []byte
-			}{
-				Status:     res.Status,
-				StatusCode: res.StatusCode,
-				//Body:       resByte,
-			}
+			//отправляем в ядро информацию по event Id
+			mmisp.SendingDataOutput(SettingChanOutputMISP{
+				Command: "send eventId",
+				EventId: eventId,
+			})
 		}
 	}()
 
@@ -178,6 +165,7 @@ func getUserMisp(conf confighandler.AppConfigMISP, storageApp *memorytemporaryst
 	usmispf := []datamodels.UsersSettingsMispFormat{}
 	err = json.Unmarshal(resByte, &usmispf)
 	if err != nil {
+
 		_, f, l, _ := runtime.Caller(0)
 		return fmt.Errorf("%s %s:%d", err.Error(), f, l-2)
 	}
@@ -206,7 +194,7 @@ func sendEventsMispFormat(host, authKey string, d SettingsChanInputMISP) (*http.
 	c, err := NewClientMISP(host, authKey, false)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
-		return nil, resBodyByte, fmt.Errorf("%s %s:%d", err.Error(), f, l-2)
+		return nil, resBodyByte, fmt.Errorf("events add,%s %s:%d", err.Error(), f, l-2)
 	}
 
 	ed, ok := d.MajorData["events"]
@@ -216,27 +204,31 @@ func sendEventsMispFormat(host, authKey string, d SettingsChanInputMISP) (*http.
 		return nil, resBodyByte, fmt.Errorf("the properties of 'events' were not found in the received data %s:%d", f, l-2)
 	}
 
-	fmt.Println("func 'sendEventsMispFormat', EVENTS: ", ed)
-
 	b, err := json.Marshal(ed)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 
-		return nil, resBodyByte, fmt.Errorf("%s %s:%d", err.Error(), f, l-2)
+		return nil, resBodyByte, fmt.Errorf("events add, %s %s:%d", err.Error(), f, l-2)
 	}
 
 	res, resBodyByte, err = c.Post("/events/add", b)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 
-		return nil, resBodyByte, fmt.Errorf("%s %s:%d", err.Error(), f, l-2)
+		return nil, resBodyByte, fmt.Errorf("events add, %s %s:%d", err.Error(), f, l-2)
+	}
+
+	if res.StatusCode != http.StatusOK {
+		_, f, l, _ := runtime.Caller(0)
+
+		return nil, resBodyByte, fmt.Errorf("events add, %s %s:%d", res.Status, f, l-1)
 	}
 
 	return res, resBodyByte, nil
 }
 
 // sendAttribytesMispFormat отправляет в API MISP список атрибутов в виде среза типов Attribytes и возвращает полученный ответ
-func sendAttribytesMispFormat(host, authKey string, eventId string, d SettingsChanInputMISP, loging chan<- datamodels.MessageLoging) (*http.Response, []byte) {
+func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInputMISP, loging chan<- datamodels.MessageLoging) (*http.Response, []byte) {
 	var (
 		res         *http.Response
 		resBodyByte = make([]byte, 0)
@@ -246,7 +238,7 @@ func sendAttribytesMispFormat(host, authKey string, eventId string, d SettingsCh
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 		loging <- datamodels.MessageLoging{
-			MsgData: fmt.Sprintf("%s %s:%d", err.Error(), f, l-2),
+			MsgData: fmt.Sprintf("attributes №%s add, %s %s:%d", eventId, err.Error(), f, l-2),
 			MsgType: "error",
 		}
 
@@ -282,12 +274,23 @@ func sendAttribytesMispFormat(host, authKey string, eventId string, d SettingsCh
 
 		fmt.Println("func 'sendAttribytesMispFormat', lamf[k] = ", lamf[k])
 
+		if lamf[k].Value == "" {
+			_, f, l, _ := runtime.Caller(0)
+
+			loging <- datamodels.MessageLoging{
+				MsgData: fmt.Sprintf("attributes №%s add, the 'Value' type property should not be empty %s:%d", eventId, f, l-1),
+				MsgType: "error",
+			}
+
+			continue
+		}
+
 		b, err := json.Marshal(lamf[k])
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
 
 			loging <- datamodels.MessageLoging{
-				MsgData: fmt.Sprintf("%s %s:%d", err.Error(), f, l-2),
+				MsgData: fmt.Sprintf("attributes №%s add, %s %s:%d", eventId, err.Error(), f, l-2),
 				MsgType: "error",
 			}
 
@@ -301,11 +304,20 @@ func sendAttribytesMispFormat(host, authKey string, eventId string, d SettingsCh
 			_, f, l, _ := runtime.Caller(0)
 
 			loging <- datamodels.MessageLoging{
-				MsgData: fmt.Sprintf("%s %s:%d", err.Error(), f, l-2),
+				MsgData: fmt.Sprintf("attributes №%s add, %s %s:%d", eventId, err.Error(), f, l-2),
 				MsgType: "error",
 			}
 
 			continue
+		}
+
+		if res.StatusCode != http.StatusOK {
+			_, f, l, _ := runtime.Caller(0)
+
+			loging <- datamodels.MessageLoging{
+				MsgData: fmt.Sprintf("attributes №%s add, %s %s:%d", eventId, res.Status, f, l-1),
+				MsgType: "error",
+			}
 		}
 	}
 

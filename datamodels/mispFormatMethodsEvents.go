@@ -6,10 +6,6 @@ func (emisp EventsMispFormat) GetEventsMisp() EventsMispFormat {
 	return emisp
 }
 
-//func (emisp EventsMispFormat) Read(b []byte) (int, error) {
-
-//}
-
 func (emisp *EventsMispFormat) SetValueOrgIdEventsMisp(v interface{}, isNew bool) {
 	if data, ok := v.(string); ok {
 		emisp.OrgId = data

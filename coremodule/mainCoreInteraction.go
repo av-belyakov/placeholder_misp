@@ -45,6 +45,14 @@ func CoreHandler(
 		case data := <-mispChanReception:
 			fmt.Println("func 'NewCore', MISP reseived message from chanOutMISP: ", data)
 
+			if data.Command == "send eventId" {
+				fmt.Println("func 'NewCore', надо отправить инфу в NATS")
+
+				natsmodule.SendingDataInput(natsinteractions.SettingsInputChan{
+					Command: data.Command,
+					EventId: data.EventId,
+				})
+			}
 		}
 	}
 }

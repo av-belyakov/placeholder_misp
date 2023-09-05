@@ -15,23 +15,24 @@ import (
 
 var mnats ModuleNATS
 
+/*
 type SettingsOutputChan struct {
 	UUID string
 }
 
 type SettingsInputChan struct {
+	Command string
 	EventId string
 }
 
 // ModuleNATS инициализированный модуль
 // ChanOutputMISP - канал для отправки полученных данных из модуля
 // chanInputNATS - канал для принятия данных в модуль
-// ChanLogging - канал для отправки логов
 type ModuleNATS struct {
 	chanOutputNATS chan SettingsOutputChan
 	chanInputNATS  chan SettingsInputChan
-	ChanLogging    chan<- datamodels.MessageLoging
 }
+*/
 
 func init() {
 	mnats.chanOutputNATS = make(chan SettingsOutputChan)
@@ -42,8 +43,7 @@ func NewClientNATS(
 	ctx context.Context,
 	conf confighandler.AppConfigNATS,
 	storageApp *memorytemporarystorage.CommonStorageTemporary,
-	chanLog chan<- datamodels.MessageLoging) (*ModuleNATS, error) {
-	mnats.ChanLogging = chanLog
+	loging chan<- datamodels.MessageLoging) (*ModuleNATS, error) {
 
 	nc, err := nats.Connect(fmt.Sprintf("%s:%d", conf.Host, conf.Port))
 	if err != nil {
@@ -51,25 +51,49 @@ func NewClientNATS(
 		return &mnats, fmt.Errorf("%s %s:%d", err.Error(), f, l-2)
 	}
 
-	fmt.Println("func 'NewClientNATS', STATUS:", nc.Stats())
-
 	// обработка данных приходящих в модуль от ядра приложения
 	go func() {
 		for data := range mnats.chanInputNATS {
 			nrm := datamodels.NewResponseMessage()
-			nrm.ResponseMessageAddNewCommand(datamodels.ResponseCommandForTheHive{
-				Command: "setcustomfield",
-				Name:    "misp-event-id.string",
-				String:  data.EventId,
-			})
 
-			fmt.Println("func 'NewClientNATS', ResponseMessageFromMispToTheHave: ", nrm.GetResponseMessageFromMispToTheHave())
+			fmt.Println("func 'NewClientNATS', received data: ", data)
 
-			//
-			// Далее нужно сделать Unmarchal для ResponseMessageFromMispToTheHave и отправить
-			// в TheHive через Webhook и NATS
-			//
+			if data.Command == "send eventId" {
+				nrm.ResponseMessageAddNewCommand(datamodels.ResponseCommandForTheHive{
+					Command: "setcustomfield",
+					Name:    "misp-event-id.string",
+					String:  data.EventId,
+				})
 
+				fmt.Println("func 'NewClientNATS', ResponseMessageFromMispToTheHave: ", nrm.GetResponseMessageFromMispToTheHave())
+			}
+
+			/*
+				 Далее нужно сделать Marchal для ResponseMessageFromMispToTheHave и отправить
+				 в TheHive через Webhook и NATS
+
+				res, err := json.Marshal(nrm.GetResponseMessageFromMispToTheHave())
+				if err != nil {
+					_, f, l, _ := runtime.Caller(0)
+
+					loging <- datamodels.MessageLoging{
+						MsgData: fmt.Sprintf("%s %s:%d", err.Error(), f, l-2),
+						MsgType: "error",
+					}
+
+					continue
+				}
+
+				err = nc.Publish("setcustomfield", res)
+				if err != nil {
+					_, f, l, _ := runtime.Caller(0)
+
+					loging <- datamodels.MessageLoging{
+						MsgData: fmt.Sprintf("%s %s:%d", err.Error(), f, l-2),
+						MsgType: "error",
+					}
+				}
+			*/
 		}
 	}()
 
@@ -84,8 +108,4 @@ func NewClientNATS(
 	})
 
 	return &mnats, nil
-}
-
-func (mnats ModuleNATS) GetDataReceptionChannel() <-chan SettingsOutputChan /*[]byte*/ {
-	return mnats.chanOutputNATS
 }

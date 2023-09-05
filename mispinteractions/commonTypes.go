@@ -4,9 +4,8 @@ package mispinteractions
 // chanInputMISP - канал для отправки данных в модуль
 // chanOutputMISP - канал для отправки данных из модуля
 type ModuleMISP struct {
-	//chanInputMISP  chan map[string]interface{}
 	chanInputMISP  chan SettingsChanInputMISP
-	chanOutputMISP chan interface{}
+	chanOutputMISP chan SettingChanOutputMISP
 }
 
 type SettingsChanInputMISP struct {
@@ -14,18 +13,18 @@ type SettingsChanInputMISP struct {
 	MajorData map[string]interface{}
 }
 
-func (mmisp ModuleMISP) GetDataReceptionChannel() <-chan interface{} {
+type SettingChanOutputMISP struct {
+	Command, EventId string
+}
+
+func (mmisp ModuleMISP) GetDataReceptionChannel() <-chan SettingChanOutputMISP {
 	return mmisp.chanOutputMISP
 }
 
-func (mmisp ModuleMISP) GettingData() interface{} {
-	return <-mmisp.chanOutputMISP
-}
-
-func (mmisp ModuleMISP) SendingDataInputMisp(data SettingsChanInputMISP) {
+func (mmisp ModuleMISP) SendingDataInput(data SettingsChanInputMISP) {
 	mmisp.chanInputMISP <- data
 }
 
-func (mmisp ModuleMISP) SendingDataOutputMisp(data interface{}) {
+func (mmisp ModuleMISP) SendingDataOutput(data SettingChanOutputMISP) {
 	mmisp.chanOutputMISP <- data
 }

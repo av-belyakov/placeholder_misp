@@ -167,7 +167,7 @@ func NewMispFormat(
 					}
 				} else {
 					//тут отправляем сформированные по формату MISP пользовательские структуры
-					mispmodule.SendingDataInputMisp(mispinteractions.SettingsChanInputMISP{
+					mispmodule.SendingDataInput(mispinteractions.SettingsChanInputMISP{
 						UserEmail: userEmail,
 						MajorData: map[string]interface{}{
 							"events":     eventsMisp,

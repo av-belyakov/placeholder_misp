@@ -147,7 +147,8 @@ func main() {
 			_ = sl.WriteLoggingData(msg.MsgData, msg.MsgType)
 
 			/*
-				отправлять логи в zabbix
+				здесь нужно дополнительно сделат
+					отправку логов в zabbix
 			*/
 		}
 	}()

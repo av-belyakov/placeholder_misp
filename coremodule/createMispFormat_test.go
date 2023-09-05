@@ -66,18 +66,13 @@ func PrintStringOrInt[T string | int](v T) {
 
 var _ = Describe("CreateMispFormat", Ordered, func() {
 	var (
-		listRule    rules.ListRulesProcessingMsgMISP
-		storageApp  *memorytemporarystorage.CommonStorageTemporary
-		loging      chan datamodels.MessageLoging
-		moduleMisp  *mispinteractions.ModuleMISP
-		exampleByte []byte
-		errGetRule  error
-
-		testChan chan struct {
-			Status     string
-			StatusCode int
-			Body       []byte
-		}
+		listRule             rules.ListRulesProcessingMsgMISP
+		storageApp           *memorytemporarystorage.CommonStorageTemporary
+		loging               chan datamodels.MessageLoging
+		mispOutput           <-chan mispinteractions.SettingChanOutputMISP
+		moduleMisp           *mispinteractions.ModuleMISP
+		exampleByte          []byte
+		errGetRule, errHMisp error
 	)
 
 	getExampleByte := func() []byte {
@@ -100,57 +95,37 @@ var _ = Describe("CreateMispFormat", Ordered, func() {
 	//}
 
 	BeforeAll(func() {
-		//PrintStringOrInt("hello")
-		//PrintStringOrInt(42)
-
-		testChan = make(chan struct {
-			Status     string
-			StatusCode int
-			Body       []byte
-		})
-
+		//инициализация модуля конфига
 		ca, _ := confighandler.NewConfig()
-		mts := memorytemporarystorage.NewTemporaryStorage()
 
+		//канал для логирования
 		loging = make(chan datamodels.MessageLoging)
+
+		//пример кейса в виде байтов
 		exampleByte = getExampleByte()
+
+		//инициализация списка правил
 		listRule, _, errGetRule = rules.GetRuleProcessingMsgForMISP("rules", "procmispmsg_test.yaml")
+
+		//fmt.Println("list RULES = ", listRule)
 
 		//инициализируем модуль временного хранения информации
 		storageApp = memorytemporarystorage.NewTemporaryStorage()
+
+		//инициализация модуля для взаимодействия с MISP
 		ctxMISP, _ := context.WithTimeout(context.Background(), 2*time.Second)
-		moduleMisp, _ = mispinteractions.HandlerMISP(ctxMISP, *ca.GetAppMISP(), mts, testChan, loging)
+		moduleMisp, errHMisp = mispinteractions.HandlerMISP(ctxMISP, *ca.GetAppMISP(), storageApp, loging)
 
-		/*
-			eventsMisp = datamodels.EventsMispFormat{
-				Analysis:          getAnalysis(),
-				Timestamp:         "0",
-				ThreatLevelId:     "4",
-				PublishTimestamp:  "0",
-				SightingTimestamp: "0",
-			}
-
-			listHandlerMisp = map[string][]func(interface{}) bool{
-				"event.object.title":     {eventsMisp.SetValueInfoEventsMisp},
-				"event.object.startDate": {eventsMisp.SetValueTimestampEventsMisp},
-				"event.details.endDate":  {eventsMisp.SetValueDateEventsMisp},
-				"event.object.tlp":       {eventsMisp.SetValueDistributionEventsMisp},
-				"event.object.severity":  {eventsMisp.SetValueThreatLevelIdEventsMisp},
-				"event.organisationId":   {eventsMisp.SetValueOrgIdEventsMisp},
-				"event.object.updatedAt": {eventsMisp.SetValueSightingTimestampEventsMisp},
-				"event.object.owner":     {eventsMisp.SetValueEventCreatorEmailEventsMisp},
-				"observables._id":        {attributesMisp.SetValueObjectIdAttributesMisp},
-				"observables.data":       {attributesMisp.SetValueValueAttributesMisp},
-				"observables._createdAt": {attributesMisp.SetValueTimestampAttributesMisp},
-				"observables.message":    {attributesMisp.SetValueCommentAttributesMisp},
-				"observables.startDate":  {attributesMisp.SetValueFirstSeenAttributesMisp},
-			}
-		*/
+		mispOutput = moduleMisp.GetDataReceptionChannel()
 	})
 
 	Context("Тест 1. Проверка формирования правил фильтрации", func() {
 		It("При формировании правил фильтрации ошибки быть не должно", func() {
 			Expect(errGetRule).ShouldNot(HaveOccurred())
+		})
+
+		It("При инициализации модуля взаимодействия с MISP ошибки быть не должно", func() {
+			Expect(errHMisp).ShouldNot(HaveOccurred())
 		})
 	})
 
@@ -166,6 +141,7 @@ var _ = Describe("CreateMispFormat", Ordered, func() {
 
 	Context("Тест 2. Проверяем правельность обработки сообщения по правилам и корректность формирования MISP форматов", func() {
 		It("Сообщение должно быть успешно обработано, должены быть сформированы типы Events и Attributes", func(ctx SpecContext) {
+			cd := make(chan struct{})
 
 			uuidTask := uuid.NewString()
 			storageApp.SetRawDataHiveFormatMessage(uuidTask, exampleByte)
@@ -175,31 +151,21 @@ var _ = Describe("CreateMispFormat", Ordered, func() {
 
 			go coremodule.HandlerMessageFromHive(uuidTask, storageApp, listRule, chanCreateMispFormat, chanDone, loging)
 
-			/*
-				data := <-testChan
-				fmt.Println("Resiver DATA: ", data)
+			go func() {
+				for {
+					select {
+					case log := <-loging:
+						fmt.Println("___ Log = ", log, " ____")
+					case <-cd:
+						fmt.Println("-== STOP TEST ==-")
 
+						return
+					}
+				}
+			}()
 
-					ed, ok := data["events"]
-					fmt.Println("EVENTS: ", ed)
-					Expect(ok).ShouldNot(Equal(BeFalse()))
-
-					ad, ok := data["attributes"]
-					fmt.Println("ATTRIBUTES: ", ad)
-					Expect(ok).ShouldNot(Equal(BeFalse()))
-			*/
-
-			resp := <-testChan
-
-			fmt.Println("RESPONSE status: ", resp.Status)
-			fmt.Println("RESPONSE status code: ", resp.StatusCode)
-			fmt.Println("RESPONSE count body = ", len(resp.Body))
-
-			//str, err := supportingfunctions.NewReadReflectJSONSprint(resp.Body)
-			//str := []interface{}{}
-			//err := json.Unmarshal(resp.Body, &str)
-			//Expect(err).ShouldNot(HaveOccurred())
-			fmt.Printf("BODY:\n%s\n", string(resp.Body))
+			fmt.Println("reseived data: ", <-mispOutput)
+			cd <- struct{}{}
 
 			Expect(true).Should(BeTrue())
 		}, SpecTimeout(time.Second*15))

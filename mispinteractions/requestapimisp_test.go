@@ -101,7 +101,10 @@ var _ = Describe("Requestapimisp", Ordered, func() {
 			Expect(errHttpRes).ShouldNot(HaveOccurred())
 			Expect(errUnmar).ShouldNot(HaveOccurred())
 
-			//fmt.Println("COUNT USERS = ", len(usmispf))
+			fmt.Println("COUNT USERS = ", len(usmispf))
+			for k, v := range usmispf {
+				fmt.Printf("%d. userEmail:%s\n", k, v.User.Email)
+			}
 
 			Expect(len(usmispf)).Should(Equal(78))
 		})
