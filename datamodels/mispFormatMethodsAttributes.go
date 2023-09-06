@@ -26,8 +26,14 @@ func createNewAttributesMisp() AttributesMispFormat {
 	}
 }
 
-func (lambda *ListAttributesMispFormat) getCountListAttributesMisp() int {
+func (lambda *ListAttributesMispFormat) GetCountListAttributesMisp() int {
 	return len(lambda.attributes)
+}
+
+func (lambda *ListAttributesMispFormat) CleanListAttributesMisp() {
+	lambda.mutex.Lock()
+	lambda.attributes = []AttributesMispFormat{}
+	lambda.mutex.Unlock()
 }
 
 func (lamisp *ListAttributesMispFormat) GetListAttributesMisp() []AttributesMispFormat {
@@ -48,7 +54,7 @@ func (lamisp *ListAttributesMispFormat) SetValueObjectIdAttributesMisp(v interfa
 		lamisp.attributes = append(lamisp.attributes, createNewAttributesMisp())
 	}
 
-	lamisp.attributes[lamisp.getCountListAttributesMisp()-1].ObjectId = fmt.Sprint(v)
+	lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].ObjectId = fmt.Sprint(v)
 	lamisp.mutex.Unlock()
 }
 
@@ -58,7 +64,7 @@ func (lamisp *ListAttributesMispFormat) SetValueObjectRelationAttributesMisp(v i
 		lamisp.attributes = append(lamisp.attributes, createNewAttributesMisp())
 	}
 
-	lamisp.attributes[lamisp.getCountListAttributesMisp()-1].ObjectRelation = fmt.Sprint(v)
+	lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].ObjectRelation = fmt.Sprint(v)
 	lamisp.mutex.Unlock()
 }
 
@@ -68,7 +74,7 @@ func (lamisp *ListAttributesMispFormat) SetValueCategoryAttributesMisp(v interfa
 		lamisp.attributes = append(lamisp.attributes, createNewAttributesMisp())
 	}
 
-	lamisp.attributes[lamisp.getCountListAttributesMisp()-1].Category = fmt.Sprint(v)
+	lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].Category = fmt.Sprint(v)
 	lamisp.mutex.Unlock()
 }
 
@@ -78,7 +84,7 @@ func (lamisp *ListAttributesMispFormat) SetValueTypeAttributesMisp(v interface{}
 		lamisp.attributes = append(lamisp.attributes, createNewAttributesMisp())
 	}
 
-	lamisp.attributes[lamisp.getCountListAttributesMisp()-1].Type = fmt.Sprint(v)
+	lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].Type = fmt.Sprint(v)
 	lamisp.mutex.Unlock()
 }
 
@@ -88,7 +94,7 @@ func (lamisp *ListAttributesMispFormat) SetValueValueAttributesMisp(v interface{
 		lamisp.attributes = append(lamisp.attributes, createNewAttributesMisp())
 	}
 
-	lamisp.attributes[lamisp.getCountListAttributesMisp()-1].Value = fmt.Sprint(v)
+	lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].Value = fmt.Sprint(v)
 	lamisp.mutex.Unlock()
 }
 
@@ -98,7 +104,7 @@ func (lamisp *ListAttributesMispFormat) SetValueUuidAttributesMisp(v interface{}
 		lamisp.attributes = append(lamisp.attributes, createNewAttributesMisp())
 	}
 
-	lamisp.attributes[lamisp.getCountListAttributesMisp()-1].Uuid = fmt.Sprint(v)
+	lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].Uuid = fmt.Sprint(v)
 	lamisp.mutex.Unlock()
 }
 
@@ -109,7 +115,7 @@ func (lamisp *ListAttributesMispFormat) SetValueTimestampAttributesMisp(v interf
 	}
 
 	if dt, ok := v.(float64); ok {
-		lamisp.attributes[lamisp.getCountListAttributesMisp()-1].Timestamp = fmt.Sprintf("%10.f", dt)[:10]
+		lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].Timestamp = fmt.Sprintf("%10.f", dt)[:10]
 	}
 
 	lamisp.mutex.Unlock()
@@ -121,7 +127,7 @@ func (lamisp *ListAttributesMispFormat) SetValueDistributionAttributesMisp(v int
 		lamisp.attributes = append(lamisp.attributes, createNewAttributesMisp())
 	}
 
-	lamisp.attributes[lamisp.getCountListAttributesMisp()-1].Distribution = fmt.Sprint(v)
+	lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].Distribution = fmt.Sprint(v)
 	lamisp.mutex.Unlock()
 }
 
@@ -131,7 +137,7 @@ func (lamisp *ListAttributesMispFormat) SetValueSharingGroupIdAttributesMisp(v i
 		lamisp.attributes = append(lamisp.attributes, createNewAttributesMisp())
 	}
 
-	lamisp.attributes[lamisp.getCountListAttributesMisp()-1].SharingGroupId = fmt.Sprint(v)
+	lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].SharingGroupId = fmt.Sprint(v)
 	lamisp.mutex.Unlock()
 }
 
@@ -141,7 +147,7 @@ func (lamisp *ListAttributesMispFormat) SetValueCommentAttributesMisp(v interfac
 		lamisp.attributes = append(lamisp.attributes, createNewAttributesMisp())
 	}
 
-	lamisp.attributes[lamisp.getCountListAttributesMisp()-1].Comment = fmt.Sprint(v)
+	lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].Comment = fmt.Sprint(v)
 	lamisp.mutex.Unlock()
 }
 
@@ -153,7 +159,7 @@ func (lamisp *ListAttributesMispFormat) SetValueFirstSeenAttributesMisp(v interf
 
 	if dt, ok := v.(float64); ok {
 		//		lamisp.attributes[lamisp.getCountListAttributesMisp()-1].FirstSeen = fmt.Sprintf("%13.f000", dt)
-		lamisp.attributes[lamisp.getCountListAttributesMisp()-1].FirstSeen = time.UnixMilli(int64(dt)).Format(time.RFC3339)
+		lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].FirstSeen = time.UnixMilli(int64(dt)).Format(time.RFC3339)
 	}
 
 	lamisp.mutex.Unlock()
@@ -167,7 +173,7 @@ func (lamisp *ListAttributesMispFormat) SetValueLastSeenAttributesMisp(v interfa
 
 	if dt, ok := v.(float64); ok {
 		//lamisp.attributes[lamisp.getCountListAttributesMisp()-1].LastSeen = fmt.Sprintf("%13.f000", dt)
-		lamisp.attributes[lamisp.getCountListAttributesMisp()-1].LastSeen = time.UnixMilli(int64(dt)).Format(time.RFC3339)
+		lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].LastSeen = time.UnixMilli(int64(dt)).Format(time.RFC3339)
 	}
 
 	lamisp.mutex.Unlock()
@@ -180,7 +186,7 @@ func (lamisp *ListAttributesMispFormat) SetValueToIdsAttributesMisp(v interface{
 	}
 
 	if data, ok := v.(bool); ok {
-		lamisp.attributes[lamisp.getCountListAttributesMisp()-1].ToIds = data
+		lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].ToIds = data
 	}
 	lamisp.mutex.Unlock()
 }
@@ -192,7 +198,7 @@ func (lamisp *ListAttributesMispFormat) SetValueDeletedAttributesMisp(v interfac
 	}
 
 	if data, ok := v.(bool); ok {
-		lamisp.attributes[lamisp.getCountListAttributesMisp()-1].Deleted = data
+		lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].Deleted = data
 	}
 	lamisp.mutex.Unlock()
 }
@@ -204,7 +210,7 @@ func (lamisp *ListAttributesMispFormat) SetValueDisableCorrelationAttributesMisp
 	}
 
 	if data, ok := v.(bool); ok {
-		lamisp.attributes[lamisp.getCountListAttributesMisp()-1].DisableCorrelation = data
+		lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].DisableCorrelation = data
 	}
 	lamisp.mutex.Unlock()
 }

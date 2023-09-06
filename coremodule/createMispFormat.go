@@ -36,15 +36,7 @@ var (
 )
 
 func init() {
-	eventsMisp = datamodels.EventsMispFormat{
-		Analysis:          getAnalysis(),
-		Distribution:      getDistributionEvent(),
-		Timestamp:         "0",
-		ThreatLevelId:     getThreatLevelId(),
-		PublishTimestamp:  "0",
-		SightingTimestamp: "0",
-		SharingGroupId:    getSharingGroupId(),
-	}
+	eventsMisp = datamodels.NewEventMisp()
 	listAttributesMisp = datamodels.NewListAttributesMispFormat()
 
 	/*galaxyClustersMisp = datamodels.GalaxyClustersMispFormat{
@@ -173,9 +165,12 @@ func NewMispFormat(
 							"events":     eventsMisp,
 							"attributes": listAttributesMisp.GetListAttributesMisp(),
 						}})
-
-					userEmail = ""
 				}
+
+				//очищаем события, список аттрибутов и текущий email пользователя
+				userEmail = ""
+				eventsMisp.CleanEventsMispFormat()
+				listAttributesMisp.CleanListAttributesMisp()
 
 				return
 			}
@@ -184,37 +179,3 @@ func NewMispFormat(
 
 	return chanInput, chanDone
 }
-
-func getAnalysis() string {
-	return "2"
-}
-
-func getDistributionEvent() string {
-	return "3"
-}
-
-func getThreatLevelId() string {
-	return "4"
-}
-
-func getSharingGroupId() string {
-	return "1"
-}
-
-/*func getTagTLP(tlp int) datamodels.TagsMispFormat {
-	tag := datamodels.TagsMispFormat{Name: "tlp:red", Colour: "#cc0033"}
-
-	switch tlp {
-	case 0:
-		tag.Name = "tlp:white"
-		tag.Colour = "#ffffff"
-	case 1:
-		tag.Name = "tlp:green"
-		tag.Colour = "#339900"
-	case 2:
-		tag.Name = "tlp:amber"
-		tag.Colour = "#ffc000"
-	}
-
-	return tag
-}*/

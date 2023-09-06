@@ -156,5 +156,7 @@ func main() {
 		}
 	}()
 
+	_ = sl.WriteLoggingData("application 'placeholder_misp' is started", "info")
+
 	coremodule.CoreHandler(natsModule, mispModule, esModule, nkckiModule, listRulesProcMISPMsg, storageApp, loging)
 }
