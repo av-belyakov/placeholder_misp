@@ -15,25 +15,6 @@ import (
 
 var mnats ModuleNATS
 
-/*
-type SettingsOutputChan struct {
-	UUID string
-}
-
-type SettingsInputChan struct {
-	Command string
-	EventId string
-}
-
-// ModuleNATS инициализированный модуль
-// ChanOutputMISP - канал для отправки полученных данных из модуля
-// chanInputNATS - канал для принятия данных в модуль
-type ModuleNATS struct {
-	chanOutputNATS chan SettingsOutputChan
-	chanInputNATS  chan SettingsInputChan
-}
-*/
-
 func init() {
 	mnats.chanOutputNATS = make(chan SettingsOutputChan)
 	mnats.chanInputNATS = make(chan SettingsInputChan)
@@ -48,7 +29,7 @@ func NewClientNATS(
 	nc, err := nats.Connect(fmt.Sprintf("%s:%d", conf.Host, conf.Port))
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
-		return &mnats, fmt.Errorf("%s %s:%d", err.Error(), f, l-2)
+		return &mnats, fmt.Errorf(" '%s' %s:%d", err.Error(), f, l-2)
 	}
 
 	// обработка данных приходящих в модуль от ядра приложения

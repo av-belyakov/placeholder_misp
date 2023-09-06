@@ -96,7 +96,7 @@ func init() {
 	if len(listRulesProcMISPMsg.Rules.Pass) == 0 && !listRulesProcMISPMsg.Rules.Passany {
 		msg := "there are no rules for handling messages received from NATS or all rules have failed validation"
 		_, f, l, _ := runtime.Caller(0)
-		_ = sl.WriteLoggingData(fmt.Sprintf("%s %s:%d", msg, f, l-3), "error")
+		_ = sl.WriteLoggingData(fmt.Sprintf(" '%s' %s:%d", msg, f, l-3), "error")
 
 		log.Fatalf("%s\n", msg)
 	}
@@ -113,7 +113,8 @@ func main() {
 	defer ctxCloseNATS()
 	natsModule, err := natsinteractions.NewClientNATS(ctxNATS, confApp.AppConfigNATS, storageApp, loging)
 	if err != nil {
-		_ = sl.WriteLoggingData(fmt.Sprintln(err), "error")
+		_, f, l, _ := runtime.Caller(0)
+		_ = sl.WriteLoggingData(fmt.Sprintf(" '%s' %s:%d", err, f, l-2), "error")
 
 		log.Fatal(err)
 	}
@@ -123,7 +124,8 @@ func main() {
 	defer ctxCloseMISP()
 	mispModule, err := mispinteractions.HandlerMISP(ctxMISP, confApp.AppConfigMISP, storageApp, loging)
 	if err != nil {
-		_ = sl.WriteLoggingData(fmt.Sprintln(err), "error")
+		_, f, l, _ := runtime.Caller(0)
+		_ = sl.WriteLoggingData(fmt.Sprintf(" '%s' %s:%d", err, f, l-2), "error")
 	}
 
 	//инициализация модуля для взаимодействия с ElasticSearch
@@ -131,7 +133,8 @@ func main() {
 	defer ctxCloseES()
 	esModule, err := elasticsearchinteractions.HandlerElasticSearch(ctxES, confApp.AppConfigElasticSearch, storageApp, loging)
 	if err != nil {
-		_ = sl.WriteLoggingData(fmt.Sprintln(err), "error")
+		_, f, l, _ := runtime.Caller(0)
+		_ = sl.WriteLoggingData(fmt.Sprintf(" '%s' %s:%d", err, f, l-2), "error")
 	}
 
 	// инициализация модуля для взаимодействия с NKCKI

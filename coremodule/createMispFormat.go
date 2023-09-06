@@ -23,7 +23,7 @@ var (
 	eventsMisp         datamodels.EventsMispFormat
 	listAttributesMisp *datamodels.ListAttributesMispFormat
 
-	//пока не нужны, временно отключаем
+	//		пока не нужны, временно отключаем
 	//galaxyClustersMisp datamodels.GalaxyClustersMispFormat
 	//galaxyElementMisp  datamodels.GalaxyElementMispFormat
 	//usersMisp          datamodels.UsersMispFormat
@@ -162,7 +162,7 @@ func NewMispFormat(
 					_, f, l, _ := runtime.Caller(0)
 
 					loging <- datamodels.MessageLoging{
-						MsgData: fmt.Sprintf("the message with %s was not sent to MISP because it does not comply with the rules %s:%d", uuidTask, f, l-2),
+						MsgData: fmt.Sprintf(" 'the message with %s was not sent to MISP because it does not comply with the rules' %s:%d", uuidTask, f, l-1),
 						MsgType: "warning",
 					}
 				} else {
@@ -199,10 +199,6 @@ func getThreatLevelId() string {
 
 func getSharingGroupId() string {
 	return "1"
-}
-
-func getToIds() bool {
-	return true
 }
 
 /*func getTagTLP(tlp int) datamodels.TagsMispFormat {

@@ -46,20 +46,15 @@ func HandlerMISP(
 		_, f, l, _ := runtime.Caller(0)
 
 		loging <- datamodels.MessageLoging{
-			MsgData: fmt.Sprintf("%s %s:%d", err.Error(), f, l-2),
+			MsgData: fmt.Sprintf(" '%s' %s:%d", err.Error(), f, l-2),
 			MsgType: "error",
 		}
 	}
-
-	//fmt.Println("func 'HandlerMISP', START")
-	//fmt.Println("func 'HandlerMISP', user MISP: ", storageApp.ListUserSettingsMISP)
 
 	//здесь обрабатываем данные из входного канала модуля MISP
 	go func() {
 		for data := range mmisp.chanInputMISP {
 			authKey := conf.Auth
-
-			fmt.Println("func 'HandlerMISP', 111 user email = ", data.UserEmail)
 
 			// получаем авторизационный ключ пользователя по его email
 			if us, ok := storageApp.GetUserSettingsMISP(data.UserEmail); ok {
@@ -72,21 +67,19 @@ func HandlerMISP(
 				_, f, l, _ := runtime.Caller(0)
 
 				loging <- datamodels.MessageLoging{
-					MsgData: fmt.Sprintf("%s %s:%d", err.Error(), f, l-2),
+					MsgData: fmt.Sprintf(" '%s' %s:%d", err.Error(), f, l-2),
 					MsgType: "error",
 				}
 
 				continue
 			}
 
-			fmt.Println("func 'HandlerMISP', 222")
-
 			resMisp := RespMISP{}
 			if err := json.Unmarshal(resBodyByte, &resMisp); err != nil {
 				_, f, l, _ := runtime.Caller(0)
 
 				loging <- datamodels.MessageLoging{
-					MsgData: fmt.Sprintf("%s %s:%d", err.Error(), f, l-2),
+					MsgData: fmt.Sprintf(" '%s' %s:%d", err.Error(), f, l-2),
 					MsgType: "error",
 				}
 
@@ -104,13 +97,11 @@ func HandlerMISP(
 				}
 			}
 
-			fmt.Println("func 'HandlerMISP', EventId '", eventId, "' send to NATS")
-
 			if eventId == "" {
 				_, f, l, _ := runtime.Caller(0)
 
 				loging <- datamodels.MessageLoging{
-					MsgData: fmt.Sprintf("the formation of events of the 'Attributes' type was not performed because the EventID is empty %s:%d", f, l-1),
+					MsgData: fmt.Sprintf(" 'the formation of events of the 'Attributes' type was not performed because the EventID is empty' %s:%d", f, l-1),
 					MsgType: "error",
 				}
 
@@ -118,8 +109,6 @@ func HandlerMISP(
 			}
 
 			_, _ = sendAttribytesMispFormat(conf.Host, authKey, eventId, data, loging)
-
-			fmt.Println("func 'HandlerMISP', отправляем в ядро информацию по event Id")
 
 			//отправляем в ядро информацию по event Id
 			mmisp.SendingDataOutput(SettingChanOutputMISP{
@@ -153,13 +142,13 @@ func getUserMisp(conf confighandler.AppConfigMISP, storageApp *memorytemporaryst
 	client, err := NewClientMISP(conf.Host, conf.Auth, false)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
-		return fmt.Errorf("%s %s:%d", err.Error(), f, l-2)
+		return fmt.Errorf(" '%s' %s:%d", err.Error(), f, l-2)
 	}
 
 	_, resByte, err := client.Get("/admin/users", nil)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
-		return fmt.Errorf("%s %s:%d", err.Error(), f, l-2)
+		return fmt.Errorf(" '%s' %s:%d", err.Error(), f, l-2)
 	}
 
 	usmispf := []datamodels.UsersSettingsMispFormat{}
@@ -167,7 +156,7 @@ func getUserMisp(conf confighandler.AppConfigMISP, storageApp *memorytemporaryst
 	if err != nil {
 
 		_, f, l, _ := runtime.Caller(0)
-		return fmt.Errorf("%s %s:%d", err.Error(), f, l-2)
+		return fmt.Errorf(" '%s' %s:%d", err.Error(), f, l-2)
 	}
 
 	for _, v := range usmispf {
@@ -191,37 +180,39 @@ func sendEventsMispFormat(host, authKey string, d SettingsChanInputMISP) (*http.
 		resBodyByte = make([]byte, 0)
 	)
 
+	fmt.Println("		func 'sendEventsMispFormat', USER EMAIL: ", d.UserEmail)
+
 	c, err := NewClientMISP(host, authKey, false)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
-		return nil, resBodyByte, fmt.Errorf("events add,%s %s:%d", err.Error(), f, l-2)
+		return nil, resBodyByte, fmt.Errorf(" 'events add, %s' %s:%d", err.Error(), f, l-2)
 	}
 
 	ed, ok := d.MajorData["events"]
 	if !ok {
 		_, f, l, _ := runtime.Caller(0)
 
-		return nil, resBodyByte, fmt.Errorf("the properties of 'events' were not found in the received data %s:%d", f, l-2)
+		return nil, resBodyByte, fmt.Errorf(" 'the properties of \"events\" were not found in the received data' %s:%d", f, l-2)
 	}
 
 	b, err := json.Marshal(ed)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 
-		return nil, resBodyByte, fmt.Errorf("events add, %s %s:%d", err.Error(), f, l-2)
+		return nil, resBodyByte, fmt.Errorf(" 'events add, %s' %s:%d", err.Error(), f, l-2)
 	}
 
 	res, resBodyByte, err = c.Post("/events/add", b)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 
-		return nil, resBodyByte, fmt.Errorf("events add, %s %s:%d", err.Error(), f, l-2)
+		return nil, resBodyByte, fmt.Errorf(" 'events add, %s' %s:%d", err.Error(), f, l-2)
 	}
 
 	if res.StatusCode != http.StatusOK {
 		_, f, l, _ := runtime.Caller(0)
 
-		return nil, resBodyByte, fmt.Errorf("events add, %s %s:%d", res.Status, f, l-1)
+		return nil, resBodyByte, fmt.Errorf(" 'events add, %s' %s:%d", res.Status, f, l-1)
 	}
 
 	return res, resBodyByte, nil
@@ -238,7 +229,7 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 		loging <- datamodels.MessageLoging{
-			MsgData: fmt.Sprintf("attributes №%s add, %s %s:%d", eventId, err.Error(), f, l-2),
+			MsgData: fmt.Sprintf(" 'attributes №%s add, %s' %s:%d", eventId, err.Error(), f, l-2),
 			MsgType: "error",
 		}
 
@@ -250,7 +241,7 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 		_, f, l, _ := runtime.Caller(0)
 
 		loging <- datamodels.MessageLoging{
-			MsgData: fmt.Sprintf("the properties of 'attributes' were not found in the received data %s:%d", f, l-2),
+			MsgData: fmt.Sprintf(" 'the properties of \"attributes\" were not found in the received data' %s:%d", f, l-2),
 			MsgType: "error",
 		}
 
@@ -262,7 +253,7 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 		_, f, l, _ := runtime.Caller(0)
 
 		loging <- datamodels.MessageLoging{
-			MsgData: fmt.Sprintf("the received data does not match the type 'attributes' %s:%d", f, l-2),
+			MsgData: fmt.Sprintf(" 'the received data does not match the type \"attributes\"' %s:%d", f, l-2),
 			MsgType: "error",
 		}
 
@@ -278,8 +269,8 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 			_, f, l, _ := runtime.Caller(0)
 
 			loging <- datamodels.MessageLoging{
-				MsgData: fmt.Sprintf("attributes №%s add, the 'Value' type property should not be empty %s:%d", eventId, f, l-1),
-				MsgType: "error",
+				MsgData: fmt.Sprintf(" 'attributes №%s add, the \"Value\" type property should not be empty' %s:%d", eventId, f, l-1),
+				MsgType: "warning",
 			}
 
 			continue
@@ -290,8 +281,8 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 			_, f, l, _ := runtime.Caller(0)
 
 			loging <- datamodels.MessageLoging{
-				MsgData: fmt.Sprintf("attributes №%s add, %s %s:%d", eventId, err.Error(), f, l-2),
-				MsgType: "error",
+				MsgData: fmt.Sprintf(" 'attributes №%s add, %s' %s:%d", eventId, err.Error(), f, l-2),
+				MsgType: "warning",
 			}
 
 			continue
@@ -304,8 +295,8 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 			_, f, l, _ := runtime.Caller(0)
 
 			loging <- datamodels.MessageLoging{
-				MsgData: fmt.Sprintf("attributes №%s add, %s %s:%d", eventId, err.Error(), f, l-2),
-				MsgType: "error",
+				MsgData: fmt.Sprintf(" 'attributes №%s add, %s' %s:%d", eventId, err.Error(), f, l-2),
+				MsgType: "warning",
 			}
 
 			continue
@@ -315,50 +306,11 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 			_, f, l, _ := runtime.Caller(0)
 
 			loging <- datamodels.MessageLoging{
-				MsgData: fmt.Sprintf("attributes №%s add, %s %s:%d", eventId, res.Status, f, l-1),
-				MsgType: "error",
+				MsgData: fmt.Sprintf(" 'attributes №%s add, %s' %s:%d", eventId, res.Status, f, l-1),
+				MsgType: "warning",
 			}
 		}
 	}
-
-	/*
-				{
-					"event_id":"3592",
-					"object_id":"~207683696",
-					"object_relation":"",
-					"category":"Other",
-					"type":"other",
-					"value":"176.192.244.107",
-					"to_ids":true,
-					"uuid":"",
-					"timestamp":"0",
-					"distribution":"3",
-					"sharing_group_id":"",
-					"comment":"Download a piece of traffic",
-					"first_seen":"0", //похоже дело в нуле для этого типа
-					//надо в таком формате 1581984000000000 кол-во символов
-					//должно быть не 13 а больше (16)
-					"last_seen":"0", //похоже дело в нуле для этого типа
-					"deleted":false,
-					"disable_correlation":false
-				}
-
-				Возвращает ошибку 403
-			{
-		    	"saved": false,
-		    	"name": "Could not add Attribute",
-		    	"message": "Could not add Attribute",
-		    	"url": "\/attributes\/add",
-		    	"errors": {
-		        	"first_seen": [
-		            	"Invalid ISO 8601 format"
-		        	],
-		        	"last_seen": [
-		            	"Invalid ISO 8601 format"
-		        	]
-		    	}
-			}
-	*/
 
 	return res, resBodyByte
 }

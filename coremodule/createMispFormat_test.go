@@ -120,6 +120,20 @@ var _ = Describe("CreateMispFormat", Ordered, func() {
 	})
 
 	Context("Тест 1. Проверка формирования правил фильтрации", func() {
+		It("При конвертировании времени в формат ISO 8601 ошибок быть не должно", func() {
+			dateTest := "1692322715497"
+			dt, err := strconv.ParseInt(dateTest, 10, 64)
+
+			Expect(err).ShouldNot(HaveOccurred())
+
+			t := time.UnixMilli(dt)
+			tstr := t.Format(time.RFC3339)
+
+			fmt.Println("		Time format RFC3339 as string: ", tstr)
+
+			Expect(true).Should(BeTrue())
+		})
+
 		It("При формировании правил фильтрации ошибки быть не должно", func() {
 			Expect(errGetRule).ShouldNot(HaveOccurred())
 		})

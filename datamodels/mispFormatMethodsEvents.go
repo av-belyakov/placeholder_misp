@@ -71,6 +71,10 @@ func (emisp *EventsMispFormat) SetValueThreatLevelIdEventsMisp(v interface{}, is
 	if data, ok := v.(string); ok {
 		emisp.ThreatLevelId = data
 	}
+
+	if data, ok := v.(float64); ok {
+		emisp.ThreatLevelId = fmt.Sprint(data)
+	}
 }
 
 func (emisp *EventsMispFormat) SetValuePublishTimestampEventsMisp(v interface{}, isNew bool) {

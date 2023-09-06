@@ -15,12 +15,10 @@ func NewListAttributesMispFormat() *ListAttributesMispFormat {
 
 func createNewAttributesMisp() AttributesMispFormat {
 	return AttributesMispFormat{
-		Category:     "Other",
-		Type:         "other",
-		Timestamp:    "0",
-		Distribution: "3",
-		//FirstSeen:      fmt.Sprint(time.Now().UnixMicro()),
-		//LastSeen:       fmt.Sprint(time.Now().UnixMicro()),
+		Category:       "Other",
+		Type:           "other",
+		Timestamp:      "0",
+		Distribution:   "3",
 		FirstSeen:      fmt.Sprint(time.Now().Format(time.RFC3339)),
 		LastSeen:       fmt.Sprint(time.Now().Format(time.RFC3339)),
 		ToIds:          true,
@@ -154,7 +152,8 @@ func (lamisp *ListAttributesMispFormat) SetValueFirstSeenAttributesMisp(v interf
 	}
 
 	if dt, ok := v.(float64); ok {
-		lamisp.attributes[lamisp.getCountListAttributesMisp()-1].FirstSeen = fmt.Sprintf("%13.f000", dt)
+		//		lamisp.attributes[lamisp.getCountListAttributesMisp()-1].FirstSeen = fmt.Sprintf("%13.f000", dt)
+		lamisp.attributes[lamisp.getCountListAttributesMisp()-1].FirstSeen = time.UnixMilli(int64(dt)).Format(time.RFC3339)
 	}
 
 	lamisp.mutex.Unlock()
@@ -167,7 +166,8 @@ func (lamisp *ListAttributesMispFormat) SetValueLastSeenAttributesMisp(v interfa
 	}
 
 	if dt, ok := v.(float64); ok {
-		lamisp.attributes[lamisp.getCountListAttributesMisp()-1].LastSeen = fmt.Sprintf("%13.f000", dt)
+		//lamisp.attributes[lamisp.getCountListAttributesMisp()-1].LastSeen = fmt.Sprintf("%13.f000", dt)
+		lamisp.attributes[lamisp.getCountListAttributesMisp()-1].LastSeen = time.UnixMilli(int64(dt)).Format(time.RFC3339)
 	}
 
 	lamisp.mutex.Unlock()
