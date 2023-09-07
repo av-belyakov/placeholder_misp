@@ -10,6 +10,7 @@ type ModuleNATS struct {
 
 type SettingsOutputChan struct {
 	UUID string
+	Data []byte
 }
 
 type SettingsInputChan struct {

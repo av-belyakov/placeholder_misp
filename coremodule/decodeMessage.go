@@ -22,6 +22,8 @@ func HandlerMessageFromHive(
 	listTmp := map[string]interface{}{}
 	b, _ := storageApp.GetRawDataHiveFormatMessage(uuidTask)
 
+	fmt.Println("___ func 'HandlerMessageFromHive' COUNT Hive message: ", storageApp.GetCountHiveFormatMessage())
+
 	if err := json.Unmarshal(b, &listTmp); err != nil {
 		_, f, l, _ := runtime.Caller(0)
 

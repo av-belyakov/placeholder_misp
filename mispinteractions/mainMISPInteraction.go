@@ -56,6 +56,8 @@ func HandlerMISP(
 		for data := range mmisp.chanInputMISP {
 			authKey := conf.Auth
 
+			fmt.Println("			--=== RESEIVED DATA ===--	USER EMAIL: ", data.UserEmail)
+
 			// получаем авторизационный ключ пользователя по его email
 			if us, ok := storageApp.GetUserSettingsMISP(data.UserEmail); ok {
 				authKey = us.AuthKey

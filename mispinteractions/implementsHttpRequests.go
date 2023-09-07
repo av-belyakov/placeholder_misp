@@ -46,7 +46,6 @@ func (client *ClientMISP) Do(method, path string, data []byte) (*http.Response, 
 	httpReq.Header.Set("Accept", "application/json")
 
 	fmt.Println("func 'Do', Method: ", method, " client.BaseURL: ", client.BaseURL, " path: ", path)
-	fmt.Printf("REGUEST HEADER: %v\nhttpReq.ContentLength: %d\n\n", httpReq, httpReq.ContentLength)
 
 	httpClient := http.Client{
 		Transport: httpTrp,
@@ -61,7 +60,6 @@ func (client *ClientMISP) Do(method, path string, data []byte) (*http.Response, 
 	defer resp.Body.Close()
 
 	fmt.Println("func 'Do', RESPONSE status:", resp.Status)
-	fmt.Println("func 'Do', RESPONSE header:", resp.Header)
 
 	if resp.StatusCode != http.StatusOK {
 		_, f, l, _ := runtime.Caller(0)

@@ -9,6 +9,7 @@ import (
 )
 
 type ChanInputCreateMispFormat struct {
+	UUID        string
 	FieldName   string
 	ValueType   string
 	Value       interface{}
@@ -97,6 +98,8 @@ func NewMispFormat(
 	//останавливает обработчик канала chanInput (при завершении декодировании сообщения)
 	chanDone := make(chan bool)
 
+	fmt.Printf("\n\n\tfunc 'NewMispFormat', START...")
+
 	go func() {
 		var (
 			currentCount, maxCountObservables int
@@ -112,8 +115,6 @@ func NewMispFormat(
 				maxCountObservables++
 			}
 		}
-
-		fmt.Println("maxCountObservables = ", maxCountObservables)
 
 		isNew := true
 
@@ -150,6 +151,9 @@ func NewMispFormat(
 				}
 
 			case isAllowed := <-chanDone:
+
+				fmt.Printf("\n\tfunc 'NewMispFormat', RESEIVED chanDone, eventsMisp: %v, isAllowed: %v\n", eventsMisp, isAllowed)
+
 				if !isAllowed {
 					_, f, l, _ := runtime.Caller(0)
 

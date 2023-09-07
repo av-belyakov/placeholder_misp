@@ -32,6 +32,11 @@ func checkTimeDelete(cst *CommonStorageTemporary) {
 	}
 }
 
+// GetCountHiveFormatMessage возвращает количество сообщений полученных от TheHive и еще не обработанных
+func (cst *CommonStorageTemporary) GetCountHiveFormatMessage() int {
+	return len(cst.HiveFormatMessage.Storages)
+}
+
 // SetOriginalHaveFormatMessage добавляет сырые данные полученные от TheHive
 func (cst *CommonStorageTemporary) SetRawDataHiveFormatMessage(uuid string, data []byte) {
 	cst.HiveFormatMessage.mutex.Lock()

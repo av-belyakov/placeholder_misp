@@ -27,8 +27,9 @@ func CoreHandler(
 	for {
 		select {
 		case data := <-natsChanReception:
-			//uuidTask := uuid.NewString()
-			//storageApp.SetRawDataHiveFormatMessage(uuidTask, data)
+			fmt.Printf("\n\tfunc 'CoreHandler', RESEIVED data from NATS, UUID = %s\n", data.UUID)
+
+			storageApp.SetRawDataHiveFormatMessage(data.UUID, data.Data)
 
 			//формирование итоговых документов в формате MISP
 			chanCreateMispFormat, chanDone := NewMispFormat(data.UUID, mispmodule, loging)

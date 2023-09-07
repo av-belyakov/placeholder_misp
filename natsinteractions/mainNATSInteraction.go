@@ -80,11 +80,9 @@ func NewClientNATS(
 
 	nc.Subscribe("main_caseupdate", func(msg *nats.Msg) {
 		uuidTask := uuid.NewString()
-		storageApp.SetRawDataHiveFormatMessage(uuidTask, msg.Data)
-
-		//mnats.chanOutputNATS <- msg.Data
 		mnats.chanOutputNATS <- SettingsOutputChan{
 			UUID: uuidTask,
+			Data: msg.Data,
 		}
 	})
 
