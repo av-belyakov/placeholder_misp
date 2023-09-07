@@ -13,6 +13,7 @@ import (
 )
 
 func HandlerMessageFromHive(
+	b []byte,
 	uuidTask string,
 	storageApp *memorytemporarystorage.CommonStorageTemporary,
 	listRule rules.ListRulesProcessingMsgMISP,
@@ -20,7 +21,6 @@ func HandlerMessageFromHive(
 	cmispfDone chan<- bool,
 	loging chan<- datamodels.MessageLoging) {
 	listTmp := map[string]interface{}{}
-	b, _ := storageApp.GetRawDataHiveFormatMessage(uuidTask)
 
 	fmt.Println("___ func 'HandlerMessageFromHive' COUNT Hive message: ", storageApp.GetCountHiveFormatMessage())
 

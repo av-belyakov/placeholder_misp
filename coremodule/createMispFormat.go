@@ -89,7 +89,6 @@ func init() {
 }
 
 func NewMispFormat(
-	uuidTask string,
 	mispmodule *mispinteractions.ModuleMISP,
 	loging chan<- datamodels.MessageLoging) (chan ChanInputCreateMispFormat, chan bool) {
 
@@ -103,7 +102,7 @@ func NewMispFormat(
 	go func() {
 		var (
 			currentCount, maxCountObservables int
-			userEmail                         string
+			userEmail, objectId               string
 		)
 		defer func() {
 			close(chanInput)
@@ -141,6 +140,13 @@ func NewMispFormat(
 					}
 				}
 
+				//ищем id обрабатываемого события
+				if tmf.FieldBranch == "event.objectId" {
+					if oid, ok := tmf.Value.(string); ok {
+						objectId = oid
+					}
+				}
+
 				if strings.Contains(tmf.FieldBranch, "observables") {
 					currentCount++
 				}
@@ -158,12 +164,13 @@ func NewMispFormat(
 					_, f, l, _ := runtime.Caller(0)
 
 					loging <- datamodels.MessageLoging{
-						MsgData: fmt.Sprintf(" 'the message with %s was not sent to MISP because it does not comply with the rules' %s:%d", uuidTask, f, l-1),
+						MsgData: fmt.Sprintf(" 'the message with %s was not sent to MISP because it does not comply with the rules' %s:%d", objectId, f, l-1),
 						MsgType: "warning",
 					}
 				} else {
 					//тут отправляем сформированные по формату MISP пользовательские структуры
 					mispmodule.SendingDataInput(mispinteractions.SettingsChanInputMISP{
+						ObjectId:  objectId,
 						UserEmail: userEmail,
 						MajorData: map[string]interface{}{
 							"events":     eventsMisp,

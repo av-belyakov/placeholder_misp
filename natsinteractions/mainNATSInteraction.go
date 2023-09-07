@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/google/uuid"
 	"github.com/nats-io/nats.go"
 
 	"placeholder_misp/confighandler"
@@ -79,9 +78,7 @@ func NewClientNATS(
 	}()
 
 	nc.Subscribe("main_caseupdate", func(msg *nats.Msg) {
-		uuidTask := uuid.NewString()
 		mnats.chanOutputNATS <- SettingsOutputChan{
-			UUID: uuidTask,
 			Data: msg.Data,
 		}
 	})

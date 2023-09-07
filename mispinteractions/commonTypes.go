@@ -9,6 +9,7 @@ type ModuleMISP struct {
 }
 
 type SettingsChanInputMISP struct {
+	ObjectId  string
 	UserEmail string
 	MajorData map[string]interface{}
 }

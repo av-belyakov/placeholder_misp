@@ -8,8 +8,19 @@ import (
 // HiveFormatMessage временное хранилище для сообщений MISP
 // ListUserSettingsMISP список настроек пользователей MISP
 type CommonStorageTemporary struct {
+	temporaryInputCase   TemporaryInputCases
 	HiveFormatMessage    HiveFormatMessages
 	ListUserSettingsMISP []UserSettingsMISP
+}
+
+type TemporaryInputCases struct {
+	Cases map[string]SettingsInputCase
+	mutex sync.Mutex
+}
+
+type SettingsInputCase struct {
+	TimeCreate int64
+	EventId    string
 }
 
 type UserSettingsMISP struct {

@@ -5,16 +5,25 @@ import (
 	"time"
 )
 
-func NewTemporaryStorage() *CommonStorageTemporary {
-	cst := CommonStorageTemporary{
-		HiveFormatMessage: HiveFormatMessages{
-			Storages: make(map[string]StorageHiveFormatMessages),
-			mutex:    sync.Mutex{},
-		},
-		ListUserSettingsMISP: make([]UserSettingsMISP, 0),
-	}
+var once sync.Once
+var cst CommonStorageTemporary
 
-	go checkTimeDelete(&cst)
+func NewTemporaryStorage() *CommonStorageTemporary {
+	once.Do(func() {
+		cst := CommonStorageTemporary{
+			temporaryInputCase: TemporaryInputCases{
+				Cases: make(map[string]SettingsInputCase),
+				mutex: sync.Mutex{},
+			},
+			HiveFormatMessage: HiveFormatMessages{
+				Storages: make(map[string]StorageHiveFormatMessages),
+				mutex:    sync.Mutex{},
+			},
+			ListUserSettingsMISP: make([]UserSettingsMISP, 0),
+		}
+
+		go checkTimeDelete(&cst)
+	})
 
 	return &cst
 }
@@ -24,12 +33,38 @@ func checkTimeDelete(cst *CommonStorageTemporary) {
 	c := time.Tick(3 * time.Second)
 
 	for range c {
-		for k, v := range cst.HiveFormatMessage.Storages {
-			if v.isProcessedMisp && v.isProcessedElasticsearsh && v.isProcessedNKCKI {
-				deleteHiveFormatMessageElement(k, cst)
+		go func() {
+			for k, v := range cst.HiveFormatMessage.Storages {
+				if v.isProcessedMisp && v.isProcessedElasticsearsh && v.isProcessedNKCKI {
+					deleteHiveFormatMessageElement(k, cst)
+				}
 			}
-		}
+		}()
+
+		go func() {
+			for k, v := range cst.temporaryInputCase.Cases {
+				if time.Now().Unix() > (v.TimeCreate + 54000) {
+					deleteTemporaryCase(k, cst)
+				}
+			}
+		}()
 	}
+}
+
+// GetTemporaryCase возвращает информацию из временного списка входящих кейсов
+func (cst *CommonStorageTemporary) GetTemporaryCase(id string) (SettingsInputCase, bool) {
+	s, ok := cst.temporaryInputCase.Cases[id]
+
+	return s, ok
+}
+
+// SetTemporaryCase добавляет информацию о кейсах во временное хранилище
+func (cst *CommonStorageTemporary) SetTemporaryCase(id string, s SettingsInputCase) {
+	cst.temporaryInputCase.mutex.Lock()
+	defer cst.temporaryInputCase.mutex.Unlock()
+
+	s.TimeCreate = time.Now().Unix()
+	cst.temporaryInputCase.Cases[id] = s
 }
 
 // GetCountHiveFormatMessage возвращает количество сообщений полученных от TheHive и еще не обработанных
@@ -228,8 +263,13 @@ func (cst *CommonStorageTemporary) GetListUserSettingsMISP() *CommonStorageTempo
 
 func deleteHiveFormatMessageElement(uuid string, cst *CommonStorageTemporary) {
 	cst.HiveFormatMessage.mutex.Lock()
-
 	delete(cst.HiveFormatMessage.Storages, uuid)
-
 	cst.HiveFormatMessage.mutex.Unlock()
+}
+
+func deleteTemporaryCase(id string, cst *CommonStorageTemporary) {
+	cst.temporaryInputCase.mutex.Lock()
+	defer cst.temporaryInputCase.mutex.Unlock()
+
+	delete(cst.temporaryInputCase.Cases, id)
 }

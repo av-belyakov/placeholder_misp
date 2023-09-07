@@ -56,7 +56,14 @@ func HandlerMISP(
 		for data := range mmisp.chanInputMISP {
 			authKey := conf.Auth
 
-			fmt.Println("			--=== RESEIVED DATA ===--	USER EMAIL: ", data.UserEmail)
+			fmt.Printf("\t\t\t--=== RESEIVED DATA ===--	USER EMAIL: %s, ObjectId: %s\n", data.UserEmail, data.ObjectId)
+
+			/*
+				Получаем значение поля objectId события которое при получении
+				от MISP eventId нужно будет сохранить в через SetTemporaryCase
+				это позволит в дальнейшем проверять по objectId дублируемые события
+				(до какой то степени)
+			*/
 
 			// получаем авторизационный ключ пользователя по его email
 			if us, ok := storageApp.GetUserSettingsMISP(data.UserEmail); ok {
