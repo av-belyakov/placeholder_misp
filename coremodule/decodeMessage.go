@@ -10,6 +10,7 @@ import (
 	"placeholder_misp/datamodels"
 	"placeholder_misp/memorytemporarystorage"
 	rules "placeholder_misp/rulesinteraction"
+	"placeholder_misp/supportingfunctions"
 )
 
 func HandlerMessageFromHive(
@@ -23,6 +24,23 @@ func HandlerMessageFromHive(
 	listTmp := map[string]interface{}{}
 
 	fmt.Println("___ func 'HandlerMessageFromHive' COUNT Hive message: ", storageApp.GetCountHiveFormatMessage())
+
+	// -------------------- ТОЛЬКО ДЛЯ ТЕСТА -----------------
+	//-------------------------------------------------------
+	//-------------------------------------------------------
+	//-------------------------------------------------------
+	//записываем в лог файл типа 'info' все кейсы приходящие от хайва
+	//
+	str, err := supportingfunctions.NewReadReflectJSONSprint(b)
+	fmt.Println(err)
+
+	loging <- datamodels.MessageLoging{
+		MsgData: fmt.Sprintf("---------------\nEVENTS:\n%s\n", str),
+		MsgType: "info",
+	}
+	//
+	//
+	//-------------------------------------------------------
 
 	if err := json.Unmarshal(b, &listTmp); err != nil {
 		_, f, l, _ := runtime.Caller(0)

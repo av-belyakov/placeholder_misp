@@ -15,26 +15,32 @@ var _ = Describe("Esconnection", Ordered, func() {
 	var (
 		errEs  error
 		esConf elasticsearch.Config
-		es     *elasticsearch.Client
+		//es     *elasticsearch.TypedClient
+		es *elasticsearch.Client
 	)
 
 	BeforeAll(func() {
 		esConf = elasticsearch.Config{
-			Addresses: []string{"datahook.cloud.gcm"},
+			Addresses: []string{"http://es-siem-db.cloud.gcm:9200" /*"http://datahook.cloud.gcm:9200"*/},
 			Username:  "elasticsearch",
-			Password:  "1zex3TvB",
+			//Username: "elastic",
+			Password: "1zex3TvB",
+			//Password: "iG99g3lyHsazTucx8eOL",
 		}
 
+		fmt.Println(esConf)
+		//es, errEs = elasticsearch.NewTypedClient(esConf)
 		es, errEs = elasticsearch.NewClient(esConf)
 		//els, err := elasticsearch.NewTypedClient(esConf)
+
 		es.Get("thehive33", "test")
 	})
 
-	Context("Тест 1. Проверка подклюбчения к Elasticsearch", func() {
+	Context("Тест 1. Проверка подключения к Elasticsearch", func() {
 		It("Должно быть успешно установлено подключение к БД", func() {
 
 			fmt.Println("Elasticsearch client ERROR: ", errEs)
-			fmt.Println("Elasticsearch client: ")
+			fmt.Println("Elasticsearch client: ", es)
 
 			Expect(errEs).ShouldNot(HaveOccurred())
 		})

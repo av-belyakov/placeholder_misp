@@ -58,12 +58,23 @@ func HandlerMISP(
 
 			fmt.Printf("\t\t\t--=== RESEIVED DATA ===--	USER EMAIL: %s, ObjectId: %s\n", data.UserEmail, data.ObjectId)
 
-			/*
-				Получаем значение поля objectId события которое при получении
-				от MISP eventId нужно будет сохранить в через SetTemporaryCase
-				это позволит в дальнейшем проверять по objectId дублируемые события
-				(до какой то степени)
-			*/
+			//проверяем отправлялось ли недавно в MISP событие с указанным id
+			tc, ok := storageApp.GetTemporaryCase(int(data.CaseId))
+
+			fmt.Printf("\t\t\t ________________ TemporaryCase: %v ______________\n", tc)
+
+			if ok {
+				_, f, l, _ := runtime.Caller(0)
+
+				loging <- datamodels.MessageLoging{
+					MsgData: fmt.Sprintf(" 'an event with this id \"%s\" already exists in MISP' %s:%d", data.ObjectId, f, l-2),
+					MsgType: "warning",
+				}
+
+				fmt.Printf("\t\t Событие с таким id '%s' уже существует в MISP", data.ObjectId)
+
+				continue
+			}
 
 			// получаем авторизационный ключ пользователя по его email
 			if us, ok := storageApp.GetUserSettingsMISP(data.UserEmail); ok {
@@ -116,6 +127,9 @@ func HandlerMISP(
 
 				continue
 			}
+
+			//добавляем информацию о событиях недавно добавленных в MISP
+			storageApp.SetTemporaryCase(int(data.CaseId), memorytemporarystorage.SettingsInputCase{EventId: eventId})
 
 			_, _ = sendAttribytesMispFormat(conf.Host, authKey, eventId, data, loging)
 

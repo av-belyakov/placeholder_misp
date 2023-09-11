@@ -2,10 +2,11 @@ package coremodule
 
 import (
 	"fmt"
-	"placeholder_misp/datamodels"
-	"placeholder_misp/mispinteractions"
 	"runtime"
 	"strings"
+
+	"placeholder_misp/datamodels"
+	"placeholder_misp/mispinteractions"
 )
 
 type ChanInputCreateMispFormat struct {
@@ -88,6 +89,20 @@ func init() {
 	}
 }
 
+/*
+Для типов Attributes нужно сделать следующее:
+1. свойства MISP формата такие как Category и Type заполнять на основе значений
+ поля observables[*].tags из формата Hive, где из строки "misp:Network activity="email-src""
+ Network activity идет в Category, а email-src в Type, если observables[*].tags пустое,
+ то ставим "other" для Category и Type. Однако если observables[*].tags имеет
+ болше чем одно значение то тогда нужно создать то количество Attributes с одними
+ и теме же данными (поле data, время создание), но с разными Category и Type.
+2. Заменить objectId на caseId
+
+
+
+*/
+
 func NewMispFormat(
 	mispmodule *mispinteractions.ModuleMISP,
 	loging chan<- datamodels.MessageLoging) (chan ChanInputCreateMispFormat, chan bool) {
@@ -102,7 +117,9 @@ func NewMispFormat(
 	go func() {
 		var (
 			currentCount, maxCountObservables int
-			userEmail, objectId               string
+			userEmail                         string
+			//objectId               string
+			caseId float64
 		)
 		defer func() {
 			close(chanInput)
@@ -120,6 +137,28 @@ func NewMispFormat(
 		for {
 			select {
 			case tmf := <-chanInput:
+				//ищем id обрабатываемого события
+				/*if tmf.FieldBranch == "event.objectId" || tmf.FieldBranch == "event.object.id" {
+
+					fmt.Println("===================== event.objectId 1111")
+
+					if oid, ok := tmf.Value.(string); ok {
+						fmt.Println("===================== tmf.Value.(string) 222 oid = ", oid)
+
+						objectId = oid
+					}
+				}*/
+				if tmf.FieldBranch == "event.object.caseId" {
+
+					fmt.Println("===================== event.objectId 1111")
+					if cid, ok := tmf.Value.(float64); ok {
+						fmt.Println("===================== tmf.Value.(float64) 222 cid = ", cid)
+
+						caseId = cid
+					}
+				}
+
+				//проверяем есть ли путь до обрабатываемого свойства в списке обработчиков
 				lf, ok := listHandlerMisp[tmf.FieldBranch]
 				if !ok {
 					continue
@@ -140,13 +179,6 @@ func NewMispFormat(
 					}
 				}
 
-				//ищем id обрабатываемого события
-				if tmf.FieldBranch == "event.objectId" {
-					if oid, ok := tmf.Value.(string); ok {
-						objectId = oid
-					}
-				}
-
 				if strings.Contains(tmf.FieldBranch, "observables") {
 					currentCount++
 				}
@@ -164,13 +196,14 @@ func NewMispFormat(
 					_, f, l, _ := runtime.Caller(0)
 
 					loging <- datamodels.MessageLoging{
-						MsgData: fmt.Sprintf(" 'the message with %s was not sent to MISP because it does not comply with the rules' %s:%d", objectId, f, l-1),
+						MsgData: fmt.Sprintf(" 'the message with %d was not sent to MISP because it does not comply with the rules' %s:%d", int(caseId), f, l-1),
 						MsgType: "warning",
 					}
 				} else {
 					//тут отправляем сформированные по формату MISP пользовательские структуры
 					mispmodule.SendingDataInput(mispinteractions.SettingsChanInputMISP{
-						ObjectId:  objectId,
+						//ObjectId:  objectId,
+						CaseId:    caseId,
 						UserEmail: userEmail,
 						MajorData: map[string]interface{}{
 							"events":     eventsMisp,

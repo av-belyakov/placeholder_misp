@@ -14,7 +14,7 @@ type CommonStorageTemporary struct {
 }
 
 type TemporaryInputCases struct {
-	Cases map[string]SettingsInputCase
+	Cases map[int]SettingsInputCase
 	mutex sync.Mutex
 }
 

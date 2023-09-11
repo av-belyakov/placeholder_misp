@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"runtime"
 	"time"
 
@@ -29,6 +31,28 @@ var (
 	storageApp           *memorytemporarystorage.CommonStorageTemporary
 	loging               chan datamodels.MessageLoging
 )
+
+func getAppName(pf string, nl int) (string, error) {
+	var line string
+
+	f, err := os.OpenFile(pf, os.O_RDONLY, os.ModePerm)
+	if err != nil {
+		return line, err
+	}
+	defer f.Close()
+
+	num := 1
+	sc := bufio.NewScanner(f)
+	for sc.Scan() {
+		if num == nl {
+			return sc.Text(), nil
+		}
+
+		num++
+	}
+
+	return line, nil
+}
 
 func init() {
 	loging = make(chan datamodels.MessageLoging)
@@ -106,7 +130,15 @@ func init() {
 }
 
 func main() {
-	log.Println("Application 'placeholder_misp' is start")
+	var appName = "placeholder_misp"
+	if an, err := getAppName("README.md", 1); err != nil {
+		_, f, l, _ := runtime.Caller(0)
+		_ = sl.WriteLoggingData(fmt.Sprintf(" '%s' %s:%d", err, f, l-2), "warning")
+	} else {
+		appName = an
+	}
+
+	log.Printf("Application '%s' is start", appName)
 
 	//инициализация модуля для взаимодействия с NATS (Данный модуль обязателен для взаимодействия)
 	ctxNATS, ctxCloseNATS := context.WithTimeout(context.Background(), 2*time.Second)

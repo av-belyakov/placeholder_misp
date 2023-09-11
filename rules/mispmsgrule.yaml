@@ -65,7 +65,4 @@ RULES:
       - searchField: "resolutionStatus"
         searchValue: "TruePositive"
     - listAnd:
-      - searchField: "predicate"
-        searchValue: "precision"
-    - listAnd:
   PASSANY: false  

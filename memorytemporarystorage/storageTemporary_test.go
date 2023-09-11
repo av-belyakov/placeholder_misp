@@ -59,4 +59,22 @@ var _ = Describe("StorageTemporary", Ordered, func() {
 			Expect(ok).ShouldNot(Equal(BeFalse()))
 		})
 	})
+
+	Context("Тест 2. Тестируем хранилище temporaryInputCase", func() {
+		It("Должно быть успешно добавлено несколько значений", func() {
+			cst.SetTemporaryCase("~64375", memorytemporarystorage.SettingsInputCase{EventId: "4532"})
+
+			Expect(len(cst.GetListTemporaryCases())).Should(Equal(1))
+
+			cst.SetTemporaryCase("~788435", memorytemporarystorage.SettingsInputCase{EventId: "4533"})
+			cst.SetTemporaryCase("~134355", memorytemporarystorage.SettingsInputCase{EventId: "4534"})
+
+			Expect(len(cst.GetListTemporaryCases())).Should(Equal(3))
+
+			tc, ok := cst.GetTemporaryCase("~788435")
+
+			Expect(ok).Should(BeTrue())
+			Expect(tc.EventId).Should(Equal("4533"))
+		})
+	})
 })
