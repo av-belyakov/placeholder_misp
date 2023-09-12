@@ -86,6 +86,7 @@ func init() {
 		"observables._createdAt": {listAttributesMisp.SetValueTimestampAttributesMisp},
 		"observables.message":    {listAttributesMisp.SetValueCommentAttributesMisp},
 		"observables.startDate":  {listAttributesMisp.SetValueFirstSeenAttributesMisp},
+		"observables.tags":       {listAttributesMisp.HandlingValueTagsAttributesMisp},
 	}
 }
 
@@ -97,7 +98,7 @@ func init() {
  то ставим "other" для Category и Type. Однако если observables[*].tags имеет
  болше чем одно значение то тогда нужно создать то количество Attributes с одними
  и теме же данными (поле data, время создание), но с разными Category и Type.
-2. Заменить objectId на caseId
++ 2. Заменить objectId на caseId
 
 
 
@@ -168,6 +169,7 @@ func NewMispFormat(
 					isNew = false
 				}
 
+				//основной обработчик путей из tmf.FieldBranch
 				for _, f := range lf {
 					f(tmf.Value, isNew)
 				}
@@ -202,12 +204,15 @@ func NewMispFormat(
 				} else {
 					//тут отправляем сформированные по формату MISP пользовательские структуры
 					mispmodule.SendingDataInput(mispinteractions.SettingsChanInputMISP{
-						//ObjectId:  objectId,
 						CaseId:    caseId,
 						UserEmail: userEmail,
+						//AttributeTags: listAttributesMisp.GetListAttributeTags(),
 						MajorData: map[string]interface{}{
-							"events":     eventsMisp,
-							"attributes": listAttributesMisp.GetListAttributesMisp(),
+							"events": eventsMisp,
+							//"attributes": listAttributesMisp.GetListAttributesMisp(),
+							"attributes": getNewListAttributes(
+								listAttributesMisp.GetListAttributesMisp(),
+								listAttributesMisp.GetListAttributeTags()),
 						}})
 				}
 
@@ -222,4 +227,27 @@ func NewMispFormat(
 	}()
 
 	return chanInput, chanDone
+}
+
+func getNewListAttributes(al []datamodels.AttributesMispFormat, lat map[int][][2]string) []datamodels.AttributesMispFormat {
+	countAttr := len(al)
+
+	nal := make([]datamodels.AttributesMispFormat, 0, countAttr)
+
+	for k, v := range al {
+		if elem, ok := lat[k]; ok {
+			for _, value := range elem {
+				v.Category = value[0]
+				v.Type = value[1]
+
+				nal = append(nal, v)
+			}
+
+			continue
+		}
+
+		nal = append(nal, v)
+	}
+
+	return nal
 }

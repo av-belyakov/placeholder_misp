@@ -56,7 +56,7 @@ func HandlerMISP(
 		for data := range mmisp.chanInputMISP {
 			authKey := conf.Auth
 
-			fmt.Printf("\t\t\t--=== RESEIVED DATA ===--	USER EMAIL: %s, ObjectId: %s\n", data.UserEmail, data.ObjectId)
+			fmt.Printf("\t\t\t--=== RESEIVED DATA ===--	USER EMAIL: %s, ObjectId: %v\n", data.UserEmail, data.CaseId)
 
 			//проверяем отправлялось ли недавно в MISP событие с указанным id
 			tc, ok := storageApp.GetTemporaryCase(int(data.CaseId))
@@ -67,11 +67,11 @@ func HandlerMISP(
 				_, f, l, _ := runtime.Caller(0)
 
 				loging <- datamodels.MessageLoging{
-					MsgData: fmt.Sprintf(" 'an event with this id \"%s\" already exists in MISP' %s:%d", data.ObjectId, f, l-2),
+					MsgData: fmt.Sprintf(" 'an event with this id \"%v\" already exists in MISP' %s:%d", data.CaseId, f, l-2),
 					MsgType: "warning",
 				}
 
-				fmt.Printf("\t\t Событие с таким id '%s' уже существует в MISP", data.ObjectId)
+				fmt.Printf("\t\t Событие с таким id '%v' уже существует в MISP", data.CaseId)
 
 				continue
 			}
