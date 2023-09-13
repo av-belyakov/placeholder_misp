@@ -55,6 +55,7 @@ func (lamisp *ListAttributesMispFormat) SetValueObjectIdAttributesMisp(v interfa
 		lamisp.attributes = append(lamisp.attributes, createNewAttributesMisp())
 	}
 
+	//lamisp.attributes[getCountList(lamisp.GetCountListAttributesMisp())].ObjectId = fmt.Sprint(v)
 	lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].ObjectId = fmt.Sprint(v)
 }
 
@@ -66,6 +67,7 @@ func (lamisp *ListAttributesMispFormat) SetValueObjectRelationAttributesMisp(v i
 		lamisp.attributes = append(lamisp.attributes, createNewAttributesMisp())
 	}
 
+	//lamisp.attributes[getCountList(lamisp.GetCountListAttributesMisp())].ObjectRelation = fmt.Sprint(v)
 	lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].ObjectRelation = fmt.Sprint(v)
 }
 
@@ -77,6 +79,7 @@ func (lamisp *ListAttributesMispFormat) SetValueCategoryAttributesMisp(v interfa
 		lamisp.attributes = append(lamisp.attributes, createNewAttributesMisp())
 	}
 
+	//lamisp.attributes[getCountList(lamisp.GetCountListAttributesMisp())].Category = fmt.Sprint(v)
 	lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].Category = fmt.Sprint(v)
 }
 
@@ -88,6 +91,7 @@ func (lamisp *ListAttributesMispFormat) SetValueTypeAttributesMisp(v interface{}
 		lamisp.attributes = append(lamisp.attributes, createNewAttributesMisp())
 	}
 
+	//lamisp.attributes[getCountList(lamisp.GetCountListAttributesMisp())].Type = fmt.Sprint(v)
 	lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].Type = fmt.Sprint(v)
 }
 
@@ -99,6 +103,7 @@ func (lamisp *ListAttributesMispFormat) SetValueValueAttributesMisp(v interface{
 		lamisp.attributes = append(lamisp.attributes, createNewAttributesMisp())
 	}
 
+	//lamisp.attributes[getCountList(lamisp.GetCountListAttributesMisp())].Value = fmt.Sprint(v)
 	lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].Value = fmt.Sprint(v)
 }
 
@@ -110,6 +115,7 @@ func (lamisp *ListAttributesMispFormat) SetValueUuidAttributesMisp(v interface{}
 		lamisp.attributes = append(lamisp.attributes, createNewAttributesMisp())
 	}
 
+	//lamisp.attributes[getCountList(lamisp.GetCountListAttributesMisp())].Uuid = fmt.Sprint(v)
 	lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].Uuid = fmt.Sprint(v)
 }
 
@@ -122,6 +128,7 @@ func (lamisp *ListAttributesMispFormat) SetValueTimestampAttributesMisp(v interf
 	}
 
 	if dt, ok := v.(float64); ok {
+		//lamisp.attributes[getCountList(lamisp.GetCountListAttributesMisp())].Timestamp = fmt.Sprintf("%10.f", dt)[:10]
 		lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].Timestamp = fmt.Sprintf("%10.f", dt)[:10]
 	}
 }
@@ -134,6 +141,7 @@ func (lamisp *ListAttributesMispFormat) SetValueDistributionAttributesMisp(v int
 		lamisp.attributes = append(lamisp.attributes, createNewAttributesMisp())
 	}
 
+	//lamisp.attributes[getCountList(lamisp.GetCountListAttributesMisp())].Distribution = fmt.Sprint(v)
 	lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].Distribution = fmt.Sprint(v)
 }
 
@@ -145,6 +153,7 @@ func (lamisp *ListAttributesMispFormat) SetValueSharingGroupIdAttributesMisp(v i
 		lamisp.attributes = append(lamisp.attributes, createNewAttributesMisp())
 	}
 
+	//lamisp.attributes[getCountList(lamisp.GetCountListAttributesMisp())].SharingGroupId = fmt.Sprint(v)
 	lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].SharingGroupId = fmt.Sprint(v)
 }
 
@@ -156,6 +165,7 @@ func (lamisp *ListAttributesMispFormat) SetValueCommentAttributesMisp(v interfac
 		lamisp.attributes = append(lamisp.attributes, createNewAttributesMisp())
 	}
 
+	//lamisp.attributes[getCountList(lamisp.GetCountListAttributesMisp())].Comment = fmt.Sprint(v)
 	lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].Comment = fmt.Sprint(v)
 }
 
@@ -168,7 +178,7 @@ func (lamisp *ListAttributesMispFormat) SetValueFirstSeenAttributesMisp(v interf
 	}
 
 	if dt, ok := v.(float64); ok {
-		//		lamisp.attributes[lamisp.getCountListAttributesMisp()-1].FirstSeen = fmt.Sprintf("%13.f000", dt)
+		//lamisp.attributes[getCountList(lamisp.GetCountListAttributesMisp())].FirstSeen = time.UnixMilli(int64(dt)).Format(time.RFC3339)
 		lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].FirstSeen = time.UnixMilli(int64(dt)).Format(time.RFC3339)
 	}
 }
@@ -182,7 +192,7 @@ func (lamisp *ListAttributesMispFormat) SetValueLastSeenAttributesMisp(v interfa
 	}
 
 	if dt, ok := v.(float64); ok {
-		//lamisp.attributes[lamisp.getCountListAttributesMisp()-1].LastSeen = fmt.Sprintf("%13.f000", dt)
+		//lamisp.attributes[getCountList(lamisp.GetCountListAttributesMisp())].LastSeen = time.UnixMilli(int64(dt)).Format(time.RFC3339)
 		lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].LastSeen = time.UnixMilli(int64(dt)).Format(time.RFC3339)
 	}
 }
@@ -196,6 +206,7 @@ func (lamisp *ListAttributesMispFormat) SetValueToIdsAttributesMisp(v interface{
 	}
 
 	if data, ok := v.(bool); ok {
+		//lamisp.attributes[getCountList(lamisp.GetCountListAttributesMisp())].ToIds = data
 		lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].ToIds = data
 	}
 }
@@ -209,6 +220,7 @@ func (lamisp *ListAttributesMispFormat) SetValueDeletedAttributesMisp(v interfac
 	}
 
 	if data, ok := v.(bool); ok {
+		//lamisp.attributes[getCountList(lamisp.GetCountListAttributesMisp())].Deleted = data
 		lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].Deleted = data
 	}
 }
@@ -222,6 +234,7 @@ func (lamisp *ListAttributesMispFormat) SetValueDisableCorrelationAttributesMisp
 	}
 
 	if data, ok := v.(bool); ok {
+		//lamisp.attributes[getCountList(lamisp.GetCountListAttributesMisp())].DisableCorrelation = data
 		lamisp.attributes[lamisp.GetCountListAttributesMisp()-1].DisableCorrelation = data
 	}
 }
@@ -230,7 +243,7 @@ func (lamisp *ListAttributesMispFormat) HandlingValueEventIdAttributesMisp(v int
 	lamisp.mutex.Lock()
 	defer lamisp.mutex.Unlock()
 
-	if len(lamisp.attributes) < num {
+	if lamisp.GetCountListAttributesMisp() < num {
 		return
 	}
 
@@ -246,6 +259,7 @@ func (lamisp *ListAttributesMispFormat) HandlingValueTagsAttributesMisp(v interf
 	defer lamisp.mutex.Unlock()
 
 	if l, ok := v.([]string); ok {
+		//lamisp.attributeTags[getCountList(lamisp.GetCountListAttributesMisp())] = HandlingListTags(l)
 		lamisp.attributeTags[lamisp.GetCountListAttributesMisp()-1] = HandlingListTags(l)
 	}
 }
@@ -270,4 +284,12 @@ func HandlingListTags(l []string) [][2]string {
 	}
 
 	return nl
+}
+
+func getCountList(num int) int {
+	if num == 0 {
+		return 0
+	}
+
+	return num - 1
 }

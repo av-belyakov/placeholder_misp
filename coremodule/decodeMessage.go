@@ -10,7 +10,6 @@ import (
 	"placeholder_misp/datamodels"
 	"placeholder_misp/memorytemporarystorage"
 	rules "placeholder_misp/rulesinteraction"
-	"placeholder_misp/supportingfunctions"
 )
 
 func HandlerMessageFromHive(
@@ -31,13 +30,14 @@ func HandlerMessageFromHive(
 	//-------------------------------------------------------
 	//записываем в лог файл типа 'info' все кейсы приходящие от хайва
 	//
-	str, err := supportingfunctions.NewReadReflectJSONSprint(b)
-	fmt.Println(err)
+	//str, err := supportingfunctions.NewReadReflectJSONSprint(b)
+	//fmt.Println("___ func 'HandlerMessageFromHive' READ ERROR:", err)
+	//fmt.Println("___ func 'HandlerMessageFromHive' READ string:", str)
 
-	loging <- datamodels.MessageLoging{
+	/*loging <- datamodels.MessageLoging{
 		MsgData: fmt.Sprintf("---------------\nEVENTS:\n%s\n", str),
 		MsgType: "info",
-	}
+	}*/
 	//
 	//
 	//-------------------------------------------------------

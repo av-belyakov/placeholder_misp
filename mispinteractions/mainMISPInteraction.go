@@ -144,7 +144,7 @@ func HandlerMISP(
 	return &mmisp, nil
 }
 
-// NewClientMISP возвращает ытруктуру типа ClientMISP с предустановленными значениями
+// NewClientMISP возвращает структуру типа ClientMISP с предустановленными значениями
 func NewClientMISP(h, a string, v bool) (ClientMISP, error) {
 	urlBase, err := url.Parse("http://" + h)
 	if err != nil {
