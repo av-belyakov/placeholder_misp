@@ -22,6 +22,26 @@ type FieldsNameMapping struct {
 	InputFieldName, MispFieldName string
 }
 
+type storageValueName []string
+
+func NewStorageValueName() *storageValueName {
+	return &storageValueName{}
+}
+
+func (svn *storageValueName) SetValueName(value string) {
+	*svn = append(*svn, value)
+}
+
+func (svn *storageValueName) GetValueName(value string) bool {
+	for _, v := range *svn {
+		if v == value {
+			return true
+		}
+	}
+
+	return false
+}
+
 var (
 	eventsMisp         datamodels.EventsMispFormat
 	listAttributesMisp *datamodels.ListAttributesMispFormat
@@ -91,20 +111,6 @@ func init() {
 	}
 }
 
-/*
-Для типов Attributes нужно сделать следующее:
-1. свойства MISP формата такие как Category и Type заполнять на основе значений
- поля observables[*].tags из формата Hive, где из строки "misp:Network activity="email-src""
- Network activity идет в Category, а email-src в Type, если observables[*].tags пустое,
- то ставим "other" для Category и Type. Однако если observables[*].tags имеет
- болше чем одно значение то тогда нужно создать то количество Attributes с одними
- и теме же данными (поле data, время создание), но с разными Category и Type.
-+ 2. Заменить objectId на caseId
-
-
-
-*/
-
 func NewMispFormat(
 	mispmodule *mispinteractions.ModuleMISP,
 	loging chan<- datamodels.MessageLoging) (chan ChanInputCreateMispFormat, chan bool) {
@@ -118,15 +124,17 @@ func NewMispFormat(
 
 	go func() {
 		var (
-			currentCount, maxCountObservables, seqNum int
-			userEmail, observableId                   string
-			//objectId               string
-			caseId float64
+			/*currentCount,*/ maxCountObservables, seqNum int
+			userEmail, observableId                       string
+			caseId                                        float64
+			svn                                           *storageValueName
 		)
 		defer func() {
 			close(chanInput)
 			close(chanDone)
 		}()
+
+		svn = NewStorageValueName()
 
 		for key := range listHandlerMisp {
 			if strings.Contains(key, "observables") {
@@ -140,25 +148,30 @@ func NewMispFormat(
 		for {
 			select {
 			case tmf := <-chanInput:
+				//ищем id события
 				if tmf.FieldBranch == "event.object.caseId" {
 					if cid, ok := tmf.Value.(float64); ok {
 						caseId = cid
 					}
 				}
 
-				if tmf.FieldBranch == "observables._id" {
-					if id, ok := tmf.Value.(string); ok {
-						if observableId == "" {
-							observableId = id
-						}
-
-						if observableId != id {
-							seqNum++
-							fmt.Printf(":::::::: observableId '%s' == '%s' id, NUM: %d\n", observableId, id, seqNum)
-
-							observableId = id
-						}
+				// ищем email владельца события
+				if tmf.FieldBranch == "event.object.owner" {
+					if email, ok := tmf.Value.(string); ok {
+						userEmail = email
 					}
+				}
+
+				if strings.Contains(tmf.FieldBranch, "observables") {
+					if svn.GetValueName(tmf.FieldName) {
+						seqNum++
+						fmt.Printf(":_:_:_:_:_:_:_: observableId '%s', NUM: %d, field name: '%s'\n", observableId, seqNum, tmf.FieldName)
+
+						svn = NewStorageValueName()
+						isNew = true
+					}
+
+					svn.SetValueName(tmf.FieldName)
 				}
 
 				//обрабатываем свойство observables.tags
@@ -177,37 +190,33 @@ func NewMispFormat(
 
 				//проверяем есть ли путь до обрабатываемого свойства в списке обработчиков
 				lf, ok := listHandlerMisp[tmf.FieldBranch]
-				if !ok {
-					continue
-				}
-
-				if currentCount > 0 {
-					isNew = false
-				}
-
-				//основной обработчик путей из tmf.FieldBranch
-				for _, f := range lf {
-					f(tmf.Value, isNew)
-				}
-
-				// ищем email владельца события
-				if tmf.FieldBranch == "event.object.owner" {
-					if email, ok := tmf.Value.(string); ok {
-						userEmail = email
+				if ok {
+					//основной обработчик путей из tmf.FieldBranch
+					for _, f := range lf {
+						f(tmf.Value, isNew)
 					}
 				}
 
+				/*if currentCount > 0 {
+					isNew = false
+				}*/
+
 				if strings.Contains(tmf.FieldBranch, "observables") {
-					currentCount++
+					isNew = false
 				}
 
-				if currentCount == maxCountObservables {
-					currentCount = 0
+				/*
+					if strings.Contains(tmf.FieldBranch, "observables") {
+						currentCount++
+					}
 
-					fmt.Println("+++++++++++++++___________________")
+					if currentCount == maxCountObservables {
+						currentCount = 0
 
-					isNew = true
-				}
+						fmt.Println("+++++++++++++++___________________")
+
+						isNew = true
+					}*/
 
 			case isAllowed := <-chanDone:
 
@@ -223,8 +232,7 @@ func NewMispFormat(
 				} else {
 					attr := getNewListAttributes(
 						listAttributesMisp.GetListAttributesMisp(),
-						listTags,
-						/*listAttributesMisp.GetListAttributeTags()*/)
+						listTags)
 
 					fmt.Println("----------- NEW ATTRIBUTES -----------")
 					for k, v := range attr {
@@ -259,15 +267,16 @@ func NewMispFormat(
 }
 
 func getNewListAttributes(al []datamodels.AttributesMispFormat, lat map[int][2]string) []datamodels.AttributesMispFormat {
-	countAttr := len(al)
+	nal := make([]datamodels.AttributesMispFormat, 0, len(al))
 
-	nal := make([]datamodels.AttributesMispFormat, 0, countAttr)
+	fmt.Println("func 'getNewListAttributes', []datamodels.AttributesMispFormat = ", al)
 
 	for k, v := range al {
+		//fmt.Println("func 'getNewListAttributes', Data = ", v.Value)
+
 		if elem, ok := lat[k]; ok {
 			v.Category = elem[0]
 			v.Type = elem[1]
-
 			nal = append(nal, v)
 
 			continue
@@ -279,31 +288,6 @@ func getNewListAttributes(al []datamodels.AttributesMispFormat, lat map[int][2]s
 	return nal
 }
 
-/*func getNewListAttributes(al []datamodels.AttributesMispFormat, lat map[int][][2]string) []datamodels.AttributesMispFormat {
-	countAttr := len(al)
-
-	nal := make([]datamodels.AttributesMispFormat, 0, countAttr)
-
-	for k, v := range al {
-		if elem, ok := lat[k]; ok {
-			for _, value := range elem {
-				v.Category = value[0]
-				v.Type = value[1]
-
-				nal = append(nal, v)
-			}
-
-			continue
-		}
-
-		nal = append(nal, v)
-	}
-
-	fmt.Println("________ ___________ func 'getNewListAttributes', NEW LIST ATTRIBUTES = ", nal)
-
-	return nal
-}*/
-
 func HandlingListTags(tag string) ([2]string, error) {
 	nl := [2]string{}
 	patter := regexp.MustCompile(`^misp:([\w\-].*)=\"([\w\-].*)\"$`)
@@ -314,29 +298,9 @@ func HandlingListTags(tag string) ([2]string, error) {
 
 	result := patter.FindAllStringSubmatch(tag, -1)
 
-	fmt.Println("func 'HandlingListTags', ======= RESULT REGEXP = ", result)
-
 	if len(result) > 0 && len(result[0]) == 3 {
 		nl = [2]string{result[0][1], result[0][2]}
 	}
 
 	return nl, nil
 }
-
-/*func HandlingListTags(l []string) [][2]string {
-	nl := make([][2]string, 0, len(l))
-	patter := regexp.MustCompile(`^misp:([\w\-].*)=\"([\w\-].*)\"$`)
-
-	for _, v := range l {
-		if !patter.MatchString(v) {
-			continue
-		}
-
-		result := patter.FindAllStringSubmatch(v, -1)
-		if len(result) > 0 && len(result[0]) == 3 {
-			nl = append(nl, [2]string{result[0][1], result[0][2]})
-		}
-	}
-
-	return nl
-}*/

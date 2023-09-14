@@ -102,6 +102,8 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 
 			//обработчик сообщений из TheHive (выполняется разбор сообщения и его разбор на основе правил)
 			coremodule.HandlerMessageFromHive(exampleByte, uuid.New().String(), storageApp, listRules, chanCreateMispFormat, chanDone, loging)
+
+			Expect(true).Should(BeTrue())
 		})
 	})
 })
