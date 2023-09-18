@@ -106,7 +106,7 @@ var _ = Describe("Requestapimisp", Ordered, func() {
 				fmt.Printf("%d. userEmail:%s\n", k, v.User.Email)
 			}
 
-			Expect(len(usmispf)).Should(Equal(78))
+			Expect(len(usmispf)).Should(Equal(83))
 		})
 
 		It("После заполнения временного хранилища должен быть найден пользователь по его email", func() {

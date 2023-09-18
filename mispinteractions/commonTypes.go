@@ -9,13 +9,15 @@ type ModuleMISP struct {
 }
 
 type SettingsChanInputMISP struct {
+	Command   string
 	CaseId    float64
+	EventId   string
 	UserEmail string
 	MajorData map[string]interface{}
 }
 
 type SettingChanOutputMISP struct {
-	Command, EventId string
+	Command, CaseId, EventId string
 }
 
 func (mmisp ModuleMISP) GetDataReceptionChannel() <-chan SettingChanOutputMISP {

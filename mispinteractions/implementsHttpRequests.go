@@ -19,6 +19,11 @@ func (client *ClientMISP) Post(path string, data []byte) (*http.Response, []byte
 	return client.Do("POST", path, data)
 }
 
+// Delete это обертка для функции Do()
+func (client *ClientMISP) Delete(path string) (*http.Response, []byte, error) {
+	return client.Do("DELETE", path, []byte{})
+}
+
 // Do выполняет запрос к API MISP и возвращает заголовок ответа и и тело ответа в виде среза байт
 func (client *ClientMISP) Do(method, path string, data []byte) (*http.Response, []byte, error) {
 	dataLen := 0

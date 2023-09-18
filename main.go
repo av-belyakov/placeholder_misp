@@ -19,6 +19,7 @@ import (
 	"placeholder_misp/mispinteractions"
 	"placeholder_misp/natsinteractions"
 	"placeholder_misp/nkckiinteractions"
+	"placeholder_misp/redisinteractions"
 	rules "placeholder_misp/rulesinteraction"
 )
 
@@ -130,6 +131,12 @@ func init() {
 }
 
 func main() {
+	defer func() {
+		if err := recover(); err != nil {
+			_ = sl.WriteLoggingData(fmt.Sprintf("stop 'main' function, %v", err), "error")
+		}
+	}()
+
 	var appName = "placeholder_misp"
 	if an, err := getAppName("README.md", 1); err != nil {
 		_, f, l, _ := runtime.Caller(0)
@@ -150,6 +157,11 @@ func main() {
 
 		log.Fatal(err)
 	}
+
+	// инициализация модуля для взаимодействия с СУБД Redis
+	ctxRedis, ctxCloseRedis := context.WithTimeout(context.Background(), 2*time.Second)
+	defer ctxCloseRedis()
+	redisModule := redisinteractions.HandlerRedis(ctxRedis, confApp.AppConfigRedis, storageApp, loging)
 
 	//инициалиация модуля для взаимодействия с MISP
 	ctxMISP, ctxCloseMISP := context.WithTimeout(context.Background(), 2*time.Second)
@@ -174,7 +186,8 @@ func main() {
 	defer ctxCloseNKCKI()
 	nkckiModule, err := nkckiinteractions.NewClientNKCKI(ctxNKCKI, confApp.AppConfigNKCKI, loging)
 	if err != nil {
-		_ = sl.WriteLoggingData(fmt.Sprintln(err), "error")
+		_, f, l, _ := runtime.Caller(0)
+		_ = sl.WriteLoggingData(fmt.Sprintf(" '%s' %s:%d", err, f, l-2), "error")
 	}
 
 	go func() {
@@ -190,5 +203,5 @@ func main() {
 
 	_ = sl.WriteLoggingData("application 'placeholder_misp' is started", "info")
 
-	coremodule.CoreHandler(natsModule, mispModule, esModule, nkckiModule, listRulesProcMISPMsg, storageApp, loging)
+	coremodule.CoreHandler(natsModule, mispModule, redisModule, esModule, nkckiModule, listRulesProcMISPMsg, storageApp, loging)
 }

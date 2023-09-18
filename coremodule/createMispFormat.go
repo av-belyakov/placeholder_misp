@@ -55,7 +55,7 @@ var (
 	//feedsMisp          datamodels.FeedsMispFormat
 	//tagsMisp           datamodels.TagsMispFormat
 
-	listHandlerMisp map[string][]func(interface{}, bool)
+	listHandlerMisp map[string][]func(interface{}, int)
 )
 
 func init() {
@@ -91,7 +91,7 @@ func init() {
 		Inherited:      1,
 	}*/
 
-	listHandlerMisp = map[string][]func(interface{}, bool){
+	listHandlerMisp = map[string][]func(interface{}, int){
 		//events
 		"event.object.title":     {eventsMisp.SetValueInfoEventsMisp},
 		"event.object.startDate": {eventsMisp.SetValueTimestampEventsMisp},
@@ -120,14 +120,12 @@ func NewMispFormat(
 	//останавливает обработчик канала chanInput (при завершении декодировании сообщения)
 	chanDone := make(chan bool)
 
-	fmt.Printf("\n\n\tfunc 'NewMispFormat', START...")
-
 	go func() {
 		var (
-			/*currentCount,*/ maxCountObservables, seqNum int
-			userEmail, observableId                       string
-			caseId                                        float64
-			svn                                           *storageValueName
+			maxCountObservables, seqNum int
+			userEmail                   string
+			caseId                      float64
+			svn                         *storageValueName
 		)
 		defer func() {
 			close(chanInput)
@@ -142,7 +140,6 @@ func NewMispFormat(
 			}
 		}
 
-		isNew := true
 		listTags := make(map[int][2]string)
 
 		for {
@@ -165,10 +162,7 @@ func NewMispFormat(
 				if strings.Contains(tmf.FieldBranch, "observables") {
 					if svn.GetValueName(tmf.FieldName) {
 						seqNum++
-						fmt.Printf(":_:_:_:_:_:_:_: observableId '%s', NUM: %d, field name: '%s'\n", observableId, seqNum, tmf.FieldName)
-
 						svn = NewStorageValueName()
-						isNew = true
 					}
 
 					svn.SetValueName(tmf.FieldName)
@@ -176,14 +170,10 @@ func NewMispFormat(
 
 				//обрабатываем свойство observables.tags
 				if tmf.FieldBranch == "observables.tags" {
-					fmt.Println("========== func 'NewMispFormat' =========== observables.tags, tags:", tmf.Value)
-
 					if tag, ok := tmf.Value.(string); ok {
 						result, err := HandlingListTags(tag)
 						if err == nil {
 							listTags[seqNum] = result
-
-							fmt.Printf("|||||| %d. add new tag: '%s'\n", seqNum, result)
 						}
 					}
 				}
@@ -193,34 +183,13 @@ func NewMispFormat(
 				if ok {
 					//основной обработчик путей из tmf.FieldBranch
 					for _, f := range lf {
-						f(tmf.Value, isNew)
+						f(tmf.Value, seqNum)
 					}
 				}
-
-				/*if currentCount > 0 {
-					isNew = false
-				}*/
-
-				if strings.Contains(tmf.FieldBranch, "observables") {
-					isNew = false
-				}
-
-				/*
-					if strings.Contains(tmf.FieldBranch, "observables") {
-						currentCount++
-					}
-
-					if currentCount == maxCountObservables {
-						currentCount = 0
-
-						fmt.Println("+++++++++++++++___________________")
-
-						isNew = true
-					}*/
 
 			case isAllowed := <-chanDone:
 
-				fmt.Printf("\n\tfunc 'NewMispFormat', RESEIVED chanDone, eventsMisp: %v, isAllowed: %v\nLIST TAGS: '%v'\n", eventsMisp, isAllowed, listTags)
+				//				fmt.Printf("\n\tfunc 'NewMispFormat', RESEIVED chanDone, eventsMisp: %v, isAllowed: %v\nLIST TAGS: '%v'\n", eventsMisp, isAllowed, listTags)
 
 				if !isAllowed {
 					_, f, l, _ := runtime.Caller(0)
@@ -230,26 +199,16 @@ func NewMispFormat(
 						MsgType: "warning",
 					}
 				} else {
-					attr := getNewListAttributes(
-						listAttributesMisp.GetListAttributesMisp(),
-						listTags)
-
-					fmt.Println("----------- NEW ATTRIBUTES -----------")
-					for k, v := range attr {
-						fmt.Printf("%d. \n\tData: '%s'\n\tCategory: '%s'\n\tType: '%s'\n", k, v.Value, v.Category, v.Type)
-					}
-
-					//fmt.Printf("\n\tfunc 'NewMispFormat', NEW ATTRIBUTESSSSSSSS: %v\n", attr)
-
 					//тут отправляем сформированные по формату MISP пользовательские структуры
 					mispmodule.SendingDataInput(mispinteractions.SettingsChanInputMISP{
+						Command:   "add event",
 						CaseId:    caseId,
 						UserEmail: userEmail,
-						//AttributeTags: listAttributesMisp.GetListAttributeTags(),
 						MajorData: map[string]interface{}{
 							"events": eventsMisp,
-							//"attributes": listAttributesMisp.GetListAttributesMisp(),
-							"attributes": attr,
+							"attributes": getNewListAttributes(
+								listAttributesMisp.GetListAttributesMisp(),
+								listTags),
 						}})
 				}
 
@@ -266,14 +225,10 @@ func NewMispFormat(
 	return chanInput, chanDone
 }
 
-func getNewListAttributes(al []datamodels.AttributesMispFormat, lat map[int][2]string) []datamodels.AttributesMispFormat {
+func getNewListAttributes(al map[int]datamodels.AttributesMispFormat, lat map[int][2]string) []datamodels.AttributesMispFormat {
 	nal := make([]datamodels.AttributesMispFormat, 0, len(al))
 
-	fmt.Println("func 'getNewListAttributes', []datamodels.AttributesMispFormat = ", al)
-
 	for k, v := range al {
-		//fmt.Println("func 'getNewListAttributes', Data = ", v.Value)
-
 		if elem, ok := lat[k]; ok {
 			v.Category = elem[0]
 			v.Type = elem[1]

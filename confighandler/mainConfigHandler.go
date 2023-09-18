@@ -16,6 +16,7 @@ type ConfigApp struct {
 	CommonAppConfig
 	AppConfigNATS
 	AppConfigMISP
+	AppConfigRedis
 	AppConfigElasticSearch
 	AppConfigNKCKI
 	RulesProcMSGMISP
@@ -47,6 +48,11 @@ type AppConfigMISP struct {
 	Auth string
 }
 
+type AppConfigRedis struct {
+	Host string
+	Port int
+}
+
 type AppConfigElasticSearch struct {
 	Host     string
 	Port     int
@@ -75,6 +81,8 @@ func NewConfig() (ConfigApp, error) {
 		"GO_PHMISP_MAUTH":      "",
 		"GO_PHMISP_NHOST":      "",
 		"GO_PHMISP_NPORT":      "",
+		"GO_PHMISP_REDISHOST":  "",
+		"GO_PHMISP_REDISPORT":  "",
 		"GO_PHMISP_ESHOST":     "",
 		"GO_PHMISP_ESPORT":     "",
 		"GO_PHMISP_ESPREFIX":   "",
@@ -140,6 +148,14 @@ func NewConfig() (ConfigApp, error) {
 		}
 		if viper.IsSet("MISP.auth") {
 			conf.AppConfigMISP.Auth = viper.GetString("MISP.auth")
+		}
+
+		//Настройки для модуля подключения к СУБД Redis
+		if viper.IsSet("REDIS.host") {
+			conf.AppConfigRedis.Host = viper.GetString("REDIS.host")
+		}
+		if viper.IsSet("REDIS.port") {
+			conf.AppConfigRedis.Port = viper.GetInt("REDIS.port")
 		}
 
 		// Настройки для модуля подключения к ElasticSearch
@@ -250,6 +266,16 @@ func NewConfig() (ConfigApp, error) {
 		conf.AppConfigMISP.Auth = envList["GO_PHMISP_MAUTH"]
 	}
 
+	//Настройки для модуля подключения к СУБД Redis
+	if envList["GO_PHMISP_REDISHOST"] != "" {
+		conf.AppConfigRedis.Host = envList["GO_PHMISP_REDISHOST"]
+	}
+	if envList["GO_PHMISP_REDISPORT"] != "" {
+		if p, err := strconv.Atoi(envList["GO_PHMISP_REDISPORT"]); err == nil {
+			conf.AppConfigRedis.Port = p
+		}
+	}
+
 	//Настройки для модуля подключения к ElasticSearch
 	if envList["GO_PHMISP_ESHOST"] != "" {
 		conf.AppConfigElasticSearch.Host = envList["GO_PHMISP_ESHOST"]
@@ -301,6 +327,10 @@ func NewConfig() (ConfigApp, error) {
 
 func (conf *ConfigApp) GetCommonApp() *CommonAppConfig {
 	return &conf.CommonAppConfig
+}
+
+func (conf *ConfigApp) GetAppRedis() *AppConfigRedis {
+	return &conf.AppConfigRedis
 }
 
 func (conf *ConfigApp) GetAppNATS() *AppConfigNATS {

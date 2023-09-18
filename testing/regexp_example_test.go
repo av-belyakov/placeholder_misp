@@ -36,8 +36,8 @@ var _ = Describe("RegexpExample", Ordered, func() {
 
 	BeforeAll(func() {
 		listAttributes = datamodels.NewListAttributesMispFormat()
-		listAttributes.SetValueValueAttributesMisp("test value 1", true)
-		listAttributes.SetValueValueAttributesMisp("test value 2", true)
+		listAttributes.SetValueValueAttributesMisp("test value 1", 0)
+		listAttributes.SetValueValueAttributesMisp("test value 2", 1)
 		listAttributes.HandlingValueEventIdAttributesMisp(88545, 1)
 	})
 
@@ -76,14 +76,10 @@ var _ = Describe("RegexpExample", Ordered, func() {
 
 			Expect(listAttributes.GetCountListAttributesMisp()).Should(Equal(2))
 
-			listAttributes.SetValueValueAttributesMisp("test value 3", true)
-			listAttributes.SetValueCommentAttributesMisp("yytttttt", false)
-			listAttributes.SetValueValueAttributesMisp("test value 4", true)
+			listAttributes.SetValueValueAttributesMisp("test value 3", 2)
+			listAttributes.SetValueCommentAttributesMisp("yytttttt", 2)
+			listAttributes.SetValueValueAttributesMisp("test value 4", 3)
 			listAttributes.HandlingValueEventIdAttributesMisp(1234, 4)
-			listAttributes.HandlingValueTagsAttributesMisp([]string{
-				"misp:Person=\"target-email\"",
-				"misp:Antivirus detection=\"uri\"",
-			}, false)
 
 			Expect(listAttributes.GetCountListAttributesMisp()).Should(Equal(4))
 

@@ -2,6 +2,7 @@ package coremodule
 
 import (
 	"fmt"
+	"runtime"
 
 	"placeholder_misp/datamodels"
 	"placeholder_misp/elasticsearchinteractions"
@@ -9,6 +10,7 @@ import (
 	"placeholder_misp/mispinteractions"
 	"placeholder_misp/natsinteractions"
 	"placeholder_misp/nkckiinteractions"
+	"placeholder_misp/redisinteractions"
 	rules "placeholder_misp/rulesinteraction"
 
 	"github.com/google/uuid"
@@ -17,6 +19,7 @@ import (
 func CoreHandler(
 	natsmodule *natsinteractions.ModuleNATS,
 	mispmodule *mispinteractions.ModuleMISP,
+	redismodule *redisinteractions.ModuleRedis,
 	esmodule *elasticsearchinteractions.ModuleElasticSearch,
 	nkckimodule *nkckiinteractions.ModuleNKCKI,
 	listRule rules.ListRulesProcessingMsgMISP,
@@ -25,6 +28,7 @@ func CoreHandler(
 
 	natsChanReception := natsmodule.GetDataReceptionChannel()
 	mispChanReception := mispmodule.GetDataReceptionChannel()
+	redisChanReception := redismodule.GetDataReceptionChannel()
 
 	for {
 		select {
@@ -49,12 +53,45 @@ func CoreHandler(
 		case data := <-mispChanReception:
 			fmt.Println("func 'NewCore', MISP reseived message from chanOutMISP: ", data)
 
-			if data.Command == "send eventId" {
+			switch data.Command {
+			case "send eventId":
 				fmt.Println("func 'NewCore', надо отправить инфу в NATS")
 
+				//отправка eventId в NATS
 				natsmodule.SendingDataInput(natsinteractions.SettingsInputChan{
 					Command: data.Command,
 					EventId: data.EventId,
+				})
+
+			case "set new event id":
+				//обработка запроса на добавления новой связки caseId:eventId в Redis
+				redismodule.SendingDataInput(redisinteractions.SettingsChanInputRedis{
+					Command: "set caseId",
+					Data:    fmt.Sprintf("%s:%s", data.CaseId, data.EventId),
+				})
+			}
+
+		case data := <-redisChanReception:
+			fmt.Println("RESEIVED DATA FROM REDIS: ", data)
+
+			switch data.CommandResult {
+			case "found eventId":
+				// Здесь, получаем eventId из Redis для удаления события в MISP
+				eventId, ok := data.Result.(string)
+				if !ok {
+					_, f, l, _ := runtime.Caller(0)
+
+					loging <- datamodels.MessageLoging{
+						MsgData: fmt.Sprintf(" 'it is not possible to convert a value to a string' %s:%d", f, l-1),
+						MsgType: "warning",
+					}
+
+					break
+				}
+
+				mispmodule.SendingDataInput(mispinteractions.SettingsChanInputMISP{
+					Command: "del event by id",
+					EventId: eventId,
 				})
 			}
 		}

@@ -1,3 +1,4 @@
 LOGGING: 
-  - { msgTypeName: "error", writingFile: true, pathDirectory: "logs", writingStdout: false, maxFileSize: 1024 }
-  - { msgTypeName: "info", writingFile: true, pathDirectory: "logs", writingStdout: true, maxFileSize: 1024 }
+  - { msgTypeName: "error", writingFile: true, pathDirectory: "logs", writingStdout: false, maxFileSize: 10000 }
+  - { msgTypeName: "warning", writingFile: true, pathDirectory: "logs", writingStdout: false, maxFileSize: 10000 }
+  - { msgTypeName: "info", writingFile: true, pathDirectory: "logs", writingStdout: true, maxFileSize: 10000 }

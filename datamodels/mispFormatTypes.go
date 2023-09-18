@@ -26,9 +26,9 @@ type EventsMispFormat struct {
 }
 
 type ListAttributesMispFormat struct {
-	attributes    []AttributesMispFormat
-	attributeTags map[int][][2]string
-	mutex         sync.Mutex
+	//attributes    []AttributesMispFormat
+	attributes map[int]AttributesMispFormat
+	mutex      sync.Mutex
 }
 
 // описание формата MISP типа Attributes для загрузки в API MISP

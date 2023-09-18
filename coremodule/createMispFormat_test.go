@@ -3,6 +3,7 @@ package coremodule_test
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -161,9 +162,9 @@ var _ = Describe("CreateMispFormat", Ordered, func() {
 			storageApp.SetRawDataHiveFormatMessage(uuidTask, exampleByte)
 
 			//формирование итоговых документов в формате MISP
-			chanCreateMispFormat, chanDone := coremodule.NewMispFormat(uuidTask, moduleMisp, loging)
+			chanCreateMispFormat, chanDone := coremodule.NewMispFormat(moduleMisp, loging)
 
-			go coremodule.HandlerMessageFromHive(uuidTask, storageApp, listRule, chanCreateMispFormat, chanDone, loging)
+			go coremodule.HandlerMessageFromHive(exampleByte, uuidTask, storageApp, listRule, chanCreateMispFormat, chanDone, loging)
 
 			go func() {
 				for {
@@ -183,6 +184,15 @@ var _ = Describe("CreateMispFormat", Ordered, func() {
 
 			Expect(true).Should(BeTrue())
 		}, SpecTimeout(time.Second*15))
+	})
+
+	Context("Тест 3. Тестируем удаление выбранных событий", func() {
+		It("Выбранное событие должно быть успешно удалено", func() {
+			res, err := mispinteractions.DelEventsMispFormat("misp-world.cloud.gcm", "TvHkjH8jVQEIdvAxjxnL4H6wDoKyV7jobDjndvAo", "6029")
+
+			Expect(err).ShouldNot(HaveOccurred())
+			Expect(res.StatusCode).Should(Equal(http.StatusOK))
+		})
 	})
 
 	/*Context("Тест 2. Проверяем правельность обработки правил для формирования MISP форматов", func() {
