@@ -191,13 +191,7 @@ func main() {
 		}
 	}()
 
-	ok := sl.WriteLoggingData("application 'placeholder_misp' is started", "info")
-
-	fmt.Printf("\tWriteLoggingData = '%v'\n", ok)
-
-	if !ok {
-		fmt.Println("Log file is not write:::::::")
-	}
+	_ = sl.WriteLoggingData("application '"+appName+"' is started", "info")
 
 	coremodule.CoreHandler(natsModule, mispModule, redisModule, esModule, nkckiModule, listRulesProcMISPMsg, storageApp, loging)
 }
