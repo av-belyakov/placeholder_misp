@@ -2,11 +2,9 @@ package testaddnewelements_test
 
 import (
 	"bufio"
-	"context"
 	"fmt"
 	"os"
 	"path"
-	"time"
 
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
@@ -74,9 +72,7 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		exampleByte, errReadFile = readFileJson("natsinteractions/test_json", "example_3.json")
 
 		//инициалиация модуля для взаимодействия с MISP
-		ctxMISP, ctxCloseMISP := context.WithTimeout(context.Background(), 2*time.Second)
-		defer ctxCloseMISP()
-		mispModule, errMisp = mispinteractions.HandlerMISP(ctxMISP, confApp.AppConfigMISP, storageApp, loging)
+		mispModule, errMisp = mispinteractions.HandlerMISP(confApp.AppConfigMISP, storageApp, loging)
 
 		//формирование итоговых документов в формате MISP
 		chanCreateMispFormat, chanDone = coremodule.NewMispFormat(mispModule, loging)

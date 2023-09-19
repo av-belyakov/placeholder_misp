@@ -1,7 +1,6 @@
 package coremodule_test
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -114,8 +113,7 @@ var _ = Describe("CreateMispFormat", Ordered, func() {
 		storageApp = memorytemporarystorage.NewTemporaryStorage()
 
 		//инициализация модуля для взаимодействия с MISP
-		ctxMISP, _ := context.WithTimeout(context.Background(), 2*time.Second)
-		moduleMisp, errHMisp = mispinteractions.HandlerMISP(ctxMISP, *ca.GetAppMISP(), storageApp, loging)
+		moduleMisp, errHMisp = mispinteractions.HandlerMISP(*ca.GetAppMISP(), storageApp, loging)
 
 		mispOutput = moduleMisp.GetDataReceptionChannel()
 	})

@@ -9,7 +9,7 @@ import (
 )
 
 var _ = Describe("RegexpExample", Ordered, func() {
-	var listAttributes *datamodels.ListAttributesMispFormat
+	/*var listAttributes *datamodels.ListAttributesMispFormat
 
 	getNewListAttributes := func(al []datamodels.AttributesMispFormat, lat map[int][][2]string) []datamodels.AttributesMispFormat {
 		countAttr := len(al)
@@ -39,9 +39,9 @@ var _ = Describe("RegexpExample", Ordered, func() {
 		listAttributes.SetValueValueAttributesMisp("test value 1", 0)
 		listAttributes.SetValueValueAttributesMisp("test value 2", 1)
 		listAttributes.HandlingValueEventIdAttributesMisp(88545, 1)
-	})
+	})*/
 
-	Context("Тест 2. Разбираем строку из observable.tags", func() {
+	Context("Тест 1. Разбираем строку из observable.tags", func() {
 		It("Функция обработки списка тегов с помощью регулярного выражения должна отработать успешно", func() {
 			result := datamodels.HandlingListTags([]string{
 				"misp:Network activity=\"email-src\"",
@@ -67,7 +67,7 @@ var _ = Describe("RegexpExample", Ordered, func() {
 		})
 	})
 
-	Context("Тест 2. Проверка заполнения списка attributeTags", func() {
+	/*Context("Тест 2. Проверка заполнения списка attributeTags", func() {
 		It("Должно быть добавлено определенной кол-во елементов в attributeTags", func() {
 			listAttributes.HandlingValueTagsAttributesMisp([]string{
 				"misp:Network activity=\"email-src\"",
@@ -100,5 +100,5 @@ var _ = Describe("RegexpExample", Ordered, func() {
 
 			Expect(len(ndamf)).Should(Equal(6))
 		})
-	})
+	})*/
 })

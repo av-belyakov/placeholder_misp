@@ -54,11 +54,14 @@ func getAppName(pf string, nl int) (string, error) {
 	return line, nil
 }
 
-func init() {
-	loging = make(chan datamodels.MessageLoging)
+func getLoggerSettings(cls []confighandler.LogSet) []simplelogger.MessageTypeSettings {
+	loggerConf := make([]simplelogger.MessageTypeSettings, 0, len(cls))
 
-	//инициализируем модуль логирования
-	sl, err = simplelogger.NewSimpleLogger("placeholder_misp", []simplelogger.MessageTypeSettings{
+	return loggerConf
+}
+
+/*
+[]simplelogger.MessageTypeSettings{
 		{
 			MsgTypeName:   "error",
 			WritingFile:   true,
@@ -80,19 +83,23 @@ func init() {
 			WritingStdout: true,
 			MaxFileSize:   1024,
 		},
-	})
-	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		log.Fatalf("error module 'simplelogger': %v %s:%d\n", err, f, l+18)
 	}
+*/
+
+func init() {
+	loging = make(chan datamodels.MessageLoging)
 
 	//инициализируем модуль чтения конфигурационного файла
 	confApp, err = confighandler.NewConfig()
 	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		_ = sl.WriteLoggingData(fmt.Sprintf("%v %s:%d", err, f, l-2), "error")
-
 		log.Fatalf("error module 'confighandler': %v\n", err)
+	}
+
+	//инициализируем модуль логирования
+	sl, err = simplelogger.NewSimpleLogger("placeholder_misp", getLoggerSettings(confApp.GetListLogs()))
+	if err != nil {
+		_, f, l, _ := runtime.Caller(0)
+		log.Fatalf("error module 'simplelogger': %v %s:%d\n", err, f, l+18)
 	}
 
 	//инициализируем модуль чтения правил обработки MISP сообщений
@@ -191,13 +198,7 @@ func main() {
 		}
 	}()
 
-	ok := sl.WriteLoggingData("application 'placeholder_misp' is started", "info")
-
-	fmt.Printf("\tWriteLoggingData = '%v'\n", ok)
-
-	if !ok {
-		fmt.Println("Log file is not write:::::::")
-	}
+	_ = sl.WriteLoggingData("application '"+appName+"' is started", "info")
 
 	coremodule.CoreHandler(natsModule, mispModule, redisModule, esModule, nkckiModule, listRulesProcMISPMsg, storageApp, loging)
 }
