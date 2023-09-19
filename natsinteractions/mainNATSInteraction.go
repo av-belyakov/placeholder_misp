@@ -1,7 +1,6 @@
 package natsinteractions
 
 import (
-	"context"
 	"fmt"
 	"runtime"
 
@@ -20,7 +19,6 @@ func init() {
 }
 
 func NewClientNATS(
-	ctx context.Context,
 	conf confighandler.AppConfigNATS,
 	storageApp *memorytemporarystorage.CommonStorageTemporary,
 	loging chan<- datamodels.MessageLoging) (*ModuleNATS, error) {
@@ -28,7 +26,7 @@ func NewClientNATS(
 	nc, err := nats.Connect(fmt.Sprintf("%s:%d", conf.Host, conf.Port))
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
-		return &mnats, fmt.Errorf(" '%s' %s:%d", err.Error(), f, l-2)
+		return &mnats, fmt.Errorf("'%s' %s:%d", err.Error(), f, l-2)
 	}
 
 	// обработка данных приходящих в модуль от ядра приложения

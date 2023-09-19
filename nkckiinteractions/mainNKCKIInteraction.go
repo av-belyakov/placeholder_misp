@@ -1,7 +1,6 @@
 package nkckiinteractions
 
 import (
-	"context"
 	"fmt"
 
 	"placeholder_misp/confighandler"
@@ -28,7 +27,6 @@ func init() {
 }
 
 func NewClientNKCKI(
-	ctx context.Context,
 	conf confighandler.AppConfigNKCKI,
 	chanLog chan<- datamodels.MessageLoging) (*ModuleNKCKI, error) {
 	fmt.Println("func 'NewClientNKCKI', START...")

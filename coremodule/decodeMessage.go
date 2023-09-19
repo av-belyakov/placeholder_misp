@@ -46,7 +46,7 @@ func HandlerMessageFromHive(
 		_, f, l, _ := runtime.Caller(0)
 
 		loging <- datamodels.MessageLoging{
-			MsgData: fmt.Sprintf(" '%s' %s:%d", err.Error(), f, l-2),
+			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-1),
 			MsgType: "error",
 		}
 
@@ -57,7 +57,7 @@ func HandlerMessageFromHive(
 		_, f, l, _ := runtime.Caller(0)
 
 		loging <- datamodels.MessageLoging{
-			MsgData: fmt.Sprintf(" '%s' %s:%d", fmt.Errorf("error decoding the json message, it may be empty"), f, l-2),
+			MsgData: fmt.Sprintf("'%s' %s:%d", fmt.Errorf("error decoding the json message, it may be empty"), f, l-1),
 			MsgType: "error",
 		}
 
@@ -192,7 +192,7 @@ func processingReflectAnySimpleType(
 			_, f, l, _ := runtime.Caller(0)
 
 			loging <- datamodels.MessageLoging{
-				MsgData: fmt.Sprintf(" 'search value \"%s\" from rule number \"%d\" of section \"REPLACE\" is not fulfilled' %s:%d", result, num, f, l-2),
+				MsgData: fmt.Sprintf("'search value \"%s\" from rule number \"%d\" of section \"REPLACE\" is not fulfilled' %s:%d", result, num, f, l-1),
 				MsgType: "warning",
 			}
 		}
@@ -216,7 +216,7 @@ func processingReflectAnySimpleType(
 			_, f, l, _ := runtime.Caller(0)
 
 			loging <- datamodels.MessageLoging{
-				MsgData: fmt.Sprintf(" 'search value \"%d\" from rule number \"%d\" of section \"REPLACE\" is not fulfilled' %s:%d", result, num, f, l-2),
+				MsgData: fmt.Sprintf("'search value \"%d\" from rule number \"%d\" of section \"REPLACE\" is not fulfilled' %s:%d", result, num, f, l-1),
 				MsgType: "warning",
 			}
 		}
@@ -240,7 +240,7 @@ func processingReflectAnySimpleType(
 			_, f, l, _ := runtime.Caller(0)
 
 			loging <- datamodels.MessageLoging{
-				MsgData: fmt.Sprintf(" 'search value \"%d\" from rule number \"%d\" of section \"REPLACE\" is not fulfilled' %s:%d", result, num, f, l-2),
+				MsgData: fmt.Sprintf("'search value \"%d\" from rule number \"%d\" of section \"REPLACE\" is not fulfilled' %s:%d", result, num, f, l-1),
 				MsgType: "warning",
 			}
 		}
@@ -264,7 +264,7 @@ func processingReflectAnySimpleType(
 			_, f, l, _ := runtime.Caller(0)
 
 			loging <- datamodels.MessageLoging{
-				MsgData: fmt.Sprintf(" 'search value \"%v\" from rule number \"%d\" of section \"REPLACE\" is not fulfilled' %s:%d", result, num, f, l-2),
+				MsgData: fmt.Sprintf("'search value \"%v\" from rule number \"%d\" of section \"REPLACE\" is not fulfilled' %s:%d", result, num, f, l-1),
 				MsgType: "warning",
 			}
 		}
@@ -288,7 +288,7 @@ func processingReflectAnySimpleType(
 			_, f, l, _ := runtime.Caller(0)
 
 			loging <- datamodels.MessageLoging{
-				MsgData: fmt.Sprintf(" 'search value \"%v\" from rule number \"%d\" of section \"REPLACE\" is not fulfilled' %s:%d", result, num, f, l-2),
+				MsgData: fmt.Sprintf("'search value \"%v\" from rule number \"%d\" of section \"REPLACE\" is not fulfilled' %s:%d", result, num, f, l-1),
 				MsgType: "warning",
 			}
 		}

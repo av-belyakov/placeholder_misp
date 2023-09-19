@@ -1,7 +1,6 @@
 package elasticsearchinteractions
 
 import (
-	"context"
 	"fmt"
 
 	"placeholder_misp/confighandler"
@@ -31,7 +30,6 @@ func init() {
 }
 
 func HandlerElasticSearch(
-	ctx context.Context,
 	conf confighandler.AppConfigElasticSearch,
 	storageApp *memorytemporarystorage.CommonStorageTemporary,
 	loging chan<- datamodels.MessageLoging) (*ModuleElasticSearch, error) {

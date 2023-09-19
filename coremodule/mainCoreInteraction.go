@@ -64,6 +64,8 @@ func CoreHandler(
 				})
 
 			case "set new event id":
+				fmt.Printf("_____|||||| func 'NewCore', надо отправить инфу CaseID '%s' и EventId '%s' to REDIS DB\n", data.CaseId, data.EventId)
+
 				//обработка запроса на добавления новой связки caseId:eventId в Redis
 				redismodule.SendingDataInput(redisinteractions.SettingsChanInputRedis{
 					Command: "set caseId",
@@ -82,7 +84,7 @@ func CoreHandler(
 					_, f, l, _ := runtime.Caller(0)
 
 					loging <- datamodels.MessageLoging{
-						MsgData: fmt.Sprintf(" 'it is not possible to convert a value to a string' %s:%d", f, l-1),
+						MsgData: fmt.Sprintf("'it is not possible to convert a value to a string' %s:%d", f, l-1),
 						MsgType: "warning",
 					}
 

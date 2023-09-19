@@ -44,12 +44,15 @@ func HandlerRedis(
 				}
 
 			case "set caseId":
+
+				fmt.Printf("_____|||||| func 'HandlerRedis', обрабатываем добавление CaseID и EventId '%s' to REDIS DB\n", data.Data)
+
 				tmp := strings.Split(data.Data, ":")
 				if len(tmp) == 0 {
 					_, f, l, _ := runtime.Caller(0)
 
 					loging <- datamodels.MessageLoging{
-						MsgData: fmt.Sprintf(" 'it is not possible to split a string '%s' to add case and event information to the Redis DB' %s:%d", data.Data, f, l-2),
+						MsgData: fmt.Sprintf("'it is not possible to split a string '%s' to add case and event information to the Redis DB' %s:%d", data.Data, f, l-1),
 						MsgType: "warning",
 					}
 
@@ -59,6 +62,9 @@ func HandlerRedis(
 				//получаем старое значение eventId по текущему caseId (если оно есть)
 				strCmd := rdb.Get(ctx, tmp[0])
 				if eventId, err := strCmd.Result(); err == nil {
+
+					fmt.Printf("_____|||||| func 'HandlerRedis', НАЙДЕНО СТАРОЕ значение CaseID '%s' отправляем EventId '%s'\n", tmp[0], tmp[1])
+
 					//отправляем eventId для удаления события в MISP
 					mredis.SendingDataOutput(SettingChanOutputRedis{
 						CommandResult: "found eventId",
@@ -66,13 +72,15 @@ func HandlerRedis(
 					})
 				}
 
+				fmt.Println("======== ====== ===== = == = func 'HandlerRedis' заменяем старое значение новым")
+
 				//заменяем старое значение (если есть) или создаем новое
 				//tmp[0] - caseId и tmp[1] - eventId
 				if err := rdb.Set(ctx, tmp[0], tmp[1], 0).Err(); err != nil {
 					_, f, l, _ := runtime.Caller(0)
 
 					loging <- datamodels.MessageLoging{
-						MsgData: fmt.Sprintf(" '%s' %s:%d", fmt.Sprint(err), f, l-2),
+						MsgData: fmt.Sprintf("'%s' %s:%d", fmt.Sprint(err), f, l-1),
 						MsgType: "error",
 					}
 				}

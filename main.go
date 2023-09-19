@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 	"runtime"
-	"time"
 
 	"github.com/av-belyakov/simplelogger"
 
@@ -148,9 +147,7 @@ func main() {
 	log.Printf("Application '%s' is start", appName)
 
 	//инициализация модуля для взаимодействия с NATS (Данный модуль обязателен для взаимодействия)
-	ctxNATS, ctxCloseNATS := context.WithTimeout(context.Background(), 2*time.Second)
-	defer ctxCloseNATS()
-	natsModule, err := natsinteractions.NewClientNATS(ctxNATS, confApp.AppConfigNATS, storageApp, loging)
+	natsModule, err := natsinteractions.NewClientNATS(confApp.AppConfigNATS, storageApp, loging)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 		_ = sl.WriteLoggingData(fmt.Sprintf(" '%s' %s:%d", err, f, l-2), "error")
@@ -159,32 +156,25 @@ func main() {
 	}
 
 	// инициализация модуля для взаимодействия с СУБД Redis
-	ctxRedis, ctxCloseRedis := context.WithTimeout(context.Background(), 2*time.Second)
-	defer ctxCloseRedis()
+	ctxRedis := context.Background()
 	redisModule := redisinteractions.HandlerRedis(ctxRedis, confApp.AppConfigRedis, storageApp, loging)
 
 	//инициалиация модуля для взаимодействия с MISP
-	ctxMISP, ctxCloseMISP := context.WithTimeout(context.Background(), 2*time.Second)
-	defer ctxCloseMISP()
-	mispModule, err := mispinteractions.HandlerMISP(ctxMISP, confApp.AppConfigMISP, storageApp, loging)
+	mispModule, err := mispinteractions.HandlerMISP(confApp.AppConfigMISP, storageApp, loging)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 		_ = sl.WriteLoggingData(fmt.Sprintf(" '%s' %s:%d", err, f, l-2), "error")
 	}
 
 	//инициализация модуля для взаимодействия с ElasticSearch
-	ctxES, ctxCloseES := context.WithTimeout(context.Background(), 2*time.Second)
-	defer ctxCloseES()
-	esModule, err := elasticsearchinteractions.HandlerElasticSearch(ctxES, confApp.AppConfigElasticSearch, storageApp, loging)
+	esModule, err := elasticsearchinteractions.HandlerElasticSearch(confApp.AppConfigElasticSearch, storageApp, loging)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 		_ = sl.WriteLoggingData(fmt.Sprintf(" '%s' %s:%d", err, f, l-2), "error")
 	}
 
 	// инициализация модуля для взаимодействия с NKCKI
-	ctxNKCKI, ctxCloseNKCKI := context.WithTimeout(context.Background(), 2*time.Second)
-	defer ctxCloseNKCKI()
-	nkckiModule, err := nkckiinteractions.NewClientNKCKI(ctxNKCKI, confApp.AppConfigNKCKI, loging)
+	nkckiModule, err := nkckiinteractions.NewClientNKCKI(confApp.AppConfigNKCKI, loging)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 		_ = sl.WriteLoggingData(fmt.Sprintf(" '%s' %s:%d", err, f, l-2), "error")
@@ -201,7 +191,10 @@ func main() {
 		}
 	}()
 
-	_ = sl.WriteLoggingData("application 'placeholder_misp' is started", "info")
+	ok := sl.WriteLoggingData("application 'placeholder_misp' is started", "info")
+	if !ok {
+		fmt.Println("Log file is not write:::::::")
+	}
 
 	coremodule.CoreHandler(natsModule, mispModule, redisModule, esModule, nkckiModule, listRulesProcMISPMsg, storageApp, loging)
 }
