@@ -192,6 +192,9 @@ func main() {
 	}()
 
 	ok := sl.WriteLoggingData("application 'placeholder_misp' is started", "info")
+
+	fmt.Printf("\tWriteLoggingData = '%v'\n", ok)
+
 	if !ok {
 		fmt.Println("Log file is not write:::::::")
 	}
