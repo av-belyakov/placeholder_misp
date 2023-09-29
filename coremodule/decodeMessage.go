@@ -25,23 +25,12 @@ func HandlerMessageFromHive(
 
 	fmt.Println("___ func 'HandlerMessageFromHive' COUNT Hive message: ", storageApp.GetCountHiveFormatMessage())
 
-	// -------------------- ТОЛЬКО ДЛЯ ТЕСТА -----------------
-	//-------------------------------------------------------
-	//-------------------------------------------------------
-	//-------------------------------------------------------
-	//записываем в лог файл типа 'info' все кейсы приходящие от хайва
-	//
+	//для записи событий в файл events
 	str, _ := supportingfunctions.NewReadReflectJSONSprint(b)
-	//fmt.Println("___ func 'HandlerMessageFromHive' READ ERROR:", err)
-	//fmt.Println("___ func 'HandlerMessageFromHive' READ string:", str)
-
 	loging <- datamodels.MessageLoging{
-		MsgData: fmt.Sprintf("---------------\nEVENTS:\n%s\n", str),
-		MsgType: "info",
+		MsgData: fmt.Sprintf("\t---------------\n\tEVENTS:\n%s\n", str),
+		MsgType: "events",
 	}
-	//
-	//
-	//-------------------------------------------------------
 
 	if err := json.Unmarshal(b, &listTmp); err != nil {
 		_, f, l, _ := runtime.Caller(0)
