@@ -20,10 +20,10 @@ type Logs struct {
 
 type LogSet struct {
 	MsgTypeName   string
-	WritingFile   bool
 	PathDirectory string
-	WritingStdout bool
 	MaxFileSize   int
+	WritingStdout bool
+	WritingFile   bool
 }
 
 type AppConfigNATS struct {
@@ -42,14 +42,14 @@ type AppConfigRedis struct {
 }
 
 type AppConfigElasticSearch struct {
-	Host     string
-	Port     int
 	Prefix   string
 	Index    string
 	Name     string
 	Authtype string
 	User     string
 	Passwd   string
+	Host     string
+	Port     int
 }
 
 type AppConfigNKCKI struct {

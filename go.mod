@@ -3,7 +3,7 @@ module placeholder_misp
 go 1.20
 
 require (
-	github.com/av-belyakov/simplelogger v0.0.0-20230608125011-b657d45df8cf
+	github.com/av-belyakov/simplelogger v0.0.0-20230929094950-9512d4930d44
 	github.com/elastic/go-elasticsearch/v8 v8.9.0
 	github.com/google/uuid v1.3.0
 	github.com/nats-io/nats.go v1.27.0

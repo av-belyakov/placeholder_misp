@@ -57,6 +57,16 @@ func getAppName(pf string, nl int) (string, error) {
 func getLoggerSettings(cls []confighandler.LogSet) []simplelogger.MessageTypeSettings {
 	loggerConf := make([]simplelogger.MessageTypeSettings, 0, len(cls))
 
+	for _, v := range cls {
+		loggerConf = append(loggerConf, simplelogger.MessageTypeSettings{
+			MsgTypeName:   v.MsgTypeName,
+			WritingFile:   v.WritingFile,
+			PathDirectory: v.PathDirectory,
+			WritingStdout: v.WritingStdout,
+			MaxFileSize:   v.MaxFileSize,
+		})
+	}
+
 	return loggerConf
 }
 
@@ -92,14 +102,13 @@ func init() {
 	//инициализируем модуль чтения конфигурационного файла
 	confApp, err = confighandler.NewConfig()
 	if err != nil {
-		log.Fatalf("error module 'confighandler': %v\n", err)
+		log.Fatalf("error module 'confighandler': %v", err)
 	}
 
 	//инициализируем модуль логирования
 	sl, err = simplelogger.NewSimpleLogger("placeholder_misp", getLoggerSettings(confApp.GetListLogs()))
 	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		log.Fatalf("error module 'simplelogger': %v %s:%d\n", err, f, l+18)
+		log.Fatalf("error module 'simplelogger': %v", err)
 	}
 
 	//инициализируем модуль чтения правил обработки MISP сообщений
