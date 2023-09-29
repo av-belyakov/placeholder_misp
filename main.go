@@ -102,6 +102,9 @@ func init() {
 		log.Fatalf("error module 'simplelogger': %v %s:%d\n", err, f, l+18)
 	}
 
+	fmt.Println("___________ TEST ____________")
+	fmt.Println(confApp.GetListLogs())
+
 	//инициализируем модуль чтения правил обработки MISP сообщений
 	listRulesProcMISPMsg, listWarning, err = rules.GetRuleProcessingMsgForMISP(confApp.RulesProcMSGMISP.Directory, confApp.RulesProcMSGMISP.File)
 	if err != nil {
