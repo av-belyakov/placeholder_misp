@@ -152,6 +152,8 @@ func HandlerMISP(
 				})
 
 			case "del event by id":
+				fmt.Println("func 'HandlerMISP', command: ", data.Command, " удаление события типа event, где eventId:", data.EventId)
+
 				// удаление события типа event
 				_, err := DelEventsMispFormat(conf.Host, authKey, data.EventId)
 				if err != nil {

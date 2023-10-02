@@ -1,9 +1,7 @@
 package testupdatestdout_test
 
 import (
-	"bufio"
 	"fmt"
-	"os"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -11,28 +9,6 @@ import (
 )
 
 var _ = Describe("Stdoutupdate", Ordered, func() {
-	getAppName := func(pf string, nl int) (string, error) {
-		var line string
-
-		f, err := os.OpenFile(pf, os.O_RDONLY, os.ModePerm)
-		if err != nil {
-			return line, err
-		}
-		defer f.Close()
-
-		num := 1
-		sc := bufio.NewScanner(f)
-		for sc.Scan() {
-			if num == nl {
-				return sc.Text(), nil
-			}
-
-			num++
-		}
-
-		return line, nil
-	}
-
 	sendingInt := func(numBegin int) chan int {
 		sendInt := make(chan int)
 
@@ -53,11 +29,6 @@ var _ = Describe("Stdoutupdate", Ordered, func() {
 
 	Context("Тест 1. Вывод информационного дачборда", func() {
 		It("Должен быть успешно выведен информационный дачборд", func(ctx SpecContext) {
-			appN := "placeholder_misp"
-			an, err := getAppName("../../README.md", 1)
-
-			Expect(err).ShouldNot(HaveOccurred())
-			appN = an
 			/*msg := `The application %s is running
 
 			Всего событий полученно: %d
@@ -66,10 +37,7 @@ var _ = Describe("Stdoutupdate", Ordered, func() {
 			`*/
 
 			for d := range sendInt {
-				fmt.Printf("The application %s is running", appN)
-				fmt.Printf("Всего событий полученно: %d\r", d)
-				fmt.Printf("Соответствуют правилам: %d\r", d-2)
-				//fmt.Printf("%s\r", fmt.Sprintf(msg, appN, d, d-2))
+				fmt.Printf("событий полученно/обработанно - %d/%d\r", d, d-2)
 			}
 
 			fmt.Println("")

@@ -2,6 +2,7 @@ package natsinteractions
 
 import (
 	"fmt"
+	"log"
 	"runtime"
 
 	"github.com/nats-io/nats.go"
@@ -28,6 +29,8 @@ func NewClientNATS(
 		_, f, l, _ := runtime.Caller(0)
 		return &mnats, fmt.Errorf("'%s' %s:%d", err.Error(), f, l-2)
 	}
+
+	log.Printf("Connect to NATS with address %s:%d\n", conf.Host, conf.Port)
 
 	// обработка данных приходящих в модуль от ядра приложения
 	go func() {

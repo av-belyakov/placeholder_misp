@@ -3,6 +3,7 @@ package redisinteractions
 import (
 	"context"
 	"fmt"
+	"log"
 	"placeholder_misp/confighandler"
 	"placeholder_misp/datamodels"
 	"placeholder_misp/memorytemporarystorage"
@@ -29,6 +30,8 @@ func HandlerRedis(
 	rdb := redis.NewClient(&redis.Options{
 		Addr: fmt.Sprintf("%s:%d", conf.Host, conf.Port),
 	})
+
+	log.Printf("Connect to Redis DB with address %s:%d", conf.Host, conf.Port)
 
 	go func() {
 		for data := range mredis.chanInputRedis {
@@ -63,13 +66,13 @@ func HandlerRedis(
 				strCmd := rdb.Get(ctx, tmp[0])
 				if eventId, err := strCmd.Result(); err == nil {
 
-					fmt.Printf("_____|||||| func 'HandlerRedis', НАЙДЕНО СТАРОЕ значение CaseID '%s' отправляем EventId '%s'\n", tmp[0], tmp[1])
+					fmt.Printf("_____|||||| func 'HandlerRedis', НАЙДЕНО СТАРОЕ значение CaseID '%s' отправляем EventId '%s'\n", tmp[0], eventId)
 
 					//
 					// Это логирование только для теста!!!
 					//
 					loging <- datamodels.MessageLoging{
-						MsgData: fmt.Sprintf("_____|||||| func 'HandlerRedis', НАЙДЕНО СТАРОЕ значение CaseID '%s' отправляем EventId '%s'\n", tmp[0], tmp[1]),
+						MsgData: fmt.Sprintf("_____|||||| func 'HandlerRedis', НАЙДЕНО СТАРОЕ значение CaseID '%s' отправляем EventId '%s'\n", tmp[0], eventId),
 						MsgType: "info",
 					}
 					//
