@@ -1,8 +1,6 @@
 package elasticsearchinteractions
 
 import (
-	"fmt"
-
 	"placeholder_misp/confighandler"
 	"placeholder_misp/datamodels"
 	"placeholder_misp/memorytemporarystorage"
@@ -33,7 +31,6 @@ func HandlerElasticSearch(
 	conf confighandler.AppConfigElasticSearch,
 	storageApp *memorytemporarystorage.CommonStorageTemporary,
 	loging chan<- datamodels.MessageLoging) (*ModuleElasticSearch, error) {
-	fmt.Println("func 'HandlerElasticSearch', START...")
 
 	go func() {
 		for data := range es.chanInputElasticSearch {

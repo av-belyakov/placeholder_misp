@@ -23,8 +23,6 @@ func HandlerMessageFromHive(
 	loging chan<- datamodels.MessageLoging) {
 	listTmp := map[string]interface{}{}
 
-	fmt.Println("___ func 'HandlerMessageFromHive' COUNT Hive message: ", storageApp.GetCountHiveFormatMessage())
-
 	//для записи событий в файл events
 	str, _ := supportingfunctions.NewReadReflectJSONSprint(b)
 	loging <- datamodels.MessageLoging{

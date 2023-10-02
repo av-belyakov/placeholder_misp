@@ -34,7 +34,6 @@ func CoreHandler(
 		select {
 		case data := <-natsChanReception:
 			uuidCase := uuid.New().String()
-			fmt.Printf("\n\tfunc 'CoreHandler', RESEIVED data from NATS, UUID = %s\n", uuidCase)
 
 			storageApp.SetRawDataHiveFormatMessage(uuidCase, data.Data)
 
@@ -51,8 +50,6 @@ func CoreHandler(
 			//nkckimodule.SendingData(procMsg.Message)
 
 		case data := <-mispChanReception:
-			fmt.Println("func 'NewCore', MISP reseived message from chanOutMISP: ", data)
-
 			switch data.Command {
 			case "send eventId":
 				fmt.Println("func 'NewCore', надо отправить инфу в NATS")
@@ -74,10 +71,10 @@ func CoreHandler(
 			}
 
 		case data := <-redisChanReception:
-			fmt.Println("RESEIVED DATA FROM REDIS: ", data)
-
 			switch data.CommandResult {
 			case "found eventId":
+				fmt.Println("RESEIVED DATA FROM REDIS: ", data, " Здесь, получаем eventId из Redis для удаления события в MISP")
+
 				// Здесь, получаем eventId из Redis для удаления события в MISP
 				eventId, ok := data.Result.(string)
 				if !ok {

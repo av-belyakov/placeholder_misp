@@ -65,6 +65,16 @@ func HandlerRedis(
 
 					fmt.Printf("_____|||||| func 'HandlerRedis', НАЙДЕНО СТАРОЕ значение CaseID '%s' отправляем EventId '%s'\n", tmp[0], tmp[1])
 
+					//
+					// Это логирование только для теста!!!
+					//
+					loging <- datamodels.MessageLoging{
+						MsgData: fmt.Sprintf("_____|||||| func 'HandlerRedis', НАЙДЕНО СТАРОЕ значение CaseID '%s' отправляем EventId '%s'\n", tmp[0], tmp[1]),
+						MsgType: "info",
+					}
+					//
+					//
+
 					//отправляем eventId для удаления события в MISP
 					mredis.SendingDataOutput(SettingChanOutputRedis{
 						CommandResult: "found eventId",
@@ -83,7 +93,19 @@ func HandlerRedis(
 						MsgData: fmt.Sprintf("'%s' %s:%d", fmt.Sprint(err), f, l-1),
 						MsgType: "error",
 					}
+
+					continue
 				}
+
+				//
+				// Это логирование только для теста!!!
+				//
+				loging <- datamodels.MessageLoging{
+					MsgData: fmt.Sprintln("======== ====== ===== = == = func 'HandlerRedis' заменяем старое значение новым casId: ", tmp[0], " eventId: ", tmp[1]),
+					MsgType: "info",
+				}
+				//
+				//
 			}
 		}
 	}()

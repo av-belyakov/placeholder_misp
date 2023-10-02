@@ -34,8 +34,6 @@ func NewClientNATS(
 		for data := range mnats.chanInputNATS {
 			nrm := datamodels.NewResponseMessage()
 
-			fmt.Println("func 'NewClientNATS', received data: ", data)
-
 			if data.Command == "send eventId" {
 				nrm.ResponseMessageAddNewCommand(datamodels.ResponseCommandForTheHive{
 					Command: "setcustomfield",

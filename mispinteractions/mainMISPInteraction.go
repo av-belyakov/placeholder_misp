@@ -151,7 +151,7 @@ func HandlerMISP(
 					EventId: eventId,
 				})
 
-			case "del event":
+			case "del event by id":
 				// удаление события типа event
 				_, err := DelEventsMispFormat(conf.Host, authKey, data.EventId)
 				if err != nil {
@@ -228,7 +228,7 @@ func sendEventsMispFormat(host, authKey string, d SettingsChanInputMISP) (*http.
 		resBodyByte = make([]byte, 0)
 	)
 
-	fmt.Println("		func 'sendEventsMispFormat', USER EMAIL: ", d.UserEmail)
+	//fmt.Println("		func 'sendEventsMispFormat', USER EMAIL: ", d.UserEmail)
 
 	c, err := NewClientMISP(host, authKey, false)
 	if err != nil {
@@ -311,8 +311,6 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 	for k := range lamf {
 		lamf[k].EventId = eventId
 
-		fmt.Println("func 'sendAttribytesMispFormat', lamf[k] = ", lamf[k])
-
 		if lamf[k].Value == "" {
 			_, f, l, _ := runtime.Caller(0)
 
@@ -335,8 +333,6 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 
 			continue
 		}
-
-		fmt.Printf("func 'sendAttribytesMispFormat', AttributesMisp: %v\n", string(b))
 
 		res, resBodyByte, err = c.Post("/attributes/add/"+eventId, b)
 		if err != nil {
@@ -365,7 +361,7 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 
 // удаляем дублирующиеся события из MISP
 func DelEventsMispFormat(host, authKey, eventId string) (*http.Response, error) {
-	fmt.Println("func 'delEventsMispFormat', START...")
+	fmt.Println("func 'delEventsMispFormat', удаляем дублирующиеся события из MISP START...")
 
 	c, err := NewClientMISP(host, authKey, false)
 	if err != nil {
