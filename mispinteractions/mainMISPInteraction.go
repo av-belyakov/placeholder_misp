@@ -56,30 +56,15 @@ func HandlerMISP(
 
 			switch data.Command {
 			case "add event":
-
-				fmt.Printf("\t\t\t--=== RESEIVED DATA ===--	USER EMAIL: %s, ObjectId: %v\n", data.UserEmail, data.CaseId)
-
-				/////////// задесь обработка дублирующихся событий (пока поиск в памяти приложения) //////////
-				/// 	ЭТО ПОТОМ НАДО БУДЕТ УБРАТЬ
-				//проверяем отправлялось ли недавно в MISP событие с указанным id
-				/*tc, ok := storageApp.GetTemporaryCase(int(data.CaseId))
-
-				fmt.Printf("\t\t\t ________________ TemporaryCase: %v ______________\n", tc)
-
-				if ok {
-					_, f, l, _ := runtime.Caller(0)
-
-					loging <- datamodels.MessageLoging{
-						MsgData: fmt.Sprintf(" 'an event with this id \"%v\" already exists in MISP' %s:%d", data.CaseId, f, l-2),
-						MsgType: "warning",
-					}
-
-					fmt.Printf("\t\t Событие с таким id '%v' уже существует в MISP", data.CaseId)
-
-					continue
-				}*/
-				///
-				////////// окончание обработки //////////
+				// ***********************************
+				// Это логирование только для теста!!!
+				// ***********************************
+				loging <- datamodels.MessageLoging{
+					MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', --=== RESEIVED DATA ===--	USER EMAIL: %s, ObjectId: %v", data.UserEmail, data.CaseId),
+					MsgType: "info",
+				}
+				//
+				//
 
 				// получаем авторизационный ключ пользователя по его email
 				if us, ok := storageApp.GetUserSettingsMISP(data.UserEmail); ok {
@@ -133,6 +118,16 @@ func HandlerMISP(
 					continue
 				}
 
+				// ***********************************
+				// Это логирование только для теста!!!
+				// ***********************************
+				loging <- datamodels.MessageLoging{
+					MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', отправляем запрос для добавления в БД Redis, id кейса и нового события, где case id: %v, event id: %s", data.CaseId, eventId),
+					MsgType: "info",
+				}
+				//
+				//
+
 				//отправляем запрос для добавления в БД Redis, id кейса и нового события
 				mmisp.SendingDataOutput(SettingChanOutputMISP{
 					Command: "set new event id",
@@ -140,19 +135,24 @@ func HandlerMISP(
 					EventId: eventId,
 				})
 
-				//добавляем информацию о событиях недавно добавленных в MISP
-				//storageApp.SetTemporaryCase(int(data.CaseId), memorytemporarystorage.SettingsInputCase{EventId: eventId})
-
 				_, _ = sendAttribytesMispFormat(conf.Host, authKey, eventId, data, loging)
 
 				//отправляем в ядро информацию по event Id
 				mmisp.SendingDataOutput(SettingChanOutputMISP{
-					Command: "send eventId",
+					Command: "send event id",
 					EventId: eventId,
 				})
 
 			case "del event by id":
-				fmt.Println("func 'HandlerMISP', command: ", data.Command, " удаление события типа event, где eventId:", data.EventId)
+				// ***********************************
+				// Это логирование только для теста!!!
+				// ***********************************
+				loging <- datamodels.MessageLoging{
+					MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', command: '%s' удаление события типа event, где event id: %s", data.Command, data.EventId),
+					MsgType: "info",
+				}
+				//
+				//
 
 				// удаление события типа event
 				_, err := DelEventsMispFormat(conf.Host, authKey, data.EventId)
@@ -164,6 +164,23 @@ func HandlerMISP(
 						MsgType: "error",
 					}
 				}
+
+				// ***********************************
+				// Это логирование только для теста!!!
+				// ***********************************
+				loging <- datamodels.MessageLoging{
+					MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', должно было быть успешно выполненно удаление события event id: %s", data.EventId),
+					MsgType: "info",
+				}
+				//
+				//
+
+				//
+				//только для теста, для ОСТАНОВА
+				//
+				//mmisp.SendingDataOutput(SettingChanOutputMISP{
+				//	Command: "TEST STOP",
+				//})
 			}
 		}
 	}()

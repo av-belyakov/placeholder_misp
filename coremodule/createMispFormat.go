@@ -188,9 +188,6 @@ func NewMispFormat(
 				}
 
 			case isAllowed := <-chanDone:
-
-				//				fmt.Printf("\n\tfunc 'NewMispFormat', RESEIVED chanDone, eventsMisp: %v, isAllowed: %v\nLIST TAGS: '%v'\n", eventsMisp, isAllowed, listTags)
-
 				if !isAllowed {
 					_, f, l, _ := runtime.Caller(0)
 
@@ -199,6 +196,9 @@ func NewMispFormat(
 						MsgType: "warning",
 					}
 				} else {
+					//добавляем case id в поле Info
+					eventsMisp.Info += fmt.Sprintf("(TheHive case id '%d')", int(caseId))
+
 					//тут отправляем сформированные по формату MISP пользовательские структуры
 					mispmodule.SendingDataInput(mispinteractions.SettingsChanInputMISP{
 						Command:   "add event",

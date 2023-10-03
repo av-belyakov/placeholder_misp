@@ -11,11 +11,20 @@ type CommonStorageTemporary struct {
 	temporaryInputCase   TemporaryInputCases
 	HiveFormatMessage    HiveFormatMessages
 	ListUserSettingsMISP []UserSettingsMISP
+	dataCounter          DataCounter
 }
 
 type TemporaryInputCases struct {
 	Cases map[int]SettingsInputCase
 	mutex sync.Mutex
+}
+
+type DataCounter struct {
+	acceptedEvents       int
+	processedEvents      int
+	eventsDoNotMeetRules int
+	eventsMeetRules      int
+	mutex                sync.Mutex
 }
 
 type SettingsInputCase struct {

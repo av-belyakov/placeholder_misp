@@ -46,9 +46,16 @@ func HandlerRedis(
 					})
 				}
 
-			case "set caseId":
-
-				fmt.Printf("_____|||||| func 'HandlerRedis', обрабатываем добавление CaseID и EventId '%s' to REDIS DB\n", data.Data)
+			case "set case id":
+				// ***********************************
+				// Это логирование только для теста!!!
+				// ***********************************
+				loging <- datamodels.MessageLoging{
+					MsgData: fmt.Sprintf("TEST_INFO func 'HandlerRedis', обрабатываем добавление CaseID и EventId '%s' to REDIS DB", data.Data),
+					MsgType: "info",
+				}
+				//
+				//
 
 				tmp := strings.Split(data.Data, ":")
 				if len(tmp) == 0 {
@@ -64,15 +71,13 @@ func HandlerRedis(
 
 				//получаем старое значение eventId по текущему caseId (если оно есть)
 				strCmd := rdb.Get(ctx, tmp[0])
-				if eventId, err := strCmd.Result(); err == nil {
-
-					fmt.Printf("_____|||||| func 'HandlerRedis', НАЙДЕНО СТАРОЕ значение CaseID '%s' отправляем EventId '%s'\n", tmp[0], eventId)
-
-					//
+				eventId, err := strCmd.Result()
+				if err == nil {
+					// ***********************************
 					// Это логирование только для теста!!!
-					//
+					// ***********************************
 					loging <- datamodels.MessageLoging{
-						MsgData: fmt.Sprintf("_____|||||| func 'HandlerRedis', НАЙДЕНО СТАРОЕ значение CaseID '%s' отправляем EventId '%s'\n", tmp[0], eventId),
+						MsgData: fmt.Sprintf("TEST_INFO func 'HandlerRedis', НАЙДЕНО СТАРОЕ значение CaseID '%s' отправляем в ядро найденное событие с event id '%s'", tmp[0], eventId),
 						MsgType: "info",
 					}
 					//
@@ -80,12 +85,10 @@ func HandlerRedis(
 
 					//отправляем eventId для удаления события в MISP
 					mredis.SendingDataOutput(SettingChanOutputRedis{
-						CommandResult: "found eventId",
+						CommandResult: "found event id",
 						Result:        eventId,
 					})
 				}
-
-				fmt.Println("======== ====== ===== = == = func 'HandlerRedis' заменяем старое значение новым")
 
 				//заменяем старое значение (если есть) или создаем новое
 				//tmp[0] - caseId и tmp[1] - eventId
@@ -100,11 +103,11 @@ func HandlerRedis(
 					continue
 				}
 
-				//
+				// ***********************************
 				// Это логирование только для теста!!!
-				//
+				// ***********************************
 				loging <- datamodels.MessageLoging{
-					MsgData: fmt.Sprintln("======== ====== ===== = == = func 'HandlerRedis' заменяем старое значение новым casId: ", tmp[0], " eventId: ", tmp[1]),
+					MsgData: fmt.Sprintf("TEST_INFO func 'HandlerRedis', выполнили замену старого значения event id: %s новым значением event id: %s, для case id: %s", eventId, tmp[1], tmp[0]),
 					MsgType: "info",
 				}
 				//

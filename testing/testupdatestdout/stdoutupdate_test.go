@@ -37,7 +37,7 @@ var _ = Describe("Stdoutupdate", Ordered, func() {
 			`*/
 
 			for d := range sendInt {
-				fmt.Printf("событий полученно/обработанно - %d/%d\r", d, d-2)
+				fmt.Printf("\tСОБЫТИЙ получено/обработано - %d/%d\r", d, d-2)
 			}
 
 			fmt.Println("")
