@@ -6,6 +6,8 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+
+	"placeholder_misp/supportingfunctions"
 )
 
 var _ = Describe("Stdoutupdate", Ordered, func() {
@@ -36,8 +38,13 @@ var _ = Describe("Stdoutupdate", Ordered, func() {
 			--------------------------------
 			`*/
 
-			for d := range sendInt {
-				fmt.Printf("\tСОБЫТИЙ получено/обработано - %d/%d\r", d, d-2)
+			dateTmp := time.Date(2020, 4, 27, 23, 35, 0, 0, time.UTC)
+
+			for data := range sendInt {
+				d, h, m, s := supportingfunctions.GetDifference(dateTmp, time.Now())
+
+				//fmt.Printf("\tСОБЫТИЙ получено/обработано - %d/%d, время: %d\r", d, d-2, time.Now().Unix())
+				fmt.Printf("\tСОБЫТИЙ принятых/обработанных: %d/%d, соответствие/не соответствие правилам: %d/%d, время со старта приложения: дней %d, часов %d, минут %d, секунд %d\r", data, data-1, data-3, data-2, d, h, m, s)
 			}
 
 			fmt.Println("")

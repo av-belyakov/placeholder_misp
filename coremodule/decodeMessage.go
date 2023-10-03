@@ -20,7 +20,8 @@ func HandlerMessageFromHive(
 	listRule rules.ListRulesProcessingMsgMISP,
 	cmispf chan<- ChanInputCreateMispFormat,
 	cmispfDone chan<- bool,
-	loging chan<- datamodels.MessageLoging) {
+	loging chan<- datamodels.MessageLoging,
+	counting chan<- datamodels.DataCounterSettings) {
 	listTmp := map[string]interface{}{}
 
 	//для записи событий в файл events
@@ -52,6 +53,12 @@ func HandlerMessageFromHive(
 		return
 	}
 
+	//сетчик обработанных кейсов
+	counting <- datamodels.DataCounterSettings{
+		DataType: "update processed events",
+		Count:    1,
+	}
+
 	nlt := processingReflectMap(loging, cmispf, listTmp, &listRule, 0, "")
 	storageApp.SetProcessedDataHiveFormatMessage(uuidTask, nlt)
 
@@ -78,6 +85,17 @@ func HandlerMessageFromHive(
 	}
 
 	isAllowed, _ := storageApp.GetAllowedTransferHiveFormatMessage(uuidTask)
+
+	dt := "events do not meet rules"
+	if isAllowed {
+		dt = "update events meet rules"
+	}
+
+	//сетчик обработанных кейсов
+	counting <- datamodels.DataCounterSettings{
+		DataType: dt,
+		Count:    1,
+	}
 
 	//устанавливаем параметр информирующий о завершении обработки модулем
 	storageApp.SetIsProcessedMispHiveFormatMessage(uuidTask)

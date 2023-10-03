@@ -197,7 +197,7 @@ func NewMispFormat(
 					}
 				} else {
 					//добавляем case id в поле Info
-					eventsMisp.Info += fmt.Sprintf("(TheHive case id '%d')", int(caseId))
+					eventsMisp.Info += fmt.Sprintf(" :::TheHive case id '%d':::", int(caseId))
 
 					//тут отправляем сформированные по формату MISP пользовательские структуры
 					mispmodule.SendingDataInput(mispinteractions.SettingsChanInputMISP{

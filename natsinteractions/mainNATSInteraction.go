@@ -22,7 +22,8 @@ func init() {
 func NewClientNATS(
 	conf confighandler.AppConfigNATS,
 	storageApp *memorytemporarystorage.CommonStorageTemporary,
-	loging chan<- datamodels.MessageLoging) (*ModuleNATS, error) {
+	loging chan<- datamodels.MessageLoging,
+	counting chan<- datamodels.DataCounterSettings) (*ModuleNATS, error) {
 
 	nc, err := nats.Connect(fmt.Sprintf("%s:%d", conf.Host, conf.Port))
 	if err != nil {
@@ -79,6 +80,12 @@ func NewClientNATS(
 	nc.Subscribe("main_caseupdate", func(msg *nats.Msg) {
 		mnats.chanOutputNATS <- SettingsOutputChan{
 			Data: msg.Data,
+		}
+
+		//сетчик принятых кейсов
+		counting <- datamodels.DataCounterSettings{
+			DataType: "update accepted events",
+			Count:    1,
 		}
 	})
 

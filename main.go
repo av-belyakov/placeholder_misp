@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"runtime"
+	"time"
 
 	"github.com/av-belyakov/simplelogger"
 
@@ -20,6 +21,7 @@ import (
 	"placeholder_misp/nkckiinteractions"
 	"placeholder_misp/redisinteractions"
 	rules "placeholder_misp/rulesinteraction"
+	"placeholder_misp/supportingfunctions"
 )
 
 var (
@@ -30,6 +32,7 @@ var (
 	listWarning          []string
 	storageApp           *memorytemporarystorage.CommonStorageTemporary
 	loging               chan datamodels.MessageLoging
+	counting             chan datamodels.DataCounterSettings
 )
 
 func getAppName(pf string, nl int) (string, error) {
@@ -70,34 +73,9 @@ func getLoggerSettings(cls []confighandler.LogSet) []simplelogger.MessageTypeSet
 	return loggerConf
 }
 
-/*
-[]simplelogger.MessageTypeSettings{
-		{
-			MsgTypeName:   "error",
-			WritingFile:   true,
-			PathDirectory: "logs",
-			WritingStdout: true,
-			MaxFileSize:   1024,
-		},
-		{
-			MsgTypeName:   "warning",
-			WritingFile:   true,
-			PathDirectory: "logs",
-			WritingStdout: false,
-			MaxFileSize:   1024,
-		},
-		{
-			MsgTypeName:   "info",
-			WritingFile:   true,
-			PathDirectory: "logs",
-			WritingStdout: true,
-			MaxFileSize:   1024,
-		},
-	}
-*/
-
 func init() {
 	loging = make(chan datamodels.MessageLoging)
+	counting = make(chan datamodels.DataCounterSettings)
 
 	//инициализируем модуль чтения конфигурационного файла
 	confApp, err = confighandler.NewConfig()
@@ -143,6 +121,9 @@ func init() {
 
 	//инициализируем модуль временного хранения информации
 	storageApp = memorytemporarystorage.NewTemporaryStorage()
+
+	//добавляем время инициализации счетчика хранения
+	storageApp.SetStartTimeDataCounter(time.Now())
 }
 
 func main() {
@@ -163,7 +144,7 @@ func main() {
 	log.Printf("Application '%s' is start", appName)
 
 	//инициализация модуля для взаимодействия с NATS (Данный модуль обязателен для взаимодействия)
-	natsModule, err := natsinteractions.NewClientNATS(confApp.AppConfigNATS, storageApp, loging)
+	natsModule, err := natsinteractions.NewClientNATS(confApp.AppConfigNATS, storageApp, loging, counting)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 		_ = sl.WriteLoggingData(fmt.Sprintf(" '%s' %s:%d", err, f, l-2), "error")
@@ -196,6 +177,28 @@ func main() {
 		_ = sl.WriteLoggingData(fmt.Sprintf(" '%s' %s:%d", err, f, l-2), "error")
 	}
 
+	//вывод данных счетчика
+	go func() {
+		for d := range counting {
+			switch d.DataType {
+			case "update accepted events":
+				storageApp.SetAcceptedEventsDataCounter(d.Count)
+			case "update processed events":
+				storageApp.SetProcessedEventsDataCounter(d.Count)
+			case "update events meet rules":
+				storageApp.SetEventsMeetRulesDataCounter(d.Count)
+			case "events do not meet rules":
+				storageApp.SetEventsDoNotMeetRulesDataCounter(d.Count)
+			}
+
+			dc := storageApp.GetDataCounter()
+			d, h, m, s := supportingfunctions.GetDifference(dc.StartTime, time.Now())
+
+			fmt.Printf("\tСОБЫТИЙ принятых/обработанных: %d/%d, соответствие/не соответствие правилам: %d/%d, время со старта приложения: дней %d, часов %d, минут %d, секунд %d\r", dc.AcceptedEvents, dc.ProcessedEvents, dc.EventsMeetRules, dc.EventsDoNotMeetRules, d, h, m, s)
+		}
+	}()
+
+	//логирование данных
 	go func() {
 		for msg := range loging {
 			_ = sl.WriteLoggingData(msg.MsgData, msg.MsgType)
@@ -209,5 +212,5 @@ func main() {
 
 	_ = sl.WriteLoggingData("application '"+appName+"' is started", "info")
 
-	coremodule.CoreHandler(natsModule, mispModule, redisModule, esModule, nkckiModule, listRulesProcMISPMsg, storageApp, loging)
+	coremodule.CoreHandler(natsModule, mispModule, redisModule, esModule, nkckiModule, listRulesProcMISPMsg, storageApp, loging, counting)
 }

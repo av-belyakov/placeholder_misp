@@ -52,7 +52,7 @@ func HandlerRedis(
 				// ***********************************
 				loging <- datamodels.MessageLoging{
 					MsgData: fmt.Sprintf("TEST_INFO func 'HandlerRedis', обрабатываем добавление CaseID и EventId '%s' to REDIS DB", data.Data),
-					MsgType: "info",
+					MsgType: "testing",
 				}
 				//
 				//
@@ -78,7 +78,7 @@ func HandlerRedis(
 					// ***********************************
 					loging <- datamodels.MessageLoging{
 						MsgData: fmt.Sprintf("TEST_INFO func 'HandlerRedis', НАЙДЕНО СТАРОЕ значение CaseID '%s' отправляем в ядро найденное событие с event id '%s'", tmp[0], eventId),
-						MsgType: "info",
+						MsgType: "testing",
 					}
 					//
 					//
@@ -108,7 +108,7 @@ func HandlerRedis(
 				// ***********************************
 				loging <- datamodels.MessageLoging{
 					MsgData: fmt.Sprintf("TEST_INFO func 'HandlerRedis', выполнили замену старого значения event id: %s новым значением event id: %s, для case id: %s", eventId, tmp[1], tmp[0]),
-					MsgType: "info",
+					MsgType: "testing",
 				}
 				//
 				//

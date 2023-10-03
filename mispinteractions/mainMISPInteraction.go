@@ -61,7 +61,7 @@ func HandlerMISP(
 				// ***********************************
 				loging <- datamodels.MessageLoging{
 					MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', --=== RESEIVED DATA ===--	USER EMAIL: %s, ObjectId: %v", data.UserEmail, data.CaseId),
-					MsgType: "info",
+					MsgType: "testing",
 				}
 				//
 				//
@@ -123,7 +123,7 @@ func HandlerMISP(
 				// ***********************************
 				loging <- datamodels.MessageLoging{
 					MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', отправляем запрос для добавления в БД Redis, id кейса и нового события, где case id: %v, event id: %s", data.CaseId, eventId),
-					MsgType: "info",
+					MsgType: "testing",
 				}
 				//
 				//
@@ -149,7 +149,7 @@ func HandlerMISP(
 				// ***********************************
 				loging <- datamodels.MessageLoging{
 					MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', command: '%s' удаление события типа event, где event id: %s", data.Command, data.EventId),
-					MsgType: "info",
+					MsgType: "testing",
 				}
 				//
 				//
@@ -170,7 +170,7 @@ func HandlerMISP(
 				// ***********************************
 				loging <- datamodels.MessageLoging{
 					MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', должно было быть успешно выполненно удаление события event id: %s", data.EventId),
-					MsgType: "info",
+					MsgType: "testing",
 				}
 				//
 				//

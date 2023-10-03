@@ -24,7 +24,8 @@ func CoreHandler(
 	nkckimodule *nkckiinteractions.ModuleNKCKI,
 	listRule rules.ListRulesProcessingMsgMISP,
 	storageApp *memorytemporarystorage.CommonStorageTemporary,
-	loging chan<- datamodels.MessageLoging) {
+	loging chan<- datamodels.MessageLoging,
+	counting chan<- datamodels.DataCounterSettings) {
 
 	natsChanReception := natsmodule.GetDataReceptionChannel()
 	mispChanReception := mispmodule.GetDataReceptionChannel()
@@ -41,7 +42,7 @@ func CoreHandler(
 			chanCreateMispFormat, chanDone := NewMispFormat(mispmodule, loging)
 
 			//обработчик сообщений из TheHive (выполняется разбор сообщения и его разбор на основе правил)
-			go HandlerMessageFromHive(data.Data, uuidCase, storageApp, listRule, chanCreateMispFormat, chanDone, loging)
+			go HandlerMessageFromHive(data.Data, uuidCase, storageApp, listRule, chanCreateMispFormat, chanDone, loging, counting)
 
 			// отправка сообщения в Elasticshearch
 			esmodule.SendingData(elasticsearchinteractions.SettingsInputChan{UUID: uuidCase})
@@ -57,7 +58,7 @@ func CoreHandler(
 				// ***********************************
 				loging <- datamodels.MessageLoging{
 					MsgData: fmt.Sprintf("TEST_INFO func 'CoreHandler', отправляем полученный event id: %s в модуль NATS", data.EventId),
-					MsgType: "info",
+					MsgType: "testing",
 				}
 				//
 				//
@@ -74,7 +75,7 @@ func CoreHandler(
 				// ***********************************
 				loging <- datamodels.MessageLoging{
 					MsgData: fmt.Sprintf("TEST_INFO func 'CoreHandler', надо отправить инфу CaseID '%s' и EventId '%s' to REDIS DB", data.CaseId, data.EventId),
-					MsgType: "info",
+					MsgType: "testing",
 				}
 				//
 				//
@@ -94,7 +95,7 @@ func CoreHandler(
 				// ***********************************
 				loging <- datamodels.MessageLoging{
 					MsgData: fmt.Sprintf("TEST_INFO func 'CoreHandler', здесь, получаем event id: '%v' из Redis для удаления события в MISP", data.Result),
-					MsgType: "info",
+					MsgType: "testing",
 				}
 				//
 				//
@@ -117,7 +118,7 @@ func CoreHandler(
 				// ***********************************
 				loging <- datamodels.MessageLoging{
 					MsgData: fmt.Sprintf("TEST_INFO func 'CoreHandler', отправляем event id: '%s' в MISP для удаления события", eventId),
-					MsgType: "info",
+					MsgType: "testing",
 				}
 				//
 				//

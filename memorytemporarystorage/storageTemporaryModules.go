@@ -20,6 +20,7 @@ func NewTemporaryStorage() *CommonStorageTemporary {
 				mutex:    sync.Mutex{},
 			},
 			ListUserSettingsMISP: make([]UserSettingsMISP, 0),
+			dataCounter:          DataCounterStorage{mutex: sync.Mutex{}},
 		}
 
 		go checkTimeDelete(&cst)
@@ -49,6 +50,57 @@ func checkTimeDelete(cst *CommonStorageTemporary) {
 			}
 		}()
 	}
+}
+
+// GetDataCounter возвращает информацию по сетчикам
+func (cst *CommonStorageTemporary) GetDataCounter() DataCounter {
+	return DataCounter{
+		AcceptedEvents:       cst.dataCounter.acceptedEvents,
+		ProcessedEvents:      cst.dataCounter.processedEvents,
+		EventsMeetRules:      cst.dataCounter.eventsMeetRules,
+		EventsDoNotMeetRules: cst.dataCounter.eventsDoNotMeetRules,
+		StartTime:            cst.dataCounter.startTime,
+	}
+}
+
+// SetStartTimeDataCounter добавляет время начала сетчика
+func (cst *CommonStorageTemporary) SetStartTimeDataCounter(t time.Time) {
+	cst.dataCounter.mutex.Lock()
+	defer cst.dataCounter.mutex.Unlock()
+
+	cst.dataCounter.startTime = t
+}
+
+// SetAcceptedEventsDataCounter увеличивает сетчик принятых событий
+func (cst *CommonStorageTemporary) SetAcceptedEventsDataCounter(num int) {
+	cst.dataCounter.mutex.Lock()
+	defer cst.dataCounter.mutex.Unlock()
+
+	cst.dataCounter.acceptedEvents += num
+}
+
+// SetProcessedEventsDataCounter увеличивает сетчик обработанных событий
+func (cst *CommonStorageTemporary) SetProcessedEventsDataCounter(num int) {
+	cst.dataCounter.mutex.Lock()
+	defer cst.dataCounter.mutex.Unlock()
+
+	cst.dataCounter.processedEvents += num
+}
+
+// SetEventsMeetRulesDataCounter увеличивает сетчик событий соответствующих правилу
+func (cst *CommonStorageTemporary) SetEventsMeetRulesDataCounter(num int) {
+	cst.dataCounter.mutex.Lock()
+	defer cst.dataCounter.mutex.Unlock()
+
+	cst.dataCounter.eventsMeetRules += num
+}
+
+// SetEventsDoNotMeetRulesDataCounter увеличивает сетчик событий не соответствующих правилу
+func (cst *CommonStorageTemporary) SetEventsDoNotMeetRulesDataCounter(num int) {
+	cst.dataCounter.mutex.Lock()
+	defer cst.dataCounter.mutex.Unlock()
+
+	cst.dataCounter.eventsDoNotMeetRules += num
 }
 
 // GetTemporaryCase возвращает информацию из временного списка входящих кейсов

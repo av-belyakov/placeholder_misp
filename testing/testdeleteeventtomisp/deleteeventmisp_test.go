@@ -78,7 +78,7 @@ var _ = Describe("Deleteeventmisp", Ordered, func() {
 							// ***********************************
 							loging <- datamodels.MessageLoging{
 								MsgData: fmt.Sprintf("TEST_INFO func 'NewCore', надо отправить инфу CaseID '%s' и EventId '%s' to REDIS DB\n", data.CaseId, data.EventId),
-								MsgType: "info",
+								MsgType: "testing",
 							}
 							//
 							//
@@ -102,7 +102,7 @@ var _ = Describe("Deleteeventmisp", Ordered, func() {
 							// ***********************************
 							loging <- datamodels.MessageLoging{
 								MsgData: fmt.Sprintf("TEST_INFO func 'NewCore', Здесь, получаем event id: '%v' из Redis для удаления события в MISP", data.Result),
-								MsgType: "info",
+								MsgType: "testing",
 							}
 							//
 							//
@@ -125,7 +125,7 @@ var _ = Describe("Deleteeventmisp", Ordered, func() {
 							// ***********************************
 							loging <- datamodels.MessageLoging{
 								MsgData: fmt.Sprintf("TEST_INFO func 'NewCore', отправляем event id: '%s' в MISP для удаления события", eventId),
-								MsgType: "info",
+								MsgType: "testing",
 							}
 							//
 							//
