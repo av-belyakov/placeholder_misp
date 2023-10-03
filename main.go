@@ -179,6 +179,11 @@ func main() {
 
 	//вывод данных счетчика
 	go func() {
+		dc := storageApp.GetDataCounter()
+		d, h, m, s := supportingfunctions.GetDifference(dc.StartTime, time.Now())
+
+		fmt.Printf("\tСОБЫТИЙ принятых/обработанных: %d/%d, соответствие/не соответствие правилам: %d/%d, время со старта приложения: дней %d, часов %d, минут %d, секунд %d\r", dc.AcceptedEvents, dc.ProcessedEvents, dc.EventsMeetRules, dc.EventsDoNotMeetRules, d, h, m, s)
+
 		for d := range counting {
 			switch d.DataType {
 			case "update accepted events":
