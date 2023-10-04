@@ -114,6 +114,9 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 
 		//формирование итоговых документов в формате MISP
 		chanCreateMispFormat, chanDone = coremodule.NewMispFormat(mispModule, loging)
+
+		//обработчик сообщений из TheHive (выполняется разбор сообщения и его разбор на основе правил)
+		coremodule.HandlerMessageFromHive(exampleByte, uuid.New().String(), storageApp, listRules, chanCreateMispFormat, chanDone, loging, counting)
 	})
 
 	Context("Тест 1. Проверка инициализации модулей", func() {
@@ -133,8 +136,9 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 	Context("Тест 2. Проверяем обработчик кейсов", func() {
 		It("", func() {
 
-			//обработчик сообщений из TheHive (выполняется разбор сообщения и его разбор на основе правил)
-			coremodule.HandlerMessageFromHive(exampleByte, uuid.New().String(), storageApp, listRules, chanCreateMispFormat, chanDone, loging, counting)
+			mispOutput := mispModule.GetDataReceptionChannel()
+
+			<-mispOutput
 
 			Expect(true).Should(BeTrue())
 		})

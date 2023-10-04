@@ -42,6 +42,8 @@ github.com/av-belyakov/simplelogger v0.0.0-20230929094950-9512d4930d44 h1:79Gm1P
 github.com/av-belyakov/simplelogger v0.0.0-20230929094950-9512d4930d44/go.mod h1:NGvAPMeVHkAPNroGgrQzNvQBbXVmhj0g25+9y7ZUjsg=
 github.com/av-belyakov/simplelogger v0.0.0-20231003133047-ce749ce60950 h1:bXjfG/hKpubu49i5in+0bxMByaLnBLDE8NgWB2GlAJA=
 github.com/av-belyakov/simplelogger v0.0.0-20231003133047-ce749ce60950/go.mod h1:NGvAPMeVHkAPNroGgrQzNvQBbXVmhj0g25+9y7ZUjsg=
+github.com/av-belyakov/simplelogger v0.0.0-20231004094742-af2a9650e1d7 h1:PgMWW2CQk5bUSQqp9N5nA+2Fn+tzaOccf1iY0UpEWnI=
+github.com/av-belyakov/simplelogger v0.0.0-20231004094742-af2a9650e1d7/go.mod h1:NGvAPMeVHkAPNroGgrQzNvQBbXVmhj0g25+9y7ZUjsg=
 github.com/bsm/ginkgo/v2 v2.9.5 h1:rtVBYPs3+TC5iLUVOis1B9tjLTup7Cj5IfzosKtvTJ0=
 github.com/bsm/gomega v1.26.0 h1:LhQm+AFcgV2M0WyKroMASzAzCAJVpAxQXv4SaI9a69Y=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=

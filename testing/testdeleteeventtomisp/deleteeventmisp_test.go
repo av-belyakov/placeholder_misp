@@ -69,7 +69,7 @@ var _ = Describe("Deleteeventmisp", Ordered, func() {
 
 			mispmodule.SendingDataInput(mispinteractions.SettingsChanInputMISP{
 				Command: "del event by id",
-				EventId: "7221",
+				EventId: "7418",
 			})
 
 			<-chanDone
