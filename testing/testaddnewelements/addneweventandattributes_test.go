@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"time"
 
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
@@ -21,7 +22,8 @@ import (
 
 var _ = Describe("Addneweventandattributes", Ordered, func() {
 	var (
-		loging                         chan<- datamodels.MessageLoging
+		loging                         chan datamodels.MessageLoging
+		counting                       chan datamodels.DataCounterSettings
 		confApp                        confighandler.ConfigApp
 		listRules                      rules.ListRulesProcessingMsgMISP
 		mispModule                     *mispinteractions.ModuleMISP
@@ -57,10 +59,46 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 	}
 
 	BeforeAll(func() {
-		loging = make(chan<- datamodels.MessageLoging)
+		loging = make(chan datamodels.MessageLoging)
+		counting = make(chan datamodels.DataCounterSettings)
 
 		confApp.AppConfigMISP.Host = "misp-world.cloud.gcm"
 		confApp.AppConfigMISP.Auth = "TvHkjH8jVQEIdvAxjxnL4H6wDoKyV7jobDjndvAo"
+
+		go func() {
+			fmt.Println("___ Logging START")
+			defer fmt.Println("___ Logging STOP")
+
+			for log := range loging {
+				fmt.Println("----", log, "----")
+			}
+		}()
+
+		//вывод данных счетчика
+		go func() {
+			dc := storageApp.GetDataCounter()
+			d, h, m, s := supportingfunctions.GetDifference(dc.StartTime, time.Now())
+
+			fmt.Printf("\tСОБЫТИЙ принятых/обработанных: %d/%d, соответствие/не соответствие правилам: %d/%d, время со старта приложения: дней %d, часов %d, минут %d, секунд %d\n", dc.AcceptedEvents, dc.ProcessedEvents, dc.EventsMeetRules, dc.EventsDoNotMeetRules, d, h, m, s)
+
+			for d := range counting {
+				switch d.DataType {
+				case "update accepted events":
+					storageApp.SetAcceptedEventsDataCounter(d.Count)
+				case "update processed events":
+					storageApp.SetProcessedEventsDataCounter(d.Count)
+				case "update events meet rules":
+					storageApp.SetEventsMeetRulesDataCounter(d.Count)
+				case "events do not meet rules":
+					storageApp.SetEventsDoNotMeetRulesDataCounter(d.Count)
+				}
+
+				dc := storageApp.GetDataCounter()
+				d, h, m, s := supportingfunctions.GetDifference(dc.StartTime, time.Now())
+
+				fmt.Printf("\tСОБЫТИЙ принятых/обработанных: %d/%d, соответствие/не соответствие правилам: %d/%d, время со старта приложения: дней %d, часов %d, минут %d, секунд %d\n", dc.AcceptedEvents, dc.ProcessedEvents, dc.EventsMeetRules, dc.EventsDoNotMeetRules, d, h, m, s)
+			}
+		}()
 
 		//инициализируем модуль временного хранения информации
 		storageApp = memorytemporarystorage.NewTemporaryStorage()
@@ -94,8 +132,9 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 
 	Context("Тест 2. Проверяем обработчик кейсов", func() {
 		It("", func() {
+
 			//обработчик сообщений из TheHive (выполняется разбор сообщения и его разбор на основе правил)
-			coremodule.HandlerMessageFromHive(exampleByte, uuid.New().String(), storageApp, listRules, chanCreateMispFormat, chanDone, loging)
+			coremodule.HandlerMessageFromHive(exampleByte, uuid.New().String(), storageApp, listRules, chanCreateMispFormat, chanDone, loging, counting)
 
 			Expect(true).Should(BeTrue())
 		})

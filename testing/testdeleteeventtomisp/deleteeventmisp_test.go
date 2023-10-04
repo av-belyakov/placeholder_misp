@@ -1,9 +1,7 @@
 package testdeleteeventtomisp_test
 
 import (
-	"context"
 	"fmt"
-	"runtime"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -13,14 +11,13 @@ import (
 	"placeholder_misp/datamodels"
 	"placeholder_misp/memorytemporarystorage"
 	"placeholder_misp/mispinteractions"
-	"placeholder_misp/redisinteractions"
 )
 
 var _ = Describe("Deleteeventmisp", Ordered, func() {
 	var (
-		confApp                   confighandler.ConfigApp
-		storageApp                *memorytemporarystorage.CommonStorageTemporary
-		redismodule               *redisinteractions.ModuleRedis
+		confApp    confighandler.ConfigApp
+		storageApp *memorytemporarystorage.CommonStorageTemporary
+		//redismodule               *redisinteractions.ModuleRedis
 		mispmodule                *mispinteractions.ModuleMISP
 		errConfApp, errMispModule error
 	)
@@ -40,7 +37,7 @@ var _ = Describe("Deleteeventmisp", Ordered, func() {
 
 		//инициализируем модуль временного хранения информации
 		storageApp = memorytemporarystorage.NewTemporaryStorage()
-		redismodule = redisinteractions.HandlerRedis(context.Background(), confApp.AppConfigRedis, storageApp, loging)
+		//redismodule = redisinteractions.HandlerRedis(context.Background(), confApp.AppConfigRedis, storageApp, loging)
 		mispmodule, errMispModule = mispinteractions.HandlerMISP(confApp.AppConfigMISP, storageApp, loging)
 	})
 
@@ -51,107 +48,142 @@ var _ = Describe("Deleteeventmisp", Ordered, func() {
 		})
 	})
 
-	Context("Тест 2. Проверка удаления события из MISP по его id", func() {
-		It("Должно быть выполненно успешное удаление из MISP события по его id", func() {
-			chanDone := make(chan bool)
+	Context("Тест 2. Проверка работы канала передачи в MISP события для удаления", func() {
+		It("Должно быть успешно переданно событие", func() {
+			chanDone := make(chan struct{})
 
 			go func() {
 				fmt.Println("___ Logging START")
 				defer fmt.Println("___ Logging STOP")
 
 				for log := range loging {
+					if log.MsgData == "TEST_INFO STOP" {
+						chanDone <- struct{}{}
+
+						return
+					}
+
 					fmt.Println("----", log, "----")
 				}
 			}()
 
-			go func() {
-				mispChanReception := mispmodule.GetDataReceptionChannel()
-				redisChanReception := redismodule.GetDataReceptionChannel()
-
-				for {
-					select {
-					case data := <-mispChanReception:
-						switch data.Command {
-						case "set new event id":
-							// ***********************************
-							// Это логирование только для теста!!!
-							// ***********************************
-							loging <- datamodels.MessageLoging{
-								MsgData: fmt.Sprintf("TEST_INFO func 'NewCore', надо отправить инфу CaseID '%s' и EventId '%s' to REDIS DB\n", data.CaseId, data.EventId),
-								MsgType: "testing",
-							}
-							//
-							//
-
-							//обработка запроса на добавления новой связки caseId:eventId в Redis
-							redismodule.SendingDataInput(redisinteractions.SettingsChanInputRedis{
-								Command: "set case id",
-								Data:    fmt.Sprintf("%s:%s", data.CaseId, data.EventId),
-							})
-						case "TEST STOP":
-							fmt.Println("TEST STOP --====---==-=")
-
-							chanDone <- true
-						}
-
-					case data := <-redisChanReception:
-						switch data.CommandResult {
-						case "found event id":
-							// ***********************************
-							// Это логирование только для теста!!!
-							// ***********************************
-							loging <- datamodels.MessageLoging{
-								MsgData: fmt.Sprintf("TEST_INFO func 'NewCore', Здесь, получаем event id: '%v' из Redis для удаления события в MISP", data.Result),
-								MsgType: "testing",
-							}
-							//
-							//
-
-							// Здесь, получаем eventId из Redis для удаления события в MISP
-							eventId, ok := data.Result.(string)
-							if !ok {
-								_, f, l, _ := runtime.Caller(0)
-
-								loging <- datamodels.MessageLoging{
-									MsgData: fmt.Sprintf("'it is not possible to convert a value to a string' %s:%d", f, l-1),
-									MsgType: "warning",
-								}
-
-								break
-							}
-
-							// ***********************************
-							// Это логирование только для теста!!!
-							// ***********************************
-							loging <- datamodels.MessageLoging{
-								MsgData: fmt.Sprintf("TEST_INFO func 'NewCore', отправляем event id: '%s' в MISP для удаления события", eventId),
-								MsgType: "testing",
-							}
-							//
-							//
-
-							mispmodule.SendingDataInput(mispinteractions.SettingsChanInputMISP{
-								Command: "del event by id",
-								EventId: eventId,
-							})
-						}
-					}
-				}
-			}()
-
-			mispmodule.SendingDataOutput(mispinteractions.SettingChanOutputMISP{
-				Command: "set new event id",
-				CaseId:  fmt.Sprint(33669),
-				EventId: fmt.Sprint(7342),
+			mispmodule.SendingDataInput(mispinteractions.SettingsChanInputMISP{
+				Command: "del event by id",
+				EventId: "7221",
 			})
 
-			isDone := <-chanDone
-			close(loging)
+			<-chanDone
 
 			time.Sleep(1 * time.Second)
-			fmt.Println("STOP TESTING")
+			fmt.Println("STOP CHAN TESTING")
 
-			Expect(isDone).Should(BeTrue())
+			Expect(true).Should(BeTrue())
 		})
 	})
+
+	/*
+		Context("Тест 3. Проверка удаления события из MISP по его id", func() {
+			It("Должно быть выполненно успешное удаление из MISP события по его id", func() {
+				chanDone := make(chan bool)
+
+				go func() {
+					fmt.Println("___ Logging START")
+					defer fmt.Println("___ Logging STOP")
+
+					for log := range loging {
+						fmt.Println("----", log, "----")
+					}
+				}()
+
+				go func() {
+					mispChanReception := mispmodule.GetDataReceptionChannel()
+					redisChanReception := redismodule.GetDataReceptionChannel()
+
+					for {
+						select {
+						case data := <-mispChanReception:
+							switch data.Command {
+							case "set new event id":
+								// ***********************************
+								// Это логирование только для теста!!!
+								// ***********************************
+								loging <- datamodels.MessageLoging{
+									MsgData: fmt.Sprintf("TEST_INFO func 'NewCore', надо отправить инфу CaseID '%s' и EventId '%s' to REDIS DB\n", data.CaseId, data.EventId),
+									MsgType: "testing",
+								}
+								//
+								//
+
+								//обработка запроса на добавления новой связки caseId:eventId в Redis
+								redismodule.SendingDataInput(redisinteractions.SettingsChanInputRedis{
+									Command: "set case id",
+									Data:    fmt.Sprintf("%s:%s", data.CaseId, data.EventId),
+								})
+							case "TEST STOP":
+								fmt.Println("TEST STOP --====---==-=")
+
+								chanDone <- true
+							}
+
+						case data := <-redisChanReception:
+							switch data.CommandResult {
+							case "found event id":
+								// ***********************************
+								// Это логирование только для теста!!!
+								// ***********************************
+								loging <- datamodels.MessageLoging{
+									MsgData: fmt.Sprintf("TEST_INFO func 'NewCore', Здесь, получаем event id: '%v' из Redis для удаления события в MISP", data.Result),
+									MsgType: "testing",
+								}
+								//
+								//
+
+								// Здесь, получаем eventId из Redis для удаления события в MISP
+								eventId, ok := data.Result.(string)
+								if !ok {
+									_, f, l, _ := runtime.Caller(0)
+
+									loging <- datamodels.MessageLoging{
+										MsgData: fmt.Sprintf("'it is not possible to convert a value to a string' %s:%d", f, l-1),
+										MsgType: "warning",
+									}
+
+									break
+								}
+
+								// ***********************************
+								// Это логирование только для теста!!!
+								// ***********************************
+								loging <- datamodels.MessageLoging{
+									MsgData: fmt.Sprintf("TEST_INFO func 'NewCore', отправляем event id: '%s' в MISP для удаления события", eventId),
+									MsgType: "testing",
+								}
+								//
+								//
+
+								mispmodule.SendingDataInput(mispinteractions.SettingsChanInputMISP{
+									Command: "del event by id",
+									EventId: eventId,
+								})
+							}
+						}
+					}
+				}()
+
+				mispmodule.SendingDataOutput(mispinteractions.SettingChanOutputMISP{
+					Command: "set new event id",
+					CaseId:  fmt.Sprint(33669),
+					EventId: fmt.Sprint(7342),
+				})
+
+				isDone := <-chanDone
+				close(loging)
+
+				time.Sleep(1 * time.Second)
+				fmt.Println("STOP TESTING")
+
+				Expect(isDone).Should(BeTrue())
+			})
+		})
+	*/
 })

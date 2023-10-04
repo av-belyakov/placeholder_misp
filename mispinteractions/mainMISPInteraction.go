@@ -52,99 +52,115 @@ func HandlerMISP(
 	//здесь обрабатываем данные из входного канала модуля MISP
 	go func() {
 		for data := range mmisp.chanInputMISP {
-			authKey := conf.Auth
+			//authKey := conf.Auth
+
+			// ***********************************
+			// Это логирование только для теста!!!
+			// ***********************************
+			loging <- datamodels.MessageLoging{
+				MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', reseived command '%s', data object '%v'", data.Command, data),
+				MsgType: "testing",
+			}
+			//
+			//
 
 			switch data.Command {
 			case "add event":
-				// ***********************************
-				// Это логирование только для теста!!!
-				// ***********************************
-				loging <- datamodels.MessageLoging{
-					MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', --=== RESEIVED DATA ===--	USER EMAIL: %s, ObjectId: %v", data.UserEmail, data.CaseId),
-					MsgType: "testing",
-				}
-				//
-				//
+				go addEvent(conf, storageApp, data, loging)
 
-				// получаем авторизационный ключ пользователя по его email
-				if us, ok := storageApp.GetUserSettingsMISP(data.UserEmail); ok {
-					authKey = us.AuthKey
-				}
-
-				//обработка только для события типа 'events'
-				_, resBodyByte, err := sendEventsMispFormat(conf.Host, authKey, data)
-				if err != nil {
-					_, f, l, _ := runtime.Caller(0)
-
+				/*
+					// ***********************************
+					// Это логирование только для теста!!!
+					// ***********************************
 					loging <- datamodels.MessageLoging{
-						MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
-						MsgType: "error",
+						MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', --=== RESEIVED DATA ===--	USER EMAIL: %s, ObjectId: %v", data.UserEmail, data.CaseId),
+						MsgType: "testing",
+					}
+					//
+					//
+
+					// получаем авторизационный ключ пользователя по его email
+					if us, ok := storageApp.GetUserSettingsMISP(data.UserEmail); ok {
+						authKey = us.AuthKey
 					}
 
-					continue
-				}
+					//обработка только для события типа 'events'
+					_, resBodyByte, err := sendEventsMispFormat(conf.Host, authKey, data)
+					if err != nil {
+						_, f, l, _ := runtime.Caller(0)
 
-				resMisp := RespMISP{}
-				if err := json.Unmarshal(resBodyByte, &resMisp); err != nil {
-					_, f, l, _ := runtime.Caller(0)
+						loging <- datamodels.MessageLoging{
+							MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
+							MsgType: "error",
+						}
 
-					loging <- datamodels.MessageLoging{
-						MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
-						MsgType: "error",
+						continue
 					}
 
-					continue
-				}
+					resMisp := RespMISP{}
+					if err := json.Unmarshal(resBodyByte, &resMisp); err != nil {
+						_, f, l, _ := runtime.Caller(0)
 
-				var eventId string
-				for key, value := range resMisp.Event {
-					if key == "id" {
-						if str, ok := value.(string); ok {
-							eventId = str
+						loging <- datamodels.MessageLoging{
+							MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
+							MsgType: "error",
+						}
 
-							break
+						continue
+					}
+
+					var eventId string
+					for key, value := range resMisp.Event {
+						if key == "id" {
+							if str, ok := value.(string); ok {
+								eventId = str
+
+								break
+							}
 						}
 					}
-				}
 
-				if eventId == "" {
-					_, f, l, _ := runtime.Caller(0)
+					if eventId == "" {
+						_, f, l, _ := runtime.Caller(0)
 
-					loging <- datamodels.MessageLoging{
-						MsgData: fmt.Sprintf("'the formation of events of the 'Attributes' type was not performed because the EventID is empty' %s:%d", f, l-1),
-						MsgType: "error",
+						loging <- datamodels.MessageLoging{
+							MsgData: fmt.Sprintf("'the formation of events of the 'Attributes' type was not performed because the EventID is empty' %s:%d", f, l-1),
+							MsgType: "error",
+						}
+
+						continue
 					}
 
-					continue
-				}
+					// ***********************************
+					// Это логирование только для теста!!!
+					// ***********************************
+					loging <- datamodels.MessageLoging{
+						MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', отправляем запрос для добавления в БД Redis, id кейса и нового события, где case id: %v, event id: %s", data.CaseId, eventId),
+						MsgType: "testing",
+					}
+					//
+					//
 
-				// ***********************************
-				// Это логирование только для теста!!!
-				// ***********************************
-				loging <- datamodels.MessageLoging{
-					MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', отправляем запрос для добавления в БД Redis, id кейса и нового события, где case id: %v, event id: %s", data.CaseId, eventId),
-					MsgType: "testing",
-				}
-				//
-				//
+					//отправляем запрос для добавления в БД Redis, id кейса и нового события
+					mmisp.SendingDataOutput(SettingChanOutputMISP{
+						Command: "set new event id",
+						CaseId:  fmt.Sprint(data.CaseId),
+						EventId: eventId,
+					})
 
-				//отправляем запрос для добавления в БД Redis, id кейса и нового события
-				mmisp.SendingDataOutput(SettingChanOutputMISP{
-					Command: "set new event id",
-					CaseId:  fmt.Sprint(data.CaseId),
-					EventId: eventId,
-				})
+					_, _ = sendAttribytesMispFormat(conf.Host, authKey, eventId, data, loging)
 
-				_, _ = sendAttribytesMispFormat(conf.Host, authKey, eventId, data, loging)
-
-				//отправляем в ядро информацию по event Id
-				mmisp.SendingDataOutput(SettingChanOutputMISP{
-					Command: "send event id",
-					EventId: eventId,
-				})
+					//отправляем в ядро информацию по event Id
+					mmisp.SendingDataOutput(SettingChanOutputMISP{
+						Command: "send event id",
+						EventId: eventId,
+					})
+				*/
 
 			case "del event by id":
-				// ***********************************
+				go delEventById(conf, data.EventId, loging)
+
+				/*// ***********************************
 				// Это логирование только для теста!!!
 				// ***********************************
 				loging <- datamodels.MessageLoging{
@@ -175,12 +191,22 @@ func HandlerMISP(
 				//
 				//
 
+				// ***********************************
+				// Это логирование только для теста!!!
+				// ***********************************
+				loging <- datamodels.MessageLoging{
+					MsgData: "TEST_INFO STOP",
+					MsgType: "testing",
+				}
+				//
+				//
+
 				//
 				//только для теста, для ОСТАНОВА
 				//
 				//mmisp.SendingDataOutput(SettingChanOutputMISP{
 				//	Command: "TEST STOP",
-				//})
+				//})*/
 			}
 		}
 	}()
@@ -201,6 +227,153 @@ func NewClientMISP(h, a string, v bool) (ClientMISP, error) {
 		AuthHash: a,
 		Verify:   v,
 	}, nil
+}
+
+func addEvent(conf confighandler.AppConfigMISP,
+	storageApp *memorytemporarystorage.CommonStorageTemporary,
+	data SettingsChanInputMISP,
+	loging chan<- datamodels.MessageLoging) {
+	authKey := conf.Auth
+
+	// ***********************************
+	// Это логирование только для теста!!!
+	// ***********************************
+	loging <- datamodels.MessageLoging{
+		MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', --=== RESEIVED DATA ===--	USER EMAIL: %s, ObjectId: %v", data.UserEmail, data.CaseId),
+		MsgType: "testing",
+	}
+	//
+	//
+
+	// получаем авторизационный ключ пользователя по его email
+	if us, ok := storageApp.GetUserSettingsMISP(data.UserEmail); ok {
+		authKey = us.AuthKey
+	}
+
+	//обработка только для события типа 'events'
+	_, resBodyByte, err := sendEventsMispFormat(conf.Host, authKey, data)
+	if err != nil {
+		_, f, l, _ := runtime.Caller(0)
+
+		loging <- datamodels.MessageLoging{
+			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
+			MsgType: "error",
+		}
+
+		return
+	}
+
+	resMisp := RespMISP{}
+	if err := json.Unmarshal(resBodyByte, &resMisp); err != nil {
+		_, f, l, _ := runtime.Caller(0)
+
+		loging <- datamodels.MessageLoging{
+			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
+			MsgType: "error",
+		}
+
+		return
+	}
+
+	var eventId string
+	for key, value := range resMisp.Event {
+		if key == "id" {
+			if str, ok := value.(string); ok {
+				eventId = str
+
+				break
+			}
+		}
+	}
+
+	if eventId == "" {
+		_, f, l, _ := runtime.Caller(0)
+
+		loging <- datamodels.MessageLoging{
+			MsgData: fmt.Sprintf("'the formation of events of the 'Attributes' type was not performed because the EventID is empty' %s:%d", f, l-1),
+			MsgType: "error",
+		}
+
+		return
+	}
+
+	// ***********************************
+	// Это логирование только для теста!!!
+	// ***********************************
+	loging <- datamodels.MessageLoging{
+		MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', отправляем запрос для добавления в БД Redis, id кейса и нового события, где case id: %v, event id: %s", data.CaseId, eventId),
+		MsgType: "testing",
+	}
+	//
+	//
+
+	//отправляем запрос для добавления в БД Redis, id кейса и нового события
+	mmisp.SendingDataOutput(SettingChanOutputMISP{
+		Command: "set new event id",
+		CaseId:  fmt.Sprint(data.CaseId),
+		EventId: eventId,
+	})
+
+	_, _ = sendAttribytesMispFormat(conf.Host, authKey, eventId, data, loging)
+
+	//отправляем в ядро информацию по event Id
+	mmisp.SendingDataOutput(SettingChanOutputMISP{
+		Command: "send event id",
+		EventId: eventId,
+	})
+}
+
+func delEventById(conf confighandler.AppConfigMISP,
+	eventId string,
+	loging chan<- datamodels.MessageLoging) {
+
+	// ***********************************
+	// Это логирование только для теста!!!
+	// ***********************************
+	loging <- datamodels.MessageLoging{
+		MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', удаление события типа event, где event id: %s", eventId),
+		MsgType: "testing",
+	}
+	//
+	//
+
+	// удаление события типа event
+	_, err := DelEventsMispFormat(conf.Host, conf.Auth, eventId)
+	if err != nil {
+		_, f, l, _ := runtime.Caller(0)
+
+		loging <- datamodels.MessageLoging{
+			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
+			MsgType: "error",
+		}
+	}
+
+	// ***********************************
+	// Это логирование только для теста!!!
+	// ***********************************
+	loging <- datamodels.MessageLoging{
+		MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', должно было быть успешно выполненно удаление события event id: %s", eventId),
+		MsgType: "testing",
+	}
+	//
+	//
+
+	// ***********************************
+	// Это логирование только для теста!!!
+	// ***********************************
+	loging <- datamodels.MessageLoging{
+		MsgData: "TEST_INFO STOP",
+		MsgType: "testing",
+	}
+	//
+	//
+
+	//
+	//только для теста, для ОСТАНОВА
+	//
+	mmisp.SendingDataOutput(SettingChanOutputMISP{
+		Command: "TEST STOP",
+	})
 }
 
 // getUserMisp выполнеяет запрос для получения настроек пользователей через API MISP
