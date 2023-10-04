@@ -22,17 +22,17 @@ var _ = Describe("Interactionredisdb", Ordered, func() {
 		ca, _ := confighandler.NewConfig()
 
 		// канал для логирования
-		loging := make(chan datamodels.MessageLoging)
+		logging := make(chan datamodels.MessageLogging)
 
 		// инициализируем модуль временного хранения информации
 		storageApp := memorytemporarystorage.NewTemporaryStorage()
 
 		ctxRedis, _ := context.WithTimeout(context.Background(), 2*time.Second)
-		module = redisinteractions.HandlerRedis(ctxRedis, ca.AppConfigRedis, storageApp, loging)
+		module = redisinteractions.HandlerRedis(ctxRedis, ca.AppConfigRedis, storageApp, logging)
 
 		go func() {
-			for log := range loging {
-				fmt.Println("LOGING: ", log)
+			for log := range logging {
+				fmt.Println("LOGGING: ", log)
 			}
 		}()
 	})

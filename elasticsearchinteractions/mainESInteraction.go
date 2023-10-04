@@ -30,7 +30,7 @@ func init() {
 func HandlerElasticSearch(
 	conf confighandler.AppConfigElasticSearch,
 	storageApp *memorytemporarystorage.CommonStorageTemporary,
-	loging chan<- datamodels.MessageLoging) (*ModuleElasticSearch, error) {
+	logging chan<- datamodels.MessageLogging) (*ModuleElasticSearch, error) {
 
 	go func() {
 		for data := range es.chanInputElasticSearch {

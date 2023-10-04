@@ -25,7 +25,7 @@ var _ = Describe("Natsinteraction", Ordered, func() {
 		errConn    error
 		closeCtx   context.CancelFunc
 		mnats      *natsinteractions.ModuleNATS
-		chanLog    chan<- datamodels.MessageLoging
+		chanLog    chan<- datamodels.MessageLogging
 		storageApp *memorytemporarystorage.CommonStorageTemporary
 	)
 
@@ -44,7 +44,7 @@ var _ = Describe("Natsinteraction", Ordered, func() {
 	}
 
 	BeforeAll(func() {
-		chanLog = make(chan<- datamodels.MessageLoging)
+		chanLog = make(chan<- datamodels.MessageLogging)
 		//инициализируем модуль временного хранения информации
 		storageApp = memorytemporarystorage.NewTemporaryStorage()
 

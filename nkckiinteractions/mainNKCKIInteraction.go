@@ -14,7 +14,7 @@ var nkcki ModuleNKCKI
 type ModuleNKCKI struct {
 	chanInputNKCKI  chan interface{}
 	chanOutputNKCKI chan interface{}
-	ChanLogging     chan<- datamodels.MessageLoging
+	ChanLogging     chan<- datamodels.MessageLogging
 }
 
 func init() {
@@ -26,7 +26,7 @@ func init() {
 
 func NewClientNKCKI(
 	conf confighandler.AppConfigNKCKI,
-	chanLog chan<- datamodels.MessageLoging) (*ModuleNKCKI, error) {
+	chanLog chan<- datamodels.MessageLogging) (*ModuleNKCKI, error) {
 
 	nkcki.ChanLogging = chanLog
 
@@ -43,7 +43,7 @@ func (nkcki ModuleNKCKI) GetDataReceptionChannel() <-chan interface{} {
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
 
-			mmisp.ChanLogging <- datamodels.MessageLoging{
+			mmisp.ChanLogging <- datamodels.MessageLogging{
 				MsgData: fmt.Sprintf("%s %s:%d", fmt.Sprint(err), f, l-2),
 				MsgType: "error",
 			}
@@ -59,7 +59,7 @@ func (nkcki ModuleNKCKI) GettingData() interface{} {
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
 
-			mmisp.ChanLogging <- datamodels.MessageLoging{
+			mmisp.ChanLogging <- datamodels.MessageLogging{
 				MsgData: fmt.Sprintf("%s %s:%d", fmt.Sprint(err), f, l-2),
 				MsgType: "error",
 			}
@@ -75,7 +75,7 @@ func (nkcki ModuleNKCKI) SendingData(data interface{}) {
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
 
-			mmisp.ChanLogging <- datamodels.MessageLoging{
+			mmisp.ChanLogging <- datamodels.MessageLogging{
 				MsgData: fmt.Sprintf("%s %s:%d", fmt.Sprint(err), f, l-2),
 				MsgType: "error",
 			}

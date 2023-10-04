@@ -68,7 +68,7 @@ var _ = Describe("CreateMispFormat", Ordered, func() {
 	var (
 		listRule             rules.ListRulesProcessingMsgMISP
 		storageApp           *memorytemporarystorage.CommonStorageTemporary
-		loging               chan datamodels.MessageLoging
+		logging              chan datamodels.MessageLogging
 		mispOutput           <-chan mispinteractions.SettingChanOutputMISP
 		moduleMisp           *mispinteractions.ModuleMISP
 		exampleByte          []byte
@@ -99,7 +99,7 @@ var _ = Describe("CreateMispFormat", Ordered, func() {
 		ca, _ := confighandler.NewConfig()
 
 		//канал для логирования
-		loging = make(chan datamodels.MessageLoging)
+		logging = make(chan datamodels.MessageLogging)
 
 		//пример кейса в виде байтов
 		exampleByte = getExampleByte()
@@ -113,7 +113,7 @@ var _ = Describe("CreateMispFormat", Ordered, func() {
 		storageApp = memorytemporarystorage.NewTemporaryStorage()
 
 		//инициализация модуля для взаимодействия с MISP
-		moduleMisp, errHMisp = mispinteractions.HandlerMISP(*ca.GetAppMISP(), storageApp, loging)
+		moduleMisp, errHMisp = mispinteractions.HandlerMISP(*ca.GetAppMISP(), storageApp, logging)
 
 		mispOutput = moduleMisp.GetDataReceptionChannel()
 	})
@@ -160,14 +160,14 @@ var _ = Describe("CreateMispFormat", Ordered, func() {
 			storageApp.SetRawDataHiveFormatMessage(uuidTask, exampleByte)
 
 			//формирование итоговых документов в формате MISP
-			chanCreateMispFormat, chanDone := coremodule.NewMispFormat(moduleMisp, loging)
+			chanCreateMispFormat, chanDone := coremodule.NewMispFormat(moduleMisp, logging)
 
-			go coremodule.HandlerMessageFromHive(exampleByte, uuidTask, storageApp, listRule, chanCreateMispFormat, chanDone, loging)
+			go coremodule.HandlerMessageFromHive(exampleByte, uuidTask, storageApp, listRule, chanCreateMispFormat, chanDone, logging)
 
 			go func() {
 				for {
 					select {
-					case log := <-loging:
+					case log := <-logging:
 						fmt.Println("___ Log = ", log, " ____")
 					case <-cd:
 						fmt.Println("-== STOP TEST ==-")

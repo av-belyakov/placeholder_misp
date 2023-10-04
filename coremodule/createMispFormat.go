@@ -113,7 +113,7 @@ func init() {
 
 func NewMispFormat(
 	mispmodule *mispinteractions.ModuleMISP,
-	loging chan<- datamodels.MessageLoging) (chan ChanInputCreateMispFormat, chan bool) {
+	logging chan<- datamodels.MessageLogging) (chan ChanInputCreateMispFormat, chan bool) {
 
 	//канал принимающий данные необходимые для заполнения MISP форматов
 	chanInput := make(chan ChanInputCreateMispFormat)
@@ -191,7 +191,7 @@ func NewMispFormat(
 				if !isAllowed {
 					_, f, l, _ := runtime.Caller(0)
 
-					loging <- datamodels.MessageLoging{
+					logging <- datamodels.MessageLogging{
 						MsgData: fmt.Sprintf("'the message with case id %d was not sent to MISP because it does not comply with the rules' %s:%d", int(caseId), f, l-1),
 						MsgType: "warning",
 					}

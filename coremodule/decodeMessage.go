@@ -20,13 +20,13 @@ func HandlerMessageFromHive(
 	listRule rules.ListRulesProcessingMsgMISP,
 	cmispf chan<- ChanInputCreateMispFormat,
 	cmispfDone chan<- bool,
-	loging chan<- datamodels.MessageLoging,
+	logging chan<- datamodels.MessageLogging,
 	counting chan<- datamodels.DataCounterSettings) {
 	listTmp := map[string]interface{}{}
 
 	//для записи событий в файл events
 	str, _ := supportingfunctions.NewReadReflectJSONSprint(b)
-	loging <- datamodels.MessageLoging{
+	logging <- datamodels.MessageLogging{
 		MsgData: fmt.Sprintf("\t---------------\n\tEVENTS:\n%s\n", str),
 		MsgType: "events",
 	}
@@ -34,7 +34,7 @@ func HandlerMessageFromHive(
 	if err := json.Unmarshal(b, &listTmp); err != nil {
 		_, f, l, _ := runtime.Caller(0)
 
-		loging <- datamodels.MessageLoging{
+		logging <- datamodels.MessageLogging{
 			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-1),
 			MsgType: "error",
 		}
@@ -45,7 +45,7 @@ func HandlerMessageFromHive(
 	if len(listTmp) == 0 {
 		_, f, l, _ := runtime.Caller(0)
 
-		loging <- datamodels.MessageLoging{
+		logging <- datamodels.MessageLogging{
 			MsgData: fmt.Sprintf("'%s' %s:%d", fmt.Errorf("error decoding the json message, it may be empty"), f, l-1),
 			MsgType: "error",
 		}
@@ -59,7 +59,7 @@ func HandlerMessageFromHive(
 		Count:    1,
 	}
 
-	nlt := processingReflectMap(loging, cmispf, listTmp, &listRule, 0, "")
+	nlt := processingReflectMap(logging, cmispf, listTmp, &listRule, 0, "")
 	storageApp.SetProcessedDataHiveFormatMessage(uuidTask, nlt)
 
 	if listRule.Rules.Passany {
@@ -168,7 +168,7 @@ func ReplacementRuleHandler(lr *rules.ListRulesProcessingMsgMISP, svt, fn string
 }
 
 func processingReflectAnySimpleType(
-	loging chan<- datamodels.MessageLoging,
+	logging chan<- datamodels.MessageLogging,
 	chanOutMispFormat chan<- ChanInputCreateMispFormat,
 	name interface{},
 	anyType interface{},
@@ -197,7 +197,7 @@ func processingReflectAnySimpleType(
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
 
-			loging <- datamodels.MessageLoging{
+			logging <- datamodels.MessageLogging{
 				MsgData: fmt.Sprintf("'search value \"%s\" from rule number \"%d\" of section \"REPLACE\" is not fulfilled' %s:%d", result, num, f, l-1),
 				MsgType: "warning",
 			}
@@ -221,7 +221,7 @@ func processingReflectAnySimpleType(
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
 
-			loging <- datamodels.MessageLoging{
+			logging <- datamodels.MessageLogging{
 				MsgData: fmt.Sprintf("'search value \"%d\" from rule number \"%d\" of section \"REPLACE\" is not fulfilled' %s:%d", result, num, f, l-1),
 				MsgType: "warning",
 			}
@@ -245,7 +245,7 @@ func processingReflectAnySimpleType(
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
 
-			loging <- datamodels.MessageLoging{
+			logging <- datamodels.MessageLogging{
 				MsgData: fmt.Sprintf("'search value \"%d\" from rule number \"%d\" of section \"REPLACE\" is not fulfilled' %s:%d", result, num, f, l-1),
 				MsgType: "warning",
 			}
@@ -269,7 +269,7 @@ func processingReflectAnySimpleType(
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
 
-			loging <- datamodels.MessageLoging{
+			logging <- datamodels.MessageLogging{
 				MsgData: fmt.Sprintf("'search value \"%v\" from rule number \"%d\" of section \"REPLACE\" is not fulfilled' %s:%d", result, num, f, l-1),
 				MsgType: "warning",
 			}
@@ -293,7 +293,7 @@ func processingReflectAnySimpleType(
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
 
-			loging <- datamodels.MessageLoging{
+			logging <- datamodels.MessageLogging{
 				MsgData: fmt.Sprintf("'search value \"%v\" from rule number \"%d\" of section \"REPLACE\" is not fulfilled' %s:%d", result, num, f, l-1),
 				MsgType: "warning",
 			}
@@ -315,7 +315,7 @@ func processingReflectAnySimpleType(
 }
 
 func processingReflectMap(
-	loging chan<- datamodels.MessageLoging,
+	logging chan<- datamodels.MessageLogging,
 	chanOutMispFormat chan<- ChanInputCreateMispFormat,
 	l map[string]interface{},
 	lr *rules.ListRulesProcessingMsgMISP,
@@ -346,18 +346,18 @@ func processingReflectMap(
 		switch r.Kind() {
 		case reflect.Map:
 			if v, ok := v.(map[string]interface{}); ok {
-				newMap = processingReflectMap(loging, chanOutMispFormat, v, lr, num+1, fbTmp)
+				newMap = processingReflectMap(logging, chanOutMispFormat, v, lr, num+1, fbTmp)
 				nl[k] = newMap
 			}
 
 		case reflect.Slice:
 			if v, ok := v.([]interface{}); ok {
-				newList = processingReflectSlice(loging, chanOutMispFormat, v, lr, num+1, fbTmp)
+				newList = processingReflectSlice(logging, chanOutMispFormat, v, lr, num+1, fbTmp)
 				nl[k] = newList
 			}
 
 		default:
-			nl[k] = processingReflectAnySimpleType(loging, chanOutMispFormat, k, v, lr, num, fbTmp)
+			nl[k] = processingReflectAnySimpleType(logging, chanOutMispFormat, k, v, lr, num, fbTmp)
 		}
 	}
 
@@ -365,7 +365,7 @@ func processingReflectMap(
 }
 
 func processingReflectSlice(
-	loging chan<- datamodels.MessageLoging,
+	logging chan<- datamodels.MessageLogging,
 	chanOutMispFormat chan<- ChanInputCreateMispFormat,
 	l []interface{},
 	lr *rules.ListRulesProcessingMsgMISP,
@@ -388,20 +388,20 @@ func processingReflectSlice(
 		switch r.Kind() {
 		case reflect.Map:
 			if v, ok := v.(map[string]interface{}); ok {
-				newMap = processingReflectMap(loging, chanOutMispFormat, v, lr, num+1, fieldBranch)
+				newMap = processingReflectMap(logging, chanOutMispFormat, v, lr, num+1, fieldBranch)
 
 				nl = append(nl, newMap)
 			}
 
 		case reflect.Slice:
 			if v, ok := v.([]interface{}); ok {
-				newList = processingReflectSlice(loging, chanOutMispFormat, v, lr, num+1, fieldBranch)
+				newList = processingReflectSlice(logging, chanOutMispFormat, v, lr, num+1, fieldBranch)
 
 				nl = append(nl, newList...)
 			}
 
 		default:
-			nl = append(nl, processingReflectAnySimpleType(loging, chanOutMispFormat, k, v, lr, num, fieldBranch))
+			nl = append(nl, processingReflectAnySimpleType(logging, chanOutMispFormat, k, v, lr, num, fieldBranch))
 		}
 	}
 

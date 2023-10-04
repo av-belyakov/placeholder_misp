@@ -24,7 +24,7 @@ func CoreHandler(
 	nkckimodule *nkckiinteractions.ModuleNKCKI,
 	listRule rules.ListRulesProcessingMsgMISP,
 	storageApp *memorytemporarystorage.CommonStorageTemporary,
-	loging chan<- datamodels.MessageLoging,
+	logging chan<- datamodels.MessageLogging,
 	counting chan<- datamodels.DataCounterSettings) {
 
 	natsChanReception := natsmodule.GetDataReceptionChannel()
@@ -39,10 +39,10 @@ func CoreHandler(
 			storageApp.SetRawDataHiveFormatMessage(uuidCase, data.Data)
 
 			//формирование итоговых документов в формате MISP
-			chanCreateMispFormat, chanDone := NewMispFormat(mispmodule, loging)
+			chanCreateMispFormat, chanDone := NewMispFormat(mispmodule, logging)
 
 			//обработчик сообщений из TheHive (выполняется разбор сообщения и его разбор на основе правил)
-			go HandlerMessageFromHive(data.Data, uuidCase, storageApp, listRule, chanCreateMispFormat, chanDone, loging, counting)
+			go HandlerMessageFromHive(data.Data, uuidCase, storageApp, listRule, chanCreateMispFormat, chanDone, logging, counting)
 
 			// отправка сообщения в Elasticshearch
 			esmodule.SendingData(elasticsearchinteractions.SettingsInputChan{UUID: uuidCase})
@@ -56,7 +56,7 @@ func CoreHandler(
 				// ***********************************
 				// Это логирование только для теста!!!
 				// ***********************************
-				loging <- datamodels.MessageLoging{
+				logging <- datamodels.MessageLogging{
 					MsgData: fmt.Sprintf("TEST_INFO func 'CoreHandler', отправляем полученный event id: %s в модуль NATS", data.EventId),
 					MsgType: "testing",
 				}
@@ -73,7 +73,7 @@ func CoreHandler(
 				// ***********************************
 				// Это логирование только для теста!!!
 				// ***********************************
-				loging <- datamodels.MessageLoging{
+				logging <- datamodels.MessageLogging{
 					MsgData: fmt.Sprintf("TEST_INFO func 'CoreHandler', надо отправить инфу CaseID '%s' и EventId '%s' to REDIS DB", data.CaseId, data.EventId),
 					MsgType: "testing",
 				}
@@ -93,7 +93,7 @@ func CoreHandler(
 				// ***********************************
 				// Это логирование только для теста!!!
 				// ***********************************
-				loging <- datamodels.MessageLoging{
+				logging <- datamodels.MessageLogging{
 					MsgData: fmt.Sprintf("TEST_INFO func 'CoreHandler', здесь, получаем event id: '%v' из Redis для удаления события в MISP", data.Result),
 					MsgType: "testing",
 				}
@@ -105,7 +105,7 @@ func CoreHandler(
 				if !ok {
 					_, f, l, _ := runtime.Caller(0)
 
-					loging <- datamodels.MessageLoging{
+					logging <- datamodels.MessageLogging{
 						MsgData: fmt.Sprintf("'it is not possible to convert a value to a string' %s:%d", f, l-1),
 						MsgType: "error",
 					}
@@ -116,7 +116,7 @@ func CoreHandler(
 				// ***********************************
 				// Это логирование только для теста!!!
 				// ***********************************
-				loging <- datamodels.MessageLoging{
+				logging <- datamodels.MessageLogging{
 					MsgData: fmt.Sprintf("TEST_INFO func 'CoreHandler', отправляем event id: '%s' в MISP для удаления события", eventId),
 					MsgType: "testing",
 				}

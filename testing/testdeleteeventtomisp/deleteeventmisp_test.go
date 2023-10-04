@@ -22,7 +22,7 @@ var _ = Describe("Deleteeventmisp", Ordered, func() {
 		errConfApp, errMispModule error
 	)
 
-	loging := make(chan datamodels.MessageLoging)
+	logging := make(chan datamodels.MessageLogging)
 
 	BeforeAll(func() {
 		confApp, errConfApp = confighandler.NewConfig()
@@ -37,8 +37,8 @@ var _ = Describe("Deleteeventmisp", Ordered, func() {
 
 		//инициализируем модуль временного хранения информации
 		storageApp = memorytemporarystorage.NewTemporaryStorage()
-		//redismodule = redisinteractions.HandlerRedis(context.Background(), confApp.AppConfigRedis, storageApp, loging)
-		mispmodule, errMispModule = mispinteractions.HandlerMISP(confApp.AppConfigMISP, storageApp, loging)
+		//redismodule = redisinteractions.HandlerRedis(context.Background(), confApp.AppConfigRedis, storageApp, logging)
+		mispmodule, errMispModule = mispinteractions.HandlerMISP(confApp.AppConfigMISP, storageApp, logging)
 	})
 
 	Context("Тест 1. Проверка успешной инициализации модулей", func() {
@@ -56,7 +56,7 @@ var _ = Describe("Deleteeventmisp", Ordered, func() {
 				fmt.Println("___ Logging START")
 				defer fmt.Println("___ Logging STOP")
 
-				for log := range loging {
+				for log := range logging {
 					if log.MsgData == "TEST_INFO STOP" {
 						chanDone <- struct{}{}
 
@@ -90,7 +90,7 @@ var _ = Describe("Deleteeventmisp", Ordered, func() {
 					fmt.Println("___ Logging START")
 					defer fmt.Println("___ Logging STOP")
 
-					for log := range loging {
+					for log := range logging {
 						fmt.Println("----", log, "----")
 					}
 				}()
@@ -107,7 +107,7 @@ var _ = Describe("Deleteeventmisp", Ordered, func() {
 								// ***********************************
 								// Это логирование только для теста!!!
 								// ***********************************
-								loging <- datamodels.MessageLoging{
+								logging <- datamodels.MessageLogging{
 									MsgData: fmt.Sprintf("TEST_INFO func 'NewCore', надо отправить инфу CaseID '%s' и EventId '%s' to REDIS DB\n", data.CaseId, data.EventId),
 									MsgType: "testing",
 								}
@@ -131,7 +131,7 @@ var _ = Describe("Deleteeventmisp", Ordered, func() {
 								// ***********************************
 								// Это логирование только для теста!!!
 								// ***********************************
-								loging <- datamodels.MessageLoging{
+								logging <- datamodels.MessageLogging{
 									MsgData: fmt.Sprintf("TEST_INFO func 'NewCore', Здесь, получаем event id: '%v' из Redis для удаления события в MISP", data.Result),
 									MsgType: "testing",
 								}
@@ -143,7 +143,7 @@ var _ = Describe("Deleteeventmisp", Ordered, func() {
 								if !ok {
 									_, f, l, _ := runtime.Caller(0)
 
-									loging <- datamodels.MessageLoging{
+									logging <- datamodels.MessageLogging{
 										MsgData: fmt.Sprintf("'it is not possible to convert a value to a string' %s:%d", f, l-1),
 										MsgType: "warning",
 									}
@@ -154,7 +154,7 @@ var _ = Describe("Deleteeventmisp", Ordered, func() {
 								// ***********************************
 								// Это логирование только для теста!!!
 								// ***********************************
-								loging <- datamodels.MessageLoging{
+								logging <- datamodels.MessageLogging{
 									MsgData: fmt.Sprintf("TEST_INFO func 'NewCore', отправляем event id: '%s' в MISP для удаления события", eventId),
 									MsgType: "testing",
 								}
@@ -177,7 +177,7 @@ var _ = Describe("Deleteeventmisp", Ordered, func() {
 				})
 
 				isDone := <-chanDone
-				close(loging)
+				close(logging)
 
 				time.Sleep(1 * time.Second)
 				fmt.Println("STOP TESTING")

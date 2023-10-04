@@ -22,7 +22,7 @@ func init() {
 func NewClientNATS(
 	conf confighandler.AppConfigNATS,
 	storageApp *memorytemporarystorage.CommonStorageTemporary,
-	loging chan<- datamodels.MessageLoging,
+	logging chan<- datamodels.MessageLogging,
 	counting chan<- datamodels.DataCounterSettings) (*ModuleNATS, error) {
 
 	nc, err := nats.Connect(fmt.Sprintf("%s:%d", conf.Host, conf.Port))
@@ -56,7 +56,7 @@ func NewClientNATS(
 				if err != nil {
 					_, f, l, _ := runtime.Caller(0)
 
-					loging <- datamodels.MessageLoging{
+					logging <- datamodels.MessageLogging{
 						MsgData: fmt.Sprintf("%s %s:%d", err.Error(), f, l-2),
 						MsgType: "error",
 					}
@@ -68,7 +68,7 @@ func NewClientNATS(
 				if err != nil {
 					_, f, l, _ := runtime.Caller(0)
 
-					loging <- datamodels.MessageLoging{
+					logging <- datamodels.MessageLogging{
 						MsgData: fmt.Sprintf("%s %s:%d", err.Error(), f, l-2),
 						MsgType: "error",
 					}

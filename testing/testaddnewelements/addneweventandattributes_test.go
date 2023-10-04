@@ -22,7 +22,7 @@ import (
 
 var _ = Describe("Addneweventandattributes", Ordered, func() {
 	var (
-		loging                         chan datamodels.MessageLoging
+		logging                        chan datamodels.MessageLogging
 		counting                       chan datamodels.DataCounterSettings
 		confApp                        confighandler.ConfigApp
 		listRules                      rules.ListRulesProcessingMsgMISP
@@ -59,7 +59,7 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 	}
 
 	BeforeAll(func() {
-		loging = make(chan datamodels.MessageLoging)
+		logging = make(chan datamodels.MessageLogging)
 		counting = make(chan datamodels.DataCounterSettings)
 
 		confApp.AppConfigMISP.Host = "misp-world.cloud.gcm"
@@ -69,7 +69,7 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 			fmt.Println("___ Logging START")
 			defer fmt.Println("___ Logging STOP")
 
-			for log := range loging {
+			for log := range logging {
 				fmt.Println("----", log, "----")
 			}
 		}()
@@ -110,13 +110,13 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		exampleByte, errReadFile = readFileJson("natsinteractions/test_json", "example_3.json")
 
 		//инициалиация модуля для взаимодействия с MISP
-		mispModule, errMisp = mispinteractions.HandlerMISP(confApp.AppConfigMISP, storageApp, loging)
+		mispModule, errMisp = mispinteractions.HandlerMISP(confApp.AppConfigMISP, storageApp, logging)
 
 		//формирование итоговых документов в формате MISP
-		chanCreateMispFormat, chanDone = coremodule.NewMispFormat(mispModule, loging)
+		chanCreateMispFormat, chanDone = coremodule.NewMispFormat(mispModule, logging)
 
 		//обработчик сообщений из TheHive (выполняется разбор сообщения и его разбор на основе правил)
-		coremodule.HandlerMessageFromHive(exampleByte, uuid.New().String(), storageApp, listRules, chanCreateMispFormat, chanDone, loging, counting)
+		coremodule.HandlerMessageFromHive(exampleByte, uuid.New().String(), storageApp, listRules, chanCreateMispFormat, chanDone, logging, counting)
 	})
 
 	Context("Тест 1. Проверка инициализации модулей", func() {

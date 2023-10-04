@@ -31,7 +31,7 @@ var (
 	listRulesProcMISPMsg rules.ListRulesProcessingMsgMISP
 	listWarning          []string
 	storageApp           *memorytemporarystorage.CommonStorageTemporary
-	loging               chan datamodels.MessageLoging
+	logging              chan datamodels.MessageLogging
 	counting             chan datamodels.DataCounterSettings
 )
 
@@ -74,7 +74,7 @@ func getLoggerSettings(cls []confighandler.LogSet) []simplelogger.MessageTypeSet
 }
 
 func init() {
-	loging = make(chan datamodels.MessageLoging)
+	logging = make(chan datamodels.MessageLogging)
 	counting = make(chan datamodels.DataCounterSettings)
 
 	//инициализируем модуль чтения конфигурационного файла
@@ -144,7 +144,7 @@ func main() {
 	log.Printf("Application '%s' is start", appName)
 
 	//инициализация модуля для взаимодействия с NATS (Данный модуль обязателен для взаимодействия)
-	natsModule, err := natsinteractions.NewClientNATS(confApp.AppConfigNATS, storageApp, loging, counting)
+	natsModule, err := natsinteractions.NewClientNATS(confApp.AppConfigNATS, storageApp, logging, counting)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 		_ = sl.WriteLoggingData(fmt.Sprintf(" '%s' %s:%d", err, f, l-2), "error")
@@ -154,24 +154,24 @@ func main() {
 
 	// инициализация модуля для взаимодействия с СУБД Redis
 	ctxRedis := context.Background()
-	redisModule := redisinteractions.HandlerRedis(ctxRedis, confApp.AppConfigRedis, storageApp, loging)
+	redisModule := redisinteractions.HandlerRedis(ctxRedis, confApp.AppConfigRedis, storageApp, logging)
 
 	//инициалиация модуля для взаимодействия с MISP
-	mispModule, err := mispinteractions.HandlerMISP(confApp.AppConfigMISP, storageApp, loging)
+	mispModule, err := mispinteractions.HandlerMISP(confApp.AppConfigMISP, storageApp, logging)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 		_ = sl.WriteLoggingData(fmt.Sprintf(" '%s' %s:%d", err, f, l-2), "error")
 	}
 
 	//инициализация модуля для взаимодействия с ElasticSearch
-	esModule, err := elasticsearchinteractions.HandlerElasticSearch(confApp.AppConfigElasticSearch, storageApp, loging)
+	esModule, err := elasticsearchinteractions.HandlerElasticSearch(confApp.AppConfigElasticSearch, storageApp, logging)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 		_ = sl.WriteLoggingData(fmt.Sprintf(" '%s' %s:%d", err, f, l-2), "error")
 	}
 
 	// инициализация модуля для взаимодействия с NKCKI
-	nkckiModule, err := nkckiinteractions.NewClientNKCKI(confApp.AppConfigNKCKI, loging)
+	nkckiModule, err := nkckiinteractions.NewClientNKCKI(confApp.AppConfigNKCKI, logging)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 		_ = sl.WriteLoggingData(fmt.Sprintf(" '%s' %s:%d", err, f, l-2), "error")
@@ -201,7 +201,7 @@ func main() {
 
 	//логирование данных
 	go func() {
-		for msg := range loging {
+		for msg := range logging {
 			_ = sl.WriteLoggingData(msg.MsgData, msg.MsgType)
 
 			/*
@@ -213,5 +213,5 @@ func main() {
 
 	_ = sl.WriteLoggingData("application '"+appName+"' is started", "info")
 
-	coremodule.CoreHandler(natsModule, mispModule, redisModule, esModule, nkckiModule, listRulesProcMISPMsg, storageApp, loging, counting)
+	coremodule.CoreHandler(natsModule, mispModule, redisModule, esModule, nkckiModule, listRulesProcMISPMsg, storageApp, logging, counting)
 }

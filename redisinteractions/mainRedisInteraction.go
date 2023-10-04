@@ -26,7 +26,7 @@ func HandlerRedis(
 	ctx context.Context,
 	conf confighandler.AppConfigRedis,
 	storageApp *memorytemporarystorage.CommonStorageTemporary,
-	loging chan<- datamodels.MessageLoging) *ModuleRedis {
+	logging chan<- datamodels.MessageLogging) *ModuleRedis {
 	rdb := redis.NewClient(&redis.Options{
 		Addr: fmt.Sprintf("%s:%d", conf.Host, conf.Port),
 	})
@@ -50,7 +50,7 @@ func HandlerRedis(
 				// ***********************************
 				// Это логирование только для теста!!!
 				// ***********************************
-				loging <- datamodels.MessageLoging{
+				logging <- datamodels.MessageLogging{
 					MsgData: fmt.Sprintf("TEST_INFO func 'HandlerRedis', обрабатываем добавление CaseID и EventId '%s' to REDIS DB", data.Data),
 					MsgType: "testing",
 				}
@@ -61,7 +61,7 @@ func HandlerRedis(
 				if len(tmp) == 0 {
 					_, f, l, _ := runtime.Caller(0)
 
-					loging <- datamodels.MessageLoging{
+					logging <- datamodels.MessageLogging{
 						MsgData: fmt.Sprintf("'it is not possible to split a string '%s' to add case and event information to the Redis DB' %s:%d", data.Data, f, l-1),
 						MsgType: "warning",
 					}
@@ -76,7 +76,7 @@ func HandlerRedis(
 					// ***********************************
 					// Это логирование только для теста!!!
 					// ***********************************
-					loging <- datamodels.MessageLoging{
+					logging <- datamodels.MessageLogging{
 						MsgData: fmt.Sprintf("TEST_INFO func 'HandlerRedis', НАЙДЕНО СТАРОЕ значение CaseID '%s' отправляем в ядро найденное событие с event id '%s'", tmp[0], eventId),
 						MsgType: "testing",
 					}
@@ -95,7 +95,7 @@ func HandlerRedis(
 				if err := rdb.Set(ctx, tmp[0], tmp[1], 0).Err(); err != nil {
 					_, f, l, _ := runtime.Caller(0)
 
-					loging <- datamodels.MessageLoging{
+					logging <- datamodels.MessageLogging{
 						MsgData: fmt.Sprintf("'%s' %s:%d", fmt.Sprint(err), f, l-1),
 						MsgType: "error",
 					}
@@ -106,7 +106,7 @@ func HandlerRedis(
 				// ***********************************
 				// Это логирование только для теста!!!
 				// ***********************************
-				loging <- datamodels.MessageLoging{
+				logging <- datamodels.MessageLogging{
 					MsgData: fmt.Sprintf("TEST_INFO func 'HandlerRedis', выполнили замену старого значения event id: %s новым значением event id: %s, для case id: %s", eventId, tmp[1], tmp[0]),
 					MsgType: "testing",
 				}

@@ -35,7 +35,7 @@ func init() {
 func HandlerMISP(
 	conf confighandler.AppConfigMISP,
 	storageApp *memorytemporarystorage.CommonStorageTemporary,
-	loging chan<- datamodels.MessageLoging) (*ModuleMISP, error) {
+	logging chan<- datamodels.MessageLogging) (*ModuleMISP, error) {
 
 	//выполнеяем запрос для получения настроек пользователей через API MISP
 	//и сохраняем полученные параметры во временном хранилище
@@ -43,7 +43,7 @@ func HandlerMISP(
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 
-		loging <- datamodels.MessageLoging{
+		logging <- datamodels.MessageLogging{
 			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
 			MsgType: "error",
 		}
@@ -57,7 +57,7 @@ func HandlerMISP(
 			// ***********************************
 			// Это логирование только для теста!!!
 			// ***********************************
-			loging <- datamodels.MessageLoging{
+			logging <- datamodels.MessageLogging{
 				MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', reseived command '%s', data object '%v'", data.Command, data),
 				MsgType: "testing",
 			}
@@ -66,13 +66,13 @@ func HandlerMISP(
 
 			switch data.Command {
 			case "add event":
-				go addEvent(conf, storageApp, data, loging)
+				go addEvent(conf, storageApp, data, logging)
 
 				/*
 					// ***********************************
 					// Это логирование только для теста!!!
 					// ***********************************
-					loging <- datamodels.MessageLoging{
+					logging <- datamodels.MessageLogging{
 						MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', --=== RESEIVED DATA ===--	USER EMAIL: %s, ObjectId: %v", data.UserEmail, data.CaseId),
 						MsgType: "testing",
 					}
@@ -89,7 +89,7 @@ func HandlerMISP(
 					if err != nil {
 						_, f, l, _ := runtime.Caller(0)
 
-						loging <- datamodels.MessageLoging{
+						logging <- datamodels.MessageLogging{
 							MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
 							MsgType: "error",
 						}
@@ -101,7 +101,7 @@ func HandlerMISP(
 					if err := json.Unmarshal(resBodyByte, &resMisp); err != nil {
 						_, f, l, _ := runtime.Caller(0)
 
-						loging <- datamodels.MessageLoging{
+						logging <- datamodels.MessageLogging{
 							MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
 							MsgType: "error",
 						}
@@ -123,7 +123,7 @@ func HandlerMISP(
 					if eventId == "" {
 						_, f, l, _ := runtime.Caller(0)
 
-						loging <- datamodels.MessageLoging{
+						logging <- datamodels.MessageLogging{
 							MsgData: fmt.Sprintf("'the formation of events of the 'Attributes' type was not performed because the EventID is empty' %s:%d", f, l-1),
 							MsgType: "error",
 						}
@@ -134,7 +134,7 @@ func HandlerMISP(
 					// ***********************************
 					// Это логирование только для теста!!!
 					// ***********************************
-					loging <- datamodels.MessageLoging{
+					logging <- datamodels.MessageLogging{
 						MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', отправляем запрос для добавления в БД Redis, id кейса и нового события, где case id: %v, event id: %s", data.CaseId, eventId),
 						MsgType: "testing",
 					}
@@ -148,7 +148,7 @@ func HandlerMISP(
 						EventId: eventId,
 					})
 
-					_, _ = sendAttribytesMispFormat(conf.Host, authKey, eventId, data, loging)
+					_, _ = sendAttribytesMispFormat(conf.Host, authKey, eventId, data, logging)
 
 					//отправляем в ядро информацию по event Id
 					mmisp.SendingDataOutput(SettingChanOutputMISP{
@@ -158,12 +158,12 @@ func HandlerMISP(
 				*/
 
 			case "del event by id":
-				go delEventById(conf, data.EventId, loging)
+				go delEventById(conf, data.EventId, logging)
 
 				/*// ***********************************
 				// Это логирование только для теста!!!
 				// ***********************************
-				loging <- datamodels.MessageLoging{
+				logging <- datamodels.MessageLogging{
 					MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', command: '%s' удаление события типа event, где event id: %s", data.Command, data.EventId),
 					MsgType: "testing",
 				}
@@ -175,7 +175,7 @@ func HandlerMISP(
 				if err != nil {
 					_, f, l, _ := runtime.Caller(0)
 
-					loging <- datamodels.MessageLoging{
+					logging <- datamodels.MessageLogging{
 						MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
 						MsgType: "error",
 					}
@@ -184,7 +184,7 @@ func HandlerMISP(
 				// ***********************************
 				// Это логирование только для теста!!!
 				// ***********************************
-				loging <- datamodels.MessageLoging{
+				logging <- datamodels.MessageLogging{
 					MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', должно было быть успешно выполненно удаление события event id: %s", data.EventId),
 					MsgType: "testing",
 				}
@@ -194,7 +194,7 @@ func HandlerMISP(
 				// ***********************************
 				// Это логирование только для теста!!!
 				// ***********************************
-				loging <- datamodels.MessageLoging{
+				logging <- datamodels.MessageLogging{
 					MsgData: "TEST_INFO STOP",
 					MsgType: "testing",
 				}
@@ -232,13 +232,13 @@ func NewClientMISP(h, a string, v bool) (ClientMISP, error) {
 func addEvent(conf confighandler.AppConfigMISP,
 	storageApp *memorytemporarystorage.CommonStorageTemporary,
 	data SettingsChanInputMISP,
-	loging chan<- datamodels.MessageLoging) {
+	logging chan<- datamodels.MessageLogging) {
 	authKey := conf.Auth
 
 	// ***********************************
 	// Это логирование только для теста!!!
 	// ***********************************
-	loging <- datamodels.MessageLoging{
+	logging <- datamodels.MessageLogging{
 		MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', --=== RESEIVED DATA ===--	USER EMAIL: %s, ObjectId: %v", data.UserEmail, data.CaseId),
 		MsgType: "testing",
 	}
@@ -255,7 +255,7 @@ func addEvent(conf confighandler.AppConfigMISP,
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 
-		loging <- datamodels.MessageLoging{
+		logging <- datamodels.MessageLogging{
 			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
 			MsgType: "error",
 		}
@@ -267,7 +267,7 @@ func addEvent(conf confighandler.AppConfigMISP,
 	if err := json.Unmarshal(resBodyByte, &resMisp); err != nil {
 		_, f, l, _ := runtime.Caller(0)
 
-		loging <- datamodels.MessageLoging{
+		logging <- datamodels.MessageLogging{
 			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
 			MsgType: "error",
 		}
@@ -289,7 +289,7 @@ func addEvent(conf confighandler.AppConfigMISP,
 	if eventId == "" {
 		_, f, l, _ := runtime.Caller(0)
 
-		loging <- datamodels.MessageLoging{
+		logging <- datamodels.MessageLogging{
 			MsgData: fmt.Sprintf("'the formation of events of the 'Attributes' type was not performed because the EventID is empty' %s:%d", f, l-1),
 			MsgType: "error",
 		}
@@ -300,7 +300,7 @@ func addEvent(conf confighandler.AppConfigMISP,
 	// ***********************************
 	// Это логирование только для теста!!!
 	// ***********************************
-	loging <- datamodels.MessageLoging{
+	logging <- datamodels.MessageLogging{
 		MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', отправляем запрос для добавления в БД Redis, id кейса и нового события, где case id: %v, event id: %s", data.CaseId, eventId),
 		MsgType: "testing",
 	}
@@ -314,7 +314,7 @@ func addEvent(conf confighandler.AppConfigMISP,
 		EventId: eventId,
 	})
 
-	_, _ = sendAttribytesMispFormat(conf.Host, authKey, eventId, data, loging)
+	_, _ = sendAttribytesMispFormat(conf.Host, authKey, eventId, data, logging)
 
 	//отправляем в ядро информацию по event Id
 	mmisp.SendingDataOutput(SettingChanOutputMISP{
@@ -325,12 +325,12 @@ func addEvent(conf confighandler.AppConfigMISP,
 
 func delEventById(conf confighandler.AppConfigMISP,
 	eventId string,
-	loging chan<- datamodels.MessageLoging) {
+	logging chan<- datamodels.MessageLogging) {
 
 	// ***********************************
 	// Это логирование только для теста!!!
 	// ***********************************
-	loging <- datamodels.MessageLoging{
+	logging <- datamodels.MessageLogging{
 		MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', удаление события типа event, где event id: %s", eventId),
 		MsgType: "testing",
 	}
@@ -342,7 +342,7 @@ func delEventById(conf confighandler.AppConfigMISP,
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 
-		loging <- datamodels.MessageLoging{
+		logging <- datamodels.MessageLogging{
 			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
 			MsgType: "error",
 		}
@@ -351,7 +351,7 @@ func delEventById(conf confighandler.AppConfigMISP,
 	// ***********************************
 	// Это логирование только для теста!!!
 	// ***********************************
-	loging <- datamodels.MessageLoging{
+	logging <- datamodels.MessageLogging{
 		MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', должно было быть успешно выполненно удаление события event id: %s", eventId),
 		MsgType: "testing",
 	}
@@ -361,7 +361,7 @@ func delEventById(conf confighandler.AppConfigMISP,
 	// ***********************************
 	// Это логирование только для теста!!!
 	// ***********************************
-	loging <- datamodels.MessageLoging{
+	logging <- datamodels.MessageLogging{
 		MsgData: "TEST_INFO STOP",
 		MsgType: "testing",
 	}
@@ -459,7 +459,7 @@ func sendEventsMispFormat(host, authKey string, d SettingsChanInputMISP) (*http.
 }
 
 // sendAttribytesMispFormat отправляет в API MISP список атрибутов в виде среза типов Attribytes и возвращает полученный ответ
-func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInputMISP, loging chan<- datamodels.MessageLoging) (*http.Response, []byte) {
+func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInputMISP, logging chan<- datamodels.MessageLogging) (*http.Response, []byte) {
 	var (
 		res         *http.Response
 		resBodyByte = make([]byte, 0)
@@ -468,7 +468,7 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 	c, err := NewClientMISP(host, authKey, false)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
-		loging <- datamodels.MessageLoging{
+		logging <- datamodels.MessageLogging{
 			MsgData: fmt.Sprintf("'attributes №%s add, %s' %s:%d", eventId, err.Error(), f, l-2),
 			MsgType: "error",
 		}
@@ -480,7 +480,7 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 	if !ok {
 		_, f, l, _ := runtime.Caller(0)
 
-		loging <- datamodels.MessageLoging{
+		logging <- datamodels.MessageLogging{
 			MsgData: fmt.Sprintf("'the properties of \"attributes\" were not found in the received data' %s:%d", f, l-2),
 			MsgType: "error",
 		}
@@ -492,7 +492,7 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 	if !ok {
 		_, f, l, _ := runtime.Caller(0)
 
-		loging <- datamodels.MessageLoging{
+		logging <- datamodels.MessageLogging{
 			MsgData: fmt.Sprintf("'the received data does not match the type \"attributes\"' %s:%d", f, l-2),
 			MsgType: "error",
 		}
@@ -506,7 +506,7 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 		if lamf[k].Value == "" {
 			_, f, l, _ := runtime.Caller(0)
 
-			loging <- datamodels.MessageLoging{
+			logging <- datamodels.MessageLogging{
 				MsgData: fmt.Sprintf("'attributes №%s add, the \"Value\" type property should not be empty' %s:%d", eventId, f, l-1),
 				MsgType: "warning",
 			}
@@ -518,7 +518,7 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
 
-			loging <- datamodels.MessageLoging{
+			logging <- datamodels.MessageLogging{
 				MsgData: fmt.Sprintf("'attributes №%s add, %s' %s:%d", eventId, err.Error(), f, l-2),
 				MsgType: "warning",
 			}
@@ -530,7 +530,7 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
 
-			loging <- datamodels.MessageLoging{
+			logging <- datamodels.MessageLogging{
 				MsgData: fmt.Sprintf("'attributes №%s add, %s' %s:%d", eventId, err.Error(), f, l-2),
 				MsgType: "warning",
 			}
@@ -541,7 +541,7 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 		if res.StatusCode != http.StatusOK {
 			_, f, l, _ := runtime.Caller(0)
 
-			loging <- datamodels.MessageLoging{
+			logging <- datamodels.MessageLogging{
 				MsgData: fmt.Sprintf("'attributes №%s add, %s' %s:%d", eventId, res.Status, f, l-1),
 				MsgType: "warning",
 			}

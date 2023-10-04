@@ -1,9 +1,9 @@
 package datamodels
 
-// MessageLoging содержит информацию используемую при логировании
+// MessageLogging содержит информацию используемую при логировании
 // MsgData - сообщение
 // MsgType - тип сообщения
-type MessageLoging struct {
+type MessageLogging struct {
 	MsgData, MsgType string
 }
 
