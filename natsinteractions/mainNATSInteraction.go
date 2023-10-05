@@ -1,6 +1,7 @@
 package natsinteractions
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"runtime"
@@ -48,32 +49,29 @@ func NewClientNATS(
 				fmt.Println("func 'NewClientNATS', ResponseMessageFromMispToTheHave: ", nrm.GetResponseMessageFromMispToTheHave())
 			}
 
-			/*
-				 Далее нужно сделать Marchal для ResponseMessageFromMispToTheHave и отправить
-				 в TheHive через Webhook и NATS
+			// Далее нужно сделать Marchal для ResponseMessageFromMispToTheHave и отправить
+			// в TheHive через Webhook и NATS
+			res, err := json.Marshal(nrm.GetResponseMessageFromMispToTheHave())
+			if err != nil {
+				_, f, l, _ := runtime.Caller(0)
 
-				res, err := json.Marshal(nrm.GetResponseMessageFromMispToTheHave())
-				if err != nil {
-					_, f, l, _ := runtime.Caller(0)
-
-					logging <- datamodels.MessageLogging{
-						MsgData: fmt.Sprintf("%s %s:%d", err.Error(), f, l-2),
-						MsgType: "error",
-					}
-
-					continue
+				logging <- datamodels.MessageLogging{
+					MsgData: fmt.Sprintf("%s %s:%d", err.Error(), f, l-2),
+					MsgType: "error",
 				}
 
-				err = nc.Publish("setcustomfield", res)
-				if err != nil {
-					_, f, l, _ := runtime.Caller(0)
+				continue
+			}
 
-					logging <- datamodels.MessageLogging{
-						MsgData: fmt.Sprintf("%s %s:%d", err.Error(), f, l-2),
-						MsgType: "error",
-					}
+			err = nc.Publish("setcustomfield", res)
+			if err != nil {
+				_, f, l, _ := runtime.Caller(0)
+
+				logging <- datamodels.MessageLogging{
+					MsgData: fmt.Sprintf("%s %s:%d", err.Error(), f, l-2),
+					MsgType: "error",
 				}
-			*/
+			}
 		}
 	}()
 
