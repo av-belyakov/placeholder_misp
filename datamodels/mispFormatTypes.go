@@ -25,6 +25,12 @@ type EventsMispFormat struct {
 	DisableCorrelation bool   `json:"disable_correlation"`
 }
 
+type EventReports struct {
+	Name         string `json:"name"`
+	Distribution string `json:"distribution"`
+	Content      string `json:"content"`
+}
+
 type ListAttributesMispFormat struct {
 	//attributes    []AttributesMispFormat
 	attributes map[int]AttributesMispFormat
