@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"runtime"
+	"time"
 
 	"github.com/nats-io/nats.go"
 
@@ -26,11 +27,30 @@ func NewClientNATS(
 	logging chan<- datamodels.MessageLogging,
 	counting chan<- datamodels.DataCounterSettings) (*ModuleNATS, error) {
 
-	nc, err := nats.Connect(fmt.Sprintf("%s:%d", conf.Host, conf.Port))
+	nc, err := nats.Connect(
+		fmt.Sprintf("%s:%d", conf.Host, conf.Port),
+		nats.MaxReconnects(-1),
+		nats.ReconnectWait(3*time.Second))
+	_, f, l, _ := runtime.Caller(0)
+
 	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		return &mnats, fmt.Errorf("'%s' %s:%d", err.Error(), f, l-2)
+		return &mnats, fmt.Errorf("'%s' %s:%d", err.Error(), f, l-4)
 	}
+
+	//обработка разрыва соединения с NATS
+	nc.SetDisconnectErrHandler(func(c *nats.Conn, err error) {
+		logging <- datamodels.MessageLogging{
+			MsgData: fmt.Sprintf("the connection with NATS has been disconnected %s:%d", f, l-4),
+			MsgType: "error",
+		}
+	})
+
+	nc.SetReconnectHandler(func(c *nats.Conn) {
+		logging <- datamodels.MessageLogging{
+			MsgData: fmt.Sprintf("the connection to NATS has been re-established %s:%d", f, l-4),
+			MsgType: "info",
+		}
+	})
 
 	log.Printf("Connect to NATS with address %s:%d\n", conf.Host, conf.Port)
 
