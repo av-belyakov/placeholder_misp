@@ -11,19 +11,27 @@ import (
 // осуществляется с помощью пакета reflect
 func NewReadReflectJSONSprint(b []byte) (string, error) {
 	var str string
-	list := map[string]interface{}{}
+	errSrc := "error decoding the json file, it may be empty"
 
-	if err := json.Unmarshal(b, &list); err != nil {
-		return str, err
+	listMap := map[string]interface{}{}
+	if err := json.Unmarshal(b, &listMap); err == nil {
+		if len(listMap) == 0 {
+			return str, fmt.Errorf(errSrc)
+		}
+
+		return readReflectMapSprint(listMap, 0), err
 	}
 
-	if len(list) == 0 {
-		return str, fmt.Errorf("error decoding the json file, it may be empty")
+	listSlice := []interface{}{}
+	if err := json.Unmarshal(b, &listSlice); err == nil {
+		if len(listSlice) == 0 {
+			return str, fmt.Errorf(errSrc)
+		}
+
+		return readReflectSliceSprint(listSlice, 0), err
 	}
 
-	str = readReflectMapSprint(list, 0)
-
-	return str, nil
+	return str, fmt.Errorf("the contents of the file are not Map or Slice")
 }
 
 func readReflectAnyTypeSprint(name interface{}, anyType interface{}, num int) string {

@@ -133,7 +133,7 @@ func main() {
 		}
 	}()
 
-	var appName = "placeholder_misp"
+	var appName string
 	if an, err := getAppName("README.md", 1); err != nil {
 		_, f, l, _ := runtime.Caller(0)
 		_ = sl.WriteLoggingData(fmt.Sprintf(" '%s' %s:%d", err, f, l-2), "warning")
@@ -141,7 +141,8 @@ func main() {
 		appName = an
 	}
 
-	log.Printf("Application '%s' is start", appName)
+	appVersion := supportingfunctions.GetAppVersion(appName)
+	log.Printf("Placeholder_misp application, version %s is running", appVersion)
 
 	//инициализация модуля для взаимодействия с NATS (Данный модуль обязателен для взаимодействия)
 	natsModule, err := natsinteractions.NewClientNATS(confApp.AppConfigNATS, storageApp, logging, counting)

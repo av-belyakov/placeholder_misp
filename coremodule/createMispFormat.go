@@ -42,6 +42,10 @@ func (svn *storageValueName) GetValueName(value string) bool {
 	return false
 }
 
+func (svn *storageValueName) CtearValueName() {
+	*svn = storageValueName{}
+}
+
 var (
 	eventsMisp         datamodels.EventsMispFormat
 	listAttributesMisp *datamodels.ListAttributesMispFormat
@@ -107,7 +111,6 @@ func init() {
 		"observables._createdAt": {listAttributesMisp.SetValueTimestampAttributesMisp},
 		"observables.message":    {listAttributesMisp.SetValueCommentAttributesMisp},
 		"observables.startDate":  {listAttributesMisp.SetValueFirstSeenAttributesMisp},
-		//"observables.tags":       {listAttributesMisp.HandlingValueTagsAttributesMisp},
 	}
 }
 
@@ -125,14 +128,13 @@ func NewMispFormat(
 			maxCountObservables, seqNum int
 			userEmail                   string
 			caseId                      float64
-			svn                         *storageValueName
 		)
 		defer func() {
 			close(chanInput)
 			close(chanDone)
 		}()
 
-		svn = NewStorageValueName()
+		svn := NewStorageValueName()
 
 		for key := range listHandlerMisp {
 			if strings.Contains(key, "observables") {
@@ -159,13 +161,27 @@ func NewMispFormat(
 					}
 				}
 
-				if strings.Contains(tmf.FieldBranch, "observables") {
+				if strings.Contains(tmf.FieldBranch, "observables") && !strings.Contains(tmf.FieldBranch, "attachment") {
 					if svn.GetValueName(tmf.FieldName) {
+						svn.CtearValueName()
 						seqNum++
-						svn = NewStorageValueName()
 					}
 
+					//fmt.Printf("seqNum #%d. ________ %s: %s\n", seqNum, tmf.FieldName, tmf.Value)
+
 					svn.SetValueName(tmf.FieldName)
+				}
+
+				//обрабатываем свойство observables.attachment
+				if strings.Contains(tmf.FieldBranch, "attachment") {
+
+					fmt.Println("tmf.FieldBranch:", tmf.FieldBranch, " tmf.Value:", tmf.Value)
+
+					/*
+
+						здесь надо сделать обработку объекта "attachment"
+
+					*/
 				}
 
 				//обрабатываем свойство observables.tags

@@ -1,372 +1,546 @@
-2023/09/11 16:52:54 ---------------
-EVENTS:
-event:
-  "objectId": "~69181456624"
-  "base": true
-  "startDate": 1694440703934
-  "rootId": "~69181456624"
-  object:
-    "pap": 2
-    tags:
-      1. "Webhook:send="ZK""
-      2. "Webhook: send="MISP""
-      3. "NCIRCC:incident="Заражение ВПО""
-    "createdAt": 1687182973300
-    "caseId": 32572
-    "severity": 2
-    "_id": "~69181456624"
-    "startDate": 1687182660000
-    "tlp": 2
-    stats:
-    permissions:
-    "id": "~69181456624"
-    "endDate": 1688656149032
-    "owner": "d.zablotsky@cloud.gcm"
-    "_type": "case"
-    "description": "[Тестовый кейс для улучшения работы в MISP"
-    "resolutionStatus": "TruePositive"
-    "flag": false
-    "createdBy": "d.zablotsky@cloud.gcm"
-    "updatedBy": "d.zablotsky@cloud.gcm"
-    "title": "TEST MISP"
-    "status": "Open"
-    customFields:
-      notification:
-        "order": 5
-      inbox1:
-        "order": 4
-      misp-event-id:
-        "order": 0
-        "string": "100366"
-      ncircc-class-attack:
-        "string": "Не отправлять в НКЦКИ"
-        "order": 3
-      inner-letter:
-        "order": 2
-      report:
-        "order": 6
-      attack-type:
-        "order": 7
-        "string": "Распределенная КА"
-      class-attack:
-        "order": 0
-        "string": "Подбор пароля"
-      external-letter:
-        "order": 1
-    "updatedAt": 1694440703920
-    "impactStatus": "NoImpact"
-    "summary": "ТЕСТ! НЕ ДОБАВЛЯТЬ В ZK"
-  "organisationId": "~4192"
-  "organisation": "GCM"
-  "operation": "update"
-  details:
-    "status": "Open"
-  "objectType": "case"
-  "requestId": "f0d1424003dc82d6:2727b5e0:18a8458e1ee:-8000:11493"
-observables:
-  1.
-    "sighted": false
-    "data": "39058"
-    "message": "snort"
-    extraData:
-    reports:
-    "tlp": 2
-    "_createdAt": 1687943138850
-    "_type": "Observable"
-    "startDate": 1687943138850
-    "ignoreSimilarity": false
-    "ioc": true
-    "dataType": "snort_sid"
-    tags:
-    "_createdBy": "d.zablotsky@cloud.gcm"
-    "_id": "~66560999616"
-  2.
-    "sighted": false
-    "startDate": 1687943340184
-    "_id": "~69919784992"
-    "data": "https://www.google.com/search?q=%D0%B3%D1%83%D0%B3%D0%BB+%D0%BF%D0%B5%D1%80%D0%B5%D0%B2%D0%BE%D0%B4%D1%87%D0%B8%D0%BA"
-    "ignoreSimilarity": false
-    "message": "url"
-    reports:
-    "_createdAt": 1687943340184
-    extraData:
-    "ioc": true
-    tags:
-    "dataType": "url"
-    "_type": "Observable"
-    "tlp": 2
-    "_createdBy": "d.zablotsky@cloud.gcm"
-  3.
-    "_type": "Observable"
-    extraData:
-    reports:
-    tags:
-    "data": "SolarWinds.exe"
-    "ioc": true
-    "message": "filename"
-    "sighted": false
-    "startDate": 1687943195485
-    "_createdAt": 1687943195485
-    "_id": "~68609060960"
-    "dataType": "filename"
-    "tlp": 2
-    "_createdBy": "d.zablotsky@cloud.gcm"
-    "ignoreSimilarity": false
-  4.
-    "_createdBy": "d.zablotsky@cloud.gcm"
-    "_type": "Observable"
-    "sighted": false
-    "startDate": 1687943257918
-    "tlp": 2
-    "_createdAt": 1687943257918
-    "data": "kuku@mail.ru"
-    "message": "mail.ru"
-    reports:
-    "_id": "~68609069152"
-    "dataType": "email-body"
-    "ioc": true
-    extraData:
-    "ignoreSimilarity": false
-    tags:
-  5.
-    "_createdBy": "d.zablotsky@cloud.gcm"
-    "data": "+78412356789"
-    extraData:
-    "message": "телефон"
-    "sighted": false
-    "tlp": 2
-    "startDate": 1687942922738
-    "_createdAt": 1687942922738
-    "_type": "Observable"
-    "ioc": true
-    reports:
-    "_id": "~68609024096"
-    "dataType": "phone-number"
-    "ignoreSimilarity": false
-    tags:
-  6.
-    "_id": "~69510058104"
-    "sighted": false
-    "_type": "Observable"
-    extraData:
-    "message": "Тест"
-    reports:
-    "tlp": 2
-    "_createdBy": "d.zablotsky@cloud.gcm"
-    attachment:
-      "contentType": "text/plain"
-      hashes:
-        1. "c29438b04791184d3eba39bdb7cf99560ab62068fee9509d50cf59723c398ac1"
-        2. "58861ef4c118cc3270b9871734ee54852a1374e5"
-        3. "7c531394dc2f483bc6c6c628c02e0788"
-      "id": "c29438b04791184d3eba39bdb7cf99560ab62068fee9509d50cf59723c398ac1"
-      "name": "n[n.txt"
-      "size": 817
-    "ignoreSimilarity": false
-    "ioc": true
-    "_createdAt": 1687942890302
-    "dataType": "file"
-    "startDate": 1687942890302
-    tags:
-  7.
-    "_id": "~69059260416"
-    "_type": "Observable"
-    "dataType": "mail"
-    reports:
-    "_createdAt": 1688032128244
-    "_createdBy": "d.zablotsky@cloud.gcm"
-    "startDate": 1688032128244
-    "tlp": 2
-    tags:
-      1. "misp:Network activity="email-src""
-    "data": "rkhan@flynas.com"
-    extraData:
-    "ignoreSimilarity": false
-    "sighted": false
-    "ioc": false
-    "message": ""
-ttp:
-  1.
-    extraData:
-      pattern:
-        extraData:
-        "remoteSupport": false
-        "version": "1.4"
-        "capecUrl": "https://capec.mitre.org/data/definitions/574.html"
-        defenseBypassed:
-        "detection": "System and network discovery techniques normally occur throughout an operation as an adversary learns the environment. Data and events should not be viewed in isolation, but as part of a chain of behavior that could lead to other activities, such as Lateral Movement, based on the information obtained.
++1.
+  "uuid": ""
+  "timestamp": "1696584412"
+  "first_seen": "2023-10-06T12:26:52+03:00"
+  "to_ids": true
+  "deleted": false
+  "object_id": "~79094972600"
+  "category": "Artifacts dropped"
+  "type": "filename"
+  "event_id": ""
+  "value": "SolarWinds.exe"
+  "disable_correlation": false
+  "comment": ""
+  "last_seen": "2023-10-23T17:46:47+03:00"
+  "object_relation": ""
+  "distribution": "3"
+  "sharing_group_id": "1"
++2.
+  "timestamp": "1696583865"
+  "distribution": "3"
+  "comment": ""
+  "to_ids": true
+  "deleted": false
+  "disable_correlation": false
+  "event_id": ""
+  "object_relation": ""
+  "value": "apt 42"
+  "first_seen": "2023-10-06T12:17:45+03:00"
+  "type": "community-id"
+  "sharing_group_id": "1"
+  "last_seen": "2023-10-23T17:46:47+03:00"
+  "object_id": "~79751696416"
+  "category": "Network activity"
+  "uuid": ""
++3.
+  "category": "Network activity"
+  "deleted": false
+  "object_relation": ""
+  "value": "3456789"
+  "timestamp": "1696584448"
+  "sharing_group_id": "1"
+  "first_seen": "2023-10-06T12:27:28+03:00"
+  "disable_correlation": false
+  "object_id": "~80733634792"
+  "distribution": "3"
+  "comment": ""
+  "type": "snort"
+  "uuid": ""
+  "last_seen": "2023-10-23T17:46:47+03:00"
+  "to_ids": true
+  "event_id": ""
++4.
+  "event_id": ""
+  "type": "email-body"
+  "value": "kuku@mail.ru"
+  "timestamp": "1696584368"
+  "to_ids": true
+  "object_id": "~79094964408"
+  "last_seen": "2023-10-23T17:46:47+03:00"
+  "deleted": false
+  "disable_correlation": false
+  "object_relation": ""
+  "comment": ""
+  "category": "Payload delivery"
+  "uuid": ""
+  "distribution": "3"
+  "sharing_group_id": "1"
+  "first_seen": "2023-10-06T12:26:08+03:00"
+5. with "attachment"
+  "object_id": "~79668891792"
+  "deleted": false
+  "disable_correlation": false
+  "timestamp": "1696587451"
+  "comment": ""
+  "first_seen": "2023-10-06T13:17:31+03:00"
+  "last_seen": "2023-10-23T17:46:47+03:00"
+  "to_ids": true
+  "event_id": ""
+  "object_relation": ""
+  "category": "Network activity"
+  "value": ""
+  "uuid": ""
+  "distribution": "3"
+  "type": "pattern-in-file"
+  "sharing_group_id": "1"
++6.
+  "value": "rule SHADOWPAD_X64_CONFIG_MODULE { strings: $chunk_1 = {48 8D 68 ?? 48 81 EC ?? ?? ?? ?? 4C 8B E1 45 33 ED B9 ?? ?? ?? ?? 41 8B DD 48 8B F2 E8} $chunk_2 = {BE ?? ?? ?? ?? 8B CE E8 ?? ?? ?? ?? 33 D2 48 8B C8 4C 8B E8 E8 ?? ?? ?? ?? 8B D8 85 C0 0F 85} condition: 1 of ($chunk*) } rule SHADOWPAD_X86_CONFIG_MODULE { strings: $chunk_1 = {55 8B EC 83 EC ?? 83 65 ?? ?? 56 57 68 ?? ?? ?? ?? E8} $chunk_2 = {55 8B EC 83 EC ?? 56 57 33 F6 68 ?? ?? ?? ?? 89 75 ?? E8} condition: 1 of ($chunk*) }"
+  "timestamp": "1696583647"
+  "object_relation": ""
+  "uuid": ""
+  "first_seen": "2023-10-06T12:14:07+03:00"
+  "deleted": false
+  "type": "yara"
+  "last_seen": "2023-10-23T17:46:47+03:00"
+  "event_id": ""
+  "category": "Payload delivery"
+  "distribution": "3"
+  "sharing_group_id": "1"
+  "comment": ""
+  "to_ids": true
+  "disable_correlation": false
+  "object_id": "~78849253552" //должен быть "~76596396224"
++ 7.
+  "object_relation": ""
+  "type": "whois-registrar"
+  "first_seen": "2023-10-06T12:22:03+03:00"
+  "object_id": "~79751852064"
+  "value": "France"
+  "event_id": ""
+  "timestamp": "1696584123"
+  "distribution": "3"
+  "sharing_group_id": "1"
+  "comment": ""
+  "to_ids": true
+  "disable_correlation": false
+  "category": "Attribution"
+  "uuid": ""
+  "last_seen": "2023-10-23T17:46:47+03:00"
+  "deleted": false
++8.
+  "last_seen": "2023-10-23T17:46:47+03:00"
+  "to_ids": true
+  "uuid": ""
+  "timestamp": "1696583730"
+  "sharing_group_id": "1"
+  "event_id": ""
+  "type": "comment"
+  "distribution": "3"
+  "first_seen": "2023-10-06T12:15:30+03:00"
+  "disable_correlation": false
+  "object_id": "~79751667744"
+  "object_relation": ""
+  "value": "Kaspersky"
+  "category": "Antivirus detection"
+  "comment": ""
+  "deleted": false
++9.
+  "object_id": "~76596555968"
+  "type": "datetime"
+  "value": "06.10.2023"
+  "uuid": ""
+  "event_id": ""
+  "object_relation": ""
+  "distribution": "3"
+  "last_seen": "2023-10-23T17:46:47+03:00"
+  "to_ids": true
+  "deleted": false
+  "disable_correlation": false
+  "category": "Other"
+  "sharing_group_id": "1"
+  "timestamp": "1696584054"
+  "comment": ""
+  "first_seen": "2023-10-06T12:20:54+03:00"
++10.
+  "object_relation": ""
+  "last_seen": "2023-10-23T17:46:47+03:00"
+  "to_ids": true
+  "comment": ""
+  "disable_correlation": false
+  "value": "192.168.23.44"
+  "uuid": ""
+  "distribution": "3"
+  "deleted": false
+  "object_id": "~78849450160"
+  "category": "Network activity"
+  "type": "ip-dst"
+  "first_seen": "2023-10-06T12:23:10+03:00"
+  "event_id": ""
+  "timestamp": "1696584190"
+  "sharing_group_id": "1"
++11.
+  "object_id": "~78849474736"
+  "category": "Person"
+  "distribution": "3"
+  "sharing_group_id": "1"
+  "last_seen": "2023-10-23T17:46:47+03:00"
+  "event_id": ""
+  "object_relation": ""
+  "deleted": false
+  "uuid": ""
+  "timestamp": "1696584494"
+  "comment": ""
+  "first_seen": "2023-10-06T12:28:14+03:00"
+  "to_ids": true
+  "disable_correlation": false
+  "type": "phone-number"
+  "value": "+78412356789"
++12.
+  "value": "HTTPS"
+  "last_seen": "2023-10-23T17:46:47+03:00"
+  "event_id": ""
+  "object_relation": ""
+  "category": "Network activity"
+  "to_ids": true
+  "type": "http-method"
+  "timestamp": "1696583910"
+  "first_seen": "2023-10-06T12:18:30+03:00"
+  "disable_correlation": false
+  "object_id": "~76596449472"
+  "distribution": "3"
+  "comment": ""
+  "uuid": ""
+  "sharing_group_id": "1"
+  "deleted": false
++13.
+  "object_relation": ""
+  "uuid": ""
+  "last_seen": "2023-10-23T17:46:47+03:00"
+  "deleted": false
+  "disable_correlation": false
+  "event_id": ""
+  "object_id": "~80733606120"
+  "category": "Payload delivery"
+  "timestamp": "1696584241"
+  "distribution": "3"
+  "first_seen": "2023-10-06T12:24:01+03:00"
+  "to_ids": true
+  "type": "email-src"
+  "value": "rkhan@flynas.com"
+  "sharing_group_id": "1"
+  "comment": ""
+14.
+  "type": "other"
+  "to_ids": true
+  "object_id": "~76596396224"
+  "object_relation": ""
+  "value": ""
+  "distribution": "3"
+  "first_seen": "2023-10-23T17:46:47+03:00"
+  "last_seen": "2023-10-23T17:46:47+03:00"
+  "event_id": ""
+  "category": "Other"
+  "sharing_group_id": "1"
+  "deleted": false
+  "disable_correlation": false
+  "uuid": ""
+  "timestamp": "0"
+  "comment": ""
++15. не заполнен objectId ~78849253552
+  "uuid": ""
+  "to_ids": true
+  "deleted": false
+  "category": "Payload delivery"
+  "timestamp": "1696583572"
+  "distribution": "3"
+  "value": "letin@mail[.]ru"
+  "first_seen": "2023-10-06T12:12:52+03:00"
+  "last_seen": "2023-10-23T17:46:47+03:00"
+  "disable_correlation": false
+  "object_id": "" //должен быть 78849253552
+  "object_relation": ""
+  "type": "email-dst"
+  "event_id": ""
+  "sharing_group_id": "1"
+  "comment": ""
++16.
+  "object_id": "~76596596928"
+  "uuid": ""
+  "distribution": "3"
+  "category": "External analysis"
+  "sharing_group_id": "1"
+  "comment": ""
+  "to_ids": true
+  "object_relation": ""
+  "timestamp": "1696584319"
+  "first_seen": "2023-10-06T12:25:19+03:00"
+  "disable_correlation": false
+  "event_id": ""
+  "type": "url"
+  "value": "https://www.google.ru/?hl=ru"
+  "last_seen": "2023-10-23T17:46:47+03:00"
+  "deleted": false
 
-Monitor processes and command-line arguments for actions that could be taken to gather system information related to services. Remote access tools with built-in features may interact directly with the Windows API to gather information. Information may also be acquired through Windows system management tools such as [Windows Management Instrumentation](https://attack.mitre.org/techniques/T1047) and [PowerShell](https://attack.mitre.org/techniques/T1059/001)."
-        "name": "System Service Discovery"
-        permissionsRequired:
-        systemRequirements:
-        tactics:
-          1. "discovery"
-        "_createdAt": 1616761468774
-        "capecId": "CAPEC-574"
-        "description": "Adversaries may try to gather information about registered local system services. Adversaries may obtain information about services using tools as well as OS utility commands such as <code>sc query</code>, <code>tasklist /svc</code>, <code>systemctl --type=service</code>, and <code>net start</code>.
 
-Adversaries may use the information from [System Service Discovery](https://attack.mitre.org/techniques/T1007) during automated discovery to shape follow-on behaviors, including whether or not the adversary fully infects the target and/or attempts specific actions."
-        "patternId": "T1007"
-        "patternType": "attack-pattern"
-        "revoked": false
-        "url": "https://attack.mitre.org/techniques/T1007"
-        "_createdBy": "architector@33c.rcm"
-        "_id": "~468385824"
-        "_type": "Pattern"
-        dataSources:
-          1. "Command: Command Execution"
-          2. "Process: OS API Execution"
-          3. "Process: Process Creation"
-        platforms:
-          1. "Windows"
-          2. "macOS"
-          3. "Linux"
-    "occurDate": 1687182720000
-    "patternId": "T1007"
-    "tactic": "discovery"
-    "_createdAt": 1687183011677
-    "_createdBy": "d.zablotsky@cloud.gcm"
-    "_id": "~65617940704"
-  2.
-    "patternId": "T1589"
-    "tactic": "reconnaissance"
-    "_createdAt": 1687182988776
-    "_createdBy": "d.zablotsky@cloud.gcm"
-    "_id": "~66887692384"
-    extraData:
-      pattern:
-        defenseBypassed:
-        "patternId": "T1589"
-        platforms:
-          1. "PRE"
-        "remoteSupport": false
-        "url": "https://attack.mitre.org/techniques/T1589"
-        "version": "1.2"
-        "_type": "Pattern"
-        dataSources:
-          1. "Network Traffic: Network Traffic Content"
-        "revoked": false
-        systemRequirements:
-        "description": "Adversaries may gather information about the victim's identity that can be used during targeting. Information about identities may include a variety of details, including personal data (ex: employee names, email addresses, etc.) as well as sensitive details such as credentials.
-
-Adversaries may gather this information in various ways, such as direct elicitation via [Phishing for Information](https://attack.mitre.org/techniques/T1598). Information about users could also be enumerated via other active means (i.e. [Active Scanning](https://attack.mitre.org/techniques/T1595)) such as probing and analyzing responses from authentication services that may reveal valid usernames in a system.(Citation: GrimBlog UsernameEnum) Information about victims may also be exposed to adversaries via online or other accessible data sets (ex: [Social Media](https://attack.mitre.org/techniques/T1593/001) or [Search Victim-Owned Websites](https://attack.mitre.org/techniques/T1594)).(Citation: OPM Leak)(Citation: Register Deloitte)(Citation: Register Uber)(Citation: Detectify Slack Tokens)(Citation: Forbes GitHub Creds)(Citation: GitHub truffleHog)(Citation: GitHub Gitrob)(Citation: CNET Leaks)
-
-Gathering this information may reveal opportunities for other forms of reconnaissance (ex: [Search Open Websites/Domains](https://attack.mitre.org/techniques/T1593) or [Phishing for Information](https://attack.mitre.org/techniques/T1598)), establishing operational resources (ex: [Compromise Accounts](https://attack.mitre.org/techniques/T1586)), and/or initial access (ex: [Phishing](https://attack.mitre.org/techniques/T1566) or [Valid Accounts](https://attack.mitre.org/techniques/T1078))."
-        "name": "Gather Victim Identity Information"
-        "_id": "~468312096"
-        "detection": "Monitor for suspicious network traffic that could be indicative of probing for user information, such as large/iterative quantities of authentication requests originating from a single source (especially if the source is known to be associated with an adversary/botnet). Analyzing web metadata may also reveal artifacts that can be attributed to potentially malicious activity, such as referer or user-agent string HTTP/S fields.
-
-Much of this activity may have a very high occurrence and associated false positive rate, as well as potentially taking place outside the visibility of the target organization, making detection difficult for defenders.
-
-Detection efforts may be focused on related stages of the adversary lifecycle, such as during Initial Access."
-        extraData:
-        "patternType": "attack-pattern"
-        permissionsRequired:
-        tactics:
-          1. "reconnaissance"
-        "_createdAt": 1616761466210
-        "_createdBy": "architector@33c.rcm"
-    "occurDate": 1687182720000
-  3.
-    extraData:
-      pattern:
-        "detection": "Monitor the activity of cloud accounts to detect abnormal or malicious behavior, such as accessing information outside of the normal function of the account or account usage at atypical hours."
-        extraData:
-        "name": "Cloud Accounts"
-        "patternId": "T1078.004"
-        permissionsRequired:
-          1. "User"
-          2. "Administrator"
-        "remoteSupport": false
-        "_id": "~632496328"
-        dataSources:
-          1. "Logon Session: Logon Session Metadata"
-          2. "User Account: User Account Authentication"
-          3. "Logon Session: Logon Session Creation"
-        systemRequirements:
-        "version": "1.4"
-        "_createdAt": 1616761470887
-        "patternType": "attack-pattern"
-        platforms:
-          1. "Azure AD"
-          2. "Office 365"
-          3. "SaaS"
-          4. "IaaS"
-          5. "Google Workspace"
-        tactics:
-          1. "defense-evasion"
-          2. "initial-access"
-          3. "persistence"
-          4. "privilege-escalation"
-        "url": "https://attack.mitre.org/techniques/T1078/004"
-        defenseBypassed:
-        "description": "Adversaries may obtain and abuse credentials of a cloud account as a means of gaining Initial Access, Persistence, Privilege Escalation, or Defense Evasion. Cloud accounts are those created and configured by an organization for use by users, remote support, services, or for administration of resources within a cloud service provider or SaaS application. In some cases, cloud accounts may be federated with traditional identity management system, such as Window Active Directory.(Citation: AWS Identity Federation)(Citation: Google Federating GC)(Citation: Microsoft Deploying AD Federation)
-
-Compromised credentials for cloud accounts can be used to harvest sensitive data from online storage accounts and databases. Access to cloud accounts can also be abused to gain Initial Access to a network by abusing a [Trusted Relationship](https://attack.mitre.org/techniques/T1199). Similar to [Domain Accounts](https://attack.mitre.org/techniques/T1078/002), compromise of federated cloud accounts may allow adversaries to more easily move laterally within an environment.
-
-Once a cloud account is compromised, an adversary may perform [Account Manipulation](https://attack.mitre.org/techniques/T1098) - for example, by adding [Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003) - to maintain persistence and potentially escalate their privileges."
-        "revoked": false
-        "_createdBy": "architector@33c.rcm"
-        "_type": "Pattern"
-      patternParent:
-        "url": "https://attack.mitre.org/techniques/T1078"
-        "version": "2.5"
-        "_type": "Pattern"
-        "patternId": "T1078"
-        systemRequirements:
-        "revoked": false
-        tactics:
-          1. "defense-evasion"
-          2. "initial-access"
-          3. "persistence"
-          4. "privilege-escalation"
-        defenseBypassed:
-          1. "Firewall"
-          2. "Anti-virus"
-          3. "Host Intrusion Prevention Systems"
-          4. "Network Intrusion Detection System"
-          5. "Application Control"
-          6. "System Access Controls"
-        "name": "Valid Accounts"
-        platforms:
-          1. "Windows"
-          2. "Azure AD"
-          3. "Office 365"
-          4. "SaaS"
-          5. "IaaS"
-          6. "Linux"
-          7. "macOS"
-          8. "Google Workspace"
-          9. "Containers"
-          10. "Network"
-        dataSources:
-          1. "Logon Session: Logon Session Creation"
-          2. "Logon Session: Logon Session Metadata"
-          3. "User Account: User Account Authentication"
-        "description": "Adversaries may obtain and abuse credentials of existing accounts as a means of gaining Initial Access, Persistence, Privilege Escalation, or Defense Evasion. Compromised credentials may be used to bypass access controls placed on various resources on systems within the network and may even be used for persistent access to remote systems and externally available services, such as VPNs, Outlook Web Access, network devices, and remote desktop.(Citation: volexity_0day_sophos_FW) Compromised credentials may also grant an adversary increased privilege to specific systems or access to restricted areas of the network. Adversaries may choose not to use malware or tools in conjunction with the legitimate access those credentials provide to make it harder to detect their presence.
-
-In some cases, adversaries may abuse inactive accounts: for example, those belonging to individuals who are no longer part of an organization. Using these accounts may allow the adversary to evade detection, as the original account user will not be present to identify any anomalous activity taking place on their account.(Citation: CISA MFA PrintNightmare)
-
-The overlap of permissions for local, domain, and cloud accounts across a network of systems is of concern because the adversary may be able to pivot across accounts and systems to reach a high level of access (i.e., domain or enterprise administrator) to bypass access controls set within the enterprise.(Citation: TechNet Credential Theft)"
-        permissionsRequired:
-          1. "User"
-          2. "Administrator"
-        "remoteSupport": false
-        "_createdAt": 1616761469133
-        "_createdBy": "architector@33c.rcm"
-        "_id": "~468389920"
-        extraData:
-        "patternType": "attack-pattern"
-        "capecId": "CAPEC-560"
-        "capecUrl": "https://capec.mitre.org/data/definitions/560.html"
-        "detection": "Configure robust, consistent account activity audit policies across the enterprise and with externally accessible services.(Citation: TechNet Audit Policy) Look for suspicious account behavior across systems that share accounts, either user, admin, or service accounts. Examples: one account logged into multiple systems simultaneously; multiple accounts logged into the same machine simultaneously; accounts logged in at odd times or outside of business hours. Activity may be from interactive login sessions or process ownership from accounts being used to execute binaries on a remote system as a particular account. Correlate other security systems with login information (e.g., a user has an active login session but has not entered the building or does not have VPN access).
-
-Perform regular audits of domain and local system accounts to detect accounts that may have been created by an adversary for persistence. Checks on these accounts could also include whether default accounts such as Guest have been activated. These audits should also include checks on any appliances and applications for default credentials or SSH keys, and if any are discovered, they should be updated immediately."
-    "occurDate": 1687182720000
-    "patternId": "T1078.004"
-    "tactic": "initial-access"
-    "_createdAt": 1687182998135
-    "_createdBy": "d.zablotsky@cloud.gcm"
-    "_id": "~69181468912"
-"source": "gcm"
++1.
+  "uuid": ""
+  "sharing_group_id": "1"
+  "comment": ""
+  "to_ids": true
+  "disable_correlation": false
+  "object_relation": ""
+  "type": "community-id"
+  "timestamp": "1696583865"
+  "first_seen": "2023-10-06T12:17:45+03:00"
+  "value": "apt 42"
+  "deleted": false
+  "event_id": ""
+  "object_id": "~79751696416"
+  "last_seen": "2023-10-24T13:59:49+03:00"
+  "category": "Network activity"
+  "distribution": "3"
++2.
+  "value": "Kaspersky"
+  "uuid": ""
+  "distribution": "3"
+  "sharing_group_id": "1"
+  "comment": ""
+  "last_seen": "2023-10-24T13:59:49+03:00"
+  "category": "Antivirus detection"
+  "object_relation": ""
+  "object_id": "~79751667744"
+  "first_seen": "2023-10-06T12:15:30+03:00"
+  "event_id": ""
+  "timestamp": "1696583730"
+  "to_ids": true
+  "deleted": false
+  "disable_correlation": false
+  "type": "comment"
++3.
+  "value": "+78412356789"
+  "comment": ""
+  "first_seen": "2023-10-06T12:28:14+03:00"
+  "category": "Person"
+  "uuid": ""
+  "distribution": "3"
+  "sharing_group_id": "1"
+  "deleted": false
+  "object_id": "~78849474736"
+  "object_relation": ""
+  "type": "phone-number"
+  "last_seen": "2023-10-24T13:59:49+03:00"
+  "event_id": ""
+  "timestamp": "1696584494"
+  "to_ids": true
+  "disable_correlation": false
++4.
+  "distribution": "3"
+  "value": "3456789"
+  "uuid": ""
+  "timestamp": "1696584448"
+  "last_seen": "2023-10-24T13:59:49+03:00"
+  "disable_correlation": false
+  "deleted": false
+  "type": "snort"
+  "sharing_group_id": "1"
+  "comment": ""
+  "category": "Network activity"
+  "first_seen": "2023-10-06T12:27:28+03:00"
+  "to_ids": true
+  "event_id": ""
+  "object_id": "~80733634792"
+  "object_relation": ""
++5.
+  "comment": ""
+  "deleted": false
+  "object_relation": ""
+  "type": "email-body"
+  "uuid": ""
+  "timestamp": "1696584368"
+  "distribution": "3"
+  "sharing_group_id": "1"
+  "first_seen": "2023-10-06T12:26:08+03:00"
+  "last_seen": "2023-10-24T13:59:49+03:00"
+  "to_ids": true
+  "event_id": ""
+  "object_id": "~79094964408"
+  "disable_correlation": false
+  "category": "Payload delivery"
+  "value": "kuku@mail.ru"
++6.
+  "category": "Network activity"
+  "type": "http-method"
+  "value": "HTTPS"
+  "sharing_group_id": "1"
+  "last_seen": "2023-10-24T13:59:49+03:00"
+  "deleted": false
+  "event_id": ""
+  "object_relation": ""
+  "timestamp": "1696583910"
+  "distribution": "3"
+  "uuid": ""
+  "comment": ""
+  "object_id": "~76596449472"
+  "first_seen": "2023-10-06T12:18:30+03:00"
+  "to_ids": true
+  "disable_correlation": false
+7.
+  "category": "Payload delivery"
+  "comment": ""
+  "first_seen": "2023-10-06T12:14:07+03:00"
+  "to_ids": true
+  "disable_correlation": false
+  "object_relation": ""
+  "distribution": "3"
+  "sharing_group_id": "1"
+  "event_id": ""
+  "last_seen": "2023-10-24T13:59:49+03:00"
+  "timestamp": "1696583647"
+  "type": "yara"
+  "value": "" //пустое поле хотя должно быть очень много текста
+  "uuid": ""
+  "deleted": false
+  "object_id": "~76596396224"
++8.
+  "object_id": "~78849253552"
+  "uuid": ""
+  "distribution": "3"
+  "to_ids": true
+  "category": "Payload delivery"
+  "event_id": ""
+  "value": "letin@mail[.]ru"
+  "comment": ""
+  "deleted": false
+  "disable_correlation": false
+  "last_seen": "2023-10-24T13:59:49+03:00"
+  "object_relation": ""
+  "type": "email-dst"
+  "timestamp": "1696583572"
+  "sharing_group_id": "1"
+  "first_seen": "2023-10-06T12:12:52+03:00"
++9.
+  "object_relation": ""
+  "category": "External analysis"
+  "distribution": "3"
+  "type": "url"
+  "timestamp": "1696584319"
+  "deleted": false
+  "event_id": ""
+  "object_id": "~76596596928"
+  "value": "https://www.google.ru/?hl=ru"
+  "sharing_group_id": "1"
+  "first_seen": "2023-10-06T12:25:19+03:00"
+  "last_seen": "2023-10-24T13:59:49+03:00"
+  "uuid": ""
+  "comment": ""
+  "to_ids": true
+  "disable_correlation": false
++10.
+  "type": "filename"
+  "value": "SolarWinds.exe"
+  "object_id": "~79094972600"
+  "timestamp": "1696584412"
+  "first_seen": "2023-10-06T12:26:52+03:00"
+  "last_seen": "2023-10-24T13:59:49+03:00"
+  "deleted": false
+  "object_relation": ""
+  "category": "Artifacts dropped"
+  "disable_correlation": false
+  "to_ids": true
+  "event_id": ""
+  "uuid": ""
+  "distribution": "3"
+  "sharing_group_id": "1"
+  "comment": ""
++11.
+  "event_id": ""
+  "value": "rkhan@flynas.com"
+  "first_seen": "2023-10-06T12:24:01+03:00"
+  "distribution": "3"
+  "object_id": "~80733606120"
+  "object_relation": ""
+  "uuid": ""
+  "timestamp": "1696584241"
+  "comment": ""
+  "disable_correlation": false
+  "to_ids": true
+  "deleted": false
+  "category": "Payload delivery"
+  "type": "email-src"
+  "sharing_group_id": "1"
+  "last_seen": "2023-10-24T13:59:49+03:00"
++12.
+  "category": "Other"
+  "comment": ""
+  "object_id": "~76596555968"
+  "last_seen": "2023-10-24T13:59:49+03:00"
+  "timestamp": "1696584054"
+  "type": "datetime"
+  "uuid": ""
+  "first_seen": "2023-10-06T12:20:54+03:00"
+  "disable_correlation": false
+  "object_relation": ""
+  "value": "06.10.2023"
+  "distribution": "3"
+  "sharing_group_id": "1"
+  "to_ids": true
+  "deleted": false
+  "event_id": ""
+13. //вот это лишнее, должно быть совмещено с №7
+  "object_id": ""
+  "timestamp": "0"
+  "comment": ""
+  "first_seen": "2023-10-06T13:17:31+03:00"
+  "category": "Other"
+  "last_seen": "2023-10-24T13:59:49+03:00"
+  "disable_correlation": false
+  "object_relation": ""
+  "type": "other"
+  "sharing_group_id": "1"
+  "to_ids": true
+  "deleted": false
+  "event_id": ""
+  "value": "rule SHADOWPAD_X64_CONFIG_MODULE { strings: $chunk_1 = {48 8D 68 ?? 48 81 EC ?? ?? ?? ?? 4C 8B E1 45 33 ED B9 ?? ?? ?? ?? 41 8B DD 48 8B F2 E8} $chunk_2 = {BE ?? ?? ?? ?? 8B CE E8 ?? ?? ?? ?? 33 D2 48 8B C8 4C 8B E8 E8 ?? ?? ?? ?? 8B D8 85 C0 0F 85} condition: 1 of ($chunk*) } rule SHADOWPAD_X86_CONFIG_MODULE { strings: $chunk_1 = {55 8B EC 83 EC ?? 83 65 ?? ?? 56 57 68 ?? ?? ?? ?? E8} $chunk_2 = {55 8B EC 83 EC ?? 56 57 33 F6 68 ?? ?? ?? ?? 89 75 ?? E8} condition: 1 of ($chunk*) }"
+  "uuid": ""
+  "distribution": "3"
++14.
+  "object_relation": ""
+  "type": "whois-registrar"
+  "last_seen": "2023-10-24T13:59:49+03:00"
+  "to_ids": true
+  "category": "Attribution"
+  "value": "France"
+  "uuid": ""
+  "object_id": "~79751852064"
+  "sharing_group_id": "1"
+  "disable_correlation": false
+  "event_id": ""
+  "timestamp": "1696584123"
+  "distribution": "3"
+  "comment": ""
+  "first_seen": "2023-10-06T12:22:03+03:00"
+  "deleted": false
++15. //with "attachment"
+  "timestamp": "1696587451"
+  "distribution": "3"
+  "last_seen": "2023-10-24T13:59:49+03:00"
+  "object_id": "~79668891792"
+  "uuid": ""
+  "sharing_group_id": "1"
+  "to_ids": true
+  "deleted": false
+  "object_relation": ""
+  "type": "pattern-in-file"
+  "value": ""
+  "event_id": ""
+  "category": "Network activity"
+  "comment": ""
+  "first_seen": "2023-10-24T13:59:49+03:00"
+  "disable_correlation": false
++16.
+  "to_ids": true
+  "deleted": false
+  "object_id": "~78849450160"
+  "object_relation": ""
+  "timestamp": "1696584190"
+  "distribution": "3"
+  "sharing_group_id": "1"
+  "comment": ""
+  "category": "Network activity"
+  "disable_correlation": false
+  "event_id": ""
+  "last_seen": "2023-10-24T13:59:49+03:00"
+  "type": "ip-dst"
+  "value": "192.168.23.44"
+  "uuid": ""
+  "first_seen": "2023-10-06T12:23:10+03:00"

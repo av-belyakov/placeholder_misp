@@ -1,81 +1,39 @@
 package coremodule_test
 
 import (
+	"bufio"
+	"encoding/json"
 	"fmt"
-	"net/http"
+	"os"
+	"path"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"placeholder_misp/confighandler"
 	"placeholder_misp/coremodule"
 	"placeholder_misp/datamodels"
 	"placeholder_misp/memorytemporarystorage"
 	"placeholder_misp/mispinteractions"
 	rules "placeholder_misp/rulesinteraction"
-	"placeholder_misp/tmpdata"
+	"placeholder_misp/supportingfunctions"
 )
-
-/*
-type Sizer interface {
-	Size() uintptr
-}
-
-type Producer[T any] struct {
-	Val T
-}
-
-// Producer implements the Sizer interface
-
-func (p Producer[T]) Size(T) uintptr {
-	return unsafe.Sizeof(p.Val)
-}
-
-func (p Producer[T]) Produce() T {
-	return p.Val
-}
-
-func Execute[T any](s Sizer[T]) {
-	switch p := s.(type) {
-	case Producer[T]:
-		fmt.Println(p.Produce())
-	default:
-		panic("This should not happen")
-	}
-}
-
-coremodule.Execute[string](coremodule.Producer[string]{"23"})
-coremodule.Execute[string](coremodule.Producer[int64]{27})
-
-
-func PrintStringOrInt[T string | int](v T) {
-	switch any(v).(type) {
-	case string:
-		fmt.Printf("String: %v\n", v)
-	case int:
-		fmt.Printf("Int: %v\n", v)
-	default:
-		panic("Impossible")
-	}
-}
-*/
 
 var _ = Describe("CreateMispFormat", Ordered, func() {
 	var (
-		listRule             rules.ListRulesProcessingMsgMISP
-		storageApp           *memorytemporarystorage.CommonStorageTemporary
-		logging              chan datamodels.MessageLogging
-		mispOutput           <-chan mispinteractions.SettingChanOutputMISP
-		moduleMisp           *mispinteractions.ModuleMISP
-		exampleByte          []byte
-		errGetRule, errHMisp error
+		listRule                          rules.ListRulesProcessingMsgMISP
+		storageApp                        *memorytemporarystorage.CommonStorageTemporary
+		logging                           chan datamodels.MessageLogging
+		mispOutput                        <-chan mispinteractions.SettingChanOutputMISP
+		moduleMisp                        *mispinteractions.ModuleMISP
+		exampleByte                       []byte
+		counting                          chan datamodels.DataCounterSettings
+		errReadFile, errGetRule, errHMisp error
 	)
 
-	getExampleByte := func() []byte {
+	/*getExampleByte := func() []byte {
 		byteTmp := []byte{}
 
 		for _, v := range strings.Split(tmpdata.GetExampleDataThree(), " ") {
@@ -88,37 +46,70 @@ var _ = Describe("CreateMispFormat", Ordered, func() {
 		}
 
 		return byteTmp
-	}
+	}*/
 
-	//getAnalysis := func() string {
-	//	return "2"
-	//}
+	readFileJson := func(fpath, fname string) ([]byte, error) {
+		var newResult []byte
+
+		rootPath, err := supportingfunctions.GetRootPath("placeholder_misp")
+		if err != nil {
+			return newResult, err
+		}
+
+		//fmt.Println("func 'readFileJson', path = ", path.Join(rootPath, fpath, fname))
+
+		f, err := os.OpenFile(path.Join(rootPath, fpath, fname), os.O_RDONLY, os.ModePerm)
+		if err != nil {
+			return newResult, err
+		}
+		defer f.Close()
+
+		sc := bufio.NewScanner(f)
+		for sc.Scan() {
+			newResult = append(newResult, sc.Bytes()...)
+		}
+
+		return newResult, nil
+	}
 
 	BeforeAll(func() {
 		//инициализация модуля конфига
-		ca, _ := confighandler.NewConfig()
+		//ca, _ := confighandler.NewConfig()
 
 		//канал для логирования
 		logging = make(chan datamodels.MessageLogging)
+		//канал для подсчета обработанных кейсов
+		counting = make(chan datamodels.DataCounterSettings)
 
-		//пример кейса в виде байтов
-		exampleByte = getExampleByte()
+		//читаем тестовый файл
+		exampleByte, errReadFile = readFileJson("natsinteractions/test_json", "example_caseId_33705.json")
 
 		//инициализация списка правил
-		listRule, _, errGetRule = rules.GetRuleProcessingMsgForMISP("rules", "procmispmsg_test.yaml")
-
-		//fmt.Println("list RULES = ", listRule)
+		listRule, _, errGetRule = rules.GetRuleProcessingMsgForMISP("rules", "mispmsgrule.yaml")
 
 		//инициализируем модуль временного хранения информации
 		storageApp = memorytemporarystorage.NewTemporaryStorage()
 
-		//инициализация модуля для взаимодействия с MISP
-		moduleMisp, errHMisp = mispinteractions.HandlerMISP(*ca.GetAppMISP(), storageApp, logging)
+		moduleMisp = &mispinteractions.ModuleMISP{
+			ChanInputMISP:  make(chan mispinteractions.SettingsChanInputMISP),
+			ChanOutputMISP: make(chan mispinteractions.SettingChanOutputMISP),
+		}
 
-		mispOutput = moduleMisp.GetDataReceptionChannel()
+		/*
+			//инициализация модуля для взаимодействия с MISP
+			moduleMisp, errHMisp = mispinteractions.HandlerMISP(*ca.GetAppMISP(), storageApp, logging)
+
+			mispOutput = moduleMisp.GetDataReceptionChannel()
+		*/
 	})
 
-	Context("Тест 1. Проверка формирования правил фильтрации", func() {
+	Context("Тест 1. Чтение тестового JSON файла", func() {
+		It("При чтении тестового файла ошибок быть не должно", func() {
+			Expect(errReadFile).ShouldNot(HaveOccurred())
+		})
+	})
+
+	Context("Тест 2. Проверка формирования правил фильтрации", func() {
 		It("При конвертировании времени в формат ISO 8601 ошибок быть не должно", func() {
 			dateTest := "1692322715497"
 			dt, err := strconv.ParseInt(dateTest, 10, 64)
@@ -152,23 +143,58 @@ var _ = Describe("CreateMispFormat", Ordered, func() {
 		//
 	*/
 
-	Context("Тест 2. Проверяем правельность обработки сообщения по правилам и корректность формирования MISP форматов", func() {
+	Context("Тест 3. Проверяем правельность обработки сообщения по правилам и корректность формирования MISP форматов", func() {
 		It("Сообщение должно быть успешно обработано, должены быть сформированы типы Events и Attributes", func(ctx SpecContext) {
 			cd := make(chan struct{})
 
 			uuidTask := uuid.NewString()
 			storageApp.SetRawDataHiveFormatMessage(uuidTask, exampleByte)
 
+			go func() {
+				for data := range moduleMisp.GetInputChannel() {
+					fmt.Println("@@@@_________________ Приняты данные для отправки в MISP _________________@@@@")
+
+					if d, ok := data.MajorData["attributes"]; ok {
+						b, err := json.Marshal(d)
+						if err != nil {
+							fmt.Println("__________ ERROR ___________")
+							fmt.Println(err)
+						}
+
+						str, err := supportingfunctions.NewReadReflectJSONSprint(b)
+						if err != nil {
+							fmt.Println("__________ ERROR ___________")
+							fmt.Println(err)
+						}
+
+						fmt.Println(str)
+						/*
+							почему список из 16 а не из 15?!
+						*/
+
+					}
+
+					moduleMisp.SendingDataOutput(mispinteractions.SettingChanOutputMISP{Command: "STOP "})
+
+					return
+				}
+			}()
+
 			//формирование итоговых документов в формате MISP
 			chanCreateMispFormat, chanDone := coremodule.NewMispFormat(moduleMisp, logging)
 
-			go coremodule.HandlerMessageFromHive(exampleByte, uuidTask, storageApp, listRule, chanCreateMispFormat, chanDone, logging)
+			go coremodule.HandlerMessageFromHive(exampleByte, uuidTask, storageApp, listRule, chanCreateMispFormat, chanDone, logging, counting)
 
 			go func() {
 				for {
 					select {
 					case log := <-logging:
-						fmt.Println("___ Log = ", log, " ____")
+
+						if log.MsgType == "warning" {
+							fmt.Println("___ Log = ", log.MsgData, " ____")
+						}
+					case numData := <-counting:
+						fmt.Printf("Counter processed object, type:%s, count:%d\n", numData.DataType, numData.Count)
 					case <-cd:
 						fmt.Println("-== STOP TEST ==-")
 
@@ -180,49 +206,15 @@ var _ = Describe("CreateMispFormat", Ordered, func() {
 			fmt.Println("reseived data: ", <-mispOutput)
 			cd <- struct{}{}
 
+			/*
+				Объект с 219-236 стр. файла "example_caseId_33705.json"
+				в боевом приложении игнорируется
+
+				Объект с 297-324 стр. файла "example_caseId_33705.json"
+				в боевом приложении игнорируется
+			*/
+
 			Expect(true).Should(BeTrue())
 		}, SpecTimeout(time.Second*15))
 	})
-
-	Context("Тест 3. Тестируем удаление выбранных событий", func() {
-		It("Выбранное событие должно быть успешно удалено", func() {
-			res, err := mispinteractions.DelEventsMispFormat("misp-world.cloud.gcm", "TvHkjH8jVQEIdvAxjxnL4H6wDoKyV7jobDjndvAo", "6029")
-
-			Expect(err).ShouldNot(HaveOccurred())
-			Expect(res.StatusCode).Should(Equal(http.StatusOK))
-		})
-	})
-
-	/*Context("Тест 2. Проверяем правельность обработки правил для формирования MISP форматов", func() {
-		It("Обработка правил для формирования MISP форматов должна выполнятся успешно", func() {
-			chanOutMispFormat := make(chan coremodule.ChanInputCreateMispFormat)
-
-			procMsgHive, err := coremodule.NewHandleMessageFromHive(exampleByte, listRules)
-			Expect(err).ShouldNot(HaveOccurred())
-
-			go func() {
-				for v := range chanOutMispFormat {
-
-					//fmt.Println("___ v.FieldName = ", v.FieldName, " v.Value = ", v.Value, " ____")
-
-					if v.FieldBranch == "event.object.tlp" {
-						fmt.Println("|||| 'event.object.tlp' |||| FieldBranch: ", v.FieldBranch, " v.Value: ", v.Value, " |||||||||")
-					}
-
-					if lf, ok := listHandlerMisp[v.FieldBranch]; ok {
-						for _, f := range lf {
-							_ = f(v.Value)
-						}
-					}
-				}
-			}()
-
-			ok, warningMsg := procMsgHive.HandleMessage(chanOutMispFormat)
-
-			fmt.Println("EventsType: ", eventsMisp, " AttributesType: ", attributesMisp)
-
-			Expect(len(warningMsg)).Should(Equal(0))
-			Expect(ok).Should(BeTrue())
-		})
-	})*/
 })
