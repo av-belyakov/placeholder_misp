@@ -53,3 +53,16 @@ func GetAppVersion(str string) string {
 
 	return version
 }
+
+func CheckHashSum(hsum string) string {
+	switch len(hsum) {
+	case 32:
+		return "md5"
+	case 40:
+		return "sha1"
+	case 64:
+		return "sha256"
+	}
+
+	return "other"
+}

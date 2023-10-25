@@ -32,7 +32,6 @@ type EventReports struct {
 }
 
 type ListAttributesMispFormat struct {
-	//attributes    []AttributesMispFormat
 	attributes map[int]AttributesMispFormat
 	mutex      sync.Mutex
 }
@@ -252,4 +251,35 @@ type RoleSettingsMispFormat struct {
 type OrganisationSettingsMispFormat struct {
 	Id   string `json:"id"`
 	Name string `json:"name"`
+}
+
+// описание формата сообщения типа 'Objects' (нет в спецификации API)
+// формируется на основе содержимого поля observables получаемого от TheHive
+// которое дополнительно содержит поле attachment
+type ListObjectsMispFormat struct {
+	objects map[int]ObjectsMispFormat
+	mutex   sync.Mutex
+}
+
+type ObjectsMispFormat struct {
+	TemplateUUID    string        `json:"template_uuid"`
+	TemplateVersion string        `json:"template_version"`
+	FirstSeen       string        `json:"first_seen"`
+	Timestamp       string        `json:"timestamp"`
+	Name            string        `json:"name"`
+	Description     string        `json:"description"`
+	EventID         string        `json:"event_id"`
+	MetaCategory    string        `json:"meta-category"`
+	Distribution    string        `json:"distribution"`
+	Attribute       ListAttribute `json:"Attribute"`
+}
+
+type ListAttribute []AttributeMispFormat
+
+type AttributeMispFormat struct {
+	Category       string `json:"category"`
+	Type           string `json:"type"`
+	Value          string `json:"value"`
+	Distribution   string `json:"distribution"`
+	ObjectRelation string `json:"object_relation"`
 }

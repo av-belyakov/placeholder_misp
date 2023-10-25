@@ -48,6 +48,7 @@ func (svn *storageValueName) CtearValueName() {
 
 var (
 	eventsMisp         datamodels.EventsMispFormat
+	listObjectsMisp    *datamodels.ListObjectsMispFormat
 	listAttributesMisp *datamodels.ListAttributesMispFormat
 
 	//		пока не нужны, временно отключаем
@@ -64,6 +65,7 @@ var (
 
 func init() {
 	eventsMisp = datamodels.NewEventMisp()
+	listObjectsMisp = datamodels.NewListObjectsMispFormat()
 	listAttributesMisp = datamodels.NewListAttributesMispFormat()
 
 	/*galaxyClustersMisp = datamodels.GalaxyClustersMispFormat{
@@ -108,9 +110,14 @@ func init() {
 		//attributes
 		"observables._id":        {listAttributesMisp.SetValueObjectIdAttributesMisp},
 		"observables.data":       {listAttributesMisp.SetValueValueAttributesMisp},
+		"observables.dataType":   {listObjectsMisp.SetValueNameObjectsMisp},
 		"observables._createdAt": {listAttributesMisp.SetValueTimestampAttributesMisp},
 		"observables.message":    {listAttributesMisp.SetValueCommentAttributesMisp},
-		"observables.startDate":  {listAttributesMisp.SetValueFirstSeenAttributesMisp},
+		"observables.startDate": {
+			listAttributesMisp.SetValueFirstSeenAttributesMisp,
+			listObjectsMisp.SetValueFirstSeenObjectsMisp,
+			listObjectsMisp.SetValueTimestampObjectsMisp,
+		},
 	}
 }
 

@@ -386,19 +386,4 @@ Once a cloud account is compromised, an adversary may perform [Account Manipulat
           4. "privilege-escalation"
     "occurDate": 1687182720000
     "patternId": "T1078.004"
-    
-    {
-        "Attribute": [
-          {
-            "name": "new name",
-            "category": "Internal reference",
-            "value": "127.0.0.1",
-            "to_ids": true,
-            "disable_correlation": false,
-            "distribution": "0",
-            "comment": "logged source ip",
-            "object_relation": "sensor",
-            "type": "other"
-          }
-        ]
-      }
+  
