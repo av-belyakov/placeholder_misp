@@ -257,6 +257,10 @@ func NewMispFormat(
 				listAttributeTmp.CleanAttribute()
 				listAttributesMisp.CleanListAttributesMisp()
 
+				fmt.Println("-______________________________________________---")
+				fmt.Println("listObjectsMisp.GetListObjectsMisp() = ", listObjectsMisp.GetListObjectsMisp())
+				fmt.Println("listAttributeTmp.GetListAttribute() = ", listAttributeTmp.GetListAttribute())
+
 				return
 			}
 		}

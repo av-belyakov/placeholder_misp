@@ -67,7 +67,10 @@ func (la *ListAttributeTmp) GetListAttribute() map[int][]AttributeMispFormat {
 }
 
 func (la *ListAttributeTmp) CleanAttribute() {
-	la = &ListAttributeTmp{}
+	la.Lock()
+	defer la.Unlock()
+
+	la.attributes = map[int][]AttributeMispFormat{}
 }
 
 func createNewAttributeMisp() []AttributeMispFormat {

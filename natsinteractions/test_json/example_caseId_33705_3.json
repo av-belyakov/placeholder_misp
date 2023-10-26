@@ -1,0 +1,408 @@
+{
+    "event": {
+        "objectType": "case",
+        "objectId": "~79667703952",
+        "rootId": "~79667703952",
+        "requestId": "cb62121531e33860:2124cf89:18b6be958e3:-8000:4259",
+        "object": {
+            "severity": 2,
+            "_id": "~79667703952",
+            "title": "TEST MISP_2",
+            "flag": false,
+            "stats": {},
+            "createdBy": "d.zablotsky@cloud.gcm",
+            "pap": 2,
+            "summary": "ТЕСТ! НЕ ДОБАВЛЯТЬ В ZK",
+            "impactStatus": "WithImpact",
+            "resolutionStatus": "TruePositive",
+            "createdAt": 1696583267911,
+            "startDate": 1696583100000,
+            "status": "Resolved",
+            "permissions": {
+                "id": "~79667703952",
+                "createdAt": 1696583267911,
+                "pap": 2
+            },
+            "updatedBy": "webhook@cloud.gcm",
+            "_type": "case",
+            "caseId": 33705,
+            "tags": [
+                "Webhook:send=\"ZK\"",
+                "Webhook: send=\"MISP\""
+            ],
+            "endDate": 1698326586690,
+            "tlp": 2,
+            "owner": "d.zablotsky@cloud.gcm",
+            "id": "~79667703952",
+            "updatedAt": 1698326588520,
+            "description": "[Тестовый кейс для улучшения работы в MISP",
+            "customFields": {
+                "external-letter": {
+                    "order": 1
+                },
+                "inbox1": {
+                    "order": 4
+                },
+                "inner-letter": {
+                    "order": 2
+                },
+                "ncircc-class-attack": {
+                    "order": 3,
+                    "string": "Не отправлять в НКЦКИ"
+                },
+                "notification": {
+                    "order": 5
+                },
+                "report": "",
+                "attack-type": {
+                    "order": 7,
+                    "string": "Распределенная КА"
+                },
+                "class-attack": {
+                    "order": 0,
+                    "string": "Вирусное заражение"
+                }
+            }
+        },
+        "organisationId": "~4192",
+        "organisation": "GCM",
+        "operation": "update",
+        "details": {
+            "customFields": {
+                "class-attack": {
+                    "order": 0,
+                    "string": "Вирусное заражение"
+                },
+                "external-letter": {
+                    "order": 1
+                },
+                "inbox1": {
+                    "order": 4
+                },
+                "inner-letter": {
+                    "order": 2
+                },
+                "ncircc-class-attack": {
+                    "order": 3,
+                    "string": "Не отправлять в НКЦКИ"
+                },
+                "notification": {
+                    "order": 5
+                },
+                "report": {
+                    "order": 6
+                },
+                "attack-type": {
+                    "order": 7,
+                    "string": "Распределенная КА"
+                }
+            },
+            "resolutionStatus": "TruePositive",
+            "summary": "ТЕСТ! НЕ ДОБАВЛЯТЬ В ZK",
+            "status": "Resolved",
+            "impactStatus": "WithImpact",
+            "endDate": 1696587472764
+        },
+        "base": true,
+        "startDate": 1698326588524
+    },
+    "observables": [
+        {
+            "extraData": "",
+            "reports": "",
+            "_type": "Observable",
+            "data": "HTTP",
+            "tlp": 2,
+            "dataType": "method",
+            "tags": [
+                "misp:Network activity=\"http-method\""
+            ],
+            "ioc": false,
+            "startDate": 1696587717404,
+            "_createdBy": "d.zablotsky@cloud.gcm",
+            "ignoreSimilarity": false,
+            "message": "",
+            "sighted": false,
+            "_createdAt": 1696587717404,
+            "_id": "~80447311880"
+        },
+        {
+            "_id": "~79751696416",
+            "dataType": "community",
+            "ignoreSimilarity": false,
+            "tags": [
+                "misp:Network activity=\"community-id\""
+            ],
+            "_createdAt": 1696583865223,
+            "startDate": 1696583865223,
+            "extraData": "",
+            "_type": "Observable",
+            "data": "apt 42",
+            "ioc": false,
+            "message": "",
+            "reports": "",
+            "sighted": false,
+            "tlp": 2,
+            "_createdBy": "d.zablotsky@cloud.gcm"
+        },
+        {
+            "tags": [
+                "misp:External analysis=\"url\""
+            ],
+            "tlp": 2,
+            "ignoreSimilarity": false,
+            "startDate": 1696584319271,
+            "_id": "~76596596928",
+            "dataType": "url",
+            "extraData": "",
+            "ioc": false,
+            "message": "",
+            "_createdAt": 1696584319271,
+            "_createdBy": "d.zablotsky@cloud.gcm",
+            "_type": "Observable",
+            "data": "https://www.google.ru/?hl=ru",
+            "reports": "",
+            "sighted": false
+        },
+        {
+            "extraData": "",
+            "tlp": 2,
+            "_id": "~80733634792",
+            "data": "3456789",
+            "ignoreSimilarity": false,
+            "ioc": false,
+            "reports": "",
+            "sighted": false,
+            "tags": [
+                "misp:Network activity=\"snort\""
+            ],
+            "_type": "Observable",
+            "dataType": "snort_sid",
+            "message": "",
+            "startDate": 1696584448276,
+            "_createdAt": 1696584448276,
+            "_createdBy": "d.zablotsky@cloud.gcm"
+        },
+        {
+            "_id": "~79094972600",
+            "ignoreSimilarity": false,
+            "sighted": false,
+            "startDate": 1696584412158,
+            "data": "SolarWinds.exe",
+            "tlp": 2,
+            "_createdBy": "d.zablotsky@cloud.gcm",
+            "extraData": "",
+            "reports": "",
+            "tags": [
+                "misp:Artifacts dropped=\"filename\""
+            ],
+            "message": "",
+            "_createdAt": 1696584412158,
+            "_type": "Observable",
+            "dataType": "filename",
+            "ioc": false
+        },
+        {
+            "dataType": "email",
+            "extraData": "",
+            "startDate": 1696584241028,
+            "_createdBy": "d.zablotsky@cloud.gcm",
+            "_id": "~80733606120",
+            "_type": "Observable",
+            "ignoreSimilarity": false,
+            "ioc": false,
+            "sighted": false,
+            "_createdAt": 1696584241028,
+            "data": "rkhan@flynas.com",
+            "reports": "",
+            "message": "",
+            "tags": [
+                "misp:Payload delivery=\"email-src\""
+            ],
+            "tlp": 2
+        },
+        {
+            "_type": "Observable",
+            "extraData": "",
+            "reports": "",
+            "tags": [
+                "misp:Payload delivery=\"email-body\""
+            ],
+            "tlp": 2,
+            "_createdBy": "d.zablotsky@cloud.gcm",
+            "dataType": "email",
+            "sighted": false,
+            "startDate": 1696584368222,
+            "data": "kuku@mail.ru",
+            "ignoreSimilarity": false,
+            "ioc": false,
+            "_createdAt": 1696584368222,
+            "_id": "~79094964408",
+            "message": ""
+        },
+        {
+            "ignoreSimilarity": false,
+            "_type": "Observable",
+            "data": "France",
+            "sighted": false,
+            "startDate": 1696584123010,
+            "tags": [
+                "misp:Attribution=\"whois-registrar\""
+            ],
+            "tlp": 2,
+            "dataType": "whois",
+            "ioc": false,
+            "reports": "",
+            "_createdAt": 1696584123010,
+            "_createdBy": "d.zablotsky@cloud.gcm",
+            "_id": "~79751852064",
+            "extraData": "",
+            "message": ""
+        },
+        {
+            "ioc": false,
+            "message": "",
+            "_createdAt": 1696583730160,
+            "_createdBy": "d.zablotsky@cloud.gcm",
+            "_updatedAt": 1696583821804,
+            "_updatedBy": "d.zablotsky@cloud.gcm",
+            "data": "Kaspersky",
+            "extraData": "",
+            "sighted": false,
+            "tlp": 2,
+            "_type": "Observable",
+            "tags": [
+                "misp:Antivirus detection=\"comment\""
+            ],
+            "_id": "~79751667744",
+            "reports": "",
+            "startDate": 1696583730160,
+            "dataType": "other",
+            "ignoreSimilarity": false
+        },
+        {
+            "_id": "~76596555968",
+            "dataType": "other",
+            "ignoreSimilarity": false,
+            "ioc": false,
+            "message": "",
+            "tlp": 2,
+            "_type": "Observable",
+            "reports": "",
+            "data": "06.10.2023",
+            "extraData": "",
+            "tags": [
+                "misp:Other=\"datetime\""
+            ],
+            "_createdAt": 1696584054130,
+            "_createdBy": "d.zablotsky@cloud.gcm",
+            "sighted": false,
+            "startDate": 1696584054130
+        },
+        {
+            "_createdAt": 1696587451251,
+            "_createdBy": "d.zablotsky@cloud.gcm",
+            "extraData": "",
+            "ignoreSimilarity": false,
+            "startDate": 1696587451251,
+            "_type": "Observable",
+            "reports": "",
+            "_id": "~79668891792",
+            "message": "",
+            "attachment": {
+                "contentType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "hashes": [
+                    "77a79be7cbe4bc4119c6dc400046f50be218e905b70f1cccea18acbc91282084",
+                    "787d8561c9c5529f4d802e7936c58dd52e2886f1",
+                    "dcbe0c8f602a99493697ae814d62a3f3"
+                ],
+                "id": "77a79be7cbe4bc4119c6dc400046f50be218e905b70f1cccea18acbc91282084",
+                "name": "TEST.docx",
+                "size": 12107
+            },
+            "dataType": "file",
+            "ioc": false,
+            "sighted": false,
+            "tags": [
+                "misp:Network activity=\"pattern-in-file\""
+            ],
+            "tlp": 2
+        },
+        {
+            "startDate": 1696583647066,
+            "_createdBy": "d.zablotsky@cloud.gcm",
+            "ignoreSimilarity": false,
+            "ioc": false,
+            "sighted": false,
+            "_createdAt": 1696583647066,
+            "data": "rule SHADOWPAD_X64_CONFIG_MODULE { strings: $chunk_1 = {48 8D 68 ?? 48 81 EC ?? ?? ?? ?? 4C 8B E1 45 33 ED B9 ?? ?? ?? ?? 41 8B DD 48 8B F2 E8} $chunk_2 = {BE ?? ?? ?? ?? 8B CE E8 ?? ?? ?? ?? 33 D2 48 8B C8 4C 8B E8 E8 ?? ?? ?? ?? 8B D8 85 C0 0F 85} condition: 1 of ($chunk*) } rule SHADOWPAD_X86_CONFIG_MODULE { strings: $chunk_1 = {55 8B EC 83 EC ?? 83 65 ?? ?? 56 57 68 ?? ?? ?? ?? E8} $chunk_2 = {55 8B EC 83 EC ?? 56 57 33 F6 68 ?? ?? ?? ?? 89 75 ?? E8} condition: 1 of ($chunk*) }",
+            "reports": "",
+            "extraData": "",
+            "message": "",
+            "tags": [
+                "misp:Payload delivery=\"yara\""
+            ],
+            "tlp": 2,
+            "_id": "~76596396224",
+            "_type": "Observable",
+            "dataType": "yara"
+        },
+        {
+            "dataType": "email",
+            "reports": "",
+            "_createdAt": 1696583572314,
+            "_id": "~78849253552",
+            "data": "letin@mail[.]ru",
+            "extraData": "",
+            "sighted": false,
+            "startDate": 1696583572314,
+            "tags": [
+                "misp:Payload delivery=\"email-dst\""
+            ],
+            "tlp": 2,
+            "_createdBy": "d.zablotsky@cloud.gcm",
+            "ignoreSimilarity": false,
+            "ioc": false,
+            "message": "",
+            "_type": "Observable"
+        },
+        {
+            "_id": "~78849450160",
+            "sighted": false,
+            "_type": "Observable",
+            "reports": "",
+            "tags": [
+                "misp:Network activity=\"ip-dst\""
+            ],
+            "_createdAt": 1696584190173,
+            "data": "192.168.23.44",
+            "extraData": "",
+            "ignoreSimilarity": false,
+            "startDate": 1696584190173,
+            "_createdBy": "d.zablotsky@cloud.gcm",
+            "dataType": "ip_home",
+            "ioc": false,
+            "message": "",
+            "tlp": 2
+        },
+        {
+            "_id": "~78849474736",
+            "_type": "Observable",
+            "_createdBy": "d.zablotsky@cloud.gcm",
+            "message": "",
+            "data": "+78412356789",
+            "dataType": "phone-number",
+            "extraData": "",
+            "ioc": false,
+            "reports": "",
+            "tags": [
+                "misp:Person=\"phone-number\""
+            ],
+            "_createdAt": 1696584494879,
+            "ignoreSimilarity": false,
+            "sighted": false,
+            "startDate": 1696584494879,
+            "tlp": 2
+        }
+    ]
+}
