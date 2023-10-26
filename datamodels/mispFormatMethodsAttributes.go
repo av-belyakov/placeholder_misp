@@ -3,15 +3,12 @@ package datamodels
 import (
 	"fmt"
 	"regexp"
-	"sync"
 	"time"
 )
 
 func NewListAttributesMispFormat() *ListAttributesMispFormat {
 	return &ListAttributesMispFormat{
-		attributes: make(map[int]AttributesMispFormat),
-		mutex:      sync.Mutex{},
-	}
+		attributes: make(map[int]AttributesMispFormat)}
 }
 
 func createNewAttributesMisp() AttributesMispFormat {
@@ -32,8 +29,8 @@ func (lambda *ListAttributesMispFormat) GetCountListAttributesMisp() int {
 }
 
 func (lambda *ListAttributesMispFormat) CleanListAttributesMisp() {
-	lambda.mutex.Lock()
-	defer lambda.mutex.Unlock()
+	lambda.Lock()
+	defer lambda.Unlock()
 
 	lambda.attributes = map[int]AttributesMispFormat{}
 }
@@ -44,8 +41,8 @@ func (lamisp *ListAttributesMispFormat) GetListAttributesMisp() map[int]Attribut
 
 func (lamisp *ListAttributesMispFormat) SetValueObjectIdAttributesMisp(v interface{}, num int) {
 	var tmp AttributesMispFormat
-	lamisp.mutex.Lock()
-	defer lamisp.mutex.Unlock()
+	lamisp.Lock()
+	defer lamisp.Unlock()
 
 	if attr, ok := lamisp.attributes[num]; ok {
 		tmp = attr
@@ -59,8 +56,8 @@ func (lamisp *ListAttributesMispFormat) SetValueObjectIdAttributesMisp(v interfa
 
 func (lamisp *ListAttributesMispFormat) SetValueObjectRelationAttributesMisp(v interface{}, num int) {
 	var tmp AttributesMispFormat
-	lamisp.mutex.Lock()
-	defer lamisp.mutex.Unlock()
+	lamisp.Lock()
+	defer lamisp.Unlock()
 
 	if attr, ok := lamisp.attributes[num]; ok {
 		tmp = attr
@@ -74,8 +71,8 @@ func (lamisp *ListAttributesMispFormat) SetValueObjectRelationAttributesMisp(v i
 
 func (lamisp *ListAttributesMispFormat) SetValueCategoryAttributesMisp(v interface{}, num int) {
 	var tmp AttributesMispFormat
-	lamisp.mutex.Lock()
-	defer lamisp.mutex.Unlock()
+	lamisp.Lock()
+	defer lamisp.Unlock()
 
 	if attr, ok := lamisp.attributes[num]; ok {
 		tmp = attr
@@ -89,8 +86,8 @@ func (lamisp *ListAttributesMispFormat) SetValueCategoryAttributesMisp(v interfa
 
 func (lamisp *ListAttributesMispFormat) SetValueTypeAttributesMisp(v interface{}, num int) {
 	var tmp AttributesMispFormat
-	lamisp.mutex.Lock()
-	defer lamisp.mutex.Unlock()
+	lamisp.Lock()
+	defer lamisp.Unlock()
 
 	if attr, ok := lamisp.attributes[num]; ok {
 		tmp = attr
@@ -104,8 +101,8 @@ func (lamisp *ListAttributesMispFormat) SetValueTypeAttributesMisp(v interface{}
 
 func (lamisp *ListAttributesMispFormat) SetValueValueAttributesMisp(v interface{}, num int) {
 	var tmp AttributesMispFormat
-	lamisp.mutex.Lock()
-	defer lamisp.mutex.Unlock()
+	lamisp.Lock()
+	defer lamisp.Unlock()
 
 	if attr, ok := lamisp.attributes[num]; ok {
 		tmp = attr
@@ -119,8 +116,8 @@ func (lamisp *ListAttributesMispFormat) SetValueValueAttributesMisp(v interface{
 
 func (lamisp *ListAttributesMispFormat) SetValueUuidAttributesMisp(v interface{}, num int) {
 	var tmp AttributesMispFormat
-	lamisp.mutex.Lock()
-	defer lamisp.mutex.Unlock()
+	lamisp.Lock()
+	defer lamisp.Unlock()
 
 	if attr, ok := lamisp.attributes[num]; ok {
 		tmp = attr
@@ -134,8 +131,8 @@ func (lamisp *ListAttributesMispFormat) SetValueUuidAttributesMisp(v interface{}
 
 func (lamisp *ListAttributesMispFormat) SetValueTimestampAttributesMisp(v interface{}, num int) {
 	var tmp AttributesMispFormat
-	lamisp.mutex.Lock()
-	defer lamisp.mutex.Unlock()
+	lamisp.Lock()
+	defer lamisp.Unlock()
 
 	if attr, ok := lamisp.attributes[num]; ok {
 		tmp = attr
@@ -152,8 +149,8 @@ func (lamisp *ListAttributesMispFormat) SetValueTimestampAttributesMisp(v interf
 
 func (lamisp *ListAttributesMispFormat) SetValueDistributionAttributesMisp(v interface{}, num int) {
 	var tmp AttributesMispFormat
-	lamisp.mutex.Lock()
-	defer lamisp.mutex.Unlock()
+	lamisp.Lock()
+	defer lamisp.Unlock()
 
 	if attr, ok := lamisp.attributes[num]; ok {
 		tmp = attr
@@ -167,8 +164,8 @@ func (lamisp *ListAttributesMispFormat) SetValueDistributionAttributesMisp(v int
 
 func (lamisp *ListAttributesMispFormat) SetValueSharingGroupIdAttributesMisp(v interface{}, num int) {
 	var tmp AttributesMispFormat
-	lamisp.mutex.Lock()
-	defer lamisp.mutex.Unlock()
+	lamisp.Lock()
+	defer lamisp.Unlock()
 
 	if attr, ok := lamisp.attributes[num]; ok {
 		tmp = attr
@@ -182,8 +179,8 @@ func (lamisp *ListAttributesMispFormat) SetValueSharingGroupIdAttributesMisp(v i
 
 func (lamisp *ListAttributesMispFormat) SetValueCommentAttributesMisp(v interface{}, num int) {
 	var tmp AttributesMispFormat
-	lamisp.mutex.Lock()
-	defer lamisp.mutex.Unlock()
+	lamisp.Lock()
+	defer lamisp.Unlock()
 
 	if attr, ok := lamisp.attributes[num]; ok {
 		tmp = attr
@@ -197,8 +194,8 @@ func (lamisp *ListAttributesMispFormat) SetValueCommentAttributesMisp(v interfac
 
 func (lamisp *ListAttributesMispFormat) SetValueFirstSeenAttributesMisp(v interface{}, num int) {
 	var tmp AttributesMispFormat
-	lamisp.mutex.Lock()
-	defer lamisp.mutex.Unlock()
+	lamisp.Lock()
+	defer lamisp.Unlock()
 
 	if attr, ok := lamisp.attributes[num]; ok {
 		tmp = attr
@@ -215,8 +212,8 @@ func (lamisp *ListAttributesMispFormat) SetValueFirstSeenAttributesMisp(v interf
 
 func (lamisp *ListAttributesMispFormat) SetValueLastSeenAttributesMisp(v interface{}, num int) {
 	var tmp AttributesMispFormat
-	lamisp.mutex.Lock()
-	defer lamisp.mutex.Unlock()
+	lamisp.Lock()
+	defer lamisp.Unlock()
 
 	if attr, ok := lamisp.attributes[num]; ok {
 		tmp = attr
@@ -233,8 +230,8 @@ func (lamisp *ListAttributesMispFormat) SetValueLastSeenAttributesMisp(v interfa
 
 func (lamisp *ListAttributesMispFormat) SetValueToIdsAttributesMisp(v interface{}, num int) {
 	var tmp AttributesMispFormat
-	lamisp.mutex.Lock()
-	defer lamisp.mutex.Unlock()
+	lamisp.Lock()
+	defer lamisp.Unlock()
 
 	if attr, ok := lamisp.attributes[num]; ok {
 		tmp = attr
@@ -251,8 +248,8 @@ func (lamisp *ListAttributesMispFormat) SetValueToIdsAttributesMisp(v interface{
 
 func (lamisp *ListAttributesMispFormat) SetValueDeletedAttributesMisp(v interface{}, num int) {
 	var tmp AttributesMispFormat
-	lamisp.mutex.Lock()
-	defer lamisp.mutex.Unlock()
+	lamisp.Lock()
+	defer lamisp.Unlock()
 
 	if attr, ok := lamisp.attributes[num]; ok {
 		tmp = attr
@@ -269,8 +266,8 @@ func (lamisp *ListAttributesMispFormat) SetValueDeletedAttributesMisp(v interfac
 
 func (lamisp *ListAttributesMispFormat) SetValueDisableCorrelationAttributesMisp(v interface{}, num int) {
 	var tmp AttributesMispFormat
-	lamisp.mutex.Lock()
-	defer lamisp.mutex.Unlock()
+	lamisp.Lock()
+	defer lamisp.Unlock()
 
 	if attr, ok := lamisp.attributes[num]; ok {
 		tmp = attr
@@ -287,8 +284,8 @@ func (lamisp *ListAttributesMispFormat) SetValueDisableCorrelationAttributesMisp
 
 func (lamisp *ListAttributesMispFormat) HandlingValueEventIdAttributesMisp(v interface{}, num int) {
 	var tmp AttributesMispFormat
-	lamisp.mutex.Lock()
-	defer lamisp.mutex.Unlock()
+	lamisp.Lock()
+	defer lamisp.Unlock()
 
 	if attr, ok := lamisp.attributes[num]; ok {
 		tmp = attr

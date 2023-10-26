@@ -195,6 +195,9 @@ func addEvent(conf confighandler.AppConfigMISP,
 	//добавляем атрибуты
 	_, _ = sendAttribytesMispFormat(conf.Host, authKey, eventId, data, logging)
 
+	// добавляем объекты
+	_, _ = sendObjectsMispFormat(conf.Host, authKey, eventId, data, logging)
+
 	//отправляем в ядро информацию по event Id
 	mmisp.SendingDataOutput(SettingChanOutputMISP{
 		Command: "send event id",
@@ -346,7 +349,7 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 		logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("'attributes №%s add, %s' %s:%d", eventId, err.Error(), f, l-2),
+			MsgData: fmt.Sprintf("'attributes for event id%s add, %s' %s:%d", eventId, err.Error(), f, l-2),
 			MsgType: "error",
 		}
 
@@ -420,6 +423,88 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 
 			logging <- datamodels.MessageLogging{
 				MsgData: fmt.Sprintf("'attributes №%s add, %s' %s:%d", eventId, res.Status, f, l-1),
+				MsgType: "warning",
+			}
+		}
+	}
+
+	return res, resBodyByte
+}
+
+// sendObjectsMispFormat отправляет в API MISP список объектов содержащихся в свойстве observables.attachment (как правило это описание вложеного файла)
+func sendObjectsMispFormat(host, authKey, eventId string, d SettingsChanInputMISP, logging chan<- datamodels.MessageLogging) (*http.Response, []byte) {
+	var (
+		res         *http.Response
+		resBodyByte = make([]byte, 0)
+	)
+
+	c, err := NewClientMISP(host, authKey, false)
+	if err != nil {
+		_, f, l, _ := runtime.Caller(0)
+		logging <- datamodels.MessageLogging{
+			MsgData: fmt.Sprintf("'objects for event id:%s add, %s' %s:%d", eventId, err.Error(), f, l-2),
+			MsgType: "error",
+		}
+
+		return nil, resBodyByte
+	}
+
+	od, ok := d.MajorData["objects"]
+	if !ok {
+		_, f, l, _ := runtime.Caller(0)
+
+		logging <- datamodels.MessageLogging{
+			MsgData: fmt.Sprintf("'the properties of \"objects\" were not found in the received data' %s:%d", f, l-2),
+			MsgType: "error",
+		}
+
+		return nil, resBodyByte
+	}
+
+	lomf, ok := od.(map[int]datamodels.ObjectsMispFormat)
+	if !ok {
+		_, f, l, _ := runtime.Caller(0)
+
+		logging <- datamodels.MessageLogging{
+			MsgData: fmt.Sprintf("'the received data does not match the type \"objects\"' %s:%d", f, l-2),
+			MsgType: "error",
+		}
+
+		return nil, resBodyByte
+	}
+
+	for _, v := range lomf {
+		v.EventId = eventId
+
+		b, err := json.Marshal(v)
+		if err != nil {
+			_, f, l, _ := runtime.Caller(0)
+
+			logging <- datamodels.MessageLogging{
+				MsgData: fmt.Sprintf("'objects №%s add, %s' %s:%d", eventId, err.Error(), f, l-2),
+				MsgType: "warning",
+			}
+
+			continue
+		}
+
+		res, resBodyByte, err = c.Post("/objects/add/"+eventId, b)
+		if err != nil {
+			_, f, l, _ := runtime.Caller(0)
+
+			logging <- datamodels.MessageLogging{
+				MsgData: fmt.Sprintf("'objects №%s add, %s' %s:%d", eventId, err.Error(), f, l-2),
+				MsgType: "warning",
+			}
+
+			continue
+		}
+
+		if res.StatusCode != http.StatusOK {
+			_, f, l, _ := runtime.Caller(0)
+
+			logging <- datamodels.MessageLogging{
+				MsgData: fmt.Sprintf("'objects №%s add, %s' %s:%d", eventId, res.Status, f, l-1),
 				MsgType: "warning",
 			}
 		}

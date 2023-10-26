@@ -2,15 +2,23 @@ package datamodels
 
 import (
 	"strings"
+	"sync"
 
 	"placeholder_misp/supportingfunctions"
 )
 
-func NewListAttribute() ListAttribute {
-	return ListAttribute{}
+type ListAttributeTmp struct {
+	attributes map[int][]AttributeMispFormat
+	sync.Mutex
 }
 
-func (la *ListAttribute) AddAttribute(branch, value string) {
+func NewListAttributeTmp() *ListAttributeTmp {
+	return &ListAttributeTmp{
+		attributes: map[int][]AttributeMispFormat{},
+	}
+}
+
+func (la *ListAttributeTmp) AddAttribute(branch string, value interface{}, num int) {
 	t := "other"
 	objr := "other"
 
@@ -21,29 +29,47 @@ func (la *ListAttribute) AddAttribute(branch, value string) {
 		return
 	}
 
+	var tmp []AttributeMispFormat
+	la.Lock()
+	defer la.Unlock()
+
+	if attr, ok := la.attributes[num]; ok {
+		tmp = attr
+	} else {
+		tmp = createNewAttributeMisp()
+	}
+
 	if nameIsExist {
 		t = "filename"
 		objr = "filename"
 	}
 
-	if hashesIsExist {
-		t = supportingfunctions.CheckHashSum(value)
-		objr = "hashsum"
+	if str, ok := value.(string); ok {
+		if hashesIsExist {
+			t = supportingfunctions.CheckHashSum(str)
+			objr = "hashsum"
+		}
+
+		tmp = append(tmp, AttributeMispFormat{
+			Category:       "Payload delivery",
+			Distribution:   "0",
+			Value:          str,
+			Type:           t,
+			ObjectRelation: objr,
+		})
 	}
 
-	*la = append(*la, AttributeMispFormat{
-		Category:       "Payload delivery",
-		Distribution:   "0",
-		Value:          value,
-		Type:           t,
-		ObjectRelation: objr,
-	})
+	la.attributes[num] = tmp
 }
 
-func (la *ListAttribute) GetListAttribute() ListAttribute {
-	return *la
+func (la *ListAttributeTmp) GetListAttribute() map[int][]AttributeMispFormat {
+	return la.attributes
 }
 
-func (la *ListAttribute) DelAttribute() {
-	la = &ListAttribute{}
+func (la *ListAttributeTmp) CleanAttribute() {
+	la = &ListAttributeTmp{}
+}
+
+func createNewAttributeMisp() []AttributeMispFormat {
+	return []AttributeMispFormat{}
 }

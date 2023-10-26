@@ -4,12 +4,12 @@ import "fmt"
 
 func NewEventMisp() EventsMispFormat {
 	return EventsMispFormat{
-		Analysis:          getAnalysis(),
-		Distribution:      getDistributionEvent(),
 		Timestamp:         "0",
-		ThreatLevelId:     getThreatLevelId(),
 		PublishTimestamp:  "0",
 		SightingTimestamp: "0",
+		Analysis:          getAnalysis(),
+		Distribution:      getDistributionEvent(),
+		ThreatLevelId:     getThreatLevelId(),
 		SharingGroupId:    getSharingGroupId(),
 	}
 }

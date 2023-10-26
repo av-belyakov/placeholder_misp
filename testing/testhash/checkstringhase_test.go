@@ -94,10 +94,10 @@ var _ = Describe("Checkstringhase", func() {
 
 	Context("Тест 2. Проверяем обработку attachment", func() {
 		It("Attachment должно быть успешно обработанно", func() {
-			nla := datamodels.NewListAttribute()
+			nla := datamodels.NewListAttributeTmp()
 
 			for _, tmf := range testList {
-				nla.AddAttribute(tmf.FieldBranch, tmf.FieldName)
+				nla.AddAttribute(tmf.FieldBranch, tmf.FieldName, 0)
 			}
 
 			la := nla.GetListAttribute()

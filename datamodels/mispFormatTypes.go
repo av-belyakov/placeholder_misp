@@ -33,7 +33,7 @@ type EventReports struct {
 
 type ListAttributesMispFormat struct {
 	attributes map[int]AttributesMispFormat
-	mutex      sync.Mutex
+	sync.Mutex
 }
 
 // описание формата MISP типа Attributes для загрузки в API MISP
@@ -258,7 +258,7 @@ type OrganisationSettingsMispFormat struct {
 // которое дополнительно содержит поле attachment
 type ListObjectsMispFormat struct {
 	objects map[int]ObjectsMispFormat
-	mutex   sync.Mutex
+	sync.Mutex
 }
 
 type ObjectsMispFormat struct {
@@ -268,7 +268,7 @@ type ObjectsMispFormat struct {
 	Timestamp       string        `json:"timestamp"`
 	Name            string        `json:"name"`
 	Description     string        `json:"description"`
-	EventID         string        `json:"event_id"`
+	EventId         string        `json:"event_id"`
 	MetaCategory    string        `json:"meta-category"`
 	Distribution    string        `json:"distribution"`
 	Attribute       ListAttribute `json:"Attribute"`

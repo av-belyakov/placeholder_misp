@@ -167,11 +167,25 @@ var _ = Describe("CreateMispFormat", Ordered, func() {
 							fmt.Println(err)
 						}
 
+						fmt.Println("________________ attributes _________________")
 						fmt.Println(str)
-						/*
-							почему список из 16 а не из 15?!
-						*/
+					}
 
+					if d, ok := data.MajorData["objects"]; ok {
+						b, err := json.Marshal(d)
+						if err != nil {
+							fmt.Println("__________ ERROR ___________")
+							fmt.Println(err)
+						}
+
+						str, err := supportingfunctions.NewReadReflectJSONSprint(b)
+						if err != nil {
+							fmt.Println("__________ ERROR ___________")
+							fmt.Println(err)
+						}
+
+						fmt.Println("________________ objects _________________")
+						fmt.Println(str)
 					}
 
 					moduleMisp.SendingDataOutput(mispinteractions.SettingChanOutputMISP{Command: "STOP "})

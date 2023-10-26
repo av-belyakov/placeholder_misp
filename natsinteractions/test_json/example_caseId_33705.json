@@ -324,6 +324,35 @@
         "tlp": 2
       },
       {
+        "extraData": "",
+        "ignoreSimilarity": false,
+        "_id": "~69510058104",
+        "_type": "Observable",
+        "dataType": "file",
+        "attachment": {
+          "contentType": "text/plain",
+          "hashes": [
+            "c29438b04791184d3eba39bdb7cf99560ab62068fee9509d50cf59723c398ac1",
+            "58861ef4c118cc3270b9871734ee54852a1374e5",
+            "7c531394dc2f483bc6c6c628c02e0788"
+          ],
+          "id": "c29438b04791184d3eba39bdb7cf99560ab62068fee9509d50cf59723c398ac1",
+          "name": "n[n.txt",
+          "size": 817
+        },
+        "ioc": false,
+        "tags": [
+          "misp:Network activity=\"pattern-in-file\""
+        ],
+        "startDate": 1687942890302,
+        "_createdAt": 1687942890302,
+        "reports": "",
+        "sighted": false,
+        "_createdBy": "d.zablotsky@cloud.gcm",
+        "message": "",
+        "tlp": 2
+      },
+      {
         "dataType": "yara",
         "extraData": "",
         "ignoreSimilarity": false,

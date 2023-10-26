@@ -49,6 +49,7 @@ func (svn *storageValueName) CtearValueName() {
 var (
 	eventsMisp         datamodels.EventsMispFormat
 	listObjectsMisp    *datamodels.ListObjectsMispFormat
+	listAttributeTmp   *datamodels.ListAttributeTmp
 	listAttributesMisp *datamodels.ListAttributesMispFormat
 
 	//		пока не нужны, временно отключаем
@@ -66,6 +67,7 @@ var (
 func init() {
 	eventsMisp = datamodels.NewEventMisp()
 	listObjectsMisp = datamodels.NewListObjectsMispFormat()
+	listAttributeTmp = datamodels.NewListAttributeTmp()
 	listAttributesMisp = datamodels.NewListAttributesMispFormat()
 
 	/*galaxyClustersMisp = datamodels.GalaxyClustersMispFormat{
@@ -98,7 +100,7 @@ func init() {
 	}*/
 
 	listHandlerMisp = map[string][]func(interface{}, int){
-		//events
+		//event -> events
 		"event.object.title":     {eventsMisp.SetValueInfoEventsMisp},
 		"event.object.startDate": {eventsMisp.SetValueTimestampEventsMisp},
 		"event.details.endDate":  {eventsMisp.SetValueDateEventsMisp},
@@ -107,7 +109,7 @@ func init() {
 		"event.organisationId":   {eventsMisp.SetValueOrgIdEventsMisp},
 		"event.object.updatedAt": {eventsMisp.SetValueSightingTimestampEventsMisp},
 		"event.object.owner":     {eventsMisp.SetValueEventCreatorEmailEventsMisp},
-		//attributes
+		//observables -> attributes
 		"observables._id":        {listAttributesMisp.SetValueObjectIdAttributesMisp},
 		"observables.data":       {listAttributesMisp.SetValueValueAttributesMisp},
 		"observables.dataType":   {listObjectsMisp.SetValueNameObjectsMisp},
@@ -118,6 +120,8 @@ func init() {
 			listObjectsMisp.SetValueFirstSeenObjectsMisp,
 			listObjectsMisp.SetValueTimestampObjectsMisp,
 		},
+		//observables.attachment -> objects
+		"observables.attachment.size": {listObjectsMisp.SetValueSizeObjectsMisp},
 	}
 }
 
@@ -174,21 +178,12 @@ func NewMispFormat(
 						seqNum++
 					}
 
-					//fmt.Printf("seqNum #%d. ________ %s: %s\n", seqNum, tmf.FieldName, tmf.Value)
-
 					svn.SetValueName(tmf.FieldName)
 				}
 
 				//обрабатываем свойство observables.attachment
 				if strings.Contains(tmf.FieldBranch, "attachment") {
-
-					fmt.Println("tmf.FieldBranch:", tmf.FieldBranch, " tmf.Value:", tmf.Value)
-
-					/*
-
-						здесь надо сделать обработку объекта "attachment"
-
-					*/
+					listAttributeTmp.AddAttribute(tmf.FieldBranch, tmf.Value, seqNum)
 				}
 
 				//обрабатываем свойство observables.tags
@@ -222,6 +217,23 @@ func NewMispFormat(
 					//добавляем case id в поле Info
 					eventsMisp.Info += fmt.Sprintf(" :::TheHive case id '%d':::", int(caseId))
 
+					/*fmt.Println("________----------- TEST ---------- List Attribute:")
+					for k, v := range listAttributeTmp.GetListAttribute() {
+						fmt.Printf("Current num: %d\n", k)
+						for key, value := range v {
+							fmt.Printf("\t%d. %v\n", key, value)
+						}
+					}
+					fmt.Println("_________ ------------ TEST ---------- List ObjectsMispFormat:")
+					for k, v := range listObjectsMisp.GetListObjectsMisp() {
+						fmt.Printf("Current num: %d\n\t%v\n", k, v)
+					}
+					fmt.Println("---=====--==--== TEST ==---==-==--=== New List Objects")
+					newObj := getNewListObjects(listObjectsMisp.GetListObjectsMisp(), listAttributeTmp.GetListAttribute())
+					for k, v := range newObj {
+						fmt.Printf("Current num: %d\n\t%v\n", k, v)
+					}*/
+
 					//тут отправляем сформированные по формату MISP пользовательские структуры
 					mispmodule.SendingDataInput(mispinteractions.SettingsChanInputMISP{
 						Command:   "add event",
@@ -232,12 +244,17 @@ func NewMispFormat(
 							"attributes": getNewListAttributes(
 								listAttributesMisp.GetListAttributesMisp(),
 								listTags),
+							"objects": getNewListObjects(
+								listObjectsMisp.GetListObjectsMisp(),
+								listAttributeTmp.GetListAttribute()),
 						}})
 				}
 
 				//очищаем события, список аттрибутов и текущий email пользователя
 				userEmail = ""
 				eventsMisp.CleanEventsMispFormat()
+				listObjectsMisp.CleanListObjectsMisp()
+				listAttributeTmp.CleanAttribute()
 				listAttributesMisp.CleanListAttributesMisp()
 
 				return
@@ -264,6 +281,21 @@ func getNewListAttributes(al map[int]datamodels.AttributesMispFormat, lat map[in
 	}
 
 	return nal
+}
+
+func getNewListObjects(
+	listObjects map[int]datamodels.ObjectsMispFormat,
+	attachment map[int][]datamodels.AttributeMispFormat,
+) map[int]datamodels.ObjectsMispFormat {
+	nlo := make(map[int]datamodels.ObjectsMispFormat, len(attachment))
+	for k, v := range attachment {
+		if obj, ok := listObjects[k]; ok {
+			obj.Attribute = v
+			nlo[k] = obj
+		}
+	}
+
+	return nlo
 }
 
 func HandlingListTags(tag string) ([2]string, error) {

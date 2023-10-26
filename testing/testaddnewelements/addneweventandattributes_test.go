@@ -107,7 +107,8 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		listRules, _, errRules = rules.GetRuleProcessingMsgForMISP("rules", "mispmsgrule.yaml")
 
 		//читаем тестовый файл
-		exampleByte, errReadFile = readFileJson("natsinteractions/test_json", "example_3.json")
+		//exampleByte, errReadFile = readFileJson("natsinteractions/test_json", "example_3.json")
+		exampleByte, errReadFile = readFileJson("natsinteractions/test_json", "example_caseId_33705.json")
 
 		//инициалиация модуля для взаимодействия с MISP
 		mispModule, errMisp = mispinteractions.HandlerMISP(confApp.AppConfigMISP, storageApp, logging)
@@ -138,7 +139,8 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 
 			mispOutput := mispModule.GetDataReceptionChannel()
 
-			<-mispOutput
+			fmt.Println("TEST 2.1, mispOutput = ", <-mispOutput)
+			fmt.Println("TEST 2.2, mispOutput = ", <-mispOutput)
 
 			Expect(true).Should(BeTrue())
 		})
