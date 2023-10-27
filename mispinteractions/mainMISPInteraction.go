@@ -26,10 +26,6 @@ type RespMISP struct {
 }
 
 func init() {
-	/*mmisp = ModuleMISP{
-		chanInputMISP:  make(chan SettingsChanInputMISP),
-		chanOutputMISP: make(chan SettingChanOutputMISP),
-	}*/
 	mmisp = ModuleMISP{
 		ChanInputMISP:  make(chan SettingsChanInputMISP),
 		ChanOutputMISP: make(chan SettingChanOutputMISP),
@@ -55,9 +51,7 @@ func HandlerMISP(
 
 	//здесь обрабатываем данные из входного канала модуля MISP
 	go func() {
-		//for data := range mmisp.chanInputMISP {
 		for data := range mmisp.GetInputChannel() {
-			//authKey := conf.Auth
 
 			// ***********************************
 			// Это логирование только для теста!!!

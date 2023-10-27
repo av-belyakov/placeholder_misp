@@ -213,7 +213,6 @@ func processingReflectAnySimpleType(
 		}
 
 		return ncv
-
 	case reflect.Int, reflect.Int16, reflect.Int32, reflect.Int64:
 		result := reflect.ValueOf(anyType).Int()
 
@@ -237,7 +236,6 @@ func processingReflectAnySimpleType(
 		}
 
 		return ncv
-
 	case reflect.Uint, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		result := reflect.ValueOf(anyType).Uint()
 
@@ -261,7 +259,6 @@ func processingReflectAnySimpleType(
 		}
 
 		return ncv
-
 	case reflect.Float32, reflect.Float64:
 		result := reflect.ValueOf(anyType).Float()
 
@@ -285,7 +282,6 @@ func processingReflectAnySimpleType(
 		}
 
 		return ncv
-
 	case reflect.Bool:
 		result := reflect.ValueOf(anyType).Bool()
 

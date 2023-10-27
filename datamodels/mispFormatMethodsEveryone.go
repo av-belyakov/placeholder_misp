@@ -47,7 +47,7 @@ func (la *ListAttributeTmp) AddAttribute(branch string, value interface{}, num i
 	if str, ok := value.(string); ok {
 		if hashesIsExist {
 			t = supportingfunctions.CheckHashSum(str)
-			objr = "hashsum"
+			objr = t
 		}
 
 		tmp = append(tmp, AttributeMispFormat{

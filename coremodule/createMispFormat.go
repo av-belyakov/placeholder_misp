@@ -217,23 +217,6 @@ func NewMispFormat(
 					//добавляем case id в поле Info
 					eventsMisp.Info += fmt.Sprintf(" :::TheHive case id '%d':::", int(caseId))
 
-					/*fmt.Println("________----------- TEST ---------- List Attribute:")
-					for k, v := range listAttributeTmp.GetListAttribute() {
-						fmt.Printf("Current num: %d\n", k)
-						for key, value := range v {
-							fmt.Printf("\t%d. %v\n", key, value)
-						}
-					}
-					fmt.Println("_________ ------------ TEST ---------- List ObjectsMispFormat:")
-					for k, v := range listObjectsMisp.GetListObjectsMisp() {
-						fmt.Printf("Current num: %d\n\t%v\n", k, v)
-					}
-					fmt.Println("---=====--==--== TEST ==---==-==--=== New List Objects")
-					newObj := getNewListObjects(listObjectsMisp.GetListObjectsMisp(), listAttributeTmp.GetListAttribute())
-					for k, v := range newObj {
-						fmt.Printf("Current num: %d\n\t%v\n", k, v)
-					}*/
-
 					//тут отправляем сформированные по формату MISP пользовательские структуры
 					mispmodule.SendingDataInput(mispinteractions.SettingsChanInputMISP{
 						Command:   "add event",
@@ -256,10 +239,6 @@ func NewMispFormat(
 				listObjectsMisp.CleanListObjectsMisp()
 				listAttributeTmp.CleanAttribute()
 				listAttributesMisp.CleanListAttributesMisp()
-
-				fmt.Println("-______________________________________________---")
-				fmt.Println("listObjectsMisp.GetListObjectsMisp() = ", listObjectsMisp.GetListObjectsMisp())
-				fmt.Println("listAttributeTmp.GetListAttribute() = ", listAttributeTmp.GetListAttribute())
 
 				return
 			}
