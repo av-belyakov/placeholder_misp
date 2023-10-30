@@ -108,16 +108,7 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 
 		//читаем тестовый файл
 		//exampleByte, errReadFile = readFileJson("natsinteractions/test_json", "example_3.json")
-		exampleByte, errReadFile = readFileJson("natsinteractions/test_json", "example_caseId_33705_3.json")
-
-		/*
-			по тестам не дублируется, а в боевом дублируется 3 раза
-			однако и кейсов 33705 из хайва приходили 3 раза
-			может это связанно
-
-			а еще в других событиях появляется 3 объекта, таких же как
-			и в кейсе 33705
-		*/
+		exampleByte, errReadFile = readFileJson("natsinteractions/test_json", "example_caseId_33705.json")
 
 		//инициалиация модуля для взаимодействия с MISP
 		mispModule, errMisp = mispinteractions.HandlerMISP(confApp.AppConfigMISP, storageApp, logging)

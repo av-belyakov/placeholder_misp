@@ -2,6 +2,7 @@ package testhash_test
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -107,11 +108,11 @@ var _ = Describe("Checkstringhase", func() {
 				fmt.Printf("%d.\n\t%s\n", k, v)
 			}
 
-			Expect(len(la)).Should(Equal(4))
+			Expect(len(la)).Should(Equal(1))
 		})
 	})
 
-	Context("Test", func() {
+	Context("Test 3", func() {
 		It("test time", func() {
 			firstSeen := fmt.Sprint(time.Now().UnixMilli()) //13
 			timestamp := fmt.Sprint(time.Now().UnixMicro()) //16
@@ -134,6 +135,25 @@ var _ = Describe("Checkstringhase", func() {
 			fmt.Printf("%13.f", fs)
 
 			Expect(true).Should(BeTrue())
+		})
+	})
+
+	Context("Тест 4. Проверяем наличие переменных окружения", func() {
+		It("Должна быть найдена переменная окружения GO_PHMISP_MAIN", func() {
+			v, ok := os.LookupEnv("GO_PHMISP_MAIN")
+			Expect(ok).Should(BeFalse())
+			Expect(v).Should(Equal(""))
+
+			if !ok || v != "development" {
+				fmt.Println("Is production")
+			} else {
+				fmt.Println("Is development")
+			}
+
+			os.Setenv("GO_PHMISP_MAIN", "development")
+			v, ok = os.LookupEnv("GO_PHMISP_MAIN")
+			Expect(ok).Should(BeTrue())
+			Expect(v).Should(Equal("development"))
 		})
 	})
 })

@@ -8001,3 +8001,9 @@ observables:
     "startDate": 1698330014030
 
 
+"pattern": {},//именно объект
+                "remoteSupport": false,
+                "systemRequirements": [],//пока не понятно
+                "version": "1.2",
+                "defenseBypassed": {},//пока не понятно
+                "extraData": {},//

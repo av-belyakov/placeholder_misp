@@ -3,4 +3,4 @@ LOGGING:
   - { msgTypeName: "warning", writingFile: true, pathDirectory: "logs", writingStdout: false, maxFileSize: 10000 }
   - { msgTypeName: "info", writingFile: true, pathDirectory: "logs", writingStdout: true, maxFileSize: 10000 }
   - { msgTypeName: "events", writingFile: true, pathDirectory: "logs", writingStdout: false, maxFileSize: 10000 }
-//  - { msgTypeName: "testing", writingFile: true, pathDirectory: "logs", writingStdout: false, maxFileSize: 10000 }
+  - { msgTypeName: "testing", writingFile: true, pathDirectory: "logs", writingStdout: false, maxFileSize: 10000 }

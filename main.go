@@ -134,6 +134,7 @@ func main() {
 	}()
 
 	var appName string
+	appStatus := "production"
 	if an, err := getAppName("README.md", 1); err != nil {
 		_, f, l, _ := runtime.Caller(0)
 		_ = sl.WriteLoggingData(fmt.Sprintf(" '%s' %s:%d", err, f, l-2), "warning")
@@ -141,8 +142,13 @@ func main() {
 		appName = an
 	}
 
+	envValue, ok := os.LookupEnv("GO_PHMISP_MAIN")
+	if ok && envValue == "development" {
+		appStatus = envValue
+	}
+
 	appVersion := supportingfunctions.GetAppVersion(appName)
-	log.Printf("Placeholder_misp application, version %s is running", appVersion)
+	log.Printf("Placeholder_misp application, version %s is running. Application status is '%s'\n", appVersion, appStatus)
 
 	//инициализация модуля для взаимодействия с NATS (Данный модуль обязателен для взаимодействия)
 	natsModule, err := natsinteractions.NewClientNATS(confApp.AppConfigNATS, storageApp, logging, counting)
