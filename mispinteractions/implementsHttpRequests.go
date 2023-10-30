@@ -3,9 +3,11 @@ package mispinteractions
 import (
 	"bytes"
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"placeholder_misp/datamodels"
 	"runtime"
 )
 
@@ -66,18 +68,42 @@ func (client *ClientMISP) Do(method, path string, data []byte) (*http.Response, 
 
 	//fmt.Println("func 'Do', RESPONSE status:", resp.Status)
 
-	if resp.StatusCode != http.StatusOK {
-		_, f, l, _ := runtime.Caller(0)
-
-		return resp, resBodyByte, fmt.Errorf(" '%s: %v' %s:%d", resp.Status, resp.Body, f, l-1)
-	}
-
 	resBodyByte, err = io.ReadAll(resp.Body)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 
 		return resp, resBodyByte, fmt.Errorf(" '%s' %s:%d", err.Error(), f, l-2)
 	}
+
+	if resp.StatusCode != http.StatusOK {
+		_, f, l, _ := runtime.Caller(0)
+
+		mferr := datamodels.MispFormatError{}
+		if err := json.Unmarshal(resBodyByte, &mferr); err != nil {
+			return resp, resBodyByte, fmt.Errorf(" '%s: %v' %s:%d", resp.Status, err, f, l-1)
+		}
+
+		return resp, resBodyByte, fmt.Errorf(" '%s: %v' %s:%d", resp.Status, mferr, f, l-1)
+	}
+
+	/*
+		Для того что бы выводить ошибку в логах
+
+		{
+		    "saved": false,
+		    "name": "Could not add Attribute",
+		    "message": "Could not add Attribute",
+		    "url": "\/attributes\/add",
+		    "errors": {
+		        "type": [
+		            "Options depend on the selected category."
+		        ],
+		        "value": [
+		            "Value not in the right type\/format. Please double check the value or select type \"other\"."
+		        ]
+		    }
+		}
+	*/
 
 	return resp, resBodyByte, err
 }
