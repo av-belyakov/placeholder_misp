@@ -69,7 +69,7 @@ func (client *ClientMISP) Do(method, path string, data []byte) (*http.Response, 
 	if resp.StatusCode != http.StatusOK {
 		_, f, l, _ := runtime.Caller(0)
 
-		return resp, resBodyByte, fmt.Errorf(" '%s' %s:%d", resp.Status, f, l-1)
+		return resp, resBodyByte, fmt.Errorf(" '%s: %v' %s:%d", resp.Status, resp.Body, f, l-1)
 	}
 
 	resBodyByte, err = io.ReadAll(resp.Body)

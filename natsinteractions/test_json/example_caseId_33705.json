@@ -1,433 +1,433 @@
 {
-  "event": {
-    "rootId": "~79667703952",
-    "objectId": "~79667703952",
-    "details": {
-      "customFields": {
-        "class-attack": {
-          "order": 0,
-          "string": "Вирусное заражение"
+    "event": {
+        "rootId": "~79667703952",
+        "objectId": "~79667703952",
+        "details": {
+            "customFields": {
+                "class-attack": {
+                    "order": 0,
+                    "string": "Вирусное заражение"
+                },
+                "external-letter": {
+                    "order": 1
+                },
+                "inbox1": {
+                    "order": 4
+                },
+                "inner-letter": {
+                    "order": 2
+                },
+                "ncircc-class-attack": {
+                    "order": 3,
+                    "string": "Не отправлять в НКЦКИ"
+                },
+                "notification": {
+                    "order": 5
+                },
+                "report": {
+                    "order": 6
+                },
+                "attack-type": {
+                    "order": 7,
+                    "string": "Распределенная КА"
+                }
+            },
+            "resolutionStatus": "TruePositive",
+            "summary": "ТЕСТ! НЕ ДОБАВЛЯТЬ В ZK",
+            "status": "Resolved",
+            "impactStatus": "WithImpact",
+            "endDate": 1696587472764
         },
-        "external-letter": {
-          "order": 1
+        "objectType": "case",
+        "base": true,
+        "startDate": 1696587472810,
+        "requestId": "61717d2adbd8fccf:12435d50:18b03eaa998:-8000:21114",
+        "object": {
+            "summary": "ТЕСТ! НЕ ДОБАВЛЯТЬ В ZK",
+            "updatedBy": "d.zablotsky@cloud.gcm",
+            "endDate": 1696587472763,
+            "_id": "~79667703952",
+            "createdBy": "d.zablotsky@cloud.gcm",
+            "caseId": 33705,
+            "title": "TEST MISP_2",
+            "status": "Resolved",
+            "severity": 2,
+            "startDate": 1696583100000,
+            "resolutionStatus": "TruePositive",
+            "flag": false,
+            "tlp": 2,
+            "stats": {
+                "impactStatus": "WithImpact"
+            },
+            "permissions": {
+                "id": "~79667703952",
+                "createdAt": 1696583267911,
+                "pap": 2
+            },
+            "tags": "",
+            "customFields": {
+                "external-letter": {
+                    "order": 1
+                },
+                "inbox1": {
+                    "order": 4
+                },
+                "inner-letter": {
+                    "order": 2
+                },
+                "ncircc-class-attack": {
+                    "order": 3,
+                    "string": "Не отправлять в НКЦКИ"
+                },
+                "notification": {
+                    "order": 5
+                },
+                "report": "",
+                "attack-type": {
+                    "order": 7,
+                    "string": "Распределенная КА"
+                },
+                "class-attack": {
+                    "order": 0,
+                    "string": "Вирусное заражение"
+                }
+            },
+            "updatedAt": 1696587472802,
+            "_type": "case",
+            "description": "[Тестовый кейс для улучшения работы в MISP",
+            "owner": "d.zablotsky@cloud.gcm"
         },
-        "inbox1": {
-          "order": 4
-        },
-        "inner-letter": {
-          "order": 2
-        },
-        "ncircc-class-attack": {
-          "order": 3,
-          "string": "Не отправлять в НКЦКИ"
-        },
-        "notification": {
-          "order": 5
-        },
-        "report": {
-          "order": 6
-        },
-        "attack-type": {
-          "order": 7,
-          "string": "Распределенная КА"
-        }
-      },
-      "resolutionStatus": "TruePositive",
-      "summary": "ТЕСТ! НЕ ДОБАВЛЯТЬ В ZK",
-      "status": "Resolved",
-      "impactStatus": "WithImpact",
-      "endDate": 1696587472764
-    },
-    "objectType": "case",
-    "base": true,
-    "startDate": 1696587472810,
-    "requestId": "61717d2adbd8fccf:12435d50:18b03eaa998:-8000:21114",
-    "object": {
-      "summary": "ТЕСТ! НЕ ДОБАВЛЯТЬ В ZK",
-      "updatedBy": "d.zablotsky@cloud.gcm",
-      "endDate": 1696587472763,
-      "_id": "~79667703952",
-      "createdBy": "d.zablotsky@cloud.gcm",
-      "caseId": 33705,
-      "title": "TEST MISP_2",
-      "status": "Resolved",
-      "severity": 2,
-      "startDate": 1696583100000,
-      "resolutionStatus": "TruePositive",
-      "flag": false,
-      "tlp": 2,
-      "stats": {
-        "impactStatus": "WithImpact"
-      },
-      "permissions": {
-        "id": "~79667703952",
-        "createdAt": 1696583267911,
-        "pap": 2
-      },
-      "tags": "",
-      "customFields": {
-        "external-letter": {
-          "order": 1
-        },
-        "inbox1": {
-          "order": 4
-        },
-        "inner-letter": {
-          "order": 2
-        },
-        "ncircc-class-attack": {
-          "order": 3,
-          "string": "Не отправлять в НКЦКИ"
-        },
-        "notification": {
-          "order": 5
-        },
-        "report": "",
-        "attack-type": {
-          "order": 7,
-          "string": "Распределенная КА"
-        },
-        "class-attack": {
-          "order": 0,
-          "string": "Вирусное заражение"
-        }
-      },
-      "updatedAt": 1696587472802,
-      "_type": "case",
-      "description": "[Тестовый кейс для улучшения работы в MISP",
-      "owner": "d.zablotsky@cloud.gcm"
-    },
-    "organisationId": "~4192",
-    "operation": "update",
-    "organisation": "GCM"
+        "organisationId": "~4192",
+        "operation": "update",
+        "organisation": "GCM"
     },
     "observables": [
-      {
-        "reports": "",
-        "dataType": "whois",
-        "message": "",
-        "tlp": 2,
-        "_id": "~79751852064",
-        "data": "France",
-        "_type": "Observable",
-        "extraData": "",
-        "sighted": false,
-        "startDate": 1696584123010,
-        "tags": [
-          "misp:Attribution=\"whois-registrar\""
-        ],
-        "_createdAt": 1696584123010,
-        "_createdBy": "d.zablotsky@cloud.gcm",
-        "ignoreSimilarity": false,
-        "ioc": false
-      },
-      {
-        "data": "https://www.google.ru/?hl=ru",
-        "reports": "",
-        "_id": "~76596596928",
-        "_type": "Observable",
-        "extraData": "",
-        "message": "",
-        "_createdAt": 1696584319271,
-        "tags": [
-          "misp:External analysis=\"url\""
-        ],
-        "tlp": 2,
-        "_createdBy": "d.zablotsky@cloud.gcm",
-        "dataType": "url",
-        "ignoreSimilarity": false,
-        "ioc": false,
-        "sighted": false,
-        "startDate": 1696584319271
-      },
-      {
-        "sighted": false,
-        "tags": [
-          "misp:Network activity=\"snort\""
-        ],
-        "_id": "~80733634792",
-        "_type": "Observable",
-        "data": "3456789",
-        "reports": "",
-        "startDate": 1696584448276,
-        "_createdAt": 1696584448276,
-        "_createdBy": "d.zablotsky@cloud.gcm",
-        "ignoreSimilarity": false,
-        "message": "",
-        "dataType": "snort_sid",
-        "tlp": 2,
-        "extraData": "",
-        "ioc": false
-      },
-      {
-        "ioc": false,
-        "message": "",
-        "sighted": false,
-        "_createdBy": "d.zablotsky@cloud.gcm",
-        "dataType": "filename",
-        "extraData": "",
-        "_id": "~79094972600",
-        "reports": "",
-        "ignoreSimilarity": false,
-        "startDate": 1696584412158,
-        "tags": [
-          "misp:Artifacts dropped=\"filename\""
-        ],
-        "tlp": 2,
-        "_createdAt": 1696584412158,
-        "_type": "Observable",
-        "data": "SolarWinds.exe"
-      },
-      {
-        "_id": "~80733606120",
-        "_type": "Observable",
-        "dataType": "email",
-        "reports": "",
-        "_createdAt": 1696584241028,
-        "message": "",
-        "startDate": 1696584241028,
-        "tags": [
-          "misp:Payload delivery=\"email-src\""
-        ],
-        "_createdBy": "d.zablotsky@cloud.gcm",
-        "extraData": "",
-        "ioc": false,
-        "tlp": 2,
-        "data": "rkhan@flynas.com",
-        "sighted": false,
-        "ignoreSimilarity": false
-      },
-      {
-        "_type": "Observable",
-        "ignoreSimilarity": false,
-        "ioc": false,
-        "startDate": 1696584368222,
-        "_createdAt": 1696584368222,
-        "_createdBy": "d.zablotsky@cloud.gcm",
-        "_id": "~79094964408",
-        "extraData": "",
-        "message": "",
-        "tags": [
-          "misp:Payload delivery=\"email-body\""
-        ],
-        "tlp": 2,
-        "data": "kuku@mail.ru",
-        "dataType": "email",
-        "reports": "",
-        "sighted": false
-      },
-      {
-        "sighted": false,
-        "tlp": 2,
-        "dataType": "method",
-        "ioc": false,
-        "_createdBy": "d.zablotsky@cloud.gcm",
-        "message": "",
-        "reports": "",
-        "startDate": 1696583910453,
-        "_createdAt": 1696583910453,
-        "_type": "Observable",
-        "extraData": "",
-        "ignoreSimilarity": false,
-        "tags": [
-          "misp:Network activity=\"http-method\""
-        ],
-        "_id": "~76596449472",
-        "data": "HTTPS"
-      },
-      {
-        "_createdBy": "d.zablotsky@cloud.gcm",
-        "message": "",
-        "tlp": 2,
-        "_createdAt": 1696583865223,
-        "_id": "~79751696416",
-        "data": "apt 42",
-        "startDate": 1696583865223,
-        "_type": "Observable",
-        "extraData": "",
-        "ignoreSimilarity": false,
-        "reports": "",
-        "dataType": "community",
-        "ioc": false,
-        "sighted": false,
-        "tags": [
-          "misp:Network activity=\"community-id\""
-        ]
-      },
-      {
-        "_createdAt": 1696583730160,
-        "data": "Kaspersky",
-        "startDate": 1696583730160,
-        "dataType": "other",
-        "ignoreSimilarity": false,
-        "message": "",
-        "reports": "",
-        "sighted": false,
-        "_createdBy": "d.zablotsky@cloud.gcm",
-        "_type": "Observable",
-        "_updatedAt": 1696583821804,
-        "tlp": 2,
-        "ioc": false,
-        "tags": [
-          "misp:Antivirus detection=\"comment\""
-        ],
-        "_id": "~79751667744",
-        "_updatedBy": "d.zablotsky@cloud.gcm",
-        "extraData": ""
-      },
-      {
-        "sighted": false,
-        "_createdBy": "d.zablotsky@cloud.gcm",
-        "dataType": "other",
-        "startDate": 1696584054130,
-        "_id": "~76596555968",
-        "extraData": "",
-        "tags": [
-          "misp:Other=\"datetime\""
-        ],
-        "tlp": 2,
-        "data": "06.10.2023",
-        "reports": "",
-        "ignoreSimilarity": false,
-        "ioc": false,
-        "message": "",
-        "_createdAt": 1696584054130,
-        "_type": "Observable"
-      },
-      {
-        "extraData": "",
-        "ignoreSimilarity": false,
-        "_id": "~79668891792",
-        "_type": "Observable",
-        "dataType": "file",
-        "attachment": {
-          "contentType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-          "hashes": [
-            "77a79be7cbe4bc4119c6dc400046f50be218e905b70f1cccea18acbc91282084",
-            "787d8561c9c5529f4d802e7936c58dd52e2886f1",
-            "dcbe0c8f602a99493697ae814d62a3f3"
-          ],
-          "id": "77a79be7cbe4bc4119c6dc400046f50be218e905b70f1cccea18acbc91282084",
-          "name": "TEST.docx",
-          "size": 12107
+        {
+            "reports": "",
+            "dataType": "whois",
+            "message": "",
+            "tlp": 2,
+            "_id": "~79751852064",
+            "data": "France",
+            "_type": "Observable",
+            "extraData": "",
+            "sighted": false,
+            "startDate": 1696584123010,
+            "tags": [
+                "misp:Attribution=\"whois-registrar\""
+            ],
+            "_createdAt": 1696584123010,
+            "_createdBy": "d.zablotsky@cloud.gcm",
+            "ignoreSimilarity": false,
+            "ioc": false
         },
-        "ioc": false,
-        "tags": [
-          "misp:Network activity=\"pattern-in-file\""
-        ],
-        "startDate": 1696587451251,
-        "_createdAt": 1696587451251,
-        "reports": "",
-        "sighted": false,
-        "_createdBy": "d.zablotsky@cloud.gcm",
-        "message": "",
-        "tlp": 2
-      },
-      {
-        "extraData": "",
-        "ignoreSimilarity": false,
-        "_id": "~69510058104",
-        "_type": "Observable",
-        "dataType": "file",
-        "attachment": {
-          "contentType": "text/plain",
-          "hashes": [
-            "c29438b04791184d3eba39bdb7cf99560ab62068fee9509d50cf59723c398ac1",
-            "58861ef4c118cc3270b9871734ee54852a1374e5",
-            "7c531394dc2f483bc6c6c628c02e0788"
-          ],
-          "id": "c29438b04791184d3eba39bdb7cf99560ab62068fee9509d50cf59723c398ac1",
-          "name": "n[n.txt",
-          "size": 817
+        {
+            "data": "https://www.google.ru/?hl=ru",
+            "reports": "",
+            "_id": "~76596596928",
+            "_type": "Observable",
+            "extraData": "",
+            "message": "",
+            "_createdAt": 1696584319271,
+            "tags": [
+                "misp:External analysis=\"url\""
+            ],
+            "tlp": 2,
+            "_createdBy": "d.zablotsky@cloud.gcm",
+            "dataType": "url",
+            "ignoreSimilarity": false,
+            "ioc": false,
+            "sighted": false,
+            "startDate": 1696584319271
         },
-        "ioc": false,
-        "tags": [
-          "misp:Network activity=\"pattern-in-file\""
-        ],
-        "startDate": 1687942890302,
-        "_createdAt": 1687942890302,
-        "reports": "",
-        "sighted": false,
-        "_createdBy": "d.zablotsky@cloud.gcm",
-        "message": "",
-        "tlp": 2
-      },
-      {
-        "dataType": "yara",
-        "extraData": "",
-        "ignoreSimilarity": false,
-        "ioc": false,
-        "_createdBy": "d.zablotsky@cloud.gcm",
-        "_id": "~76596396224",
-        "reports": "",
-        "startDate": 1696583647066,
-        "data": "rule SHADOWPAD_X64_CONFIG_MODULE { strings: $chunk_1 = {48 8D 68 ?? 48 81 EC ?? ?? ?? ?? 4C 8B E1 45 33 ED B9 ?? ?? ?? ?? 41 8B DD 48 8B F2 E8} $chunk_2 = {BE ?? ?? ?? ?? 8B CE E8 ?? ?? ?? ?? 33 D2 48 8B C8 4C 8B E8 E8 ?? ?? ?? ?? 8B D8 85 C0 0F 85} condition: 1 of ($chunk*) } rule SHADOWPAD_X86_CONFIG_MODULE { strings: $chunk_1 = {55 8B EC 83 EC ?? 83 65 ?? ?? 56 57 68 ?? ?? ?? ?? E8} $chunk_2 = {55 8B EC 83 EC ?? 56 57 33 F6 68 ?? ?? ?? ?? 89 75 ?? E8} condition: 1 of ($chunk*) }",
-        "sighted": false,
-        "_createdAt": 1696583647066,
-        "_type": "Observable",
-        "tlp": 2,
-        "message": "",
-        "tags": [
-          "misp:Payload delivery=\"yara\""
-        ]
-      },
-      {
-        "message": "",
-        "reports": "",
-        "ignoreSimilarity": false,
-        "ioc": false,
-        "tags": [
-          "misp:Payload delivery=\"email-dst\""
-        ],
-        "data": "letin@mail[.]ru",
-        "extraData": "",
-        "_type": "Observable",
-        "_id": "~78849253552",
-        "dataType": "email",
-        "sighted": false,
-        "startDate": 1696583572314,
-        "tlp": 2,
-        "_createdAt": 1696583572314,
-        "_createdBy": "d.zablotsky@cloud.gcm"
-      },
-      {
-        "ignoreSimilarity": false,
-        "message": "",
-        "_createdAt": 1696584190173,
-        "_createdBy": "d.zablotsky@cloud.gcm",
-        "_type": "Observable",
-        "dataType": "ip_home",
-        "_id": "~78849450160",
-        "extraData": "",
-        "startDate": 1696584190173,
-        "tags": [
-          "misp:Network activity=\"ip-dst\""
-        ],
-        "data": "192.168.23.44",
-        "reports": "",
-        "sighted": false,
-        "ioc": false,
-        "tlp": 2
-      },
-      {
-        "_createdBy": "d.zablotsky@cloud.gcm",
-        "_id": "~78849474736",
-        "message": "",
-        "tags": [
-          "misp:Person=\"phone-number\""
-        ],
-        "tlp": 2,
-        "dataType": "phone-number",
-        "reports": "",
-        "startDate": 1696584494879,
-        "_createdAt": 1696584494879,
-        "_type": "Observable",
-        "data": "+78412356789",
-        "extraData": "",
-        "ignoreSimilarity": false,
-        "ioc": false,
-        "sighted": false
-      }
+        {
+            "sighted": false,
+            "tags": [
+                "misp:Network activity=\"snort\""
+            ],
+            "_id": "~80733634792",
+            "_type": "Observable",
+            "data": "3456789",
+            "reports": "",
+            "startDate": 1696584448276,
+            "_createdAt": 1696584448276,
+            "_createdBy": "d.zablotsky@cloud.gcm",
+            "ignoreSimilarity": false,
+            "message": "",
+            "dataType": "snort_sid",
+            "tlp": 2,
+            "extraData": "",
+            "ioc": false
+        },
+        {
+            "ioc": false,
+            "message": "",
+            "sighted": false,
+            "_createdBy": "d.zablotsky@cloud.gcm",
+            "dataType": "filename",
+            "extraData": "",
+            "_id": "~79094972600",
+            "reports": "",
+            "ignoreSimilarity": false,
+            "startDate": 1696584412158,
+            "tags": [
+                "misp:Artifacts dropped=\"filename\""
+            ],
+            "tlp": 2,
+            "_createdAt": 1696584412158,
+            "_type": "Observable",
+            "data": "SolarWinds.exe"
+        },
+        {
+            "_id": "~80733606120",
+            "_type": "Observable",
+            "dataType": "email",
+            "reports": "",
+            "_createdAt": 1696584241028,
+            "message": "",
+            "startDate": 1696584241028,
+            "tags": [
+                "misp:Payload delivery=\"email-src\""
+            ],
+            "_createdBy": "d.zablotsky@cloud.gcm",
+            "extraData": "",
+            "ioc": false,
+            "tlp": 2,
+            "data": "rkhan@flynas.com",
+            "sighted": false,
+            "ignoreSimilarity": false
+        },
+        {
+            "_type": "Observable",
+            "ignoreSimilarity": false,
+            "ioc": false,
+            "startDate": 1696584368222,
+            "_createdAt": 1696584368222,
+            "_createdBy": "d.zablotsky@cloud.gcm",
+            "_id": "~79094964408",
+            "extraData": "",
+            "message": "",
+            "tags": [
+                "misp:Payload delivery=\"email-body\""
+            ],
+            "tlp": 2,
+            "data": "kuku@mail.ru",
+            "dataType": "email",
+            "reports": "",
+            "sighted": false
+        },
+        {
+            "sighted": false,
+            "tlp": 2,
+            "dataType": "method",
+            "ioc": false,
+            "_createdBy": "d.zablotsky@cloud.gcm",
+            "message": "",
+            "reports": "",
+            "startDate": 1696583910453,
+            "_createdAt": 1696583910453,
+            "_type": "Observable",
+            "extraData": "",
+            "ignoreSimilarity": false,
+            "tags": [
+                "misp:Network activity=\"http-method\""
+            ],
+            "_id": "~76596449472",
+            "data": "HTTPS"
+        },
+        {
+            "_createdBy": "d.zablotsky@cloud.gcm",
+            "message": "",
+            "tlp": 2,
+            "_createdAt": 1696583865223,
+            "_id": "~79751696416",
+            "data": "apt 42",
+            "startDate": 1696583865223,
+            "_type": "Observable",
+            "extraData": "",
+            "ignoreSimilarity": false,
+            "reports": "",
+            "dataType": "community",
+            "ioc": false,
+            "sighted": false,
+            "tags": [
+                "misp:Network activity=\"community-id\""
+            ]
+        },
+        {
+            "_createdAt": 1696583730160,
+            "data": "Kaspersky",
+            "startDate": 1696583730160,
+            "dataType": "other",
+            "ignoreSimilarity": false,
+            "message": "",
+            "reports": "",
+            "sighted": false,
+            "_createdBy": "d.zablotsky@cloud.gcm",
+            "_type": "Observable",
+            "_updatedAt": 1696583821804,
+            "tlp": 2,
+            "ioc": false,
+            "tags": [
+                "misp:Antivirus detection=\"comment\""
+            ],
+            "_id": "~79751667744",
+            "_updatedBy": "d.zablotsky@cloud.gcm",
+            "extraData": ""
+        },
+        {
+            "sighted": false,
+            "_createdBy": "d.zablotsky@cloud.gcm",
+            "dataType": "other",
+            "startDate": 1696584054130,
+            "_id": "~76596555968",
+            "extraData": "",
+            "tags": [
+                "misp:Other=\"datetime\""
+            ],
+            "tlp": 2,
+            "data": "06.10.2023",
+            "reports": "",
+            "ignoreSimilarity": false,
+            "ioc": false,
+            "message": "",
+            "_createdAt": 1696584054130,
+            "_type": "Observable"
+        },
+        {
+            "extraData": "",
+            "ignoreSimilarity": false,
+            "_id": "~79668891792",
+            "_type": "Observable",
+            "dataType": "file",
+            "attachment": {
+                "contentType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "hashes": [
+                    "77a79be7cbe4bc4119c6dc400046f50be218e905b70f1cccea18acbc91282084",
+                    "787d8561c9c5529f4d802e7936c58dd52e2886f1",
+                    "dcbe0c8f602a99493697ae814d62a3f3"
+                ],
+                "id": "77a79be7cbe4bc4119c6dc400046f50be218e905b70f1cccea18acbc91282084",
+                "name": "TEST.docx",
+                "size": 12107
+            },
+            "ioc": false,
+            "tags": [
+                "misp:Network activity=\"pattern-in-file\""
+            ],
+            "startDate": 1696587451251,
+            "_createdAt": 1696587451251,
+            "reports": "",
+            "sighted": false,
+            "_createdBy": "d.zablotsky@cloud.gcm",
+            "message": "",
+            "tlp": 2
+        },
+        {
+            "extraData": "",
+            "ignoreSimilarity": false,
+            "_id": "~69510058104",
+            "_type": "Observable",
+            "dataType": "file",
+            "attachment": {
+                "contentType": "text/plain",
+                "hashes": [
+                    "c29438b04791184d3eba39bdb7cf99560ab62068fee9509d50cf59723c398ac1",
+                    "58861ef4c118cc3270b9871734ee54852a1374e5",
+                    "7c531394dc2f483bc6c6c628c02e0788"
+                ],
+                "id": "c29438b04791184d3eba39bdb7cf99560ab62068fee9509d50cf59723c398ac1",
+                "name": "n[n.txt",
+                "size": 817
+            },
+            "ioc": false,
+            "tags": [
+                "misp:Network activity=\"pattern-in-file\""
+            ],
+            "startDate": 1687942890302,
+            "_createdAt": 1687942890302,
+            "reports": "",
+            "sighted": false,
+            "_createdBy": "d.zablotsky@cloud.gcm",
+            "message": "",
+            "tlp": 2
+        },
+        {
+            "dataType": "yara",
+            "extraData": "",
+            "ignoreSimilarity": false,
+            "ioc": false,
+            "_createdBy": "d.zablotsky@cloud.gcm",
+            "_id": "~76596396224",
+            "reports": "",
+            "startDate": 1696583647066,
+            "data": "rule SHADOWPAD_X64_CONFIG_MODULE { strings: $chunk_1 = {48 8D 68 ?? 48 81 EC ?? ?? ?? ?? 4C 8B E1 45 33 ED B9 ?? ?? ?? ?? 41 8B DD 48 8B F2 E8} $chunk_2 = {BE ?? ?? ?? ?? 8B CE E8 ?? ?? ?? ?? 33 D2 48 8B C8 4C 8B E8 E8 ?? ?? ?? ?? 8B D8 85 C0 0F 85} condition: 1 of ($chunk*) } rule SHADOWPAD_X86_CONFIG_MODULE { strings: $chunk_1 = {55 8B EC 83 EC ?? 83 65 ?? ?? 56 57 68 ?? ?? ?? ?? E8} $chunk_2 = {55 8B EC 83 EC ?? 56 57 33 F6 68 ?? ?? ?? ?? 89 75 ?? E8} condition: 1 of ($chunk*) }",
+            "sighted": false,
+            "_createdAt": 1696583647066,
+            "_type": "Observable",
+            "tlp": 2,
+            "message": "",
+            "tags": [
+                "misp:Payload delivery=\"yara\""
+            ]
+        },
+        {
+            "message": "",
+            "reports": "",
+            "ignoreSimilarity": false,
+            "ioc": false,
+            "tags": [
+                "misp:Payload delivery=\"email-dst\""
+            ],
+            "data": "letin@mail[.]ru",
+            "extraData": "",
+            "_type": "Observable",
+            "_id": "~78849253552",
+            "dataType": "email",
+            "sighted": false,
+            "startDate": 1696583572314,
+            "tlp": 2,
+            "_createdAt": 1696583572314,
+            "_createdBy": "d.zablotsky@cloud.gcm"
+        },
+        {
+            "ignoreSimilarity": false,
+            "message": "",
+            "_createdAt": 1696584190173,
+            "_createdBy": "d.zablotsky@cloud.gcm",
+            "_type": "Observable",
+            "dataType": "ip_home",
+            "_id": "~78849450160",
+            "extraData": "",
+            "startDate": 1696584190173,
+            "tags": [
+                "misp:Network activity=\"ip-dst\""
+            ],
+            "data": "192.168.23.44",
+            "reports": "",
+            "sighted": false,
+            "ioc": false,
+            "tlp": 2
+        },
+        {
+            "_createdBy": "d.zablotsky@cloud.gcm",
+            "_id": "~78849474736",
+            "message": "",
+            "tags": [
+                "misp:Person=\"phone-number\""
+            ],
+            "tlp": 2,
+            "dataType": "phone-number",
+            "reports": "",
+            "startDate": 1696584494879,
+            "_createdAt": 1696584494879,
+            "_type": "Observable",
+            "data": "+78412356789",
+            "extraData": "",
+            "ignoreSimilarity": false,
+            "ioc": false,
+            "sighted": false
+        }
     ],
     "ttp": [
         {
@@ -472,390 +472,124 @@
                 "_id": "~4780280",
                 "url": "https://attack.mitre.org/techniques/T1496"
             },
-          "occurDate": "1696458360000",
-          "patternId": "T1496",
-          "tactic": "impact",
-          "_createdAt": "1696513394035",
-          "_createdBy": "zsiem@rcm.lcl",
-          "_id": "~1493225472"
+            "occurDate": "1696458360000",
+            "patternId": "T1496",
+            "tactic": "impact",
+            "_createdAt": "1696513394035",
+            "_createdBy": "zsiem@rcm.lcl",
+            "_id": "~1493225472"
         },
         {
-            "occurDate": "1696458360000",
-            "patternId": "T1499.004",
-            "tactic": "impact",
-            "_createdAt": "1696513394424",
+            "patternId": "T1588.005",
+            "tactic": "resource-development",
+            "_createdAt": "1698330017124",
             "_createdBy": "zsiem@rcm.lcl",
-            "_id": "~1493229568",
+            "_id": "~1754525896",
             "extraData": {
                 "pattern": {
-                    "_id": "~4730968"
-                  },
-                  "dataSources": [
-                    "Sensor Health: Host Status",
-                    "Application Log: Application Log Content",
-                    "Network Traffic: Network Traffic Content",
-                    "Network Traffic: Network Traffic Flow"
-                ],
-                "_createdAt": "1633310440711",
-                "patternId": "T1499.004",
-                "remoteSupport": false,
-                "revoked": false,
-                "url": "https://attack.mitre.org/techniques/T1499/004",
-                "defenseBypassed": {},
-                "detection": "Attacks targeting web applications may generate logs in the web server, application server, and/or database server that can be used to identify the type of attack. Externally monitor the availability of services that may be targeted by an Endpoint DoS.",
-                "extraData": {},
-                "name": "Application or System Exploitation",
-                "permissionsRequired": [
-                    "User",
-          "Administrator"
-                ],
-                "version": "1.1",
-                "_createdBy": "admin@thehive.local",
-                "_type": "Pattern",
-                "description": "Adversaries may exploit software vulnerabilities that can cause an application or system to crash and deny availability to users. (Citation: Sucuri BIND9 August 2015) Some systems may automatically restart critical applications and services when crashes occur, but they can likely be re-exploited to cause a persistent DoS condition.",
-                "patternType": "attack-pattern",
-                "platforms": [
-                    "Windows",
-                    "Azure AD",
-                    "Office 365",
-                    "SaaS",
-                    "IaaS",
-                    "Linux",
-                    "macOS",
-                    "Google Workspace"
-                ],
-              "systemRequirements": [],
-              "tactics": [
-                "impact"
-              ], 
+                    "_createdBy": "admin@thehive.local",
+                    "name": "Exploits",
+                    "systemRequirements": [],
+                    "detection": "Much of this activity will take place outside the visibility of the target organization, making detection of this behavior difficult. Detection efforts may be focused on behaviors relating to the use of exploits (i.e. [Exploit Public-Facing Application](https://attack.mitre.org/techniques/T1190), [Exploitation for Client Execution](https://attack.mitre.org/techniques/T1203), [Exploitation for Privilege Escalation](https://attack.mitre.org/techniques/T1068), [Exploitation for Defense Evasion](https://attack.mitre.org/techniques/T1211), [Exploitation for Credential Access](https://attack.mitre.org/techniques/T1212), [Exploitation of Remote Services](https://attack.mitre.org/techniques/T1210), and [Application or System Exploitation](https://attack.mitre.org/techniques/T1499/004)).",
+                    "extraData": {},
+                    "patternId": "T1588.005",
+                    "platforms": [
+                        "PRE"
+                    ],
+                    "revoked": false,
+                    "tactics": [
+                        "resource-development"
+                    ],
+                    "remoteSupport": false,
+                    "_id": "~4747376",
+                    "_type": "Pattern",
+                    "dataSources": [],
+                    "description": "Adversaries may buy, steal, or download exploits that can be used during targeting. An exploit takes advantage of a bug or vulnerability in order to cause unintended or unanticipated behavior to occur on computer hardware or software. Rather than developing their own exploits, an adversary may find/modify exploits from online or purchase them from exploit vendors.(Citation: Exploit Database)(Citation: TempertonDarkHotel)(Citation: NationsBuying) In addition to downloading free exploits from the internet, adversaries may purchase exploits from third-party entities. Third-party entities can include technology companies that specialize in exploit development, criminal marketplaces (including exploit kits), or from individuals.(Citation: PegasusCitizenLab)(Citation: Wired SandCat Oct 2019) In addition to purchasing exploits, adversaries may steal and repurpose exploits from third-party entities (including other adversaries).(Citation: TempertonDarkHotel) An adversary may monitor exploit provider forums to understand the state of existing, as well as newly discovered, exploits. There is usually a delay between when an exploit is discovered and when it is made public. An adversary may target the systems of those known to conduct exploit research and development in order to gain that knowledge for use during a subsequent operation. Adversaries may use exploits during various phases of the adversary lifecycle (i.e. [Exploit Public-Facing Application](https://attack.mitre.org/techniques/T1190), [Exploitation for Client Execution](https://attack.mitre.org/techniques/T1203), [Exploitation for Privilege Escalation](https://attack.mitre.org/techniques/T1068), [Exploitation for Defense Evasion](https://attack.mitre.org/techniques/T1211), [Exploitation for Credential Access](https://attack.mitre.org/techniques/T1212), [Exploitation of Remote Services](https://attack.mitre.org/techniques/T1210), and [Application or System Exploitation](https://attack.mitre.org/techniques/T1499/004)).",
+                    "patternType": "attack-pattern",
+                    "permissionsRequired": [],
+                    "_createdAt": "1633310474490",
+                    "defenseBypassed": {},
+                    "url": "https://attack.mitre.org/techniques/T1588/005",
+                    "version": "1.0"
+                },
+                "patternParent": {
+                    "patternType": "attack-pattern",
+                    "url": "https://attack.mitre.org/techniques/T1588",
+                    "version": "1.0",
+                    "_type": "Pattern",
+                    "defenseBypassed": {},
+                    "extraData": {},
+                    "remoteSupport": false,
+                    "dataSources": [],
+                    "description": "Adversaries may buy and/or steal capabilities that can be used during targeting. Rather than developing their own capabilities in-house, adversaries may purchase, freely download, or steal them. Activities may include the acquisition of malware, software (including licenses), exploits, certificates, and information relating to vulnerabilities. Adversaries may obtain capabilities to support their operations throughout numerous phases of the adversary lifecycle. In addition to downloading free malware, software, and exploits from the internet, adversaries may purchase these capabilities from third-party entities. Third-party entities can include technology companies that specialize in malware and exploits, criminal marketplaces, or from individuals.(Citation: NationsBuying)(Citation: PegasusCitizenLab) In addition to purchasing capabilities, adversaries may steal capabilities from third-party entities (including other adversaries). This can include stealing software licenses, malware, SSL/TLS and code-signing certificates, or raiding closed databases of vulnerabilities or exploits.(Citation: DiginotarCompromise)",
+                    "permissionsRequired": [],
+                    "patternId": "T1588",
+                    "revoked": false,
+                    "systemRequirements": [],
+                    "detection": "Much of this activity will take place outside the visibility of the target organization, making detection of this behavior difficult. Detection efforts may be focused on related stages of the adversary lifecycle, such as during Defense Evasion or Command and Control.",
+                    "name": "Obtain Capabilities",
+                    "platforms": [
+                        "PRE"
+                    ],
+                    "tactics": [
+                        "resource-development"
+                    ],
+                    "_createdAt": "1633310408517",
+                    "_createdBy": "admin@thehive.local",
+                    "_id": "~45645904"
+                }
             },
-
-
-
-
-              patternParent:
-                "capecId": "CAPEC-227"
-                "description": "Adversaries may perform Endpoint Denial of Service (DoS) attacks to degrade or block the availability of services to users. Endpoint DoS can be performed by exhausting the system resources those services are hosted on or exploiting the system to cause a persistent crash condition. Example services include websites, email services, DNS, and web-based applications. Adversaries have been observed conducting DoS attacks for political purposes(Citation: FireEye OpPoisonedHandover February 2016) and to support other malicious activities, including distraction(Citation: FSISAC FraudNetDoS September 2012), hacktivism, and extortion.(Citation: Symantec DDoS October 2014)
-        
-        An Endpoint DoS denies the availability of a service without saturating the network used to provide access to the service. Adversaries can target various layers of the application stack that is hosted on the system used to provide the service. These layers include the Operating Systems (OS), server applications such as web servers, DNS servers, databases, and the (typically web-based) applications that sit on top of them. Attacking each layer requires different techniques that take advantage of bottlenecks that are unique to the respective components. A DoS attack may be generated by a single system or multiple systems spread across the internet, which is commonly referred to as a distributed DoS (DDoS).
-        
-        To perform DoS attacks against endpoint resources, several aspects apply to multiple methods, including IP address spoofing and botnets.
-        
-        Adversaries may use the original IP address of an attacking system, or spoof the source IP address to make the attack traffic more difficult to trace back to the attacking system or to enable reflection. This can increase the difficulty defenders have in defending against the attack by reducing or eliminating the effectiveness of filtering by the source address on network defense devices.
-        
-        Botnets are commonly used to conduct DDoS attacks against networks and services. Large botnets can generate a significant amount of traffic from systems spread across the global internet. Adversaries may have the resources to build out and control their own botnet infrastructure or may rent time on an existing botnet to conduct an attack. In some of the worst cases for DDoS, so many systems are used to generate requests that each one only needs to send out a small amount of traffic to produce enough volume to exhaust the target's resources. In such circumstances, distinguishing DDoS traffic from legitimate clients becomes exceedingly difficult. Botnets have been used in some of the most high-profile DDoS attacks, such as the 2012 series of incidents that targeted major US banks.(Citation: USNYAG IranianBotnet March 2016)
-        
-        In cases where traffic manipulation is used, there may be points in the the global network (such as high traffic gateway routers) where packets can be altered and cause legitimate clients to execute code that directs network packets toward a target in high volume. This type of capability was previously used for the purposes of web censorship where client HTTP traffic was modified to include a reference to JavaScript that generated the DDoS code to overwhelm target web servers.(Citation: ArsTechnica Great Firewall of China)
-        
-        For attacks attempting to saturate the providing network, see [Network Denial of Service](https://attack.mitre.org/techniques/T1498).
-        "
-                "patternId": "T1499"
-                "patternType": "attack-pattern"
-                "version": "1.1"
-                "_id": "~45437080"
-                extraData:
-                "remoteSupport": false
-                "revoked": false
-                systemRequirements:
-                defenseBypassed:
-                "_type": "Pattern"
-                "capecUrl": "https://capec.mitre.org/data/definitions/227.html"
-                dataSources:
-                  1. "Sensor Health: Host Status"
-                  2. "Application Log: Application Log Content"
-                  3. "Network Traffic: Network Traffic Content"
-                  4. "Network Traffic: Network Traffic Flow"
-                "detection": "Detection of Endpoint DoS can sometimes be achieved before the effect is sufficient to cause significant impact to the availability of the service, but such response time typically requires very aggressive monitoring and responsiveness. Typical network throughput monitoring tools such as netflow, SNMP, and custom scripts can be used to detect sudden increases in circuit utilization.(Citation: Cisco DoSdetectNetflow) Real-time, automated, and qualitative study of the network traffic can identify a sudden surge in one type of protocol can be used to detect an attack as it starts.
-        
-        In addition to network level detections, endpoint logging and instrumentation can be useful for detection. Attacks targeting web applications may generate logs in the web server, application server, and/or database server that can be used to identify the type of attack, possibly before the impact is felt.
-        
-        Externally monitor the availability of services that may be targeted by an Endpoint DoS."
-                "name": "Endpoint Denial of Service"
-                platforms:
-                  1. "Windows"
-                  2. "Azure AD"
-                  3. "Office 365"
-                  4. "SaaS"
-                  5. "IaaS"
-                  6. "Linux"
-                  7. "macOS"
-                  8. "Google Workspace"
-                  9. "Containers"
-                tactics:
-                  1. "impact"
-                "_createdBy": "admin@thehive.local"
-                permissionsRequired:
-                "url": "https://attack.mitre.org/techniques/T1499"
-                "_createdAt": 1633310387840
+            "occurDate": "1698271187000"
+        },
+        {
+            "extraData": {
+                "pattern": {
+                    "remoteSupport": false,
+                    "systemRequirements": [],
+                    "version": "1.2",
+                    "defenseBypassed": {},
+                    "extraData": {},
+                    "platforms": [
+                        "Windows",
+                        "IaaS",
+                        "Linux",
+                        "macOS",
+                        "Containers"
+                    ],
+                    "patternId": "T1496",
+                    "permissionsRequired": [
+                        "User",
+                        "Administrator"
+                    ],
+                    "revoked": false,
+                    "tactics": [
+                        "impact"
+                    ],
+                    "_createdAt": "1633310416346",
+                    "dataSources": [
+                        "Process: Process Creation",
+                        "Command: Command Execution",
+                        "File: File Creation",
+                        "Network Traffic: Network Connection Creation",
+                        "Network Traffic: Network Traffic Flow",
+                        "Sensor Health: Host Status"
+                    ],
+                    "description": "Adversaries may leverage the resources of co-opted systems in order to solve resource intensive problems which may impact system and/or hosted service availability. One common purpose for Resource Hijacking is to validate transactions of cryptocurrency networks and earn virtual currency. Adversaries may consume enough system resources to negatively impact and/or cause affected machines to become unresponsive.(Citation: Kaspersky Lazarus Under The Hood Blog 2017) Servers and cloud-based(Citation: CloudSploit - Unused AWS Regions) systems are common targets because of the high potential for available resources, but user endpoint systems may also be compromised and used for Resource Hijacking and cryptocurrency mining. Containerized environments may also be targeted due to the ease of deployment via exposed APIs and the potential for scaling mining activities by deploying or compromising multiple containers within an environment or cluster.(Citation: Unit 42 Hildegard Malware)(Citation: Trend Micro Exposed Docker APIs) Additionally, some cryptocurrency mining malware kills off processes for competing malware to ensure it’s not competing for resources.(Citation: Trend Micro War of Crypto Miners)",
+                    "patternType": "attack-pattern",
+                    "_type": "Pattern",
+                    "detection": "Consider monitoring process resource usage to determine anomalous activity associated with malicious hijacking of computer resources such as CPU, memory, and graphics processing resources. Monitor for suspicious use of network resources associated with cryptocurrency mining software. Monitor for common cryptomining software process names and files on local systems that may indicate compromise and resource usage.",
+                    "name": "Resource Hijacking",
+                    "_createdBy": "admin@thehive.local",
+                    "_id": "~4780280",
+                    "url": "https://attack.mitre.org/techniques/T1496"
+                }
+            },
+            "occurDate": "1696458360000",
+            "patternId": "T1496",
+            "tactic": "impact",
+            "_createdAt": "1696513394035",
+            "_createdBy": "zsiem@rcm.lcl",
+            "_id": "~1493225472"
         }
-
-  1.
-    
-  2.
-    
-  3.
-    "_createdAt": 1696513392957
-    "_createdBy": "zsiem@rcm.lcl"
-    "_id": "~2108375216"
-    extraData:
-      pattern:
-        platforms:
-          1. "PRE"
-        "remoteSupport": false
-        "_createdBy": "admin@thehive.local"
-        "name": "Malware"
-        permissionsRequired:
-        defenseBypassed:
-        "detection": "Much of this activity will take place outside the visibility of the target organization, making detection of this behavior difficult. Detection efforts may be focused on post-compromise phases of the adversary lifecycle."
-        systemRequirements:
-        dataSources:
-        "description": "Adversaries may buy, steal, or download malware that can be used during targeting. Malicious software can include payloads, droppers, post-compromise tools, backdoors, packers, and C2 protocols. Adversaries may acquire malware to support their operations, obtaining a means for maintaining control of remote machines, evading defenses, and executing post-compromise behaviors.
-
-In addition to downloading free malware from the internet, adversaries may purchase these capabilities from third-party entities. Third-party entities can include technology companies that specialize in malware development, criminal marketplaces (including Malware-as-a-Service, or MaaS), or from individuals. In addition to purchasing malware, adversaries may steal and repurpose malware from third-party entities (including other adversaries)."
-        extraData:
-        "patternId": "T1588.001"
-        tactics:
-          1. "resource-development"
-        "_createdAt": 1633310495432
-        "_id": "~5079288"
-        "_type": "Pattern"
-        "version": "1.0"
-        "patternType": "attack-pattern"
-        "revoked": false
-        "url": "https://attack.mitre.org/techniques/T1588/001"
-      patternParent:
-        defenseBypassed:
-        "patternType": "attack-pattern"
-        systemRequirements:
-        "url": "https://attack.mitre.org/techniques/T1588"
-        "_createdAt": 1633310408517
-        "_type": "Pattern"
-        tactics:
-          1. "resource-development"
-        "description": "Adversaries may buy and/or steal capabilities that can be used during targeting. Rather than developing their own capabilities in-house, adversaries may purchase, freely download, or steal them. Activities may include the acquisition of malware, software (including licenses), exploits, certificates, and information relating to vulnerabilities. Adversaries may obtain capabilities to support their operations throughout numerous phases of the adversary lifecycle.
-
-In addition to downloading free malware, software, and exploits from the internet, adversaries may purchase these capabilities from third-party entities. Third-party entities can include technology companies that specialize in malware and exploits, criminal marketplaces, or from individuals.(Citation: NationsBuying)(Citation: PegasusCitizenLab)
-
-In addition to purchasing capabilities, adversaries may steal capabilities from third-party entities (including other adversaries). This can include stealing software licenses, malware, SSL/TLS and code-signing certificates, or raiding closed databases of vulnerabilities or exploits.(Citation: DiginotarCompromise)"
-        "revoked": false
-        extraData:
-        "remoteSupport": false
-        "version": "1.0"
-        dataSources:
-        "detection": "Much of this activity will take place outside the visibility of the target organization, making detection of this behavior difficult. Detection efforts may be focused on related stages of the adversary lifecycle, such as during Defense Evasion or Command and Control."
-        "name": "Obtain Capabilities"
-        "patternId": "T1588"
-        permissionsRequired:
-        platforms:
-          1. "PRE"
-        "_createdBy": "admin@thehive.local"
-        "_id": "~45645904"
-    "occurDate": 1696458360000
-    "patternId": "T1588.001"
-    "tactic": "resource-development"
-  4.
-    "_id": "~4462883056"
-    extraData:
-      pattern:
-        "patternType": "attack-pattern"
-        permissionsRequired:
-        platforms:
-          1. "Linux"
-          2. "macOS"
-          3. "Windows"
-        "remoteSupport": false
-        "revoked": false
-        tactics:
-          1. "exfiltration"
-        dataSources:
-          1. "Network Traffic: Network Connection Creation"
-          2. "Network Traffic: Network Traffic Flow"
-          3. "Network Traffic: Network Traffic Content"
-          4. "File: File Access"
-          5. "Command: Command Execution"
-        "name": "Exfiltration Over Other Network Medium"
-        "_createdAt": 1633310389333
-        extraData:
-        "patternId": "T1011"
-        systemRequirements:
-        "url": "https://attack.mitre.org/techniques/T1011"
-        "_createdBy": "admin@thehive.local"
-        "_id": "~4632824"
-        "_type": "Pattern"
-        defenseBypassed:
-        "description": "Adversaries may attempt to exfiltrate data over a different network medium than the command and control channel. If the command and control network is a wired Internet connection, the exfiltration may occur, for example, over a WiFi connection, modem, cellular data connection, Bluetooth, or another radio frequency (RF) channel.
-
-Adversaries may choose to do this if they have sufficient access or proximity, and the connection might not be secured or defended as well as the primary Internet-connected channel because it is not routed through the same enterprise network"
-        "detection": "Monitor for processes utilizing the network that do not normally have network communication or have never been seen before. Processes that normally require user-driven events to access the network (for example, a web browser opening with a mouse click or key press) but access the network without such may be malicious.
-
-Monitor for and investigate changes to host adapter settings, such as addition and/or replication of communication interfaces."
-        "version": "1.1"
-    "occurDate": 1696458360000
-    "patternId": "T1011"
-    "tactic": "exfiltration"
-    "_createdAt": 1696513393340
-    "_createdBy": "zsiem@rcm.lcl"
-  5.
-    "_createdBy": "zsiem@rcm.lcl"
-    "_id": "~4462887152"
-    extraData:
-      pattern:
-        dataSources:
-          1. "Command: Command Execution"
-          2. "Script: Script Execution"
-          3. "Network Traffic: Network Connection Creation"
-          4. "Network Traffic: Network Traffic Flow"
-          5. "Network Traffic: Network Traffic Content"
-          6. "File: File Access"
-        "description": "Adversaries may exfiltrate data, such as sensitive documents, through the use of automated processing after being gathered during Collection. 
-
-When automated exfiltration is used, other exfiltration techniques likely apply as well to transfer the information out of the network, such as [Exfiltration Over C2 Channel](https://attack.mitre.org/techniques/T1041) and [Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048)."
-        "name": "Automated Exfiltration"
-        permissionsRequired:
-        platforms:
-          1. "Linux"
-          2. "macOS"
-          3. "Windows"
-          4. "Network"
-        systemRequirements:
-        "revoked": false
-        "_createdBy": "admin@thehive.local"
-        "_type": "Pattern"
-        defenseBypassed:
-        "detection": "Monitor process file access patterns and network behavior. Unrecognized processes or scripts that appear to be traversing file systems and sending network traffic may be suspicious."
-        extraData:
-        "patternType": "attack-pattern"
-        "_createdAt": 1633310372159
-        "_id": "~4542712"
-        "patternId": "T1020"
-        "remoteSupport": false
-        tactics:
-          1. "exfiltration"
-        "url": "https://attack.mitre.org/techniques/T1020"
-        "version": "1.2"
-    "occurDate": 1696458360000
-    "patternId": "T1020"
-    "tactic": "exfiltration"
-    "_createdAt": 1696513393713
-"source": "rcmkha"
-event:
-  "startDate": 1698329069148
-  "rootId": "~1412231296"
-  object:
-    permissions:
-    "createdBy": "zsiem@rcm.lcl"
-    "owner": "zsiem@rcm.lcl"
-    "endDate": 1698329056034
-    "status": "Resolved"
-    "createdAt": 1696513366164
-    "impactStatus": "WithImpact"
-    tags:
-      1. "Sensor:id="310012""
-      2. "Webhook: send="MISP""
-      3. "tlp:amber"
-      4. "NCIRCC:incident="Заражение ВПО""
-      5. "svo:other"
-      6. "Sensor:name="Правительство Хабаровского края (ул. Карла Маркса, д. 58)""
-    stats:
-    "_id": "~1412231296"
-    "updatedBy": "zsiem@rcm.lcl"
-    customFields:
-      ncircc-class-attack:
-        "string": "Заражение ВПО;incident"
-        "order": 0
-      verdict:
-        "order": 10
-        "string": "malware"
-      class-attack:
-        "order": 0
-        "string": "Вирусное заражение"
-      classification:
-        "order": 9
-        "string": "MacOS/Adload Proxy"
-      first-time:
-        "date": 1696458360000
-        "order": 0
-      last-time:
-        "date": 1697762100000
-        "order": 0
-      misp-event-id:
-      ncircc-bulletin-id:
-    "caseId": 13925
-    "description": "**Задача переданная из смежной системы: Заслон-Пост-Модерн**
-
-В формате ГЦМ: **`DFO-I-20231005-12844`**
-
-URL: **[https://utes.rcm/cgi/arm_eventdetail.php?eid=12844](https://utes.rcm/cgi/arm_eventdetail.php?eid=12844)**
-
-Автор задачи: **`yav`**
-
-Тип: **`snort`**
-
-**Причина, по которой создана задача**
-
-Название: `Функционирование ВПО`
-
-Описание: `Функционирование ВПО (MacOS/Adload Proxy). ЦУ - 129.153.49.67, 129.153.53.180, 159.203.48.195, 159.203.49.5, 159.203.50.188, 174.138.115.38, 174.138.115.8, 192.18.144.233, 192.18.149.161, 192.18.150.139`
-
-Отработало на СОА: 
-- **`310012`** Правительство Хабаровского края (ул. Карла Маркса, д. 58), Установлен: Хабаровский край, Хабаровск
-
-
-
-**Полное описание события IDS:**
-
-- Время начала: **`05.10.2023 01:26:00`**
-- Время окончания: **`20.10.2023 03:35:00`**
-- **IP из домашней подсети**
-
-1. **`91.233.247.209`**
-
-- **IP или домены из внешней подсети**
-
-1. **`129.153.49.67`**
-2. **`129.153.53.180`**
-3. **`159.203.48.195`**
-4. **`159.203.49.5`**
-5. **`159.203.50.188`**
-6. **`174.138.115.38`**
-7. **`174.138.115.8`**
-8. **`192.18.144.233`**
-9. **`192.18.149.161`**
-10. **`192.18.150.139`**
-
-
-**Сигнатуры на которых отработал анализатор сетевого трафика:**
-
-1. РП: **`2047629`**, Сообщение: ET TROJAN MacOS/Adload Proxy Node Beacon
-2. РП: **`2047630`**, Сообщение: ET TROJAN MacOS/Adload Proxy Node Response
-
-"
-    "severity": 2
-    "pap": 2
-    "resolutionStatus": "TruePositive"
-    "tlp": 2
-    "startDate": 1696513366141
-    "_type": "case"
-    "title": "Функционирование ВПО (MacOS/Adload Proxy)."
-    "flag": false
-    "summary": "Результат мероприятий по реагированию на инцидент: **`Последствия КИ полностью устранены силами владельца ИР`**
-
-Количество СВТ, вовлеченных в КИ: **`1`**
-
-Выданные рекомендации:локализовать инфицированные объекты, провести антивирусную проверку, определить каналы внедрения ВПО и принять соответствующие меры по минимизации угроз, при наличии возможности переустановить операционную систему на зараженных компьютерах, установить средства антивирусной защиты с актуальными антивирусными базами, сменить аутентификационные данные для всех систем и пользователей на выявленных объектах 
-"
-    "id": "~1412231296"
-    "updatedAt": 1698329069137
-  "operation": "update"
-  "objectType": "case"
-  "objectId": "~1412231296"
-  "base": true
-  "requestId": "bbf87fe0943a9ab3:-678f7f85:18a63b039d7:-8000:361687"
-  "organisationId": "~4136"
-  "organisation": "RCM_DFO"
-  details:
-    customFields:
-      ncircc-bulletin-id:
-        "string": "MOWALL-23-10-7735"
     ]
 }
