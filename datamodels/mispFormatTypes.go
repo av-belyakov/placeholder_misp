@@ -202,6 +202,12 @@ type TagsMispFormat struct {
 	IsCustomGalaxy bool   `json:"is_custom_galaxy"`
 }
 
+// EventObjectTagsMispFormat описание формата MISP для загрузки в event.object.tags
+type EventObjectTagsMispFormat struct {
+	Event string `json:"event"`
+	Tag   string `json:"tag"`
+}
+
 // описание формата MISP типа Users для данных приходящих из API MISP
 // на GET запрос типа /admin/users
 type UsersSettingsMispFormat struct {

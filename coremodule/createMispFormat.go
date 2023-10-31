@@ -22,6 +22,7 @@ type FieldsNameMapping struct {
 	InputFieldName, MispFieldName string
 }
 
+// storageValueName временное хранилище свойств элементов observables
 type storageValueName []string
 
 func NewStorageValueName() *storageValueName {
@@ -42,7 +43,7 @@ func (svn *storageValueName) GetValueName(value string) bool {
 	return false
 }
 
-func (svn *storageValueName) CtearValueName() {
+func (svn *storageValueName) CleanValueName() {
 	*svn = storageValueName{}
 }
 
@@ -146,6 +147,7 @@ func NewMispFormat(
 		}()
 
 		svn := NewStorageValueName()
+		leot := datamodels.NewListEventObjectTags()
 
 		for key := range listHandlerMisp {
 			if strings.Contains(key, "observables") {
@@ -174,7 +176,7 @@ func NewMispFormat(
 
 				if strings.Contains(tmf.FieldBranch, "observables") && !strings.Contains(tmf.FieldBranch, "attachment") {
 					if svn.GetValueName(tmf.FieldName) {
-						svn.CtearValueName()
+						svn.CleanValueName()
 						seqNum++
 					}
 
@@ -186,10 +188,18 @@ func NewMispFormat(
 					listAttributeTmp.AddAttribute(tmf.FieldBranch, tmf.Value, seqNum)
 				}
 
+				//обрабатываем свойство event.object.tags, оно ответственно за
+				//наполнение поля "Теги" MISP
+				if tmf.FieldBranch == "event.object.tags" {
+					if tag, ok := tmf.Value.(string); ok {
+						leot.SetTag(tag)
+					}
+				}
+
 				//обрабатываем свойство observables.tags
 				if tmf.FieldBranch == "observables.tags" {
 					if tag, ok := tmf.Value.(string); ok {
-						result, err := HandlingListTags(tag)
+						result, err := HandlingObservablesTag(tag)
 						if err == nil {
 							listTags[seqNum] = result
 						}
@@ -230,11 +240,13 @@ func NewMispFormat(
 							"objects": getNewListObjects(
 								listObjectsMisp.GetListObjectsMisp(),
 								listAttributeTmp.GetListAttribute()),
+							"event.object.tags": leot.GetListTags(),
 						}})
 				}
 
 				//очищаем события, список аттрибутов и текущий email пользователя
 				userEmail = ""
+				leot.CleanListTags()
 				eventsMisp.CleanEventsMispFormat()
 				listObjectsMisp.CleanListObjectsMisp()
 				listAttributeTmp.CleanAttribute()
@@ -281,7 +293,7 @@ func getNewListObjects(
 	return nlo
 }
 
-func HandlingListTags(tag string) ([2]string, error) {
+func HandlingObservablesTag(tag string) ([2]string, error) {
 	nl := [2]string{}
 	patter := regexp.MustCompile(`^misp:([\w\-].*)=\"([\w\-].*)\"$`)
 

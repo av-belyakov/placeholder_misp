@@ -192,6 +192,16 @@ func addEvent(conf confighandler.AppConfigMISP,
 	// добавляем объекты
 	_, _ = sendObjectsMispFormat(conf.Host, authKey, eventId, data, logging)
 
+	// добавляем event_tags
+	if err := sendEventTagsMispFormat(conf.Host, authKey, eventId, data, logging); err != nil {
+		_, f, l, _ := runtime.Caller(0)
+
+		logging <- datamodels.MessageLogging{
+			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
+			MsgType: "error",
+		}
+	}
+
 	//отправляем в ядро информацию по event Id
 	mmisp.SendingDataOutput(SettingChanOutputMISP{
 		Command: "send event id",
@@ -511,7 +521,7 @@ func sendEventReportsMispFormat(host, authKey, eventId string, caseId float64, l
 	c, err := NewClientMISP(host, authKey, false)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
-		return fmt.Errorf("'events add, %s' %s:%d", err.Error(), f, l-2)
+		return fmt.Errorf("'event report add, %s' %s:%d", err.Error(), f, l-2)
 	}
 
 	b, err := json.Marshal(datamodels.EventReports{
@@ -521,20 +531,94 @@ func sendEventReportsMispFormat(host, authKey, eventId string, caseId float64, l
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 
-		return fmt.Errorf("'events add, %s' %s:%d", err.Error(), f, l-2)
+		return fmt.Errorf("'event report add, %s' %s:%d", err.Error(), f, l-2)
 	}
 
 	res, _, err := c.Post("/event_reports/add/"+eventId, b)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 
-		return fmt.Errorf("'events add, %s' %s:%d", err.Error(), f, l-2)
+		return fmt.Errorf("'event report add, %s' %s:%d", err.Error(), f, l-2)
 	}
 
 	if res.StatusCode != http.StatusOK {
 		_, f, l, _ := runtime.Caller(0)
 
-		return fmt.Errorf("'events add, %s' %s:%d", res.Status, f, l-1)
+		return fmt.Errorf("'event report add, %s' %s:%d", res.Status, f, l-1)
+	}
+
+	return nil
+}
+
+func sendEventTagsMispFormat(host, authKey, eventId string, d SettingsChanInputMISP, logging chan<- datamodels.MessageLogging) error {
+	c, err := NewClientMISP(host, authKey, false)
+	if err != nil {
+		_, f, l, _ := runtime.Caller(0)
+		return fmt.Errorf("'event tags add, %s' %s:%d", err.Error(), f, l-2)
+	}
+
+	eot, ok := d.MajorData["event.object.tags"]
+	if !ok {
+		_, f, l, _ := runtime.Caller(0)
+
+		logging <- datamodels.MessageLogging{
+			MsgData: fmt.Sprintf("'the properties of \"objects\" were not found in the received data' %s:%d", f, l-2),
+			MsgType: "error",
+		}
+
+		return nil
+	}
+
+	leot, ok := eot.(datamodels.ListEventObjectTags)
+	if !ok {
+		_, f, l, _ := runtime.Caller(0)
+
+		logging <- datamodels.MessageLogging{
+			MsgData: fmt.Sprintf("'the received data does not match the type \"objects\"' %s:%d", f, l-2),
+			MsgType: "error",
+		}
+
+		return nil
+	}
+
+	eotmf := datamodels.EventObjectTagsMispFormat{}
+
+	for _, v := range leot {
+		eotmf.Event = eventId
+		eotmf.Tag = v
+
+		b, err := json.Marshal(eotmf)
+		if err != nil {
+			_, f, l, _ := runtime.Caller(0)
+
+			logging <- datamodels.MessageLogging{
+				MsgData: fmt.Sprintf("'event tags №%s add, %s' %s:%d", eventId, err.Error(), f, l-2),
+				MsgType: "warning",
+			}
+
+			continue
+		}
+
+		res, _, err := c.Post("/events/addTag", b)
+		if err != nil {
+			_, f, l, _ := runtime.Caller(0)
+
+			logging <- datamodels.MessageLogging{
+				MsgData: fmt.Sprintf("'event tags №%s add, %s' %s:%d", eventId, err.Error(), f, l-2),
+				MsgType: "warning",
+			}
+
+			continue
+		}
+
+		if res.StatusCode != http.StatusOK {
+			_, f, l, _ := runtime.Caller(0)
+
+			logging <- datamodels.MessageLogging{
+				MsgData: fmt.Sprintf("'event tags №%s add, %s' %s:%d", eventId, res.Status, f, l-1),
+				MsgType: "warning",
+			}
+		}
 	}
 
 	return nil
