@@ -44,3 +44,14 @@ type RulePass struct {
 type RuleReplace struct {
 	SearchField, SearchValue, ReplaceValue string
 }
+
+// CleanStatementExpressionRulePass приводит поле StatementExpression к значению false
+// это поле проверяется на соответствие заданным правилам обрабатываемым значениям
+// обязательно нужно выполнять данный метод после проверки значения StatementExpression
+func (lr *ListRulesProcessingMsgMISP) CleanStatementExpressionRulePass() {
+	for k, v := range lr.Rules.Pass {
+		for key := range v.ListAnd {
+			lr.Rules.Pass[k].ListAnd[key].StatementExpression = false
+		}
+	}
+}

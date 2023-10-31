@@ -84,6 +84,9 @@ func HandlerMessageFromHive(
 		}
 	}
 
+	//выполняет очистку значения StatementExpression что равно отсудствию совпадений в правилах Pass
+	listRule.CleanStatementExpressionRulePass()
+
 	isAllowed, _ := storageApp.GetAllowedTransferHiveFormatMessage(uuidTask)
 
 	dt := "events do not meet rules"

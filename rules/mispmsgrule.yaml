@@ -65,4 +65,4 @@ RULES:
       - searchField: "resolutionStatus"
         searchValue: "TruePositive"
     - listAnd:
-  PASSANY: false  
+  PASSANY: false
