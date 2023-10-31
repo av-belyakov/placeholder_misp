@@ -1,5 +1,7 @@
 package datamodels
 
+import "strings"
+
 // MessageLogging содержит информацию используемую при логировании
 // MsgData - сообщение
 // MsgType - тип сообщения
@@ -21,6 +23,10 @@ func NewListEventObjectTags() *ListEventObjectTags {
 }
 
 func (leot *ListEventObjectTags) SetTag(v string) {
+	if !strings.Contains(v, "ATs:") {
+		return
+	}
+
 	*leot = append(*leot, v)
 }
 

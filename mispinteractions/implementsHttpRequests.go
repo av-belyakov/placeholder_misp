@@ -74,7 +74,7 @@ func (client *ClientMISP) Do(method, path string, data []byte) (*http.Response, 
 	if resp.StatusCode != http.StatusOK {
 		_, f, l, _ := runtime.Caller(0)
 
-		mferr := datamodels.MispFormatError{}
+		mferr := datamodels.MispFormatError{Errors: map[string]interface{}{}}
 		if err := json.Unmarshal(resBodyByte, &mferr); err != nil {
 			return resp, resBodyByte, fmt.Errorf(" '%s: %v' %s:%d", resp.Status, err, f, l-1)
 		}
