@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"regexp"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 func NewListAttributesMispFormat() *ListAttributesMispFormat {
@@ -17,6 +19,7 @@ func createNewAttributesMisp() AttributesMispFormat {
 		Type:           "other",
 		Timestamp:      "0",
 		Distribution:   "3",
+		Uuid:           uuid.New().String(),
 		FirstSeen:      fmt.Sprint(time.Now().Format(time.RFC3339)),
 		LastSeen:       fmt.Sprint(time.Now().Format(time.RFC3339)),
 		ToIds:          true,

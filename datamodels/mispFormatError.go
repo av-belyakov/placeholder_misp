@@ -6,6 +6,12 @@ package datamodels
     "message": "Could not add Attribute",
     "url": "\/attributes\/add",
     "errors": {
+        "Event":{
+            "uuid":[
+                "Please provide a valid RFC 4122 UUID",
+                ],
+            },
+        },
         "type": [
             "Options depend on the selected category."
         ],
@@ -16,14 +22,9 @@ package datamodels
 }*/
 
 type MispFormatError struct {
-	Saved   bool          `json:"saved"`
-	Name    string        `json:"name"`
-	Message string        `json:"message"`
-	URL     string        `json:"url"`
-	Errors  ErrorsPattern `json:"errors"`
-}
-
-type ErrorsPattern struct {
-	Type  []string `json:"type"`
-	Value []string `json:"value"`
+	Saved   bool                   `json:"saved"`
+	Name    string                 `json:"name"`
+	Message string                 `json:"message"`
+	URL     string                 `json:"url"`
+	Errors  map[string]interface{} `json:"errors"`
 }

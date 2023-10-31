@@ -62,8 +62,13 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		logging = make(chan datamodels.MessageLogging)
 		counting = make(chan datamodels.DataCounterSettings)
 
-		confApp.AppConfigMISP.Host = "misp-world.cloud.gcm"
-		confApp.AppConfigMISP.Auth = "TvHkjH8jVQEIdvAxjxnL4H6wDoKyV7jobDjndvAo"
+		//misp-world
+		//confApp.AppConfigMISP.Host = "misp-world.cloud.gcm"
+		//confApp.AppConfigMISP.Auth = "TvHkjH8jVQEIdvAxjxnL4H6wDoKyV7jobDjndvAo"
+
+		//misp-center
+		confApp.AppConfigMISP.Host = "misp-center.cloud.gcm"
+		confApp.AppConfigMISP.Auth = "Z2PwRBdP5lFP7rdDJBzxmSahaLEwIvJoeOuwhRYQ"
 
 		go func() {
 			fmt.Println("___ Logging START")
@@ -107,7 +112,8 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		listRules, _, errRules = rules.GetRuleProcessingMsgForMISP("rules", "mispmsgrule.yaml")
 
 		//читаем тестовый файл
-		//exampleByte, errReadFile = readFileJson("natsinteractions/test_json", "example_3.json")
+		//"example_caseId_33705.json" совпадает с правилами
+		//"example_caseId_33807.json" НЕ совпадает с правилами
 		exampleByte, errReadFile = readFileJson("natsinteractions/test_json", "example_caseId_33705.json")
 
 		//инициалиация модуля для взаимодействия с MISP

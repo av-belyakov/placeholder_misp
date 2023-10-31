@@ -10,6 +10,7 @@ import (
 	"placeholder_misp/confighandler"
 	"placeholder_misp/datamodels"
 	"placeholder_misp/memorytemporarystorage"
+	"placeholder_misp/supportingfunctions"
 )
 
 var mmisp ModuleMISP
@@ -399,6 +400,10 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 
 			continue
 		}
+
+		fmt.Println("|||||||||||||||||||||||||||||||||||||_______________________ START _____________________------")
+		fmt.Println(supportingfunctions.NewReadReflectJSONSprint(b))
+		fmt.Println("|||||||||||||||||||||||||||||||||||||________________________ END ______________________------")
 
 		res, resBodyByte, err = c.Post("/attributes/add/"+eventId, b)
 		if err != nil {

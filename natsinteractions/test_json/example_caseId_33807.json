@@ -1,0 +1,110 @@
+{
+    "event": {
+        "organisation": "GCM",
+        "organisationId": "~4192",
+        "operation": "update",
+        "objectType": "case",
+        "base": true,
+        "startDate": "1698740063566",
+        "rootId": "~80897413208",
+        "requestId": "e4f22fdb1282cd6f:-23f74b51:18b84aa9e6e:-8000:1742",
+        "details": {
+            "customFields": {
+                "report": {
+                    "string": "Share TheHive"
+                }
+            },
+            "objectId": "~80897413208"
+        },
+        "object": {
+            "updatedBy": "d.sergeev@cloud.gcm",
+            "permissions": [],
+            "owner": "i.monahov@cloud.gcm",
+            "resolutionStatus": "",
+            "severity": 2,
+            "startDate": "1697620865718",
+            "flag": false,
+            "tags": [
+                "Sensor:id=\"8030002\"",
+                "ATs:reason=\"Зафиксирована подозрительная активность по признакам НКЦКИ\"",
+                "ATs:reason=\"INFO Controlled FGS\"",
+                "ZK:send",
+                "ATs:geoip=\"США\"",
+                "ATs:reason=\"Зафиксированы признаки взаимодействия ВПО класса trojan\"",
+                "APPA:Direction=\"outbound\""
+            ],
+            "pap": 2,
+            "updatedAt": "1698740063220",
+            "title": "Malware ( x[.]mochiads[.]com - редиректит с  браузерной игры)",
+            "description": "Атака направлена **наружу**, использует протоколы: **tcp/http**, host: **x[.]mochiads[.]com****Задача переданная из смежной системы: Заслон-Пост-Модерн** В формате ГЦМ: **`TSK-8MSK-6-ZPM-231018-1185183`** ID: `1185183` [http://siem.cloud.gcm/tasks/card/TSK-8MSK-6-ZPM-231018-1185183](http://siem.cloud.gcm/tasks/card/TSK-8MSK-6-ZPM-231018-1185183) Файл на СОА: `/opt/zaslon/zmanager/data/pfilter_storage/1698647952_2023_10_30____09_39_12_928540.pcap`",
+            "impactStatus": "",
+            "tlp": 2,
+            "stats": [],
+            "id": "~80897413208",
+            "_type": "case",
+            "createdAt": "1697620865746",
+            "endDate": 0,
+            "summary": "",
+            "_id": "~80897413208",
+            "createdBy": "i.monahov@cloud.gcm",
+            "customFields": {
+                "inbox1": {},
+                "report": {
+                    "string": "Share TheHive",
+                    "order": 6
+                },
+                "ncircc-class-attack": {
+                    "order": 3,
+                    "string": "Заражение ВПО;incident"
+                },
+                "notification": {
+                    "order": 5,
+                    "string": "Share TheHive"
+                },
+                "attack-type": {
+                    "order": 7,
+                    "string": "Распределенная КА"
+                },
+                "class-attack": {
+                    "order": 0,
+                    "string": "Вирусное заражение"
+                },
+                "external-letter": {
+                    "order": 1
+                },
+                "first-time": {
+                    "date": "1698647799000",
+                    "order": 9
+                },
+                "inner-letter": {},
+                "last-time": {
+                    "order": 8,
+                    "date": 1698647814000
+                }
+            },
+            "caseId": 33807,
+            "status": "Open"
+        }
+    },
+    "observables": [
+        {
+            "ignoreSimilarity": true,
+            "ioc": true,
+            "_type": "Observable",
+            "dataType": "url_pcap",
+            "data": "ftp://ftp.cloud.gcm/traffic/8030002/1698647952_2023_10_30____09_39_12_928540.pcap",
+            "reports": {},
+            "extraData": {},
+            "message": "Download a piece of traffic",
+            "startDate": "1698674684922",
+            "tags": [
+              "2.2 KB"
+            ],
+            "tlp": 2,
+            "_createdAt": "1698674684922",
+            "_id": "~79872032944",
+            "_createdBy": "s.chinkov@cloud.gcm",
+            "sighted": false
+        }
+    ]
+}

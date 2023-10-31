@@ -1,12 +1,17 @@
 package datamodels
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/google/uuid"
+)
 
 func NewEventMisp() EventsMispFormat {
 	return EventsMispFormat{
 		Timestamp:         "0",
 		PublishTimestamp:  "0",
 		SightingTimestamp: "0",
+		Uuid:              uuid.New().String(),
 		Analysis:          getAnalysis(),
 		Distribution:      getDistributionEvent(),
 		ThreatLevelId:     getThreatLevelId(),
@@ -22,7 +27,7 @@ func (emisp *EventsMispFormat) CleanEventsMispFormat() {
 	emisp.OrgId = ""
 	emisp.OrgcId = ""
 	emisp.Info = ""
-	emisp.Uuid = ""
+	emisp.Uuid = uuid.New().String()
 	emisp.Date = ""
 	emisp.AttributeCount = ""
 	emisp.ExtendsUuid = ""

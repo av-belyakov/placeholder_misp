@@ -83,7 +83,7 @@ func (client *ClientMISP) Do(method, path string, data []byte) (*http.Response, 
 			return resp, resBodyByte, fmt.Errorf(" '%s: %v' %s:%d", resp.Status, err, f, l-1)
 		}
 
-		return resp, resBodyByte, fmt.Errorf(" '%s: %v' %s:%d", resp.Status, mferr, f, l-1)
+		return resp, resBodyByte, fmt.Errorf(" '%s: msg - %s, url - %s, err - %v' %s:%d", resp.Status, mferr.Message, mferr.URL, mferr.Errors, f, l-1)
 	}
 
 	/*

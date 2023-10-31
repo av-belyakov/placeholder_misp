@@ -1,0 +1,4163 @@
+2023/10/31 07:07:26 	---------------
+	EVENTS:
+"source": "gcm"
+event:
+  "base": true
+  "startDate": 1698736074829
+  "rootId": "~77129183288"
+  "organisation": "GCM"
+  details:
+    customFields:
+      report:
+        "string": "Письмо"
+  "objectType": "case"
+  "objectId": "~77129183288"
+  "requestId": "1ff28f18cad49f4d:5fba20f2:18b8399cae3:-8000:11241"
+  object:
+    "description": "Внешние и внутренние ip-адреса являются **домашними**, использует протоколы: **tcp/http/tls**, host: **80[.]66[.]157[.]26, 80[.]66[.]157[.]26[:]443**
+
+
+**Задача переданная из смежной системы: Заслон-Пост-Модерн**
+
+В формате ГЦМ: **`TSK-8MSK-6-ZPM-230915-1167526`** ID: `1167526`
+
+[http://siem.cloud.gcm/tasks/card/TSK-8MSK-6-ZPM-230915-1167526](http://siem.cloud.gcm/tasks/card/TSK-8MSK-6-ZPM-230915-1167526)
+
+Автор задачи: **`Security Event Manager`**
+
+Тип: **`snort_alert`**
+
+**Причина по которой создана задача**
+
+Название: `Зафиксированы признаки взаимодействия ВПО класса trojan, Malware Miner с 192.168.10.39`
+
+Описание: `## Данная задача создана автоматически
+ Время начала: 2023-09-15 06:09:05
+ Время окончания: 2023-09-15 06:09:36
+ Продолжительность воздействий: 0:00:31`
+
+Отработало на СОА: 
+- **`8030103`**   ПО Иваново, Установлен: Иваново,Ивановская область, IP адрес: 10.20.0.103
+
+
+**Полное описание события IDS:**
+
+- Время начала: **`15.09.2023 03:09:05`**
+- Время окончания: **`15.09.2023 03:09:36`**
+- **IP из домашней подсети**
+
+1. **`192.168.199.99`**
+- **IP из внешней подсети**
+
+1. **`192.168.10.39`**
+
+
+**Сигнатуры на которых отработал анализатор сетевого трафика:**
+
+1. РП: **`36304068`**, Сообщение: RiskTool.BitCoinMiner.TCP.C&C, Добавлена: 05.04.2022 17:49:00
+2. РП: **`45549`**, Сообщение: PUA-OTHER XMRig cryptocurrency mining pool connection attempt, Добавлена: 05.04.2022 17:49:00
+3. РП: **`3028146`**, Сообщение: AM TROJAN Trojan.Johnnie.D17E73 login attempt via json-file, Добавлена: 05.04.2022 17:49:00
+4. РП: **`3014885`**, Сообщение: AM TROJAN MSIL/Razy Cryptominer.NS, Добавлена: 05.04.2022 17:49:00
+5. РП: **`36304068`**, Сообщение: RiskTool.BitCoinMiner.TCP.C&C, Добавлена: 09.06.2023 07:29:05
+
+
+
+
+**Фильтрация и выгрузка от** Fri Sep 15 2023 03:18:56 GMT+0000 
+
+Размер: **`22.3 KB`**, [Скачать файл](ftp://ftp.cloud.gcm//traffic/8030103/1694747931_2023_09_15____06_18_51_961325.pcap)
+
+
+**Ссылка на arkime:** 
+ - [http://arkime.cloud.gcm/2023_09_15_06_18_36_708255____1694747931_2023_09_15____06_18_51_961325.pcap](http://anisimova.cloud.gcm:8005/sessions?expression=file%20%3D%3D%20%2Fopt%2Farkime%2Fraw%2F2023_09_15_06_18_36_708255____1694747931_2023_09_15____06_18_51_961325.pcap&date=-1)
+
+Контент: Фильтрация успешно завершена. Включена автоматическая выгрузка
+
+Файл на СОА: `/opt/zaslon/zmanager/data/pfilter_storage/1694747931_2023_09_15____06_18_51_961325.pcap`
+
+
+
+
+
+
+
+**Фильтрация и выгрузка от** Tue Sep 26 2023 08:51:35 GMT+0000 
+
+Размер: **`7.4 MB`**, [Скачать файл](ftp://ftp.cloud.gcm//traffic/8030103/1695718110_2023_09_26____11_48_30_588932.pcap)
+
+
+**Ссылка на arkime:** 
+ - [http://arkime.cloud.gcm/2023_09_26_11_52_33_698551____1695718110_2023_09_26____11_48_30_588932.pcap](http://anisimova.cloud.gcm:8005/sessions?expression=file%20%3D%3D%20%2Fopt%2Farkime%2Fraw%2F2023_09_26_11_52_33_698551____1695718110_2023_09_26____11_48_30_588932.pcap&date=-1)
+
+Контент: Фильтрация успешно завершена. Включена автоматическая выгрузка
+
+Файл на СОА: `/opt/zaslon/zmanager/data/pfilter_storage/1695718110_2023_09_26____11_48_30_588932.pcap`
+
+
+
+"
+    "endDate": 1698044112461
+    "_type": "case"
+    "status": "Resolved"
+    permissions:
+    "createdBy": "a.pinyaskin@cloud.gcm"
+    "resolutionStatus": "Indeterminate"
+    tags:
+      1. "Sensor:id="8030103""
+      2. "ATs:reason="Зафиксированы признаки взаимодействия ВПО класса trojan""
+      3. "ATs:reason="Malware Miner""
+      4. "is_private"
+    "tlp": 2
+    "summary": "Инцидент отработан"
+    "owner": "a.pinyaskin@cloud.gcm"
+    "createdAt": 1694750797392
+    "updatedBy": "i.marshalova@cloud.gcm"
+    "flag": false
+    "_id": "~77129183288"
+    "updatedAt": 1698736074821
+    "caseId": 33539
+    "id": "~77129183288"
+    "pap": 2
+    "impactStatus": "NotApplicable"
+    "title": "Malware miner"
+    "startDate": 1694750797329
+    customFields:
+      inner-letter:
+        "order": 2
+        "string": "21186"
+      last-time:
+        "date": 1694747376000
+        "order": 8
+      ncircc-class-attack:
+        "order": 3
+        "string": "Не отправлять в НКЦКИ"
+      report:
+        "order": 6
+        "string": "Письмо"
+      attack-type:
+        "order": 7
+        "string": "Распределенная КА"
+      class-attack:
+        "order": 0
+        "string": "Indeterminate"
+      external-letter:
+      first-time:
+        "date": 1694747345000
+        "order": 9
+      inbox1:
+        "order": 4
+        "string": "1939"
+      notification:
+        "order": 5
+        "string": "Письмо+Share TheHive"
+    stats:
+    "severity": 2
+  "organisationId": "~4192"
+  "operation": "update"
+observables:
+  1.
+    "_createdAt": 1695718296398
+    "_createdBy": "zsiem@cloud.gcm"
+    "_id": "~81429831880"
+    "_type": "Observable"
+    reports:
+    "tlp": 2
+    "data": "ftp://ftp.cloud.gcm/traffic/8030103/1695718110_2023_09_26____11_48_30_588932.pcap"
+    extraData:
+    "ignoreSimilarity": true
+    "message": "Download a piece of traffic"
+    "startDate": 1695718296398
+    "dataType": "url_pcap"
+    "sighted": false
+    "ioc": true
+    tags:
+      1. "7.4 MB"
+  2.
+    "_createdBy": "e.anisimova@cloud.gcm"
+    "_type": "Observable"
+    "tlp": 2
+    "dataType": "url_arkime"
+    extraData:
+    "startDate": 1695718382049
+    "_id": "~81429860552"
+    "data": "http://anisimova.cloud.gcm:8005/sessions?expression=file%20%3D%3D%20%2Fopt%2Farkime%2Fraw%2F2023_09_26_11_52_33_698551____1695718110_2023_09_26____11_48_30_588932.pcap&date=-1"
+    "sighted": false
+    "message": "Ссылка на Arkime"
+    reports:
+    tags:
+    "_createdAt": 1695718382049
+    "ignoreSimilarity": true
+    "ioc": false
+  3.
+    "_createdBy": "a.pinyaskin@cloud.gcm"
+    "startDate": 1694750797616
+    tags:
+      1. "external"
+      2. "geo:iso="-""
+      3. "geo:country="Не определена""
+    "_type": "Observable"
+    "data": "192.168.10.39"
+    "dataType": "ip"
+    reports:
+    "sighted": false
+    "_createdAt": 1694750797616
+    "_id": "~77990953080"
+    extraData:
+    "ioc": true
+    "tlp": 2
+  4.
+    "_createdAt": 1694750797756
+    "ignoreSimilarity": true
+    "_id": "~78562791512"
+    "data": "ftp://ftp.cloud.gcm/traffic/8030103/1694747931_2023_09_15____06_18_51_961325.pcap"
+    "dataType": "url_pcap"
+    "message": "Download a piece of traffic"
+    reports:
+    "tlp": 2
+    "_createdBy": "a.pinyaskin@cloud.gcm"
+    "_type": "Observable"
+    extraData:
+    "ioc": true
+    "sighted": false
+    "startDate": 1694750797756
+    tags:
+      1. "22.3 KB"
+  5.
+    "_createdBy": "a.pinyaskin@cloud.gcm"
+    "_id": "~80815362096"
+    "startDate": 1694750797724
+    "_type": "Observable"
+    "data": "36304068, 45549, 3028146, 3014885, 36304068"
+    extraData:
+    "ioc": false
+    tags:
+      1. "snort"
+    "_createdAt": 1694750797724
+    "dataType": "snort_sid"
+    reports:
+    "sighted": false
+    "tlp": 2
+  6.
+    "_createdBy": "a.pinyaskin@cloud.gcm"
+    "_id": "~76760436952"
+    "dataType": "url_arkime"
+    "startDate": 1694750797783
+    "_type": "Observable"
+    extraData:
+    "ignoreSimilarity": true
+    "ioc": false
+    "data": "http://anisimova.cloud.gcm:8005/sessions?expression=file%20%3D%3D%20%2Fopt%2Farkime%2Fraw%2F2023_09_15_06_18_36_708255____1694747931_2023_09_15____06_18_51_961325.pcap&date=-1"
+    reports:
+    tags:
+    "tlp": 2
+    "_createdAt": 1694750797783
+    "message": "Ссылка на Arkime"
+    "sighted": false
+  7.
+    "_createdBy": "a.pinyaskin@cloud.gcm"
+    "dataType": "ip_home"
+    extraData:
+    "sighted": false
+    tags:
+      1. "home"
+    "_id": "~77579554992"
+    "data": "8030103:192.168.199.99"
+    "ioc": false
+    "tlp": 2
+    reports:
+    "startDate": 1694750797693
+    "_createdAt": 1694750797693
+    "_type": "Observable"
+ttp:
+
+
+2023/10/31 07:10:12 	---------------
+	EVENTS:
+"source": "rcmlnx"
+event:
+  "operation": "update"
+  "startDate": 1698736225902
+  "organisationId": "~20488"
+  "base": true
+  "rootId": "~372285528"
+  "requestId": "019f0dbc0ab90bbe:-58339429:18b66b86afa:-8000:54029"
+  object:
+    "_id": "~372285528"
+    "id": "~372285528"
+    "updatedBy": "d.surzhikov@cloud.rcm"
+    "createdAt": 1698735502479
+    "status": "Open"
+    "_type": "case"
+    "startDate": 1698735502472
+    "owner": "d.surzhikov@cloud.rcm"
+    "updatedAt": 1698736225885
+    customFields:
+      class-attack:
+        "order": 2
+      first-time:
+        "date": 1698728863000
+        "order": 0
+      last-time:
+        "date": 1698728863000
+        "order": 1
+      ncircc-bulletin-id:
+        "order": 4
+      ncircc-class-attack:
+    "description": "**Задача переданная из смежной системы: Заслон-Пост-Модерн**
+
+В формате ГЦМ: **`TSK-SMO-2-ZPM-231031-28799`** ID: `28799`
+
+[http://10.67.1.26:3000/tasks/card/TSK-SMO-2-ZPM-231031-28799](http://10.67.1.26:3000/tasks/card/TSK-SMO-2-ZPM-231031-28799)
+
+Автор задачи: **`Security Event Manager`**
+
+Тип: **`snort_alert`**
+
+**Причина по которой создана задача**
+
+Название: `Зафиксированы признаки взаимодействия ВПО класса trojan с 165.154.163.113`
+
+Описание: `## Данная задача создана автоматически
+ Время начала: 2023-10-31 08:07:43
+ Время окончания: 2023-10-31 08:07:43
+ Продолжительность воздействий: 0:00:00`
+
+Отработало на СОА: 
+- **`690010`**   Брянск ДОН, Установлен: Брянск,Брянская область, IP адрес: 10.67.67.11
+
+
+**Полное описание события IDS:**
+
+- Время начала: **`31.10.2023 05:07:43`**
+- Время окончания: **`31.10.2023 05:07:43`**
+- **IP из домашней подсети**
+
+1. **`84.42.49.66`**
+- **IP из внешней подсети**
+
+1. **`165.154.163.113`**
+
+
+**Сигнатуры на которых отработал анализатор сетевого трафика:**
+
+1. РП: **`55928939`**, Сообщение: Exploit.CVE-2022-23131.HTTP.C&C, Добавлена: 09.06.2023 07:29:05
+2. РП: **`2035373`**, Сообщение: ET EXPLOIT Zabbix v5.4.0 - 5.4.8 SSO/SALM Auth Bypass (CVE-2022-23131) M3, Добавлена: 05.04.2022 17:49:00
+
+
+
+
+**Фильтрация и выгрузка от** Tue Oct 31 2023 05:12:22 GMT+0000 
+
+Размер: **`454.7 KB`**, [Скачать файл](ftp://10.67.1.21//traffic/690010/1698729533_2023_10_31____08_18_53_960467.pcap)
+
+Контент: Фильтрация успешно завершена. Включена автоматическая выгрузка
+
+Файл на СОА: `/opt/zaslon/zmanager/data/pfilter_storage/1698729533_2023_10_31____08_18_53_960467.pcap`
+
+
+
+"
+    "tlp": 2
+    stats:
+    permissions:
+    "createdBy": "d.surzhikov@cloud.rcm"
+    "caseId": 3406
+    "severity": 2
+    "endDate": 0
+    "impactStatus": ""
+    "title": "RCE Attempt Zabbix SSO (CVE-2022-23131) с 165.154.163.113"
+    tags:
+      1. "Sensor:id="690010""
+      2. "ATs:reason="Зафиксированы признаки взаимодействия ВПО класса trojan""
+      3. "ATs:geoip="США""
+    "flag": false
+    "resolutionStatus": ""
+    "pap": 2
+    "summary": ""
+  "organisation": "RCM"
+  details:
+  "objectType": "case"
+  "objectId": "~372285528"
+observables:
+  1.
+    reports:
+      ZPMSig_1_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "zpmSig"
+            "predicate": "Precision"
+            "value": "unknown"
+    tags:
+      1. "snort"
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    extraData:
+    "_type": "Observable"
+    "startDate": 1698735502495
+    "_createdAt": 1698735502495
+    "_id": "~290300000"
+    "data": "55928939, 2035373"
+    "ioc": false
+    "tlp": 2
+    "dataType": "snort_sid"
+    "sighted": false
+  2.
+    "dataType": "ip"
+    "_createdAt": 1698735502501
+    "_id": "~290304096"
+    extraData:
+    reports:
+      AbuseIPDB_1_0:
+        taxonomies:
+          1.
+            "level": "malicious"
+            "namespace": "AbuseIPDB"
+            "predicate": "Records"
+            "value": 794
+      GreyNoise_3_1:
+        taxonomies:
+          1.
+            "level": "malicious"
+            "namespace": "GreyNoise Community"
+            "predicate": "classification"
+            "value": "malicious"
+          2.
+            "namespace": "GreyNoise Community"
+            "predicate": "Name"
+            "value": "unknown"
+            "level": "malicious"
+          3.
+            "level": "malicious"
+            "namespace": "GreyNoise Community"
+            "predicate": "Type"
+            "value": "Internet Noise"
+      MISP_2_1:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "MISP"
+            "predicate": "Search"
+            "value": "0 events"
+      ZPMSig_1_0:
+        taxonomies:
+          1.
+            "value": "NotFound"
+            "level": "info"
+            "namespace": "ZPM_Sensor"
+            "predicate": "IP"
+    "startDate": 1698735502501
+    tags:
+      1. "external"
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    "sighted": false
+    "_type": "Observable"
+    "ioc": true
+    "tlp": 2
+    "data": "165.154.163.113"
+  3.
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    "_type": "Observable"
+    "data": "ftp://10.67.1.21/traffic/690010/1698729533_2023_10_31____08_18_53_960467.pcap"
+    "dataType": "url_pcap"
+    extraData:
+    "ioc": true
+    reports:
+    "sighted": false
+    tags:
+      1. "454.7 KB"
+    "_id": "~290308192"
+    "ignoreSimilarity": true
+    "message": "Download a piece of traffic"
+    "startDate": 1698735502515
+    "_createdAt": 1698735502515
+    "tlp": 2
+  4.
+    "_id": "~290402304"
+    tags:
+      1. "home"
+    "tlp": 2
+    "_type": "Observable"
+    "sighted": false
+    "startDate": 1698735502508
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    "data": "690010:84.42.49.66"
+    "dataType": "ip_home"
+    reports:
+      ZPMSig_1_0:
+        taxonomies:
+          1.
+            "level": "safe"
+            "namespace": "ZPM_Sensor"
+            "predicate": "Status"
+            "value": "online"
+    "_createdAt": 1698735502508
+    extraData:
+    "ioc": false
+ttp:
+  1.
+    "tactic": "initial-access"
+    "_createdAt": 1698735983942
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    "_id": "~290390048"
+    extraData:
+      pattern:
+        "_type": "Pattern"
+        defenseBypassed:
+        tactics:
+          1. "initial-access"
+        "url": "https://attack.mitre.org/techniques/T1190"
+        extraData:
+        "name": "Exploit Public-Facing Application"
+        "revoked": false
+        "_createdAt": 1679910380455
+        "_createdBy": "admin@thehive.local"
+        "_id": "~118880"
+        "detection": "Monitor application logs for abnormal behavior that may indicate attempted or successful exploitation. Use deep packet inspection to look for artifacts of common exploit traffic, such as SQL injection. Web Application Firewalls may detect improper inputs attempting exploitation."
+        "remoteSupport": false
+        dataSources:
+          1. "Application Log: Application Log Content"
+          2. "Network Traffic: Network Traffic Content"
+        "patternId": "T1190"
+        "patternType": "attack-pattern"
+        permissionsRequired:
+        "description": "Adversaries may attempt to take advantage of a weakness in an Internet-facing computer or program using software, data, or commands in order to cause unintended or unanticipated behavior. The weakness in the system can be a bug, a glitch, or a design vulnerability. These applications are often websites, but can include databases (like SQL), standard services (like SMB or SSH), network device administration and management protocols (like SNMP and Smart Install), and any other applications with Internet accessible open sockets, such as web servers and related services.(Citation: NVD CVE-2016-6662)(Citation: CIS Multiple SMB Vulnerabilities)(Citation: US-CERT TA18-106A Network Infrastructure Devices 2018)(Citation: Cisco Blog Legacy Device Attacks)(Citation: NVD CVE-2014-7169) Depending on the flaw being exploited this may include [Exploitation for Defense Evasion](https://attack.mitre.org/techniques/T1211). 
+
+If an application is hosted on cloud-based infrastructure and/or is containerized, then exploiting it may lead to compromise of the underlying instance or container. This can allow an adversary a path to access the cloud or container APIs, exploit container host access via [Escape to Host](https://attack.mitre.org/techniques/T1611), or take advantage of weak identity and access management policies.
+
+For websites and databases, the OWASP top 10 and CWE top 25 highlight the most common web-based vulnerabilities.(Citation: OWASP Top 10)(Citation: CWE top 25)"
+        platforms:
+          1. "Windows"
+          2. "IaaS"
+          3. "Network"
+          4. "Linux"
+          5. "macOS"
+          6. "Containers"
+        systemRequirements:
+        "version": "2.3"
+    "occurDate": 1698735960000
+    "patternId": "T1190"
+
+
+2023/10/31 07:10:20 	---------------
+	EVENTS:
+"source": "rcmlnx"
+event:
+  "requestId": "019f0dbc0ab90bbe:-58339429:18b66b86afa:-8000:54038"
+  "organisationId": "~20488"
+  "objectType": "case"
+  "base": true
+  "objectId": "~372285528"
+  "startDate": 1698736234547
+  "rootId": "~372285528"
+  object:
+    "updatedBy": "d.surzhikov@cloud.rcm"
+    "flag": false
+    "summary": ""
+    customFields:
+      class-attack:
+        "order": 2
+      first-time:
+        "date": 1698728863000
+        "order": 0
+      last-time:
+        "order": 1
+        "date": 1698728863000
+      ncircc-bulletin-id:
+        "order": 4
+      ncircc-class-attack:
+        "order": 3
+        "string": "Попытки эксплуатации уязвимости;attack"
+    permissions:
+    "endDate": 0
+    "_type": "case"
+    "title": "RCE Attempt Zabbix SSO (CVE-2022-23131) с 165.154.163.113"
+    "severity": 2
+    "resolutionStatus": ""
+    "tlp": 2
+    "status": "Open"
+    "_id": "~372285528"
+    "id": "~372285528"
+    "createdBy": "d.surzhikov@cloud.rcm"
+    tags:
+      1. "Sensor:id="690010""
+      2. "ATs:reason="Зафиксированы признаки взаимодействия ВПО класса trojan""
+      3. "ATs:geoip="США""
+    "pap": 2
+    stats:
+    "description": "**Задача переданная из смежной системы: Заслон-Пост-Модерн**
+
+В формате ГЦМ: **`TSK-SMO-2-ZPM-231031-28799`** ID: `28799`
+
+[http://10.67.1.26:3000/tasks/card/TSK-SMO-2-ZPM-231031-28799](http://10.67.1.26:3000/tasks/card/TSK-SMO-2-ZPM-231031-28799)
+
+Автор задачи: **`Security Event Manager`**
+
+Тип: **`snort_alert`**
+
+**Причина по которой создана задача**
+
+Название: `Зафиксированы признаки взаимодействия ВПО класса trojan с 165.154.163.113`
+
+Описание: `## Данная задача создана автоматически
+ Время начала: 2023-10-31 08:07:43
+ Время окончания: 2023-10-31 08:07:43
+ Продолжительность воздействий: 0:00:00`
+
+Отработало на СОА: 
+- **`690010`**   Брянск ДОН, Установлен: Брянск,Брянская область, IP адрес: 10.67.67.11
+
+
+**Полное описание события IDS:**
+
+- Время начала: **`31.10.2023 05:07:43`**
+- Время окончания: **`31.10.2023 05:07:43`**
+- **IP из домашней подсети**
+
+1. **`84.42.49.66`**
+- **IP из внешней подсети**
+
+1. **`165.154.163.113`**
+
+
+**Сигнатуры на которых отработал анализатор сетевого трафика:**
+
+1. РП: **`55928939`**, Сообщение: Exploit.CVE-2022-23131.HTTP.C&C, Добавлена: 09.06.2023 07:29:05
+2. РП: **`2035373`**, Сообщение: ET EXPLOIT Zabbix v5.4.0 - 5.4.8 SSO/SALM Auth Bypass (CVE-2022-23131) M3, Добавлена: 05.04.2022 17:49:00
+
+
+
+
+**Фильтрация и выгрузка от** Tue Oct 31 2023 05:12:22 GMT+0000 
+
+Размер: **`454.7 KB`**, [Скачать файл](ftp://10.67.1.21//traffic/690010/1698729533_2023_10_31____08_18_53_960467.pcap)
+
+Контент: Фильтрация успешно завершена. Включена автоматическая выгрузка
+
+Файл на СОА: `/opt/zaslon/zmanager/data/pfilter_storage/1698729533_2023_10_31____08_18_53_960467.pcap`
+
+
+
+"
+    "owner": "d.surzhikov@cloud.rcm"
+    "impactStatus": ""
+    "createdAt": 1698735502479
+    "updatedAt": 1698736234535
+    "caseId": 3406
+    "startDate": 1698735502472
+  "organisation": "RCM"
+  "operation": "update"
+  details:
+    customFields:
+      ncircc-class-attack:
+        "string": "Попытки эксплуатации уязвимости;attack"
+observables:
+  1.
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    "_type": "Observable"
+    reports:
+      ZPMSig_1_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "zpmSig"
+            "predicate": "Precision"
+            "value": "unknown"
+    "data": "55928939, 2035373"
+    extraData:
+    "_createdAt": 1698735502495
+    "_id": "~290300000"
+    "dataType": "snort_sid"
+    "ioc": false
+    "startDate": 1698735502495
+    tags:
+      1. "snort"
+    "tlp": 2
+    "sighted": false
+  2.
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    "_id": "~290304096"
+    "_type": "Observable"
+    tags:
+      1. "external"
+    "tlp": 2
+    "_createdAt": 1698735502501
+    "data": "165.154.163.113"
+    "ioc": true
+    reports:
+      AbuseIPDB_1_0:
+        taxonomies:
+          1.
+            "level": "malicious"
+            "namespace": "AbuseIPDB"
+            "predicate": "Records"
+            "value": 794
+      GreyNoise_3_1:
+        taxonomies:
+          1.
+            "namespace": "GreyNoise Community"
+            "predicate": "classification"
+            "value": "malicious"
+            "level": "malicious"
+          2.
+            "level": "malicious"
+            "namespace": "GreyNoise Community"
+            "predicate": "Name"
+            "value": "unknown"
+          3.
+            "level": "malicious"
+            "namespace": "GreyNoise Community"
+            "predicate": "Type"
+            "value": "Internet Noise"
+      MISP_2_1:
+        taxonomies:
+          1.
+            "namespace": "MISP"
+            "predicate": "Search"
+            "value": "0 events"
+            "level": "info"
+      ZPMSig_1_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "ZPM_Sensor"
+            "predicate": "IP"
+            "value": "NotFound"
+    "sighted": false
+    "dataType": "ip"
+    extraData:
+    "startDate": 1698735502501
+  3.
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    "_id": "~290308192"
+    extraData:
+    "ioc": true
+    reports:
+    "dataType": "url_pcap"
+    "sighted": false
+    "_createdAt": 1698735502515
+    "data": "ftp://10.67.1.21/traffic/690010/1698729533_2023_10_31____08_18_53_960467.pcap"
+    "message": "Download a piece of traffic"
+    "startDate": 1698735502515
+    "_type": "Observable"
+    "ignoreSimilarity": true
+    tags:
+      1. "454.7 KB"
+    "tlp": 2
+  4.
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    "_type": "Observable"
+    reports:
+      ZPMSig_1_0:
+        taxonomies:
+          1.
+            "level": "safe"
+            "namespace": "ZPM_Sensor"
+            "predicate": "Status"
+            "value": "online"
+    "ioc": false
+    "sighted": false
+    "tlp": 2
+    "_createdAt": 1698735502508
+    "dataType": "ip_home"
+    "_id": "~290402304"
+    "data": "690010:84.42.49.66"
+    extraData:
+    "startDate": 1698735502508
+    tags:
+      1. "home"
+ttp:
+  1.
+    "_id": "~290390048"
+    extraData:
+      pattern:
+        "_type": "Pattern"
+        extraData:
+        tactics:
+          1. "initial-access"
+        "url": "https://attack.mitre.org/techniques/T1190"
+        "version": "2.3"
+        "_createdAt": 1679910380455
+        "_createdBy": "admin@thehive.local"
+        "patternType": "attack-pattern"
+        "detection": "Monitor application logs for abnormal behavior that may indicate attempted or successful exploitation. Use deep packet inspection to look for artifacts of common exploit traffic, such as SQL injection. Web Application Firewalls may detect improper inputs attempting exploitation."
+        permissionsRequired:
+        "remoteSupport": false
+        "_id": "~118880"
+        dataSources:
+          1. "Application Log: Application Log Content"
+          2. "Network Traffic: Network Traffic Content"
+        "description": "Adversaries may attempt to take advantage of a weakness in an Internet-facing computer or program using software, data, or commands in order to cause unintended or unanticipated behavior. The weakness in the system can be a bug, a glitch, or a design vulnerability. These applications are often websites, but can include databases (like SQL), standard services (like SMB or SSH), network device administration and management protocols (like SNMP and Smart Install), and any other applications with Internet accessible open sockets, such as web servers and related services.(Citation: NVD CVE-2016-6662)(Citation: CIS Multiple SMB Vulnerabilities)(Citation: US-CERT TA18-106A Network Infrastructure Devices 2018)(Citation: Cisco Blog Legacy Device Attacks)(Citation: NVD CVE-2014-7169) Depending on the flaw being exploited this may include [Exploitation for Defense Evasion](https://attack.mitre.org/techniques/T1211). 
+
+If an application is hosted on cloud-based infrastructure and/or is containerized, then exploiting it may lead to compromise of the underlying instance or container. This can allow an adversary a path to access the cloud or container APIs, exploit container host access via [Escape to Host](https://attack.mitre.org/techniques/T1611), or take advantage of weak identity and access management policies.
+
+For websites and databases, the OWASP top 10 and CWE top 25 highlight the most common web-based vulnerabilities.(Citation: OWASP Top 10)(Citation: CWE top 25)"
+        platforms:
+          1. "Windows"
+          2. "IaaS"
+          3. "Network"
+          4. "Linux"
+          5. "macOS"
+          6. "Containers"
+        "revoked": false
+        systemRequirements:
+        defenseBypassed:
+        "name": "Exploit Public-Facing Application"
+        "patternId": "T1190"
+    "occurDate": 1698735960000
+    "patternId": "T1190"
+    "tactic": "initial-access"
+    "_createdAt": 1698735983942
+    "_createdBy": "d.surzhikov@cloud.rcm"
+
+
+2023/10/31 07:35:48 	---------------
+	EVENTS:
+"source": "rcmlnx"
+event:
+  "base": true
+  "startDate": 1698737762032
+  "organisationId": "~20488"
+  "organisation": "RCM"
+  "objectType": "case"
+  "objectId": "~372285528"
+  "rootId": "~372285528"
+  "requestId": "019f0dbc0ab90bbe:-58339429:18b66b86afa:-8000:54365"
+  object:
+    "flag": false
+    "tlp": 2
+    "_type": "case"
+    "caseId": 3406
+    stats:
+    "createdBy": "d.surzhikov@cloud.rcm"
+    "title": "RCE Attempt Zabbix SSO (CVE-2022-23131) с 165.154.163.113"
+    permissions:
+    "severity": 2
+    "endDate": 0
+    "resolutionStatus": ""
+    "startDate": 1698735502472
+    "description": "**Задача переданная из смежной системы: Заслон-Пост-Модерн**
+
+В формате ГЦМ: **`TSK-SMO-2-ZPM-231031-28799`** ID: `28799`
+
+[http://10.67.1.26:3000/tasks/card/TSK-SMO-2-ZPM-231031-28799](http://10.67.1.26:3000/tasks/card/TSK-SMO-2-ZPM-231031-28799)
+
+Автор задачи: **`Security Event Manager`**
+
+Тип: **`snort_alert`**
+
+**Причина по которой создана задача**
+
+Название: `Зафиксированы признаки взаимодействия ВПО класса trojan с 165.154.163.113`
+
+Описание: `## Данная задача создана автоматически
+ Время начала: 2023-10-31 08:07:43
+ Время окончания: 2023-10-31 08:07:43
+ Продолжительность воздействий: 0:00:00`
+
+Отработало на СОА: 
+- **`690010`**   Брянск ДОН, Установлен: Брянск,Брянская область, IP адрес: 10.67.67.11
+
+
+**Полное описание события IDS:**
+
+- Время начала: **`31.10.2023 05:07:43`**
+- Время окончания: **`31.10.2023 05:07:43`**
+- **IP из домашней подсети**
+
+1. **`84.42.49.66`**
+- **IP из внешней подсети**
+
+1. **`165.154.163.113`**
+
+
+**Сигнатуры на которых отработал анализатор сетевого трафика:**
+
+1. РП: **`55928939`**, Сообщение: Exploit.CVE-2022-23131.HTTP.C&C, Добавлена: 09.06.2023 07:29:05
+2. РП: **`2035373`**, Сообщение: ET EXPLOIT Zabbix v5.4.0 - 5.4.8 SSO/SALM Auth Bypass (CVE-2022-23131) M3, Добавлена: 05.04.2022 17:49:00
+
+
+
+
+**Фильтрация и выгрузка от** Tue Oct 31 2023 05:12:22 GMT+0000 
+
+Размер: **`454.7 KB`**, [Скачать файл](ftp://10.67.1.21//traffic/690010/1698729533_2023_10_31____08_18_53_960467.pcap)
+
+Контент: Фильтрация успешно завершена. Включена автоматическая выгрузка
+
+Файл на СОА: `/opt/zaslon/zmanager/data/pfilter_storage/1698729533_2023_10_31____08_18_53_960467.pcap`
+
+
+
+"
+    "status": "Open"
+    "summary": ""
+    "id": "~372285528"
+    customFields:
+      last-time:
+        "date": 1698728863000
+        "order": 1
+      ncircc-bulletin-id:
+        "order": 4
+      ncircc-class-attack:
+        "order": 3
+        "string": "Попытки эксплуатации уязвимости;attack"
+      class-attack:
+        "order": 2
+        "string": "Exploit"
+      first-time:
+        "date": 1698728863000
+        "order": 0
+    tags:
+      1. "Sensor:id="690010""
+      2. "ATs:reason="Зафиксированы признаки взаимодействия ВПО класса trojan""
+      3. "ATs:geoip="США""
+    "impactStatus": ""
+    "updatedBy": "d.surzhikov@cloud.rcm"
+    "pap": 2
+    "owner": "d.surzhikov@cloud.rcm"
+    "_id": "~372285528"
+    "createdAt": 1698735502479
+    "updatedAt": 1698737762019
+  "operation": "update"
+  details:
+    customFields:
+      class-attack:
+        "string": "Exploit"
+observables:
+  1.
+    reports:
+      ZPMSig_1_0:
+        taxonomies:
+          1.
+            "value": "unknown"
+            "level": "info"
+            "namespace": "zpmSig"
+            "predicate": "Precision"
+    tags:
+      1. "snort"
+    extraData:
+    "_id": "~290300000"
+    "data": "55928939, 2035373"
+    "dataType": "snort_sid"
+    "sighted": false
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    "_type": "Observable"
+    "tlp": 2
+    "_createdAt": 1698735502495
+    "startDate": 1698735502495
+    "ioc": false
+  2.
+    "_createdAt": 1698735502501
+    "_id": "~290304096"
+    "data": "165.154.163.113"
+    reports:
+      AbuseIPDB_1_0:
+        taxonomies:
+          1.
+            "level": "malicious"
+            "namespace": "AbuseIPDB"
+            "predicate": "Records"
+            "value": 794
+      GreyNoise_3_1:
+        taxonomies:
+          1.
+            "level": "malicious"
+            "namespace": "GreyNoise Community"
+            "predicate": "classification"
+            "value": "malicious"
+          2.
+            "value": "unknown"
+            "level": "malicious"
+            "namespace": "GreyNoise Community"
+            "predicate": "Name"
+          3.
+            "level": "malicious"
+            "namespace": "GreyNoise Community"
+            "predicate": "Type"
+            "value": "Internet Noise"
+      MISP_2_1:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "MISP"
+            "predicate": "Search"
+            "value": "0 events"
+      ZPMSig_1_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "ZPM_Sensor"
+            "predicate": "IP"
+            "value": "NotFound"
+    "dataType": "ip"
+    "startDate": 1698735502501
+    "tlp": 2
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    "_type": "Observable"
+    extraData:
+    tags:
+      1. "external"
+    "ioc": true
+    "sighted": false
+  3.
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    "_type": "Observable"
+    "ioc": true
+    "startDate": 1698735502515
+    "_id": "~290308192"
+    "ignoreSimilarity": true
+    "sighted": false
+    "dataType": "url_pcap"
+    reports:
+    extraData:
+    "message": "Download a piece of traffic"
+    tags:
+      1. "454.7 KB"
+    "tlp": 2
+    "_createdAt": 1698735502515
+    "data": "ftp://10.67.1.21/traffic/690010/1698729533_2023_10_31____08_18_53_960467.pcap"
+  4.
+    "ioc": false
+    reports:
+      ZPMSig_1_0:
+        taxonomies:
+          1.
+            "value": "online"
+            "level": "safe"
+            "namespace": "ZPM_Sensor"
+            "predicate": "Status"
+    "_createdAt": 1698735502508
+    "_id": "~290402304"
+    "startDate": 1698735502508
+    extraData:
+    "sighted": false
+    "data": "690010:84.42.49.66"
+    "dataType": "ip_home"
+    tags:
+      1. "home"
+    "tlp": 2
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    "_type": "Observable"
+ttp:
+  1.
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    "_id": "~290390048"
+    extraData:
+      pattern:
+        "name": "Exploit Public-Facing Application"
+        platforms:
+          1. "Windows"
+          2. "IaaS"
+          3. "Network"
+          4. "Linux"
+          5. "macOS"
+          6. "Containers"
+        "version": "2.3"
+        "_id": "~118880"
+        "_type": "Pattern"
+        "description": "Adversaries may attempt to take advantage of a weakness in an Internet-facing computer or program using software, data, or commands in order to cause unintended or unanticipated behavior. The weakness in the system can be a bug, a glitch, or a design vulnerability. These applications are often websites, but can include databases (like SQL), standard services (like SMB or SSH), network device administration and management protocols (like SNMP and Smart Install), and any other applications with Internet accessible open sockets, such as web servers and related services.(Citation: NVD CVE-2016-6662)(Citation: CIS Multiple SMB Vulnerabilities)(Citation: US-CERT TA18-106A Network Infrastructure Devices 2018)(Citation: Cisco Blog Legacy Device Attacks)(Citation: NVD CVE-2014-7169) Depending on the flaw being exploited this may include [Exploitation for Defense Evasion](https://attack.mitre.org/techniques/T1211). 
+
+If an application is hosted on cloud-based infrastructure and/or is containerized, then exploiting it may lead to compromise of the underlying instance or container. This can allow an adversary a path to access the cloud or container APIs, exploit container host access via [Escape to Host](https://attack.mitre.org/techniques/T1611), or take advantage of weak identity and access management policies.
+
+For websites and databases, the OWASP top 10 and CWE top 25 highlight the most common web-based vulnerabilities.(Citation: OWASP Top 10)(Citation: CWE top 25)"
+        "revoked": false
+        systemRequirements:
+        tactics:
+          1. "initial-access"
+        defenseBypassed:
+        extraData:
+        "remoteSupport": false
+        "patternId": "T1190"
+        permissionsRequired:
+        "_createdAt": 1679910380455
+        "_createdBy": "admin@thehive.local"
+        "detection": "Monitor application logs for abnormal behavior that may indicate attempted or successful exploitation. Use deep packet inspection to look for artifacts of common exploit traffic, such as SQL injection. Web Application Firewalls may detect improper inputs attempting exploitation."
+        dataSources:
+          1. "Application Log: Application Log Content"
+          2. "Network Traffic: Network Traffic Content"
+        "patternType": "attack-pattern"
+        "url": "https://attack.mitre.org/techniques/T1190"
+    "occurDate": 1698735960000
+    "patternId": "T1190"
+    "tactic": "initial-access"
+    "_createdAt": 1698735983942
+
+
+2023/10/31 07:35:53 	---------------
+	EVENTS:
+"source": "rcmlnx"
+event:
+  "organisation": "RCM"
+  details:
+    "endDate": 1698737766779
+    customFields:
+      ncircc-class-attack:
+        "order": 3
+        "string": "Попытки эксплуатации уязвимости;attack"
+      class-attack:
+        "order": 2
+        "string": "Exploit"
+      first-time:
+        "date": 1698728863000
+        "order": 0
+      last-time:
+        "date": 1698728863000
+        "order": 1
+      ncircc-bulletin-id:
+        "order": 4
+    "resolutionStatus": "TruePositive"
+    "summary": "RCE Attempt Zabbix SSO (CVE-2022-23131) с 165.154.163.113"
+    "status": "Resolved"
+    "impactStatus": "NoImpact"
+  "objectType": "case"
+  "objectId": "~372285528"
+  "base": true
+  "startDate": 1698737766803
+  "requestId": "019f0dbc0ab90bbe:-58339429:18b66b86afa:-8000:54375"
+  "operation": "update"
+  "rootId": "~372285528"
+  object:
+    "owner": "d.surzhikov@cloud.rcm"
+    customFields:
+      last-time:
+        "date": 1698728863000
+        "order": 1
+      ncircc-bulletin-id:
+        "order": 4
+      ncircc-class-attack:
+        "order": 3
+        "string": "Попытки эксплуатации уязвимости;attack"
+      class-attack:
+        "order": 2
+        "string": "Exploit"
+      first-time:
+        "order": 0
+        "date": 1698728863000
+    stats:
+    "createdBy": "d.surzhikov@cloud.rcm"
+    "_type": "case"
+    "endDate": 1698737766779
+    "resolutionStatus": "TruePositive"
+    "_id": "~372285528"
+    "startDate": 1698735502472
+    "updatedBy": "d.surzhikov@cloud.rcm"
+    "description": "**Задача переданная из смежной системы: Заслон-Пост-Модерн**
+
+В формате ГЦМ: **`TSK-SMO-2-ZPM-231031-28799`** ID: `28799`
+
+[http://10.67.1.26:3000/tasks/card/TSK-SMO-2-ZPM-231031-28799](http://10.67.1.26:3000/tasks/card/TSK-SMO-2-ZPM-231031-28799)
+
+Автор задачи: **`Security Event Manager`**
+
+Тип: **`snort_alert`**
+
+**Причина по которой создана задача**
+
+Название: `Зафиксированы признаки взаимодействия ВПО класса trojan с 165.154.163.113`
+
+Описание: `## Данная задача создана автоматически
+ Время начала: 2023-10-31 08:07:43
+ Время окончания: 2023-10-31 08:07:43
+ Продолжительность воздействий: 0:00:00`
+
+Отработало на СОА: 
+- **`690010`**   Брянск ДОН, Установлен: Брянск,Брянская область, IP адрес: 10.67.67.11
+
+
+**Полное описание события IDS:**
+
+- Время начала: **`31.10.2023 05:07:43`**
+- Время окончания: **`31.10.2023 05:07:43`**
+- **IP из домашней подсети**
+
+1. **`84.42.49.66`**
+- **IP из внешней подсети**
+
+1. **`165.154.163.113`**
+
+
+**Сигнатуры на которых отработал анализатор сетевого трафика:**
+
+1. РП: **`55928939`**, Сообщение: Exploit.CVE-2022-23131.HTTP.C&C, Добавлена: 09.06.2023 07:29:05
+2. РП: **`2035373`**, Сообщение: ET EXPLOIT Zabbix v5.4.0 - 5.4.8 SSO/SALM Auth Bypass (CVE-2022-23131) M3, Добавлена: 05.04.2022 17:49:00
+
+
+
+
+**Фильтрация и выгрузка от** Tue Oct 31 2023 05:12:22 GMT+0000 
+
+Размер: **`454.7 KB`**, [Скачать файл](ftp://10.67.1.21//traffic/690010/1698729533_2023_10_31____08_18_53_960467.pcap)
+
+Контент: Фильтрация успешно завершена. Включена автоматическая выгрузка
+
+Файл на СОА: `/opt/zaslon/zmanager/data/pfilter_storage/1698729533_2023_10_31____08_18_53_960467.pcap`
+
+
+
+"
+    "impactStatus": "NoImpact"
+    "createdAt": 1698735502479
+    "summary": "RCE Attempt Zabbix SSO (CVE-2022-23131) с 165.154.163.113"
+    "pap": 2
+    "flag": false
+    "updatedAt": 1698737766800
+    "severity": 2
+    "tlp": 2
+    "id": "~372285528"
+    "caseId": 3406
+    "title": "RCE Attempt Zabbix SSO (CVE-2022-23131) с 165.154.163.113"
+    tags:
+      1. "Sensor:id="690010""
+      2. "ATs:reason="Зафиксированы признаки взаимодействия ВПО класса trojan""
+      3. "ATs:geoip="США""
+    "status": "Resolved"
+    permissions:
+  "organisationId": "~20488"
+observables:
+  1.
+    "_createdAt": 1698735502495
+    "_type": "Observable"
+    "dataType": "snort_sid"
+    "ioc": false
+    tags:
+      1. "snort"
+    "sighted": false
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    "_id": "~290300000"
+    extraData:
+    "tlp": 2
+    "data": "55928939, 2035373"
+    reports:
+      ZPMSig_1_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "zpmSig"
+            "predicate": "Precision"
+            "value": "unknown"
+    "startDate": 1698735502495
+  2.
+    "_type": "Observable"
+    extraData:
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    "_id": "~290304096"
+    "startDate": 1698735502501
+    "tlp": 2
+    "_createdAt": 1698735502501
+    "ioc": true
+    "sighted": false
+    tags:
+      1. "external"
+    reports:
+      AbuseIPDB_1_0:
+        taxonomies:
+          1.
+            "level": "malicious"
+            "namespace": "AbuseIPDB"
+            "predicate": "Records"
+            "value": 794
+      GreyNoise_3_1:
+        taxonomies:
+          1.
+            "level": "malicious"
+            "namespace": "GreyNoise Community"
+            "predicate": "classification"
+            "value": "malicious"
+          2.
+            "level": "malicious"
+            "namespace": "GreyNoise Community"
+            "predicate": "Name"
+            "value": "unknown"
+          3.
+            "value": "Internet Noise"
+            "level": "malicious"
+            "namespace": "GreyNoise Community"
+            "predicate": "Type"
+      MISP_2_1:
+        taxonomies:
+          1.
+            "value": "0 events"
+            "level": "info"
+            "namespace": "MISP"
+            "predicate": "Search"
+      ZPMSig_1_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "ZPM_Sensor"
+            "predicate": "IP"
+            "value": "NotFound"
+    "data": "165.154.163.113"
+    "dataType": "ip"
+  3.
+    "dataType": "url_pcap"
+    "message": "Download a piece of traffic"
+    tags:
+      1. "454.7 KB"
+    extraData:
+    "ioc": true
+    reports:
+    "tlp": 2
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    "ignoreSimilarity": true
+    "sighted": false
+    "startDate": 1698735502515
+    "_createdAt": 1698735502515
+    "_id": "~290308192"
+    "_type": "Observable"
+    "data": "ftp://10.67.1.21/traffic/690010/1698729533_2023_10_31____08_18_53_960467.pcap"
+  4.
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    "_id": "~290402304"
+    reports:
+      ZPMSig_1_0:
+        taxonomies:
+          1.
+            "level": "safe"
+            "namespace": "ZPM_Sensor"
+            "predicate": "Status"
+            "value": "online"
+    tags:
+      1. "home"
+    "_createdAt": 1698735502508
+    "_type": "Observable"
+    "dataType": "ip_home"
+    "sighted": false
+    "data": "690010:84.42.49.66"
+    extraData:
+    "ioc": false
+    "startDate": 1698735502508
+    "tlp": 2
+ttp:
+  1.
+    "patternId": "T1190"
+    "tactic": "initial-access"
+    "_createdAt": 1698735983942
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    "_id": "~290390048"
+    extraData:
+      pattern:
+        "patternType": "attack-pattern"
+        tactics:
+          1. "initial-access"
+        "_id": "~118880"
+        dataSources:
+          1. "Application Log: Application Log Content"
+          2. "Network Traffic: Network Traffic Content"
+        "detection": "Monitor application logs for abnormal behavior that may indicate attempted or successful exploitation. Use deep packet inspection to look for artifacts of common exploit traffic, such as SQL injection. Web Application Firewalls may detect improper inputs attempting exploitation."
+        extraData:
+        "version": "2.3"
+        "description": "Adversaries may attempt to take advantage of a weakness in an Internet-facing computer or program using software, data, or commands in order to cause unintended or unanticipated behavior. The weakness in the system can be a bug, a glitch, or a design vulnerability. These applications are often websites, but can include databases (like SQL), standard services (like SMB or SSH), network device administration and management protocols (like SNMP and Smart Install), and any other applications with Internet accessible open sockets, such as web servers and related services.(Citation: NVD CVE-2016-6662)(Citation: CIS Multiple SMB Vulnerabilities)(Citation: US-CERT TA18-106A Network Infrastructure Devices 2018)(Citation: Cisco Blog Legacy Device Attacks)(Citation: NVD CVE-2014-7169) Depending on the flaw being exploited this may include [Exploitation for Defense Evasion](https://attack.mitre.org/techniques/T1211). 
+
+If an application is hosted on cloud-based infrastructure and/or is containerized, then exploiting it may lead to compromise of the underlying instance or container. This can allow an adversary a path to access the cloud or container APIs, exploit container host access via [Escape to Host](https://attack.mitre.org/techniques/T1611), or take advantage of weak identity and access management policies.
+
+For websites and databases, the OWASP top 10 and CWE top 25 highlight the most common web-based vulnerabilities.(Citation: OWASP Top 10)(Citation: CWE top 25)"
+        "name": "Exploit Public-Facing Application"
+        platforms:
+          1. "Windows"
+          2. "IaaS"
+          3. "Network"
+          4. "Linux"
+          5. "macOS"
+          6. "Containers"
+        "remoteSupport": false
+        "url": "https://attack.mitre.org/techniques/T1190"
+        "_createdAt": 1679910380455
+        "_createdBy": "admin@thehive.local"
+        defenseBypassed:
+        systemRequirements:
+        "_type": "Pattern"
+        "patternId": "T1190"
+        permissionsRequired:
+        "revoked": false
+    "occurDate": 1698735960000
+
+
+2023/10/31 07:35:53 	---------------
+	EVENTS:
+ttp:
+  1.
+    "_id": "~290390048"
+    extraData:
+      pattern:
+        "_createdBy": "admin@thehive.local"
+        extraData:
+        "patternId": "T1190"
+        tactics:
+          1. "initial-access"
+        systemRequirements:
+        dataSources:
+          1. "Application Log: Application Log Content"
+          2. "Network Traffic: Network Traffic Content"
+        "description": "Adversaries may attempt to take advantage of a weakness in an Internet-facing computer or program using software, data, or commands in order to cause unintended or unanticipated behavior. The weakness in the system can be a bug, a glitch, or a design vulnerability. These applications are often websites, but can include databases (like SQL), standard services (like SMB or SSH), network device administration and management protocols (like SNMP and Smart Install), and any other applications with Internet accessible open sockets, such as web servers and related services.(Citation: NVD CVE-2016-6662)(Citation: CIS Multiple SMB Vulnerabilities)(Citation: US-CERT TA18-106A Network Infrastructure Devices 2018)(Citation: Cisco Blog Legacy Device Attacks)(Citation: NVD CVE-2014-7169) Depending on the flaw being exploited this may include [Exploitation for Defense Evasion](https://attack.mitre.org/techniques/T1211). 
+
+If an application is hosted on cloud-based infrastructure and/or is containerized, then exploiting it may lead to compromise of the underlying instance or container. This can allow an adversary a path to access the cloud or container APIs, exploit container host access via [Escape to Host](https://attack.mitre.org/techniques/T1611), or take advantage of weak identity and access management policies.
+
+For websites and databases, the OWASP top 10 and CWE top 25 highlight the most common web-based vulnerabilities.(Citation: OWASP Top 10)(Citation: CWE top 25)"
+        "name": "Exploit Public-Facing Application"
+        "patternType": "attack-pattern"
+        platforms:
+          1. "Windows"
+          2. "IaaS"
+          3. "Network"
+          4. "Linux"
+          5. "macOS"
+          6. "Containers"
+        "remoteSupport": false
+        "revoked": false
+        "_createdAt": 1679910380455
+        "_type": "Pattern"
+        defenseBypassed:
+        permissionsRequired:
+        "url": "https://attack.mitre.org/techniques/T1190"
+        "_id": "~118880"
+        "detection": "Monitor application logs for abnormal behavior that may indicate attempted or successful exploitation. Use deep packet inspection to look for artifacts of common exploit traffic, such as SQL injection. Web Application Firewalls may detect improper inputs attempting exploitation."
+        "version": "2.3"
+    "occurDate": 1698735960000
+    "patternId": "T1190"
+    "tactic": "initial-access"
+    "_createdAt": 1698735983942
+    "_createdBy": "d.surzhikov@cloud.rcm"
+"source": "rcmlnx"
+event:
+  details:
+  "objectType": "case"
+  "objectId": "~372285528"
+  object:
+    "title": "RCE Attempt Zabbix SSO (CVE-2022-23131) с 165.154.163.113"
+    "pap": 2
+    "status": "Resolved"
+    stats:
+    "createdAt": 1698735502479
+    "updatedAt": 1698737767687
+    "caseId": 3406
+    "owner": "d.surzhikov@cloud.rcm"
+    permissions:
+    "description": "**Задача переданная из смежной системы: Заслон-Пост-Модерн**
+
+В формате ГЦМ: **`TSK-SMO-2-ZPM-231031-28799`** ID: `28799`
+
+[http://10.67.1.26:3000/tasks/card/TSK-SMO-2-ZPM-231031-28799](http://10.67.1.26:3000/tasks/card/TSK-SMO-2-ZPM-231031-28799)
+
+Автор задачи: **`Security Event Manager`**
+
+Тип: **`snort_alert`**
+
+**Причина по которой создана задача**
+
+Название: `Зафиксированы признаки взаимодействия ВПО класса trojan с 165.154.163.113`
+
+Описание: `## Данная задача создана автоматически
+ Время начала: 2023-10-31 08:07:43
+ Время окончания: 2023-10-31 08:07:43
+ Продолжительность воздействий: 0:00:00`
+
+Отработало на СОА: 
+- **`690010`**   Брянск ДОН, Установлен: Брянск,Брянская область, IP адрес: 10.67.67.11
+
+
+**Полное описание события IDS:**
+
+- Время начала: **`31.10.2023 05:07:43`**
+- Время окончания: **`31.10.2023 05:07:43`**
+- **IP из домашней подсети**
+
+1. **`84.42.49.66`**
+- **IP из внешней подсети**
+
+1. **`165.154.163.113`**
+
+
+**Сигнатуры на которых отработал анализатор сетевого трафика:**
+
+1. РП: **`55928939`**, Сообщение: Exploit.CVE-2022-23131.HTTP.C&C, Добавлена: 09.06.2023 07:29:05
+2. РП: **`2035373`**, Сообщение: ET EXPLOIT Zabbix v5.4.0 - 5.4.8 SSO/SALM Auth Bypass (CVE-2022-23131) M3, Добавлена: 05.04.2022 17:49:00
+
+
+
+
+**Фильтрация и выгрузка от** Tue Oct 31 2023 05:12:22 GMT+0000 
+
+Размер: **`454.7 KB`**, [Скачать файл](ftp://10.67.1.21//traffic/690010/1698729533_2023_10_31____08_18_53_960467.pcap)
+
+Контент: Фильтрация успешно завершена. Включена автоматическая выгрузка
+
+Файл на СОА: `/opt/zaslon/zmanager/data/pfilter_storage/1698729533_2023_10_31____08_18_53_960467.pcap`
+
+
+
+"
+    "startDate": 1698735502472
+    "resolutionStatus": "TruePositive"
+    tags:
+      1. "Sensor:id="690010""
+      2. "ATs:reason="Зафиксированы признаки взаимодействия ВПО класса trojan""
+      3. "ATs:geoip="США""
+      4. "Webhook: send="MISP""
+    "updatedBy": "hivehook@cloud.rcm"
+    "_type": "case"
+    "endDate": 1698737766779
+    "_id": "~372285528"
+    "severity": 2
+    "flag": false
+    "tlp": 2
+    "summary": "RCE Attempt Zabbix SSO (CVE-2022-23131) с 165.154.163.113"
+    "id": "~372285528"
+    "createdBy": "d.surzhikov@cloud.rcm"
+    "impactStatus": "NoImpact"
+    customFields:
+      class-attack:
+        "string": "Exploit"
+        "order": 2
+      first-time:
+        "date": 1698728863000
+        "order": 0
+      last-time:
+        "order": 1
+        "date": 1698728863000
+      ncircc-bulletin-id:
+      ncircc-class-attack:
+        "order": 3
+        "string": "Попытки эксплуатации уязвимости;attack"
+  "organisation": "RCM"
+  "operation": "update"
+  "base": true
+  "startDate": 1698737767690
+  "rootId": "~372285528"
+  "requestId": "019f0dbc0ab90bbe:-58339429:18b66b86afa:-8000:54386"
+  "organisationId": "~20488"
+observables:
+  1.
+    tags:
+      1. "snort"
+    "tlp": 2
+    "data": "55928939, 2035373"
+    "ioc": false
+    "sighted": false
+    extraData:
+    reports:
+      ZPMSig_1_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "zpmSig"
+            "predicate": "Precision"
+            "value": "unknown"
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    "_id": "~290300000"
+    "dataType": "snort_sid"
+    "startDate": 1698735502495
+    "_createdAt": 1698735502495
+    "_type": "Observable"
+  2.
+    "dataType": "ip"
+    extraData:
+    "ioc": true
+    tags:
+      1. "external"
+    "tlp": 2
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    "_type": "Observable"
+    reports:
+      GreyNoise_3_1:
+        taxonomies:
+          1.
+            "value": "malicious"
+            "level": "malicious"
+            "namespace": "GreyNoise Community"
+            "predicate": "classification"
+          2.
+            "level": "malicious"
+            "namespace": "GreyNoise Community"
+            "predicate": "Name"
+            "value": "unknown"
+          3.
+            "level": "malicious"
+            "namespace": "GreyNoise Community"
+            "predicate": "Type"
+            "value": "Internet Noise"
+      MISP_2_1:
+        taxonomies:
+          1.
+            "namespace": "MISP"
+            "predicate": "Search"
+            "value": "0 events"
+            "level": "info"
+      ZPMSig_1_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "ZPM_Sensor"
+            "predicate": "IP"
+            "value": "NotFound"
+      AbuseIPDB_1_0:
+        taxonomies:
+          1.
+            "value": 794
+            "level": "malicious"
+            "namespace": "AbuseIPDB"
+            "predicate": "Records"
+    "startDate": 1698735502501
+    "_id": "~290304096"
+    "data": "165.154.163.113"
+    "_createdAt": 1698735502501
+    "sighted": false
+  3.
+    extraData:
+    "message": "Download a piece of traffic"
+    reports:
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    "_id": "~290308192"
+    "_type": "Observable"
+    "data": "ftp://10.67.1.21/traffic/690010/1698729533_2023_10_31____08_18_53_960467.pcap"
+    "ignoreSimilarity": true
+    "dataType": "url_pcap"
+    "tlp": 2
+    tags:
+      1. "454.7 KB"
+    "_createdAt": 1698735502515
+    "ioc": true
+    "sighted": false
+    "startDate": 1698735502515
+  4.
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    "data": "690010:84.42.49.66"
+    tags:
+      1. "home"
+    "startDate": 1698735502508
+    "_id": "~290402304"
+    "ioc": false
+    "tlp": 2
+    "_createdAt": 1698735502508
+    "_type": "Observable"
+    "dataType": "ip_home"
+    extraData:
+    reports:
+      ZPMSig_1_0:
+        taxonomies:
+          1.
+            "level": "safe"
+            "namespace": "ZPM_Sensor"
+            "predicate": "Status"
+            "value": "online"
+    "sighted": false
+
+
+2023/10/31 07:36:16 	---------------
+	EVENTS:
+"source": "rcmlnx"
+event:
+  "operation": "update"
+  details:
+    customFields:
+      ncircc-bulletin-id:
+        "string": "WRNG-23-10-8598"
+  "objectType": "case"
+  "startDate": 1698737790470
+  "rootId": "~372285528"
+  "requestId": "019f0dbc0ab90bbe:-58339429:18b66b86afa:-8000:54434"
+  object:
+    "startDate": 1698735502472
+    "endDate": 1698737766779
+    "flag": false
+    stats:
+    "description": "**Задача переданная из смежной системы: Заслон-Пост-Модерн**
+
+В формате ГЦМ: **`TSK-SMO-2-ZPM-231031-28799`** ID: `28799`
+
+[http://10.67.1.26:3000/tasks/card/TSK-SMO-2-ZPM-231031-28799](http://10.67.1.26:3000/tasks/card/TSK-SMO-2-ZPM-231031-28799)
+
+Автор задачи: **`Security Event Manager`**
+
+Тип: **`snort_alert`**
+
+**Причина по которой создана задача**
+
+Название: `Зафиксированы признаки взаимодействия ВПО класса trojan с 165.154.163.113`
+
+Описание: `## Данная задача создана автоматически
+ Время начала: 2023-10-31 08:07:43
+ Время окончания: 2023-10-31 08:07:43
+ Продолжительность воздействий: 0:00:00`
+
+Отработало на СОА: 
+- **`690010`**   Брянск ДОН, Установлен: Брянск,Брянская область, IP адрес: 10.67.67.11
+
+
+**Полное описание события IDS:**
+
+- Время начала: **`31.10.2023 05:07:43`**
+- Время окончания: **`31.10.2023 05:07:43`**
+- **IP из домашней подсети**
+
+1. **`84.42.49.66`**
+- **IP из внешней подсети**
+
+1. **`165.154.163.113`**
+
+
+**Сигнатуры на которых отработал анализатор сетевого трафика:**
+
+1. РП: **`55928939`**, Сообщение: Exploit.CVE-2022-23131.HTTP.C&C, Добавлена: 09.06.2023 07:29:05
+2. РП: **`2035373`**, Сообщение: ET EXPLOIT Zabbix v5.4.0 - 5.4.8 SSO/SALM Auth Bypass (CVE-2022-23131) M3, Добавлена: 05.04.2022 17:49:00
+
+
+
+
+**Фильтрация и выгрузка от** Tue Oct 31 2023 05:12:22 GMT+0000 
+
+Размер: **`454.7 KB`**, [Скачать файл](ftp://10.67.1.21//traffic/690010/1698729533_2023_10_31____08_18_53_960467.pcap)
+
+Контент: Фильтрация успешно завершена. Включена автоматическая выгрузка
+
+Файл на СОА: `/opt/zaslon/zmanager/data/pfilter_storage/1698729533_2023_10_31____08_18_53_960467.pcap`
+
+
+
+"
+    "owner": "d.surzhikov@cloud.rcm"
+    "impactStatus": "NoImpact"
+    "title": "RCE Attempt Zabbix SSO (CVE-2022-23131) с 165.154.163.113"
+    "pap": 2
+    "status": "Resolved"
+    customFields:
+      ncircc-bulletin-id:
+        "order": 4
+        "string": "WRNG-23-10-8598"
+      ncircc-class-attack:
+        "order": 3
+        "string": "Попытки эксплуатации уязвимости;attack"
+      class-attack:
+        "order": 2
+        "string": "Exploit"
+      first-time:
+        "order": 0
+        "date": 1698728863000
+      last-time:
+        "date": 1698728863000
+        "order": 1
+    "updatedBy": "hivehook@cloud.rcm"
+    "_id": "~372285528"
+    "updatedAt": 1698737790459
+    "severity": 2
+    "tlp": 2
+    "summary": "RCE Attempt Zabbix SSO (CVE-2022-23131) с 165.154.163.113"
+    "createdAt": 1698735502479
+    "_type": "case"
+    "caseId": 3406
+    tags:
+      1. "WebHook:send="NCIRCC""
+      2. "Sensor:id="690010""
+      3. "Webhook: send="MISP""
+      4. "ATs:geoip="США""
+      5. "ATs:reason="Зафиксированы признаки взаимодействия ВПО класса trojan""
+    permissions:
+    "id": "~372285528"
+    "createdBy": "d.surzhikov@cloud.rcm"
+    "resolutionStatus": "TruePositive"
+  "organisationId": "~20488"
+  "objectId": "~372285528"
+  "base": true
+  "organisation": "RCM"
+observables:
+  1.
+    "_id": "~290300000"
+    "dataType": "snort_sid"
+    reports:
+      ZPMSig_1_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "zpmSig"
+            "predicate": "Precision"
+            "value": "unknown"
+    "startDate": 1698735502495
+    "tlp": 2
+    "_createdAt": 1698735502495
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    "data": "55928939, 2035373"
+    "sighted": false
+    tags:
+      1. "snort"
+    "_type": "Observable"
+    extraData:
+    "ioc": false
+  2.
+    "ioc": true
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    "_type": "Observable"
+    "data": "165.154.163.113"
+    "dataType": "ip"
+    reports:
+      AbuseIPDB_1_0:
+        taxonomies:
+          1.
+            "level": "malicious"
+            "namespace": "AbuseIPDB"
+            "predicate": "Records"
+            "value": 794
+      GreyNoise_3_1:
+        taxonomies:
+          1.
+            "level": "malicious"
+            "namespace": "GreyNoise Community"
+            "predicate": "classification"
+            "value": "malicious"
+          2.
+            "level": "malicious"
+            "namespace": "GreyNoise Community"
+            "predicate": "Name"
+            "value": "unknown"
+          3.
+            "level": "malicious"
+            "namespace": "GreyNoise Community"
+            "predicate": "Type"
+            "value": "Internet Noise"
+      MISP_2_1:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "MISP"
+            "predicate": "Search"
+            "value": "0 events"
+      ZPMSig_1_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "ZPM_Sensor"
+            "predicate": "IP"
+            "value": "NotFound"
+    "_createdAt": 1698735502501
+    extraData:
+    "sighted": false
+    "tlp": 2
+    "_id": "~290304096"
+    "startDate": 1698735502501
+    tags:
+      1. "external"
+  3.
+    "ioc": true
+    "data": "ftp://10.67.1.21/traffic/690010/1698729533_2023_10_31____08_18_53_960467.pcap"
+    reports:
+    "sighted": false
+    "tlp": 2
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    "_id": "~290308192"
+    "_type": "Observable"
+    "message": "Download a piece of traffic"
+    "_createdAt": 1698735502515
+    "dataType": "url_pcap"
+    extraData:
+    "ignoreSimilarity": true
+    "startDate": 1698735502515
+    tags:
+      1. "454.7 KB"
+  4.
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    extraData:
+    "ioc": false
+    "startDate": 1698735502508
+    "_createdAt": 1698735502508
+    "dataType": "ip_home"
+    "tlp": 2
+    "data": "690010:84.42.49.66"
+    reports:
+      ZPMSig_1_0:
+        taxonomies:
+          1.
+            "level": "safe"
+            "namespace": "ZPM_Sensor"
+            "predicate": "Status"
+            "value": "online"
+    "sighted": false
+    "_id": "~290402304"
+    "_type": "Observable"
+    tags:
+      1. "home"
+ttp:
+  1.
+    "tactic": "initial-access"
+    "_createdAt": 1698735983942
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    "_id": "~290390048"
+    extraData:
+      pattern:
+        defenseBypassed:
+        "patternId": "T1190"
+        "patternType": "attack-pattern"
+        dataSources:
+          1. "Application Log: Application Log Content"
+          2. "Network Traffic: Network Traffic Content"
+        "detection": "Monitor application logs for abnormal behavior that may indicate attempted or successful exploitation. Use deep packet inspection to look for artifacts of common exploit traffic, such as SQL injection. Web Application Firewalls may detect improper inputs attempting exploitation."
+        extraData:
+        permissionsRequired:
+        "version": "2.3"
+        "name": "Exploit Public-Facing Application"
+        platforms:
+          1. "Windows"
+          2. "IaaS"
+          3. "Network"
+          4. "Linux"
+          5. "macOS"
+          6. "Containers"
+        systemRequirements:
+        "_createdAt": 1679910380455
+        "_createdBy": "admin@thehive.local"
+        "_id": "~118880"
+        "_type": "Pattern"
+        "description": "Adversaries may attempt to take advantage of a weakness in an Internet-facing computer or program using software, data, or commands in order to cause unintended or unanticipated behavior. The weakness in the system can be a bug, a glitch, or a design vulnerability. These applications are often websites, but can include databases (like SQL), standard services (like SMB or SSH), network device administration and management protocols (like SNMP and Smart Install), and any other applications with Internet accessible open sockets, such as web servers and related services.(Citation: NVD CVE-2016-6662)(Citation: CIS Multiple SMB Vulnerabilities)(Citation: US-CERT TA18-106A Network Infrastructure Devices 2018)(Citation: Cisco Blog Legacy Device Attacks)(Citation: NVD CVE-2014-7169) Depending on the flaw being exploited this may include [Exploitation for Defense Evasion](https://attack.mitre.org/techniques/T1211). 
+
+If an application is hosted on cloud-based infrastructure and/or is containerized, then exploiting it may lead to compromise of the underlying instance or container. This can allow an adversary a path to access the cloud or container APIs, exploit container host access via [Escape to Host](https://attack.mitre.org/techniques/T1611), or take advantage of weak identity and access management policies.
+
+For websites and databases, the OWASP top 10 and CWE top 25 highlight the most common web-based vulnerabilities.(Citation: OWASP Top 10)(Citation: CWE top 25)"
+        tactics:
+          1. "initial-access"
+        "url": "https://attack.mitre.org/techniques/T1190"
+        "remoteSupport": false
+        "revoked": false
+    "occurDate": 1698735960000
+    "patternId": "T1190"
+
+
+2023/10/31 07:37:56 	---------------
+	EVENTS:
+"source": "rcmlnx"
+event:
+  "base": true
+  "startDate": 1698737890395
+  "rootId": "~617078800"
+  "requestId": "019f0dbc0ab90bbe:-58339429:18b66b86afa:-8000:54473"
+  object:
+    "startDate": 1695680386686
+    stats:
+    "caseId": 3007
+    tags:
+      1. "WebHook:send="NCIRCC""
+      2. "ATs:reason="Зафиксирована подозрительная активность по признакам НКЦКИ""
+      3. "ATs:geoip="Китай""
+      4. "Webhook: send="MISP""
+      5. "Sensor:id="690006""
+    "id": "~617078800"
+    "updatedBy": "d.surzhikov@cloud.rcm"
+    "title": "RCE Attempt (CVE-2021-41773) с 122.114.78.145"
+    "owner": "p.delyukin@cloud.rcm"
+    "tlp": 2
+    "description": "**Задача переданная из смежной системы: Заслон-Пост-Модерн**
+
+В формате ГЦМ: **`TSK-SMO-2-ZPM-230925-25717`** ID: `25717`
+
+[http://10.67.1.26:3000/tasks/card/TSK-SMO-2-ZPM-230925-25717](http://10.67.1.26:3000/tasks/card/TSK-SMO-2-ZPM-230925-25717)
+
+Автор задачи: **`Security Event Manager`**
+
+Тип: **`snort_alert`**
+
+**Причина по которой создана задача**
+
+Название: `Зафиксирована подозрительная активность по признакам НКЦКИ с 122.114.78.145`
+
+Описание: `## Данная задача создана автоматически
+ Время начала: 2023-09-25 23:24:19
+ Время окончания: 2023-09-25 23:24:22
+ Продолжительность воздействий: 0:00:03`
+
+Отработало на СОА: 
+- **`690006`**   АО Смоленск, Установлен: Смоленск,Смоленская область, IP адрес: 10.67.67.7
+
+
+**Полное описание события IDS:**
+
+- Время начала: **`25.09.2023 20:24:19`**
+- Время окончания: **`25.09.2023 20:24:22`**
+- **IP из домашней подсети**
+
+1. **`46.61.209.169`**
+- **IP из внешней подсети**
+
+1. **`122.114.78.145`**
+
+
+**Сигнатуры на которых отработал анализатор сетевого трафика:**
+
+1. РП: **`2034125`**, Сообщение: ET EXPLOIT Apache HTTP Server 2.4.49 - Path Traversal Attempt (CVE-2021-41773) M2, Добавлена: 19.04.2022 01:00:00
+2. РП: **`96040057`**, Сообщение: NCIRCC /bin/sh Shell, Добавлена: 19.09.2022 07:25:42
+3. РП: **`2034125`**, Сообщение: ET EXPLOIT Apache HTTP Server 2.4.49 - Path Traversal Attempt (CVE-2021-41773) M2, Добавлена: 05.04.2022 17:49:00
+4. РП: **`2011465`**, Сообщение: ET WEB_SERVER /bin/sh In URI Possible Shell Command Execution Attempt, Добавлена: 05.04.2022 17:49:00
+5. РП: **`58276`**, Сообщение: SERVER-WEBAPP Apache HTTP Server httpd directory traversal attempt, Добавлена: 05.04.2022 17:49:00
+
+
+
+
+**Фильтрация и выгрузка от** Mon Sep 25 2023 20:58:21 GMT+0000 
+
+Размер: **`112.3 KB`**, [Скачать файл](ftp://10.67.1.21//traffic/690006/1695675785_2023_09_26____00_03_05_235776.pcap)
+
+Контент: Фильтрация успешно завершена. Включена автоматическая выгрузка
+
+Файл на СОА: `/opt/zaslon/zmanager/data/pfilter_storage/1695675785_2023_09_26____00_03_05_235776.pcap`
+
+
+
+
+  
+#### Merged with alert #TSK-SMO-2-ZPM-231021-28274 Зафиксирована подозрительная активность по признакам НКЦКИ с 122.114.78.145
+
+**Задача переданная из смежной системы: Заслон-Пост-Модерн**
+
+В формате ГЦМ: **`TSK-SMO-2-ZPM-231021-28274`** ID: `28274`
+
+[http://10.67.1.26:3000/tasks/card/TSK-SMO-2-ZPM-231021-28274](http://10.67.1.26:3000/tasks/card/TSK-SMO-2-ZPM-231021-28274)
+
+Автор задачи: **`Security Event Manager`**
+
+Тип: **`snort_alert`**
+
+**Причина по которой создана задача**
+
+Название: `Зафиксирована подозрительная активность по признакам НКЦКИ с 122.114.78.145`
+
+Описание: `## Данная задача создана автоматически
+ Время начала: 2023-10-21 05:25:01
+ Время окончания: 2023-10-21 05:25:04
+ Продолжительность воздействий: 0:00:03`
+
+Отработало на СОА: 
+- **`690006`**   Смоленск АО, Установлен: Смоленск,Смоленская область, IP адрес: 10.67.67.7
+
+
+**Полное описание события IDS:**
+
+- Время начала: **`21.10.2023 02:25:01`**
+- Время окончания: **`21.10.2023 02:25:04`**
+- **IP из домашней подсети**
+
+1. **`172.16.10.56`**
+- **IP из внешней подсети**
+
+1. **`122.114.78.145`**
+
+
+**Сигнатуры на которых отработал анализатор сетевого трафика:**
+
+1. РП: **`2034125`**, Сообщение: ET EXPLOIT Apache HTTP Server 2.4.49 - Path Traversal Attempt (CVE-2021-41773) M2, Добавлена: 05.04.2022 17:49:00
+2. РП: **`2034125`**, Сообщение: ET EXPLOIT Apache HTTP Server 2.4.49 - Path Traversal Attempt (CVE-2021-41773) M2, Добавлена: 19.04.2022 01:00:00
+3. РП: **`96040057`**, Сообщение: NCIRCC /bin/sh Shell, Добавлена: 19.09.2022 07:25:42
+4. РП: **`58276`**, Сообщение: SERVER-WEBAPP Apache HTTP Server httpd directory traversal attempt, Добавлена: 05.04.2022 17:49:00
+5. РП: **`2011465`**, Сообщение: ET WEB_SERVER /bin/sh In URI Possible Shell Command Execution Attempt, Добавлена: 05.04.2022 17:49:00
+
+
+
+
+**Фильтрация и выгрузка от** Sat Oct 21 2023 02:29:33 GMT+0000 
+
+Размер: **`18.3 KB`**, [Скачать файл](ftp://10.67.1.21//traffic/690006/1697855736_2023_10_21____05_35_36_273482.pcap)
+
+Контент: Фильтрация успешно завершена. Включена автоматическая выгрузка
+
+Файл на СОА: `/opt/zaslon/zmanager/data/pfilter_storage/1697855736_2023_10_21____05_35_36_273482.pcap`
+  
+#### Merged with alert #TSK-SMO-2-ZPM-231031-28797 Зафиксирована подозрительная активность по признакам НКЦКИ с 122.114.78.145
+
+**Задача переданная из смежной системы: Заслон-Пост-Модерн**
+
+В формате ГЦМ: **`TSK-SMO-2-ZPM-231031-28797`** ID: `28797`
+
+[http://10.67.1.26:3000/tasks/card/TSK-SMO-2-ZPM-231031-28797](http://10.67.1.26:3000/tasks/card/TSK-SMO-2-ZPM-231031-28797)
+
+Автор задачи: **`Security Event Manager`**
+
+Тип: **`snort_alert`**
+
+**Причина по которой создана задача**
+
+Название: `Зафиксирована подозрительная активность по признакам НКЦКИ с 122.114.78.145`
+
+Описание: `## Данная задача создана автоматически
+ Время начала: 2023-10-31 04:46:47
+ Время окончания: 2023-10-31 04:46:52
+ Продолжительность воздействий: 0:00:05`
+
+Отработало на СОА: 
+- **`690006`**   Смоленск АО, Установлен: Смоленск,Смоленская область, IP адрес: 10.67.67.7
+
+
+**Полное описание события IDS:**
+
+- Время начала: **`31.10.2023 01:46:47`**
+- Время окончания: **`31.10.2023 01:46:52`**
+- **IP из домашней подсети**
+
+1. **`46.61.209.93`**
+- **IP из внешней подсети**
+
+1. **`122.114.78.145`**
+
+
+**Сигнатуры на которых отработал анализатор сетевого трафика:**
+
+1. РП: **`2034125`**, Сообщение: ET EXPLOIT Apache HTTP Server 2.4.49 - Path Traversal Attempt (CVE-2021-41773) M2, Добавлена: 05.04.2022 17:49:00
+2. РП: **`2011465`**, Сообщение: ET WEB_SERVER /bin/sh In URI Possible Shell Command Execution Attempt, Добавлена: 05.04.2022 17:49:00
+3. РП: **`58276`**, Сообщение: SERVER-WEBAPP Apache HTTP Server httpd directory traversal attempt, Добавлена: 05.04.2022 17:49:00
+4. РП: **`2034125`**, Сообщение: ET EXPLOIT Apache HTTP Server 2.4.49 - Path Traversal Attempt (CVE-2021-41773) M2, Добавлена: 19.04.2022 01:00:00
+5. РП: **`96040057`**, Сообщение: NCIRCC /bin/sh Shell, Добавлена: 19.09.2022 07:25:42
+
+
+
+
+**Фильтрация и выгрузка от** Tue Oct 31 2023 01:50:29 GMT+0000 
+
+Размер: **`216.6 KB`**, [Скачать файл](ftp://10.67.1.21//traffic/690006/1698717417_2023_10_31____04_56_57_297151.pcap)
+
+Контент: Фильтрация успешно завершена. Включена автоматическая выгрузка
+
+Файл на СОА: `/opt/zaslon/zmanager/data/pfilter_storage/1698717417_2023_10_31____04_56_57_297151.pcap`
+  
+#### Merged with alert #TSK-SMO-2-ZPM-231031-28800 Зафиксирована подозрительная активность по признакам НКЦКИ с 122.114.78.145
+
+**Задача переданная из смежной системы: Заслон-Пост-Модерн**
+
+В формате ГЦМ: **`TSK-SMO-2-ZPM-231031-28800`** ID: `28800`
+
+[http://10.67.1.26:3000/tasks/card/TSK-SMO-2-ZPM-231031-28800](http://10.67.1.26:3000/tasks/card/TSK-SMO-2-ZPM-231031-28800)
+
+Автор задачи: **`Security Event Manager`**
+
+Тип: **`snort_alert`**
+
+**Причина по которой создана задача**
+
+Название: `Зафиксирована подозрительная активность по признакам НКЦКИ с 122.114.78.145`
+
+Описание: `## Данная задача создана автоматически
+ Время начала: 2023-10-31 08:29:22
+ Время окончания: 2023-10-31 08:29:24
+ Продолжительность воздействий: 0:00:02`
+
+Отработало на СОА: 
+- **`690006`**   Смоленск АО, Установлен: Смоленск,Смоленская область, IP адрес: 10.67.67.7
+
+
+**Полное описание события IDS:**
+
+- Время начала: **`31.10.2023 05:29:22`**
+- Время окончания: **`31.10.2023 05:29:24`**
+- **IP из домашней подсети**
+
+1. **`46.61.209.163`**
+- **IP из внешней подсети**
+
+1. **`122.114.78.145`**
+
+
+**Сигнатуры на которых отработал анализатор сетевого трафика:**
+
+1. РП: **`96040057`**, Сообщение: NCIRCC /bin/sh Shell, Добавлена: 19.09.2022 07:25:42
+2. РП: **`2034125`**, Сообщение: ET EXPLOIT Apache HTTP Server 2.4.49 - Path Traversal Attempt (CVE-2021-41773) M2, Добавлена: 05.04.2022 17:49:00
+3. РП: **`2011465`**, Сообщение: ET WEB_SERVER /bin/sh In URI Possible Shell Command Execution Attempt, Добавлена: 05.04.2022 17:49:00
+4. РП: **`2034125`**, Сообщение: ET EXPLOIT Apache HTTP Server 2.4.49 - Path Traversal Attempt (CVE-2021-41773) M2, Добавлена: 19.04.2022 01:00:00
+5. РП: **`58276`**, Сообщение: SERVER-WEBAPP Apache HTTP Server httpd directory traversal attempt, Добавлена: 05.04.2022 17:49:00
+
+
+
+
+**Фильтрация и выгрузка от** Tue Oct 31 2023 05:35:29 GMT+0000 
+
+Размер: **`57.4 KB`**, [Скачать файл](ftp://10.67.1.21//traffic/690006/1698730919_2023_10_31____08_41_59_046483.pcap)
+
+Контент: Фильтрация успешно завершена. Включена автоматическая выгрузка
+
+Файл на СОА: `/opt/zaslon/zmanager/data/pfilter_storage/1698730919_2023_10_31____08_41_59_046483.pcap`"
+    "status": "Resolved"
+    "impactStatus": "NoImpact"
+    "summary": "RCE Attempt (CVE-2021-41773)"
+    "createdBy": "p.delyukin@cloud.rcm"
+    "createdAt": 1695680386693
+    "_type": "case"
+    "endDate": 1695711410980
+    "pap": 2
+    customFields:
+      ncircc-bulletin-id:
+        "string": "WRNG-23-10-5894"
+        "order": 4
+      ncircc-class-attack:
+        "order": 3
+        "string": "Попытки эксплуатации уязвимости;attack"
+      class-attack:
+        "order": 2
+        "string": "Exploit"
+      first-time:
+        "date": 1698730162000
+        "order": 0
+      last-time:
+        "date": 1698730164000
+        "order": 1
+    "severity": 2
+    "flag": false
+    permissions:
+    "_id": "~617078800"
+    "updatedAt": 1698737890386
+    "resolutionStatus": "TruePositive"
+  "operation": "update"
+  details:
+    customFields:
+      first-time:
+        "date": 1698730162000
+        "order": 0
+      last-time:
+        "date": 1698730164000
+        "order": 0
+  "objectId": "~617078800"
+  "organisationId": "~20488"
+  "objectType": "case"
+  "organisation": "RCM"
+observables:
+  1.
+    "_type": "Observable"
+    "sighted": false
+    "tlp": 2
+    "_createdAt": 1695711233719
+    "dataType": "domain"
+    "startDate": 1695711233719
+    "_createdBy": "p.delyukin@cloud.rcm"
+    "data": "asyncfox.xyz"
+    extraData:
+    "ignoreSimilarity": false
+    "ioc": true
+    "message": ""
+    reports:
+      MISP_2_1:
+        taxonomies:
+          1.
+            "level": "suspicious"
+            "namespace": "MISP"
+            "predicate": "Search"
+            "value": "40 event(s)"
+      VirusTotal_GetReport_3_1:
+        taxonomies:
+          1.
+            "value": "12/89"
+            "level": "malicious"
+            "namespace": "VT"
+            "predicate": "GetReport"
+    "_id": "~595034120"
+    tags:
+      1. "misp:Network activity="domain""
+  2.
+    "_createdBy": "p.delyukin@cloud.rcm"
+    "dataType": "url"
+    "message": ""
+    tags:
+      1. "misp:Network activity="url""
+    "tlp": 2
+    "_createdAt": 1695711299244
+    "_id": "~226271264"
+    "sighted": false
+    "_type": "Observable"
+    "ioc": true
+    "startDate": 1695711299244
+    "data": "http://download.asyncfox.xyz/download/dupa2.sh"
+    extraData:
+    "ignoreSimilarity": false
+    reports:
+      MISP_2_1:
+        taxonomies:
+          1.
+            "predicate": "Search"
+            "value": "204 event(s)"
+            "level": "suspicious"
+            "namespace": "MISP"
+      VirusTotal_GetReport_3_1:
+        taxonomies:
+          1.
+            "value": "14/89"
+            "level": "malicious"
+            "namespace": "VT"
+            "predicate": "GetReport"
+  3.
+    "_createdAt": 1695711344107
+    "_id": "~431702264"
+    "message": ""
+    "sighted": false
+    "_createdBy": "p.delyukin@cloud.rcm"
+    "data": "Custom-AsyncHttpClient"
+    "dataType": "user-agent"
+    extraData:
+    tags:
+      1. "misp:Payload delivery="user-agent""
+    "_type": "Observable"
+    "ioc": true
+    reports:
+      MISP_2_1:
+        taxonomies:
+          1.
+            "level": "suspicious"
+            "namespace": "MISP"
+            "predicate": "Search"
+            "value": "166 event(s)"
+    "startDate": 1695711344107
+    "ignoreSimilarity": false
+    "tlp": 2
+  4.
+    "startDate": 1695711266210
+    "tlp": 2
+    tags:
+      1. "misp:Payload delivery="filename""
+    "_createdAt": 1695711266210
+    "_createdBy": "p.delyukin@cloud.rcm"
+    "ioc": true
+    reports:
+      MISP_2_1:
+        taxonomies:
+          1.
+            "predicate": "Search"
+            "value": "84 event(s)"
+            "level": "suspicious"
+            "namespace": "MISP"
+    "sighted": false
+    extraData:
+    "ignoreSimilarity": false
+    "_id": "~595038216"
+    "_type": "Observable"
+    "data": "dupa2.sh"
+    "dataType": "filename"
+    "message": ""
+  5.
+    "_id": "~594874376"
+    "ioc": false
+    tags:
+      1. "snort"
+    "tlp": 2
+    "_createdBy": "p.delyukin@cloud.rcm"
+    "_type": "Observable"
+    "dataType": "snort_sid"
+    "sighted": false
+    "_createdAt": 1695680386713
+    "data": "2034125, 96040057, 2034125, 2011465, 58276"
+    extraData:
+    reports:
+      ZPMSig_1_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "zpmSig"
+            "predicate": "Precision"
+            "value": "unknown"
+    "startDate": 1695680386713
+  6.
+    "dataType": "ip"
+    reports:
+      ZPMSig_1_0:
+        taxonomies:
+          1.
+            "predicate": "IP"
+            "value": "NotFound"
+            "level": "info"
+            "namespace": "ZPM_Sensor"
+      AbuseIPDB_1_0:
+        taxonomies:
+          1.
+            "predicate": "Records"
+            "value": 20
+            "level": "malicious"
+            "namespace": "AbuseIPDB"
+      GreyNoise_3_1:
+        taxonomies:
+          1.
+            "level": "malicious"
+            "namespace": "GreyNoise Community"
+            "predicate": "Type"
+            "value": "Internet Noise"
+          2.
+            "namespace": "GreyNoise Community"
+            "predicate": "classification"
+            "value": "malicious"
+            "level": "malicious"
+          3.
+            "predicate": "Name"
+            "value": "unknown"
+            "level": "malicious"
+            "namespace": "GreyNoise Community"
+      MISP_2_1:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "MISP"
+            "predicate": "Search"
+            "value": "0 events"
+    "_createdBy": "p.delyukin@cloud.rcm"
+    "startDate": 1695680386720
+    "tlp": 2
+    "_createdAt": 1695680386720
+    "_id": "~431546616"
+    "_type": "Observable"
+    "data": "122.114.78.145"
+    "ioc": true
+    tags:
+      1. "external"
+    extraData:
+    "sighted": false
+  7.
+    "_id": "~226136096"
+    "startDate": 1695680386727
+    "sighted": false
+    extraData:
+    "ignoreSimilarity": true
+    reports:
+    "_createdBy": "p.delyukin@cloud.rcm"
+    "data": "ftp://10.67.1.21/traffic/690006/1695675785_2023_09_26____00_03_05_235776.pcap"
+    "message": "Download a piece of traffic"
+    "ioc": true
+    tags:
+      1. "112.3 KB"
+    "tlp": 2
+    "_createdAt": 1695680386727
+    "_type": "Observable"
+    "dataType": "url_pcap"
+  8.
+    "_createdAt": 1695680386707
+    "_type": "Observable"
+    "sighted": false
+    "_id": "~431542520"
+    extraData:
+    "tlp": 2
+    "data": "690006:46.61.209.169"
+    "dataType": "ip_home"
+    "ioc": false
+    reports:
+      ZPMSig_1_0:
+        taxonomies:
+          1.
+            "value": "online"
+            "level": "safe"
+            "namespace": "ZPM_Sensor"
+            "predicate": "Status"
+    "startDate": 1695680386707
+    tags:
+      1. "home"
+    "_createdBy": "p.delyukin@cloud.rcm"
+  9.
+    "dataType": "snort_sid"
+    extraData:
+    "ioc": false
+    "sighted": false
+    "_createdBy": "p.pospelov@cloud.rcm"
+    reports:
+    "tlp": 2
+    "_createdAt": 1697861430724
+    "data": "2034125, 2034125, 96040057, 58276, 2011465"
+    "startDate": 1697861430724
+    tags:
+      1. "snort"
+    "_id": "~83439688"
+    "_type": "Observable"
+  10.
+    "data": "690006:172.16.10.56"
+    "dataType": "ip_home"
+    "sighted": false
+    "_createdAt": 1697861430731
+    extraData:
+    tags:
+      1. "home"
+    "tlp": 2
+    "_id": "~247181312"
+    "ioc": false
+    "startDate": 1697861430731
+    "_createdBy": "p.pospelov@cloud.rcm"
+    "_type": "Observable"
+    reports:
+  11.
+    "_createdAt": 1697861430738
+    "_id": "~246341672"
+    "sighted": false
+    "dataType": "url_pcap"
+    "ioc": true
+    tags:
+      1. "18.3 KB"
+    "tlp": 2
+    "_type": "Observable"
+    "ignoreSimilarity": true
+    reports:
+    "_createdBy": "p.pospelov@cloud.rcm"
+    "data": "ftp://10.67.1.21/traffic/690006/1697855736_2023_10_21____05_35_36_273482.pcap"
+    extraData:
+    "message": "Download a piece of traffic"
+    "startDate": 1697861430738
+  12.
+    extraData:
+    "ioc": false
+    reports:
+    "data": "2034125, 2011465, 58276, 2034125, 96040057"
+    "dataType": "snort_sid"
+    tags:
+      1. "snort"
+    "_createdAt": 1698720925743
+    "_createdBy": "i.bolobin@cloud.rcm"
+    "startDate": 1698720925743
+    "_id": "~290156640"
+    "_type": "Observable"
+    "sighted": false
+    "tlp": 2
+  13.
+    "_id": "~498520312"
+    "data": "690006:46.61.209.93"
+    "ioc": false
+    reports:
+    "_createdAt": 1698720925737
+    "tlp": 2
+    "_type": "Observable"
+    "dataType": "ip_home"
+    extraData:
+    "startDate": 1698720925737
+    "_createdBy": "i.bolobin@cloud.rcm"
+    "sighted": false
+    tags:
+      1. "home"
+  14.
+    "_createdAt": 1698720925729
+    "_createdBy": "i.bolobin@cloud.rcm"
+    "dataType": "url_pcap"
+    "_id": "~167518392"
+    "_type": "Observable"
+    extraData:
+    reports:
+    "startDate": 1698720925729
+    "ignoreSimilarity": true
+    "ioc": true
+    "sighted": false
+    "data": "ftp://10.67.1.21/traffic/690006/1698717417_2023_10_31____04_56_57_297151.pcap"
+    "message": "Download a piece of traffic"
+    tags:
+      1. "216.6 KB"
+    "tlp": 2
+  15.
+    "data": "ftp://10.67.1.21/traffic/690006/1698730919_2023_10_31____08_41_59_046483.pcap"
+    "ioc": true
+    "sighted": false
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    "_id": "~498938104"
+    extraData:
+    reports:
+    "_createdAt": 1698737890376
+    "dataType": "url_pcap"
+    "message": "Download a piece of traffic"
+    tags:
+      1. "57.4 KB"
+    "tlp": 2
+    "_type": "Observable"
+    "ignoreSimilarity": true
+    "startDate": 1698737890376
+  16.
+    "_id": "~208470080"
+    "data": "96040057, 2034125, 2011465, 2034125, 58276"
+    "startDate": 1698737890356
+    tags:
+      1. "snort"
+    "tlp": 2
+    "_type": "Observable"
+    "dataType": "snort_sid"
+    "ioc": false
+    reports:
+    "sighted": false
+    extraData:
+    "_createdAt": 1698737890356
+    "_createdBy": "d.surzhikov@cloud.rcm"
+  17.
+    "_createdBy": "d.surzhikov@cloud.rcm"
+    "sighted": false
+    "ioc": false
+    "startDate": 1698737890364
+    reports:
+    tags:
+      1. "home"
+    "tlp": 2
+    "_id": "~498934008"
+    "_type": "Observable"
+    "data": "690006:46.61.209.163"
+    "_createdAt": 1698737890364
+    "dataType": "ip_home"
+    extraData:
+ttp:
+  1.
+    "_createdAt": 1695711397159
+    "_createdBy": "p.delyukin@cloud.rcm"
+    "_id": "~226910368"
+    extraData:
+      pattern:
+        "patternId": "T1006"
+        tactics:
+          1. "defense-evasion"
+        "_createdAt": 1679910378216
+        "detection": "Monitor handle opens on drive volumes that are made by processes to determine when they may directly access logical drives. (Citation: Github PowerSploit Ninjacopy)
+
+Monitor processes and command-line arguments for actions that could be taken to copy files from the logical drive and evade common file system protections. Since this technique may also be used through [PowerShell](https://attack.mitre.org/techniques/T1059/001), additional logging of PowerShell scripts is recommended."
+        defenseBypassed:
+          1. "File monitoring"
+          2. "File system access controls"
+        extraData:
+        "name": "Direct Volume Access"
+        platforms:
+          1. "Windows"
+        "remoteSupport": false
+        "url": "https://attack.mitre.org/techniques/T1006"
+        "_id": "~73856"
+        "_type": "Pattern"
+        "revoked": false
+        systemRequirements:
+        "_createdBy": "admin@thehive.local"
+        dataSources:
+          1. "Drive: Drive Access"
+          2. "Command: Command Execution"
+        permissionsRequired:
+          1. "Administrator"
+        "version": "2.0"
+        "description": "Adversaries may directly access a volume to bypass file access controls and file system monitoring. Windows allows programs to have direct access to logical volumes. Programs with direct access may read and write files directly from the drive by analyzing file system data structures. This technique bypasses Windows file access controls as well as file system monitoring tools. (Citation: Hakobyan 2009)
+
+Utilities, such as NinjaCopy, exist to perform these actions in PowerShell. (Citation: Github PowerSploit Ninjacopy)"
+        "patternType": "attack-pattern"
+    "occurDate": 1695711360000
+    "patternId": "T1006"
+    "tactic": "defense-evasion"
+
+
+2023/10/31 07:51:51 	---------------
+	EVENTS:
+"source": "rcmros"
+event:
+  "operation": "update"
+  details:
+  "objectId": "~270094456"
+  "rootId": "~270094456"
+  "organisation": "РЦМ в ЮФО"
+  "objectType": "case"
+  "base": false
+  "startDate": 1698738507709
+  "requestId": "d5ebb65a9dc38361:-71fbee6f:18af3b1468f:-8000:72713"
+  object:
+    "owner": "analyst@mail.rcm"
+    "severity": 2
+    "impactStatus": ""
+    permissions:
+    customFields:
+      event-source:
+        "order": 4
+        "string": "Заслон-ПМ. Ведомственное СОА"
+      first-time:
+        "order": 2
+        "date": 1698731348000
+      last-time:
+        "date": 1698731348000
+        "order": 3
+      ncircc-class-attack:
+        "order": 0
+        "string": "Попытки внедрения ВПО;attack"
+      b2mid:
+        "integer": 54003
+        "order": 1
+    "updatedBy": ""
+    "description": "В 08:49:08 2023-10-31 (мск) в ходе сетевого взаимодействия IP-адреса 186.195.239.144 (Бразилия) с контролируемым IP-адресом 62.183.107.70 зафиксированы компьютерные воздействия (количество: 3), свидетельствующие об осуществлении компьютерной атаки, нацеленной на получение несанкционированного доступа к контролируемому ресурсу методом эксплуатации уязвимости видеорегистратора «MVPower» по протоколу прикладного уровня «HTTP» (порт 80/TCP) с использованием специального программного обеспечения типа «Metasploit». КА была безуспешна. "
+    tags:
+      1. "Object:name="ГБУЗ АО МИАЦ""
+      2. "Sensor:id=630091"
+      3. "NCIRCC:attack="Попытки внедрения ВПО""
+      4. "geo:alpha2="BR""
+      5. "Object:id=630091"
+    "flag": true
+    "pap": 2
+    "_id": "~270094456"
+    "updatedAt": 0
+    "title": "B2M-54003 Попытки внедрения ВПО"
+    "createdAt": 1698738507701
+    "startDate": 1698738534477
+    "createdBy": "analyst@mail.rcm"
+    "caseId": 6081
+    "summary": ""
+    stats:
+    "endDate": 0
+    "tlp": 2
+    "status": "Open"
+    "id": "~270094456"
+    "_type": "case"
+    "resolutionStatus": ""
+  "organisationId": "~41058528"
+observables:
+  1.
+    extraData:
+    tags:
+      1. "misp:Network activity="snort""
+    "tlp": 2
+    "ignoreSimilarity": false
+    "ioc": false
+    "message": "Идентификаторы сработавших сигнатур"
+    "startDate": 1698738507919
+    "_id": "~433594504"
+    "sighted": false
+    "_createdAt": 1698738507919
+    "_createdBy": "analyst@mail.rcm"
+    "_type": "Observable"
+    "data": "2025883,43037295,56009370"
+    "dataType": "snort_sid"
+    reports:
+ttp:
+
+
+2023/10/31 07:51:51 	---------------
+	EVENTS:
+ttp:
+  1.
+    "_id": "~229286104"
+    extraData:
+      pattern:
+        "_createdAt": 1647277031402
+        defenseBypassed:
+        platforms:
+          1. "Windows"
+          2. "IaaS"
+          3. "Network"
+          4. "Linux"
+          5. "macOS"
+          6. "Containers"
+        "revoked": false
+        tactics:
+          1. "initial-access"
+        "description": "Adversaries may attempt to take advantage of a weakness in an Internet-facing computer or program using software, data, or commands in order to cause unintended or unanticipated behavior. The weakness in the system can be a bug, a glitch, or a design vulnerability. These applications are often websites, but can include databases (like SQL)(Citation: NVD CVE-2016-6662), standard services (like SMB(Citation: CIS Multiple SMB Vulnerabilities) or SSH), network device administration and management protocols (like SNMP and Smart Install(Citation: US-CERT TA18-106A Network Infrastructure Devices 2018)(Citation: Cisco Blog Legacy Device Attacks)), and any other applications with Internet accessible open sockets, such as web servers and related services.(Citation: NVD CVE-2014-7169) Depending on the flaw being exploited this may include [Exploitation for Defense Evasion](https://attack.mitre.org/techniques/T1211). 
+
+If an application is hosted on cloud-based infrastructure and/or is containerized, then exploiting it may lead to compromise of the underlying instance or container. This can allow an adversary a path to access the cloud or container APIs, exploit container host access via [Escape to Host](https://attack.mitre.org/techniques/T1611), or take advantage of weak identity and access management policies.
+
+For websites and databases, the OWASP top 10 and CWE top 25 highlight the most common web-based vulnerabilities.(Citation: OWASP Top 10)(Citation: CWE top 25)"
+        "detection": "Monitor application logs for abnormal behavior that may indicate attempted or successful exploitation. Use deep packet inspection to look for artifacts of common exploit traffic, such as SQL injection. Web Application Firewalls may detect improper inputs attempting exploitation."
+        "remoteSupport": false
+        systemRequirements:
+        "_createdBy": "admin@thehive.local"
+        "_id": "~114912"
+        "_type": "Pattern"
+        dataSources:
+          1. "Application Log: Application Log Content"
+          2. "Network Traffic: Network Traffic Content"
+        extraData:
+        "patternType": "attack-pattern"
+        "url": "https://attack.mitre.org/techniques/T1190"
+        "name": "Exploit Public-Facing Application"
+        "patternId": "T1190"
+        permissionsRequired:
+        "version": "2.3"
+    "occurDate": 1698736332000
+    "patternId": "T1190"
+    "tactic": "Initial Access"
+    "_createdAt": 1698736305477
+    "_createdBy": "analyst@mail.rcm"
+  2.
+    "_id": "~270020728"
+    extraData:
+      pattern:
+        platforms:
+          1. "macOS"
+          2. "Linux"
+        "url": "https://attack.mitre.org/techniques/T1059/004"
+        dataSources:
+          1. "Command: Command Execution"
+          2. "Process: Process Creation"
+        "name": "Unix Shell"
+        permissionsRequired:
+          1. "User"
+          2. "root"
+        "version": "1.1"
+        tactics:
+          1. "execution"
+        "_createdAt": 1647277097632
+        "description": "Adversaries may abuse Unix shell commands and scripts for execution. Unix shells are the primary command prompt on Linux and macOS systems, though many variations of the Unix shell exist (e.g. sh, bash, zsh, etc.) depending on the specific OS or distribution.(Citation: DieNet Bash)(Citation: Apple ZShell) Unix shells can control every aspect of a system, with certain commands requiring elevated privileges.
+
+Unix shells also support scripts that enable sequential execution of commands as well as other typical programming operations such as conditionals and loops. Common uses of shell scripts include long or repetitive tasks, or the need to run the same set of commands on multiple systems.
+
+Adversaries may abuse Unix shells to execute various commands or payloads. Interactive shells may be accessed through command and control channels or during lateral movement such as with [SSH](https://attack.mitre.org/techniques/T1021/004). Adversaries may also leverage shell scripts to deliver and execute multiple commands on victims or as part of payloads used for persistence."
+        "detection": "Unix shell usage may be common on administrator, developer, or power user systems, depending on job function. If scripting is restricted for normal users, then any attempt to enable scripts running on a system would be considered suspicious. If scripts are not commonly used on a system, but enabled, scripts running out of cycle from patching or other administrator functions are suspicious. Scripts should be captured from the file system when possible to determine their actions and intent.
+
+Scripts are likely to perform actions with various effects on a system that may generate events, depending on the types of monitoring used. Monitor processes and command-line arguments for script execution and subsequent behavior. Actions may be related to network and system information discovery, collection, or other scriptable post-compromise behaviors and could be used as indicators of detection leading back to the source script. "
+        "patternId": "T1059.004"
+        "remoteSupport": true
+        "revoked": false
+        systemRequirements:
+        "_createdBy": "admin@thehive.local"
+        "_id": "~303112"
+        "_type": "Pattern"
+        defenseBypassed:
+        extraData:
+        "patternType": "attack-pattern"
+      patternParent:
+        systemRequirements:
+        "_createdBy": "admin@thehive.local"
+        "_id": "~32872"
+        "_type": "Pattern"
+        defenseBypassed:
+        "description": "Adversaries may abuse command and script interpreters to execute commands, scripts, or binaries. These interfaces and languages provide ways of interacting with computer systems and are a common feature across many different platforms. Most systems come with some built-in command-line interface and scripting capabilities, for example, macOS and Linux distributions include some flavor of [Unix Shell](https://attack.mitre.org/techniques/T1059/004) while Windows installations include the [Windows Command Shell](https://attack.mitre.org/techniques/T1059/003) and [PowerShell](https://attack.mitre.org/techniques/T1059/001).
+
+There are also cross-platform interpreters such as [Python](https://attack.mitre.org/techniques/T1059/006), as well as those commonly associated with client applications such as [JavaScript](https://attack.mitre.org/techniques/T1059/007) and [Visual Basic](https://attack.mitre.org/techniques/T1059/005).
+
+Adversaries may abuse these technologies in various ways as a means of executing arbitrary commands. Commands and scripts can be embedded in [Initial Access](https://attack.mitre.org/tactics/TA0001) payloads delivered to victims as lure documents or as secondary payloads downloaded from an existing C2. Adversaries may also execute commands through interactive terminals/shells, as well as utilize various [Remote Services](https://attack.mitre.org/techniques/T1021) in order to achieve remote Execution.(Citation: Powershell Remote Commands)(Citation: Cisco IOS Software Integrity Assurance - Command History)(Citation: Remote Shell Execution in Python)"
+        "detection": "Command-line and scripting activities can be captured through proper logging of process execution with command-line arguments. This information can be useful in gaining additional insight to adversaries' actions through how they use native processes or custom tools. Also monitor for loading of modules associated with specific languages.
+
+If scripting is restricted for normal users, then any attempt to enable scripts running on a system would be considered suspicious. If scripts are not commonly used on a system, but enabled, scripts running out of cycle from patching or other administrator functions are suspicious. Scripts should be captured from the file system when possible to determine their actions and intent.
+
+Scripts are likely to perform actions with various effects on a system that may generate events, depending on the types of monitoring used. Monitor processes and command-line arguments for script execution and subsequent behavior. Actions may be related to network and system information discovery, collection, or other scriptable post-compromise behaviors and could be used as indicators of detection leading back to the source script."
+        permissionsRequired:
+          1. "User"
+        tactics:
+          1. "execution"
+        "url": "https://attack.mitre.org/techniques/T1059"
+        "version": "2.2"
+        extraData:
+        platforms:
+          1. "Linux"
+          2. "macOS"
+          3. "Windows"
+          4. "Network"
+        "remoteSupport": true
+        dataSources:
+          1. "Command: Command Execution"
+          2. "Process: Process Creation"
+          3. "Module: Module Load"
+          4. "Script: Script Execution"
+        "patternType": "attack-pattern"
+        "_createdAt": 1647277028643
+        "name": "Command and Scripting Interpreter"
+        "patternId": "T1059"
+        "revoked": false
+    "occurDate": 1698736331000
+    "patternId": "T1059.004"
+    "tactic": "Execution"
+    "_createdAt": 1698736305340
+    "_createdBy": "analyst@mail.rcm"
+"source": "rcmros"
+event:
+  "objectId": "~270008440"
+  "startDate": 1698737852740
+  "rootId": "~270008440"
+  object:
+    "id": "~270008440"
+    "createdBy": "analyst@mail.rcm"
+    "createdAt": 1698736303677
+    "impactStatus": "NoImpact"
+    "status": "Resolved"
+    permissions:
+    "_type": "case"
+    "title": "B2M-53997 Попытки внедрения ВПО"
+    "pap": 2
+    "summary": "Blocked"
+    "_id": "~270008440"
+    "description": "В 03:17:22 2023-10-31 (мск) в ходе сетевого взаимодействия IP-адреса 112.121.239.92 (Республика Корея) с контролируемым IP-адресом 62.183.107.68 зафиксированы компьютерные воздействия (количество: 3), свидетельствующие об осуществлении компьютерной атаки, нацеленной на получение несанкционированного доступа к контролируемому ресурсу методом эксплуатации уязвимости видеорегистратора «MVPower» по протоколу прикладного уровня «HTTP» (порт 80/TCP) с использованием специального программного обеспечения типа «Metasploit». КА была безуспешна. "
+    "flag": true
+    "owner": "analyst@mail.rcm"
+    "caseId": 6075
+    "startDate": 1698736330482
+    "endDate": 1698737852712
+    tags:
+      1. "Object:name="ГБУЗ АО МИАЦ""
+      2. "Sensor:id=630091"
+      3. "NCIRCC:attack="Попытки внедрения ВПО""
+      4. "geo:alpha2="KR""
+      5. "Object:id=630091"
+    customFields:
+      ncircc-class-attack:
+        "order": 0
+        "string": "Попытки внедрения ВПО;attack"
+      b2mid:
+        "integer": 53997
+        "order": 1
+      event-source:
+        "order": 4
+        "string": "Заслон-ПМ. Ведомственное СОА"
+      first-time:
+        "date": 1698711442000
+        "order": 2
+      last-time:
+        "date": 1698711442000
+        "order": 3
+    "updatedBy": "annin@mail.rcm"
+    "resolutionStatus": "TruePositive"
+    "tlp": 2
+    stats:
+    "updatedAt": 1698737852736
+    "severity": 2
+  "organisation": "РЦМ в ЮФО"
+  "operation": "update"
+  details:
+    "status": "Resolved"
+    "impactStatus": "NoImpact"
+    "endDate": 1698737852712
+    "resolutionStatus": "TruePositive"
+    "summary": "Blocked"
+  "objectType": "case"
+  "base": true
+  "requestId": "d5ebb65a9dc38361:-71fbee6f:18af3b1468f:-8000:72696"
+  "organisationId": "~41058528"
+observables:
+  1.
+    "dataType": "url_pcap"
+    "sighted": false
+    "_type": "Observable"
+    "data": "/dbdata/dump/events/53997/B2M-53997.pcap"
+    extraData:
+    "ioc": false
+    reports:
+    "startDate": 1698736304077
+    "tlp": 2
+    "_createdBy": "analyst@mail.rcm"
+    "message": "Основной фрагмент сетевого трафика с указанной активностью"
+    tags:
+      1. "misp:Network activity="attachment""
+      2. "b2m:dumpfile="main""
+    "_createdAt": 1698736304077
+    "_id": "~188284952"
+    "ignoreSimilarity": false
+  2.
+    "tlp": 2
+    "_createdAt": 1698736303910
+    "_id": "~229257432"
+    "ignoreSimilarity": false
+    "sighted": false
+    "_createdBy": "analyst@mail.rcm"
+    "dataType": "snort_sid"
+    "ioc": false
+    "data": "43037295,56009370,2025883"
+    extraData:
+    reports:
+    "startDate": 1698736303910
+    tags:
+      1. "misp:Network activity="snort""
+    "_type": "Observable"
+    "message": "Идентификаторы сработавших сигнатур"
+  3.
+    "startDate": 1698736304203
+    "dataType": "ip"
+    "ignoreSimilarity": false
+    reports:
+    "sighted": false
+    tags:
+      1. "misp:Network activity="ip-src""
+      2. "b2m:ip_ext=112.121.239.92"
+    "_createdBy": "analyst@mail.rcm"
+    "_id": "~417058816"
+    "_type": "Observable"
+    "data": "112.121.239.92"
+    "ioc": true
+    "tlp": 2
+    "_createdAt": 1698736304203
+    extraData:
+    "message": "Источник активности"
+  4.
+    "ignoreSimilarity": false
+    "sighted": false
+    "tlp": 2
+    "_type": "Observable"
+    "data": "93.123.85.29"
+    extraData:
+    "_createdAt": 1698736304502
+    "_createdBy": "analyst@mail.rcm"
+    tags:
+      1. "misp:Payload delivery="ip-src""
+    "_id": "~229122192"
+    reports:
+    "startDate": 1698736304502
+    "dataType": "ip"
+    "ioc": true
+    "message": "Выявлено в ходе анализа фрагмента сетевого взаимодействия"
+  5.
+    "data": "jaws"
+    "ignoreSimilarity": false
+    "sighted": false
+    "tlp": 2
+    "_createdBy": "analyst@mail.rcm"
+    "_id": "~417079296"
+    "dataType": "filename"
+    extraData:
+    "ioc": true
+    reports:
+    tags:
+      1. "misp:Payload delivery="filename""
+    "message": "Выявлено в ходе анализа фрагмента сетевого взаимодействия"
+    "startDate": 1698736304823
+    "_createdAt": 1698736304823
+    "_type": "Observable"
+  6.
+    "_type": "Observable"
+    "data": "630091:62.183.107.68"
+    extraData:
+    "ignoreSimilarity": false
+    "ioc": false
+    "_createdBy": "analyst@mail.rcm"
+    "dataType": "ip_home"
+    "message": "Контролируемый IP-адрес"
+    reports:
+    "sighted": false
+    "startDate": 1698736304341
+    tags:
+      1. "misp:Network activity="ip-dst""
+      2. "b2m:ip_home=62.183.107.68"
+    "_createdAt": 1698736304341
+    "tlp": 2
+    "_id": "~270012536"
+  7.
+    "ioc": true
+    "sighted": false
+    "startDate": 1698736304661
+    "_createdAt": 1698736304661
+    extraData:
+    "_type": "Observable"
+    reports:
+    "data": "93.123.85.29/jaws"
+    "_createdBy": "analyst@mail.rcm"
+    "_id": "~417075200"
+    "message": "Выявлено в ходе анализа фрагмента сетевого взаимодействия"
+    tags:
+      1. "misp:Payload delivery="url""
+    "tlp": 2
+    "dataType": "url"
+    "ignoreSimilarity": false
+
+
+2023/10/31 07:51:51 	---------------
+	EVENTS:
+observables:
+  1.
+    "_createdBy": "analyst@mail.rcm"
+    reports:
+    "_createdAt": 1698737417217
+    "_type": "Observable"
+    "dataType": "ip_home"
+    extraData:
+    "ioc": false
+    "sighted": false
+    "tlp": 2
+    "_id": "~188362776"
+    "data": "630125:176.100.102.141"
+    "ignoreSimilarity": false
+    "message": "Контролируемый IP-адрес"
+    "startDate": 1698737417217
+    tags:
+      1. "misp:Network activity="ip-dst""
+      2. "b2m:ip_home=176.100.102.141"
+  2.
+    "tlp": 2
+    "dataType": "snort_sid"
+    extraData:
+    "ignoreSimilarity": false
+    "message": "Идентификаторы сработавших сигнатур"
+    "startDate": 1698737416822
+    "_type": "Observable"
+    "data": "2025883"
+    "_id": "~417173504"
+    "ioc": false
+    reports:
+    "_createdAt": 1698737416822
+    "_createdBy": "analyst@mail.rcm"
+    "sighted": false
+    tags:
+      1. "misp:Network activity="snort""
+  3.
+    "_createdBy": "analyst@mail.rcm"
+    "_id": "~229339352"
+    "_type": "Observable"
+    "sighted": false
+    "tlp": 2
+    "ignoreSimilarity": false
+    reports:
+    "startDate": 1698737417082
+    "_createdAt": 1698737417082
+    "data": "113.26.250.140"
+    "dataType": "ip"
+    extraData:
+    "ioc": true
+    "message": "Источник активности"
+    tags:
+      1. "misp:Network activity="ip-src""
+      2. "b2m:ip_ext=113.26.250.140"
+  4.
+    "data": "jaws"
+    "dataType": "filename"
+    tags:
+      1. "misp:Payload delivery="filename""
+    "tlp": 2
+    "_createdAt": 1698737417797
+    "_type": "Observable"
+    extraData:
+    "ioc": true
+    "_createdBy": "analyst@mail.rcm"
+    "ignoreSimilarity": false
+    reports:
+    "sighted": false
+    "_id": "~433569928"
+    "message": "Выявлено в ходе анализа фрагмента сетевого взаимодействия"
+    "startDate": 1698737417797
+  5.
+    "_createdAt": 1698737417358
+    "data": "45.12.253.180/jaws"
+    "dataType": "url"
+    extraData:
+    "ignoreSimilarity": false
+    reports:
+    "sighted": false
+    "startDate": 1698737417358
+    "_type": "Observable"
+    "ioc": true
+    "message": "Выявлено в ходе анализа фрагмента сетевого взаимодействия"
+    "_createdBy": "analyst@mail.rcm"
+    "_id": "~433565832"
+    tags:
+      1. "misp:Payload delivery="url""
+    "tlp": 2
+  6.
+    "_createdBy": "analyst@mail.rcm"
+    extraData:
+    "ignoreSimilarity": false
+    "tlp": 2
+    "_id": "~598044856"
+    "_type": "Observable"
+    "data": "/dbdata/dump/events/54001/B2M-54001.pcap"
+    "ioc": false
+    "sighted": false
+    tags:
+      1. "misp:Network activity="attachment""
+      2. "b2m:dumpfile="main""
+    "_createdAt": 1698737416968
+    "dataType": "url_pcap"
+    "message": "Основной фрагмент сетевого трафика с указанной активностью"
+    reports:
+    "startDate": 1698737416968
+  7.
+    "message": "Выявлено в ходе анализа фрагмента сетевого взаимодействия"
+    "sighted": false
+    "startDate": 1698737417665
+    "_type": "Observable"
+    "dataType": "ip"
+    "ioc": true
+    reports:
+    "_createdBy": "analyst@mail.rcm"
+    "_id": "~228630760"
+    "data": "45.12.253.180"
+    extraData:
+    "ignoreSimilarity": false
+    tags:
+      1. "misp:Payload delivery="ip-src""
+    "tlp": 2
+    "_createdAt": 1698737417665
+ttp:
+  1.
+    "occurDate": 1698737445000
+    "patternId": "T1190"
+    "tactic": "Initial Access"
+    "_createdAt": 1698737418974
+    "_createdBy": "analyst@mail.rcm"
+    "_id": "~270078072"
+    extraData:
+      pattern:
+        "name": "Exploit Public-Facing Application"
+        "revoked": false
+        tactics:
+          1. "initial-access"
+        "_createdBy": "admin@thehive.local"
+        dataSources:
+          1. "Application Log: Application Log Content"
+          2. "Network Traffic: Network Traffic Content"
+        defenseBypassed:
+        "description": "Adversaries may attempt to take advantage of a weakness in an Internet-facing computer or program using software, data, or commands in order to cause unintended or unanticipated behavior. The weakness in the system can be a bug, a glitch, or a design vulnerability. These applications are often websites, but can include databases (like SQL)(Citation: NVD CVE-2016-6662), standard services (like SMB(Citation: CIS Multiple SMB Vulnerabilities) or SSH), network device administration and management protocols (like SNMP and Smart Install(Citation: US-CERT TA18-106A Network Infrastructure Devices 2018)(Citation: Cisco Blog Legacy Device Attacks)), and any other applications with Internet accessible open sockets, such as web servers and related services.(Citation: NVD CVE-2014-7169) Depending on the flaw being exploited this may include [Exploitation for Defense Evasion](https://attack.mitre.org/techniques/T1211). 
+
+If an application is hosted on cloud-based infrastructure and/or is containerized, then exploiting it may lead to compromise of the underlying instance or container. This can allow an adversary a path to access the cloud or container APIs, exploit container host access via [Escape to Host](https://attack.mitre.org/techniques/T1611), or take advantage of weak identity and access management policies.
+
+For websites and databases, the OWASP top 10 and CWE top 25 highlight the most common web-based vulnerabilities.(Citation: OWASP Top 10)(Citation: CWE top 25)"
+        extraData:
+        platforms:
+          1. "Windows"
+          2. "IaaS"
+          3. "Network"
+          4. "Linux"
+          5. "macOS"
+          6. "Containers"
+        "remoteSupport": false
+        "_createdAt": 1647277031402
+        "_type": "Pattern"
+        "detection": "Monitor application logs for abnormal behavior that may indicate attempted or successful exploitation. Use deep packet inspection to look for artifacts of common exploit traffic, such as SQL injection. Web Application Firewalls may detect improper inputs attempting exploitation."
+        "patternType": "attack-pattern"
+        permissionsRequired:
+        "url": "https://attack.mitre.org/techniques/T1190"
+        "_id": "~114912"
+        systemRequirements:
+        "version": "2.3"
+        "patternId": "T1190"
+  2.
+    extraData:
+      pattern:
+        extraData:
+        "name": "Unix Shell"
+        "remoteSupport": true
+        "revoked": false
+        "version": "1.1"
+        "_type": "Pattern"
+        "description": "Adversaries may abuse Unix shell commands and scripts for execution. Unix shells are the primary command prompt on Linux and macOS systems, though many variations of the Unix shell exist (e.g. sh, bash, zsh, etc.) depending on the specific OS or distribution.(Citation: DieNet Bash)(Citation: Apple ZShell) Unix shells can control every aspect of a system, with certain commands requiring elevated privileges.
+
+Unix shells also support scripts that enable sequential execution of commands as well as other typical programming operations such as conditionals and loops. Common uses of shell scripts include long or repetitive tasks, or the need to run the same set of commands on multiple systems.
+
+Adversaries may abuse Unix shells to execute various commands or payloads. Interactive shells may be accessed through command and control channels or during lateral movement such as with [SSH](https://attack.mitre.org/techniques/T1021/004). Adversaries may also leverage shell scripts to deliver and execute multiple commands on victims or as part of payloads used for persistence."
+        "detection": "Unix shell usage may be common on administrator, developer, or power user systems, depending on job function. If scripting is restricted for normal users, then any attempt to enable scripts running on a system would be considered suspicious. If scripts are not commonly used on a system, but enabled, scripts running out of cycle from patching or other administrator functions are suspicious. Scripts should be captured from the file system when possible to determine their actions and intent.
+
+Scripts are likely to perform actions with various effects on a system that may generate events, depending on the types of monitoring used. Monitor processes and command-line arguments for script execution and subsequent behavior. Actions may be related to network and system information discovery, collection, or other scriptable post-compromise behaviors and could be used as indicators of detection leading back to the source script. "
+        "patternType": "attack-pattern"
+        permissionsRequired:
+          1. "User"
+          2. "root"
+        tactics:
+          1. "execution"
+        "_createdAt": 1647277097632
+        "_createdBy": "admin@thehive.local"
+        "_id": "~303112"
+        dataSources:
+          1. "Command: Command Execution"
+          2. "Process: Process Creation"
+        "patternId": "T1059.004"
+        "url": "https://attack.mitre.org/techniques/T1059/004"
+        defenseBypassed:
+        platforms:
+          1. "macOS"
+          2. "Linux"
+        systemRequirements:
+      patternParent:
+        "_createdAt": 1647277028643
+        "_createdBy": "admin@thehive.local"
+        dataSources:
+          1. "Command: Command Execution"
+          2. "Process: Process Creation"
+          3. "Module: Module Load"
+          4. "Script: Script Execution"
+        defenseBypassed:
+        "patternId": "T1059"
+        platforms:
+          1. "Linux"
+          2. "macOS"
+          3. "Windows"
+          4. "Network"
+        "_type": "Pattern"
+        "remoteSupport": true
+        "revoked": false
+        "url": "https://attack.mitre.org/techniques/T1059"
+        "detection": "Command-line and scripting activities can be captured through proper logging of process execution with command-line arguments. This information can be useful in gaining additional insight to adversaries' actions through how they use native processes or custom tools. Also monitor for loading of modules associated with specific languages.
+
+If scripting is restricted for normal users, then any attempt to enable scripts running on a system would be considered suspicious. If scripts are not commonly used on a system, but enabled, scripts running out of cycle from patching or other administrator functions are suspicious. Scripts should be captured from the file system when possible to determine their actions and intent.
+
+Scripts are likely to perform actions with various effects on a system that may generate events, depending on the types of monitoring used. Monitor processes and command-line arguments for script execution and subsequent behavior. Actions may be related to network and system information discovery, collection, or other scriptable post-compromise behaviors and could be used as indicators of detection leading back to the source script."
+        "patternType": "attack-pattern"
+        permissionsRequired:
+          1. "User"
+        tactics:
+          1. "execution"
+        "version": "2.2"
+        "_id": "~32872"
+        "description": "Adversaries may abuse command and script interpreters to execute commands, scripts, or binaries. These interfaces and languages provide ways of interacting with computer systems and are a common feature across many different platforms. Most systems come with some built-in command-line interface and scripting capabilities, for example, macOS and Linux distributions include some flavor of [Unix Shell](https://attack.mitre.org/techniques/T1059/004) while Windows installations include the [Windows Command Shell](https://attack.mitre.org/techniques/T1059/003) and [PowerShell](https://attack.mitre.org/techniques/T1059/001).
+
+There are also cross-platform interpreters such as [Python](https://attack.mitre.org/techniques/T1059/006), as well as those commonly associated with client applications such as [JavaScript](https://attack.mitre.org/techniques/T1059/007) and [Visual Basic](https://attack.mitre.org/techniques/T1059/005).
+
+Adversaries may abuse these technologies in various ways as a means of executing arbitrary commands. Commands and scripts can be embedded in [Initial Access](https://attack.mitre.org/tactics/TA0001) payloads delivered to victims as lure documents or as secondary payloads downloaded from an existing C2. Adversaries may also execute commands through interactive terminals/shells, as well as utilize various [Remote Services](https://attack.mitre.org/techniques/T1021) in order to achieve remote Execution.(Citation: Powershell Remote Commands)(Citation: Cisco IOS Software Integrity Assurance - Command History)(Citation: Remote Shell Execution in Python)"
+        extraData:
+        "name": "Command and Scripting Interpreter"
+        systemRequirements:
+    "occurDate": 1698737444000
+    "patternId": "T1059.004"
+    "tactic": "Execution"
+    "_createdAt": 1698737418824
+    "_createdBy": "analyst@mail.rcm"
+    "_id": "~598053048"
+"source": "rcmros"
+event:
+  "objectType": "case"
+  "base": true
+  "requestId": "d5ebb65a9dc38361:-71fbee6f:18af3b1468f:-8000:72710"
+  "operation": "update"
+  details:
+    "endDate": 1698737907141
+    "resolutionStatus": "TruePositive"
+    "summary": "Blocked"
+    "status": "Resolved"
+    "impactStatus": "NoImpact"
+  "rootId": "~417165312"
+  object:
+    stats:
+    "id": "~417165312"
+    "startDate": 1698737443388
+    tags:
+      1. "NCIRCC:attack="Попытки внедрения ВПО""
+      2. "Object:name="ГКУ «Волгоспас»""
+      3. "Object:id=630125"
+      4. "geo:alpha2="CN""
+      5. "Sensor:id=630125"
+    "status": "Resolved"
+    "updatedBy": "annin@mail.rcm"
+    "description": "В 05:29:46 2023-10-31 (мск) в ходе сетевого взаимодействия IP-адреса 113.26.250.140 (Китай) с контролируемым IP-адресом 176.100.102.141 зафиксированы компьютерные воздействия (количество: 1), свидетельствующие об осуществлении компьютерной атаки, нацеленной на получение несанкционированного доступа к контролируемому ресурсу методом эксплуатации уязвимости видеорегистратора «MVPower» по протоколу прикладного уровня «HTTP» (порт 80/TCP) с использованием специального программного обеспечения типа «Metasploit». КА была безуспешна. "
+    "summary": "Blocked"
+    "owner": "analyst@mail.rcm"
+    customFields:
+      b2mid:
+        "integer": 54001
+        "order": 1
+      event-source:
+        "order": 4
+        "string": "Заслон-ПМ. Ведомственное СОА"
+      first-time:
+        "date": 1698719386000
+        "order": 2
+      last-time:
+        "order": 3
+        "date": 1698719386000
+      ncircc-class-attack:
+        "order": 0
+        "string": "Попытки внедрения ВПО;attack"
+    "updatedAt": 1698737907162
+    "createdBy": "analyst@mail.rcm"
+    "impactStatus": "NoImpact"
+    "tlp": 2
+    "createdAt": 1698737416613
+    "_type": "case"
+    "resolutionStatus": "TruePositive"
+    "title": "B2M-54001 Попытки внедрения ВПО"
+    "flag": true
+    "severity": 2
+    "endDate": 1698737907141
+    "pap": 2
+    permissions:
+    "_id": "~417165312"
+    "caseId": 6079
+  "organisationId": "~41058528"
+  "organisation": "РЦМ в ЮФО"
+  "objectId": "~417165312"
+  "startDate": 1698737907166
+
+
+2023/10/31 08:13:54 	---------------
+	EVENTS:
+event:
+  details:
+    customFields:
+      report:
+        "string": "Share TheHive"
+  "objectId": "~80897413208"
+  object:
+    "updatedBy": "d.sergeev@cloud.gcm"
+    permissions:
+    "owner": "i.monahov@cloud.gcm"
+    "resolutionStatus": ""
+    "severity": 2
+    "startDate": 1697620865718
+    "flag": false
+    tags:
+      1. "Sensor:id="8030002""
+      2. "ATs:reason="Зафиксирована подозрительная активность по признакам НКЦКИ""
+      3. "ATs:reason="INFO Controlled FGS""
+      4. "ZK:send"
+      5. "ATs:geoip="США""
+      6. "ATs:reason="Зафиксированы признаки взаимодействия ВПО класса trojan""
+      7. "APPA:Direction="outbound""
+    "pap": 2
+    "updatedAt": 1698740063220
+    "title": "Malware ( x[.]mochiads[.]com - редиректит с  браузерной игры)"
+    "description": "Атака направлена **наружу**, использует протоколы: **tcp/http**, host: **x[.]mochiads[.]com**
+
+
+**Задача переданная из смежной системы: Заслон-Пост-Модерн**
+
+В формате ГЦМ: **`TSK-8MSK-6-ZPM-231018-1185183`** ID: `1185183`
+
+[http://siem.cloud.gcm/tasks/card/TSK-8MSK-6-ZPM-231018-1185183](http://siem.cloud.gcm/tasks/card/TSK-8MSK-6-ZPM-231018-1185183)
+
+Автор задачи: **`Security Event Manager`**
+
+Тип: **`snort_alert`**
+
+**Причина по которой создана задача**
+
+Название: `Зафиксированы признаки взаимодействия ВПО класса trojan, Зафиксирована подозрительная активность по признакам НКЦКИ, INFO Controlled FGS с 162.210.195.122`
+
+Описание: `## Данная задача создана автоматически
+ Время начала: 2023-10-18 11:21:00
+ Время окончания: 2023-10-18 11:21:00
+ Продолжительность воздействий: 0:00:00`
+
+Отработало на СОА: 
+- **`8030002`**   RSNet, Установлен: Москва,Москва, IP адрес: 10.20.0.2
+
+
+**Полное описание события IDS:**
+
+- Время начала: **`18.10.2023 11:21:00`**
+- Время окончания: **`18.10.2023 11:21:00`**
+- **IP из домашней подсети**
+
+1. **`95.173.128.202`**
+- **IP из внешней подсети**
+
+1. **`162.210.195.122`**
+
+
+**Сигнатуры на которых отработал анализатор сетевого трафика:**
+
+1. РП: **`99010483`**, Сообщение: NCIRCC CNC-IP 162.210.195.122 downlink (survey-smiles[.]com), Добавлена: 05.04.2022 20:49:00
+2. РП: **`99010482`**, Сообщение: NCIRCC CNC-IP 162.210.195.122 uplink (survey-smiles[.]com), Добавлена: 05.04.2022 20:49:00
+
+
+
+
+**Фильтрация и выгрузка от** Wed Oct 18 2023 11:40:33 GMT+0300 
+
+Размер: **`2.2 KB`**, [Скачать файл](ftp://ftp.cloud.gcm//traffic/8030002/1697618427_2023_10_18____11_40_27_778554.pcap)
+
+
+**Ссылка на arkime:** 
+ - [http://arkime.cloud.gcm/2023_10_18_11_40_10_666749____1697618427_2023_10_18____11_40_27_778554.pcap](http://anisimova.cloud.gcm:8005/sessions?expression=file%20%3D%3D%20%2Fopt%2Farkime%2Fraw%2F2023_10_18_11_40_10_666749____1697618427_2023_10_18____11_40_27_778554.pcap&date=-1)
+
+Контент: Фильтрация успешно завершена. Включена автоматическая выгрузка
+
+Файл на СОА: `/opt/zaslon/zmanager/data/pfilter_storage/1697618427_2023_10_18____11_40_27_778554.pcap`
+
+
+
+
+  
+#### Merged with alert #TSK-8MSK-6-ZPM-231030-1188535 Зафиксированы признаки взаимодействия ВПО класса trojan, Зафиксирована подозрительная активность по признакам НКЦКИ, INFO Controlled FGS с 162.210.195.122
+
+**Задача переданная из смежной системы: Заслон-Пост-Модерн**
+
+В формате ГЦМ: **`TSK-8MSK-6-ZPM-231030-1188535`** ID: `1188535`
+
+[http://siem.cloud.gcm/tasks/card/TSK-8MSK-6-ZPM-231030-1188535](http://siem.cloud.gcm/tasks/card/TSK-8MSK-6-ZPM-231030-1188535)
+
+Автор задачи: **`Security Event Manager`**
+
+Тип: **`snort_alert`**
+
+**Причина по которой создана задача**
+
+Название: `Зафиксированы признаки взаимодействия ВПО класса trojan, Зафиксирована подозрительная активность по признакам НКЦКИ, INFO Controlled FGS с 162.210.195.122`
+
+Описание: `## Данная задача создана автоматически
+ Время начала: 2023-10-30 09:36:39
+ Время окончания: 2023-10-30 09:36:54
+ Продолжительность воздействий: 0:00:15`
+
+Отработало на СОА: 
+- **`8030002`**   RSNet, Установлен: Москва,Москва, IP адрес: 10.20.0.2
+
+
+**Полное описание события IDS:**
+
+- Время начала: **`30.10.2023 09:36:39`**
+- Время окончания: **`30.10.2023 09:36:54`**
+- **IP из домашней подсети**
+
+1. **`95.173.128.202`**
+- **IP из внешней подсети**
+
+1. **`162.210.195.122`**
+
+
+**Сигнатуры на которых отработал анализатор сетевого трафика:**
+
+1. РП: **`99010482`**, Сообщение: NCIRCC CNC-IP 162.210.195.122 uplink (survey-smiles[.]com), Добавлена: 05.04.2022 20:49:00
+2. РП: **`99010483`**, Сообщение: NCIRCC CNC-IP 162.210.195.122 downlink (survey-smiles[.]com), Добавлена: 05.04.2022 20:49:00
+
+
+
+
+**Фильтрация и выгрузка от** Mon Oct 30 2023 09:39:16 GMT+0300 
+
+Размер: **`2.2 KB`**, [Скачать файл](ftp://ftp.cloud.gcm//traffic/8030002/1698647952_2023_10_30____09_39_12_928540.pcap)
+
+Контент: Фильтрация успешно завершена. Включена автоматическая выгрузка
+
+Файл на СОА: `/opt/zaslon/zmanager/data/pfilter_storage/1698647952_2023_10_30____09_39_12_928540.pcap`"
+    "impactStatus": ""
+    "tlp": 2
+    stats:
+    "id": "~80897413208"
+    "_type": "case"
+    "createdAt": 1697620865746
+    "endDate": 0
+    "summary": ""
+    "_id": "~80897413208"
+    "createdBy": "i.monahov@cloud.gcm"
+    customFields:
+      inbox1:
+      report:
+        "string": "Share TheHive"
+        "order": 6
+      ncircc-class-attack:
+        "order": 3
+        "string": "Заражение ВПО;incident"
+      notification:
+        "order": 5
+        "string": "Share TheHive"
+      attack-type:
+        "order": 7
+        "string": "Распределенная КА"
+      class-attack:
+        "order": 0
+        "string": "Вирусное заражение"
+      external-letter:
+        "order": 1
+      first-time:
+        "date": 1698647799000
+        "order": 9
+      inner-letter:
+      last-time:
+        "order": 8
+        "date": 1698647814000
+    "caseId": 33807
+    "status": "Open"
+  "organisation": "GCM"
+  "organisationId": "~4192"
+  "operation": "update"
+  "objectType": "case"
+  "base": true
+  "startDate": 1698740063566
+  "rootId": "~80897413208"
+  "requestId": "e4f22fdb1282cd6f:-23f74b51:18b84aa9e6e:-8000:1742"
+observables:
+  1.
+    "ignoreSimilarity": true
+    "ioc": true
+    "_type": "Observable"
+    "dataType": "url_pcap"
+    "data": "ftp://ftp.cloud.gcm/traffic/8030002/1698647952_2023_10_30____09_39_12_928540.pcap"
+    reports:
+    extraData:
+    "message": "Download a piece of traffic"
+    "startDate": 1698674684922
+    tags:
+      1. "2.2 KB"
+    "tlp": 2
+    "_createdAt": 1698674684922
+    "_id": "~79872032944"
+    "_createdBy": "s.chinkov@cloud.gcm"
+    "sighted": false
+  2.
+    extraData:
+    "ioc": false
+    "_createdBy": "s.chinkov@cloud.gcm"
+    "_type": "Observable"
+    reports:
+    tags:
+      1. "snort"
+    "tlp": 2
+    "_createdAt": 1698674684534
+    "dataType": "snort_sid"
+    "sighted": false
+    "startDate": 1698674684534
+    "_id": "~83312656496"
+    "data": "99010482, 99010483"
+  3.
+    "ignoreSimilarity": false
+    "startDate": 1697621265606
+    "_createdAt": 1697621265606
+    "_createdBy": "i.monahov@cloud.gcm"
+    "sighted": false
+    extraData:
+    "ioc": true
+    "dataType": "domain"
+    "message": "."
+    reports:
+      BIZONE_ThreatVision_1_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "ThreatVision"
+            "predicate": "Results"
+            "value": "0"
+      MISP_2_1:
+        taxonomies:
+          1.
+            "predicate": "Search"
+            "value": "0 events"
+            "level": "info"
+            "namespace": "MISP"
+      Shodan_DNSResolve_1_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "Shodan"
+            "predicate": "DNS resolutions"
+            "value": "1"
+      VirusTotal_GetReport_3_0:
+        taxonomies:
+          1.
+            "namespace": "VT"
+            "predicate": "GetReport"
+            "value": "0"
+            "level": "info"
+      Crt_sh_Transparency_Logs_1_0:
+        taxonomies:
+          1.
+            "value": "0"
+            "level": "info"
+            "namespace": "crt.sh"
+            "predicate": "Certificates"
+      CyberCrime-Tracker_1_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "CCT"
+            "predicate": "C2 Search"
+            "value": "0 hits"
+      InventoryCase_0_1:
+        taxonomies:
+          1.
+            "predicate": "Search"
+            "value": "0"
+            "level": "info"
+            "namespace": "InventoryCase"
+      Maltiverse_Report_1_0:
+        taxonomies:
+          1.
+            "level": "safe"
+            "namespace": "Maltiverse"
+            "predicate": "Report"
+            "value": "-"
+      Shodan_InfoDomain_1_0:
+        taxonomies:
+          1.
+            "value": "0"
+            "level": "info"
+            "namespace": "Shodan"
+            "predicate": "IPs"
+          2.
+            "level": "info"
+            "namespace": "Shodan"
+            "predicate": "Domains"
+            "value": "0"
+          3.
+            "namespace": "Shodan"
+            "predicate": "ASNs"
+            "value": "0"
+            "level": "info"
+          4.
+            "predicate": "ISPs"
+            "value": "0"
+            "level": "info"
+            "namespace": "Shodan"
+      Urlscan_io_Scan_0_1_0:
+        taxonomies:
+          1.
+            "namespace": "urlscan.io"
+            "predicate": "Scan"
+            "value": "Overall Score:0"
+            "level": "info"
+    "_id": "~80446808064"
+    "data": "https://flash4play.com"
+    "tlp": 2
+    "_type": "Observable"
+    tags:
+  4.
+    "_createdAt": 1697620865954
+    "_createdBy": "i.monahov@cloud.gcm"
+    "_type": "Observable"
+    "dataType": "url_pcap"
+    "ioc": true
+    reports:
+      Moloch_1_7:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "Moloch"
+            "predicate": "Uploading"
+            "value": "1 pcap(s)"
+    "startDate": 1697620865954
+    "sighted": false
+    tags:
+      1. "2.2 KB"
+    "tlp": 2
+    "_id": "~80897417304"
+    "data": "ftp://ftp.cloud.gcm/traffic/8030002/1697618427_2023_10_18____11_40_27_778554.pcap"
+    extraData:
+    "ignoreSimilarity": true
+    "message": "Download a piece of traffic"
+  5.
+    "_id": "~82699583688"
+    tags:
+      1. "external"
+      2. "geo:iso="US""
+      3. "geo:country="США""
+    "sighted": false
+    "startDate": 1697620865895
+    "_createdBy": "i.monahov@cloud.gcm"
+    extraData:
+    "dataType": "ip"
+    "tlp": 2
+    "_createdAt": 1697620865895
+    "_type": "Observable"
+    reports:
+      NCIRCC_GeoIP_1_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "GeoIP"
+            "predicate": "Country"
+            "value": "США "
+      ARIADNA_GeoIP_1_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "Ariadna_GeoIP"
+            "predicate": "Country"
+            "value": "США "
+      AbuseIPDB_1_0:
+        taxonomies:
+          1.
+            "namespace": "AbuseIPDB"
+            "predicate": "Records"
+            "value": 0
+            "level": "safe"
+      BIZONE_ThreatVision_1_0:
+        taxonomies:
+          1.
+            "namespace": "ThreatVision"
+            "predicate": "Results"
+            "value": "0"
+            "level": "info"
+      CyberCrime-Tracker_1_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "CCT"
+            "predicate": "C2 Search"
+            "value": "0 hits"
+      MISP_2_1:
+        taxonomies:
+          1.
+            "level": "suspicious"
+            "namespace": "MISP"
+            "predicate": "Search"
+            "value": "11 event(s)"
+      Maltiverse_Report_1_0:
+        taxonomies:
+          1.
+            "level": "safe"
+            "namespace": "Maltiverse"
+            "predicate": "Report"
+            "value": "whitelist"
+      URLhaus_2_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "URLhaus"
+            "predicate": "Search"
+            "value": "No results"
+      Urlscan_io_Search_0_1_1:
+        taxonomies:
+          1.
+            "level": "suspicious"
+            "namespace": "urlscan.io"
+            "predicate": "Search"
+            "value": "380 results"
+      VirusTotal_GetReport_3_0:
+        taxonomies:
+          1.
+            "level": "malicious"
+            "namespace": "VT"
+            "predicate": "GetReport"
+            "value": "100 detected_url(s)"
+      ZPMSig_1_0:
+        taxonomies:
+          1.
+            "level": "malicious"
+            "namespace": "ZPM_Sensor"
+            "predicate": "IP"
+            "value": "Found"
+    "data": "162.210.195.122"
+    "ioc": true
+  6.
+    "_createdBy": "i.monahov@cloud.gcm"
+    "_id": "~82699661512"
+    "dataType": "domain"
+    extraData:
+    "ignoreSimilarity": false
+    "sighted": false
+    tags:
+    "tlp": 2
+    "_createdAt": 1697621221204
+    "data": "http://survey-smiles[.]com"
+    "ioc": true
+    "message": "."
+    reports:
+      VirusTotal_GetReport_3_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "VT"
+            "predicate": "GetReport"
+            "value": "0"
+      InventoryCase_0_1:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "InventoryCase"
+            "predicate": "Search"
+            "value": "0"
+      MISP_2_1:
+        taxonomies:
+          1.
+            "namespace": "MISP"
+            "predicate": "Search"
+            "value": "0 events"
+            "level": "info"
+      Shodan_DNSResolve_1_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "Shodan"
+            "predicate": "DNS resolutions"
+            "value": "1"
+      Shodan_InfoDomain_1_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "Shodan"
+            "predicate": "Domains"
+            "value": "0"
+          2.
+            "level": "info"
+            "namespace": "Shodan"
+            "predicate": "ISPs"
+            "value": "0"
+          3.
+            "level": "info"
+            "namespace": "Shodan"
+            "predicate": "ASNs"
+            "value": "0"
+          4.
+            "level": "info"
+            "namespace": "Shodan"
+            "predicate": "IPs"
+            "value": "0"
+      Urlscan_io_Scan_0_1_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "urlscan.io"
+            "predicate": "Scan"
+            "value": "Overall Score:0"
+      BIZONE_ThreatVision_1_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "ThreatVision"
+            "predicate": "Results"
+            "value": "0"
+      Crt_sh_Transparency_Logs_1_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "crt.sh"
+            "predicate": "Certificates"
+            "value": "0"
+      CyberCrime-Tracker_1_0:
+        taxonomies:
+          1.
+            "value": "0 hits"
+            "level": "info"
+            "namespace": "CCT"
+            "predicate": "C2 Search"
+      Maltiverse_Report_1_0:
+        taxonomies:
+          1.
+            "predicate": "Report"
+            "value": "-"
+            "level": "safe"
+            "namespace": "Maltiverse"
+    "_type": "Observable"
+    "startDate": 1697621221204
+  7.
+    "_createdBy": "i.monahov@cloud.gcm"
+    "_type": "Observable"
+    "data": "http://anisimova.cloud.gcm:8005/sessions?expression=file%20%3D%3D%20%2Fopt%2Farkime%2Fraw%2F2023_10_18_11_40_10_666749____1697618427_2023_10_18____11_40_27_778554.pcap&date=-1"
+    "ignoreSimilarity": true
+    "_createdAt": 1697620865974
+    extraData:
+    "message": "Ссылка на Arkime"
+    "tlp": 2
+    "_id": "~80446775296"
+    "dataType": "url_arkime"
+    "ioc": false
+    reports:
+    "startDate": 1697620865974
+    tags:
+    "sighted": false
+  8.
+    "sighted": false
+    "_createdAt": 1697621243245
+    "_id": "~80487755920"
+    extraData:
+    "ignoreSimilarity": false
+    "dataType": "domain"
+    reports:
+      BIZONE_ThreatVision_1_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "ThreatVision"
+            "predicate": "Results"
+            "value": "0"
+      Crt_sh_Transparency_Logs_1_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "crt.sh"
+            "predicate": "Certificates"
+            "value": "4"
+      CyberCrime-Tracker_1_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "CCT"
+            "predicate": "C2 Search"
+            "value": "0 hits"
+      Shodan_DNSResolve_1_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "Shodan"
+            "predicate": "DNS resolutions"
+            "value": "1"
+      MISP_2_1:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "MISP"
+            "predicate": "Search"
+            "value": "0 events"
+      Maltiverse_Report_1_0:
+        taxonomies:
+          1.
+            "level": "malicious"
+            "namespace": "Maltiverse"
+            "predicate": "Report"
+            "value": "malicious"
+      Urlscan_io_Scan_0_1_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "urlscan.io"
+            "predicate": "Scan"
+            "value": "Overall Score:0"
+      Urlscan_io_Search_0_1_1:
+        taxonomies:
+          1.
+            "predicate": "Search"
+            "value": "138 results"
+            "level": "suspicious"
+            "namespace": "urlscan.io"
+      VirusTotal_GetReport_3_0:
+        taxonomies:
+          1.
+            "level": "malicious"
+            "namespace": "VT"
+            "predicate": "GetReport"
+            "value": "99 detected_url(s)"
+      NCIRCC_PDNS_1_0:
+        taxonomies:
+          1.
+            "level": "safe"
+            "namespace": "PDNS"
+            "predicate": "Result"
+            "value": "42822 dns requests"
+      Shodan_InfoDomain_1_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "Shodan"
+            "predicate": "ASNs"
+            "value": "0"
+          2.
+            "value": "0"
+            "level": "info"
+            "namespace": "Shodan"
+            "predicate": "Domains"
+          3.
+            "predicate": "IPs"
+            "value": "0"
+            "level": "info"
+            "namespace": "Shodan"
+          4.
+            "value": "0"
+            "level": "info"
+            "namespace": "Shodan"
+            "predicate": "ISPs"
+      SpamhausDBL_1_0:
+        taxonomies:
+          1.
+            "predicate": "return_code"
+            "value": "NXDOMAIN"
+            "level": "info"
+            "namespace": "SpamhausDBL"
+          2.
+            "value": "Clean"
+            "level": "info"
+            "namespace": "SpamhausDBL"
+            "predicate": "classification"
+      URLhaus_2_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "URLhaus"
+            "predicate": "Search"
+            "value": "No results"
+    "startDate": 1697621243245
+    "tlp": 2
+    "_createdBy": "i.monahov@cloud.gcm"
+    "_type": "Observable"
+    "message": "."
+    tags:
+    "data": "x.mochiads.com"
+    "ioc": true
+  9.
+    reports:
+      NCIRCC_GeoIP_1_0:
+        taxonomies:
+          1.
+            "level": "safe"
+            "namespace": "GeoIP"
+            "predicate": "Country"
+            "value": "Россия , ГосСОПКА"
+      ZPMSig_1_0:
+        taxonomies:
+          1.
+            "level": "safe"
+            "namespace": "ZPM_Sensor"
+            "predicate": "Status"
+            "value": "online"
+      ARIADNA_GeoIP_1_0:
+        taxonomies:
+          1.
+            "level": "safe"
+            "namespace": "Ariadna_GeoIP"
+            "predicate": "Country"
+            "value": "Россия , ГосСОПКА"
+      InventoryCase_0_1:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "InventoryCase"
+            "predicate": "Search"
+            "value": "0"
+    "sighted": false
+    tags:
+      1. "home"
+    "ioc": false
+    "dataType": "ip_home"
+    extraData:
+    "startDate": 1697620865852
+    "tlp": 2
+    "_createdBy": "i.monahov@cloud.gcm"
+    "_type": "Observable"
+    "data": "8030002:95.173.128.202"
+    "_createdAt": 1697620865852
+    "_id": "~79873306808"
+  10.
+    "_id": "~79873310904"
+    "data": "99010483, 99010482"
+    "ioc": false
+    "startDate": 1697620865917
+    extraData:
+    "sighted": false
+    "tlp": 2
+    "dataType": "snort_sid"
+    tags:
+      1. "snort"
+    "_createdAt": 1697620865917
+    "_createdBy": "i.monahov@cloud.gcm"
+    "_type": "Observable"
+    reports:
+      ZPMSig_1_0:
+        taxonomies:
+          1.
+            "level": "info"
+            "namespace": "zpmSig"
+            "predicate": "Precision"
+            "value": "unknown"
+ttp:
+"source": "gcm"
+
+
+2023/10/31 08:28:32 	---------------
+	EVENTS:
+"source": "rcmros"
+event:
+  "operation": "update"
+  details:
+  "startDate": 1698740914219
+  "requestId": "d5ebb65a9dc38361:-71fbee6f:18af3b1468f:-8000:72758"
+  "organisation": "РЦМ в ЮФО"
+  "objectType": "case"
+  "objectId": "~188432408"
+  "base": false
+  "rootId": "~188432408"
+  object:
+    "resolutionStatus": ""
+    "pap": 2
+    "status": "Open"
+    "updatedBy": ""
+    "caseId": 6084
+    "description": "В период с 2023-10-30 23:59:18 по 2023-10-31 02:00:19 (мск) в ходе сетевого взаимодействия IP-адреса 1.192.213.115 (Китай) с контролируемым IP-адресом 212.192.136.201 зафиксированы компьютерные воздействия (количество: 692), свидетельствующие об осуществлении компьютерной атаки, нацеленной на получение несанкционированного доступа к контролируемому ресурсу методом подбора аутентификационной информации по протоколу прикладного уровня «SSH» (порт 22/TCP) с использованием специального программного обеспечения типа «Brutus». КА была успешна. "
+    permissions:
+    "_id": "~188432408"
+    "_type": "case"
+    "impactStatus": ""
+    "id": "~188432408"
+    "severity": 2
+    "startDate": 1698740941035
+    "endDate": 0
+    customFields:
+      ncircc-class-attack:
+        "string": "Неудачные попытки авторизации;attack"
+        "order": 0
+      b2mid:
+        "integer": 54006
+        "order": 1
+      event-source:
+        "order": 4
+        "string": "Заслон-ПМ. Ведомственное СОА"
+      first-time:
+        "date": 1698699558000
+        "order": 2
+      last-time:
+        "order": 3
+        "date": 1698706819000
+    "createdBy": "analyst@mail.rcm"
+    "createdAt": 1698740914212
+    "updatedAt": 0
+    "flag": true
+    "tlp": 2
+    stats:
+    "owner": "analyst@mail.rcm"
+    "title": "B2M-54006 Неудачные попытки авторизации"
+    tags:
+      1. "Sensor:id=630128"
+      2. "NCIRCC:attack="Неудачные попытки авторизации""
+      3. "Object:name="«Кубанский государственный университет»""
+      4. "geo:alpha2="CN""
+      5. "Object:id=630128"
+    "summary": ""
+  "organisationId": "~41058528"
+observables:
+  1.
+    "dataType": "snort_sid"
+    "ioc": false
+    "startDate": 1698740914418
+    "tlp": 2
+    "_createdBy": "analyst@mail.rcm"
+    extraData:
+    "ignoreSimilarity": false
+    "message": "Идентификаторы сработавших сигнатур"
+    "data": "99009570"
+    "_type": "Observable"
+    tags:
+      1. "misp:Network activity="snort""
+    "_id": "~311078928"
+    reports:
+    "sighted": false
+    "_createdAt": 1698740914418
+ttp:
+
+
