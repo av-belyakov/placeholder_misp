@@ -52,8 +52,6 @@ func (client *ClientMISP) Do(method, path string, data []byte) (*http.Response, 
 	httpReq.Header.Set("Content-type", "application/json")
 	httpReq.Header.Set("Accept", "application/json")
 
-	//fmt.Println("func 'Do', Method: ", method, " client.BaseURL: ", client.BaseURL, " path: ", path)
-
 	httpClient := http.Client{
 		Transport: httpTrp,
 	}
@@ -65,8 +63,6 @@ func (client *ClientMISP) Do(method, path string, data []byte) (*http.Response, 
 		return nil, resBodyByte, fmt.Errorf(" '%s' %s:%d", err.Error(), f, l-2)
 	}
 	defer resp.Body.Close()
-
-	//fmt.Println("func 'Do', RESPONSE status:", resp.Status)
 
 	resBodyByte, err = io.ReadAll(resp.Body)
 	if err != nil {
@@ -85,25 +81,6 @@ func (client *ClientMISP) Do(method, path string, data []byte) (*http.Response, 
 
 		return resp, resBodyByte, fmt.Errorf(" '%s: msg - %s, url - %s, err - %v' %s:%d", resp.Status, mferr.Message, mferr.URL, mferr.Errors, f, l-1)
 	}
-
-	/*
-		Для того что бы выводить ошибку в логах
-
-		{
-		    "saved": false,
-		    "name": "Could not add Attribute",
-		    "message": "Could not add Attribute",
-		    "url": "\/attributes\/add",
-		    "errors": {
-		        "type": [
-		            "Options depend on the selected category."
-		        ],
-		        "value": [
-		            "Value not in the right type\/format. Please double check the value or select type \"other\"."
-		        ]
-		    }
-		}
-	*/
 
 	return resp, resBodyByte, err
 }

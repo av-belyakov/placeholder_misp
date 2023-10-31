@@ -65,8 +65,6 @@ func NewClientNATS(
 					Name:    "misp-event-id.string",
 					String:  data.EventId,
 				})
-
-				fmt.Println("func 'NewClientNATS', ResponseMessageFromMispToTheHave: ", nrm.GetResponseMessageFromMispToTheHave())
 			}
 
 			// Далее нужно сделать Marchal для ResponseMessageFromMispToTheHave и отправить

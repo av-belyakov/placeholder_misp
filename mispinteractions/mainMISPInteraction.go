@@ -10,7 +10,6 @@ import (
 	"placeholder_misp/confighandler"
 	"placeholder_misp/datamodels"
 	"placeholder_misp/memorytemporarystorage"
-	"placeholder_misp/supportingfunctions"
 )
 
 var mmisp ModuleMISP
@@ -401,10 +400,6 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 			continue
 		}
 
-		fmt.Println("|||||||||||||||||||||||||||||||||||||_______________________ START _____________________------")
-		fmt.Println(supportingfunctions.NewReadReflectJSONSprint(b))
-		fmt.Println("|||||||||||||||||||||||||||||||||||||________________________ END ______________________------")
-
 		res, resBodyByte, err = c.Post("/attributes/add/"+eventId, b)
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
@@ -547,8 +542,6 @@ func sendEventReportsMispFormat(host, authKey, eventId string, caseId float64, l
 
 // удаляем дублирующиеся события из MISP
 func delEventsMispFormat(host, authKey, eventId string) (*http.Response, error) {
-	fmt.Println("func 'delEventsMispFormat', удаляем дублирующиеся события из MISP START...")
-
 	c, err := NewClientMISP(host, authKey, false)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
@@ -559,8 +552,6 @@ func delEventsMispFormat(host, authKey, eventId string) (*http.Response, error) 
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println("func 'delEventsMispFormat', res = ", res.Status)
 
 	return res, nil
 }

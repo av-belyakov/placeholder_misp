@@ -62,8 +62,6 @@ func HandlerMessageFromHive(
 	nlt := processingReflectMap(logging, cmispf, listTmp, &listRule, 0, "")
 	storageApp.SetProcessedDataHiveFormatMessage(uuidTask, nlt)
 
-	fmt.Println("______________ проверяем соответствие сообщения правилам из раздела Pass __________________")
-
 	if listRule.Rules.Passany {
 		storageApp.SetAllowedTransferTrueHiveFormatMessage(uuidTask)
 	} else {
@@ -71,9 +69,6 @@ func HandlerMessageFromHive(
 		for _, v := range listRule.Rules.Pass {
 			skipMsg := true
 			for _, value := range v.ListAnd {
-
-				fmt.Println("BEFORE StatementExpression = ", value)
-
 				if !value.StatementExpression {
 					skipMsg = false
 
@@ -93,13 +88,6 @@ func HandlerMessageFromHive(
 	listRule.CleanStatementExpressionRulePass()
 
 	isAllowed, _ := storageApp.GetAllowedTransferHiveFormatMessage(uuidTask)
-
-	for _, v := range listRule.Rules.Pass {
-		for _, value := range v.ListAnd {
-
-			fmt.Println("AFTER StatementExpression = ", value)
-		}
-	}
 
 	dt := "events do not meet rules"
 	if isAllowed {
