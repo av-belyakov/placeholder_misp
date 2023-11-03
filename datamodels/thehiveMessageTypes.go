@@ -4,6 +4,7 @@ package datamodels
 type ResponseMessageFromMispToTheHave struct {
 	Success  bool                        `json:"success"`
 	Service  string                      `json:"string"`
+	Error    error                       `json:"error"`
 	Commands []ResponseCommandForTheHive `json:"commands"`
 }
 

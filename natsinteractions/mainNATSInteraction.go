@@ -81,7 +81,8 @@ func NewClientNATS(
 				continue
 			}
 
-			err = nc.Publish("setcustomfield", res)
+			//err = nc.Publish("setcustomfield", res)
+			err = nc.Publish("main_caseupdate", res)
 			if err != nil {
 				_, f, l, _ := runtime.Caller(0)
 
@@ -103,6 +104,8 @@ func NewClientNATS(
 			DataType: "update accepted events",
 			Count:    1,
 		}
+
+		//msg.Respond()
 	})
 
 	return &mnats, nil

@@ -52,6 +52,7 @@ func CoreHandler(
 
 		case data := <-mispChanReception:
 			switch data.Command {
+			//отправка данных в NATS
 			case "send event id":
 				// ***********************************
 				// Это логирование только для теста!!!
@@ -69,6 +70,7 @@ func CoreHandler(
 					EventId: data.EventId,
 				})
 
+				//отправка данных в Redis
 			case "set new event id":
 				// ***********************************
 				// Это логирование только для теста!!!

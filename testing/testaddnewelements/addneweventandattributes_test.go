@@ -2,12 +2,14 @@ package testaddnewelements_test
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/nats-io/nats.go"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
@@ -58,17 +60,57 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		return newResult, nil
 	}
 
+	natsSendData := func(conf confighandler.AppConfigNATS, eventId string) error {
+		nc, err := nats.Connect(
+			fmt.Sprintf("%s:%d", conf.Host, conf.Port),
+			nats.MaxReconnects(-1),
+			nats.ReconnectWait(3*time.Second))
+		if err != nil {
+			return err
+		}
+
+		nrm := datamodels.NewResponseMessage()
+		nrm.ResponseMessageAddNewCommand(datamodels.ResponseCommandForTheHive{
+			Command: "setcustomfield",
+			Name:    "misp-event-id.string",
+			String:  eventId,
+		})
+
+		fmt.Println("________________________________________")
+		fmt.Println("nrm.GetResponseMessageFromMispToTheHave(): ", nrm.GetResponseMessageFromMispToTheHave())
+		fmt.Println("________________________________________")
+
+		// Далее нужно сделать Marchal для ResponseMessageFromMispToTheHave и отправить
+		// в TheHive через Webhook и NATS
+		res, err := json.Marshal(nrm.GetResponseMessageFromMispToTheHave())
+		if err != nil {
+			return err
+		}
+
+		//err = nc.Publish("setcustomfield", res)
+		err = nc.Publish("main_caseupdate", res)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+
 	BeforeAll(func() {
 		logging = make(chan datamodels.MessageLogging)
 		counting = make(chan datamodels.DataCounterSettings)
 
+		// NATS
+		confApp.AppConfigNATS.Host = "nats.cloud.gcm"
+		confApp.AppConfigNATS.Port = 4222
+
 		//misp-world
-		//confApp.AppConfigMISP.Host = "misp-world.cloud.gcm"
-		//confApp.AppConfigMISP.Auth = "TvHkjH8jVQEIdvAxjxnL4H6wDoKyV7jobDjndvAo"
+		confApp.AppConfigMISP.Host = "misp-world.cloud.gcm"
+		confApp.AppConfigMISP.Auth = "TvHkjH8jVQEIdvAxjxnL4H6wDoKyV7jobDjndvAo"
 
 		//misp-center
-		confApp.AppConfigMISP.Host = "misp-center.cloud.gcm"
-		confApp.AppConfigMISP.Auth = "Z2PwRBdP5lFP7rdDJBzxmSahaLEwIvJoeOuwhRYQ"
+		//confApp.AppConfigMISP.Host = "misp-center.cloud.gcm"
+		//confApp.AppConfigMISP.Auth = "Z2PwRBdP5lFP7rdDJBzxmSahaLEwIvJoeOuwhRYQ"
 
 		go func() {
 			fmt.Println("___ Logging START")
@@ -141,13 +183,27 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 	})
 
 	Context("Тест 2. Проверяем обработчик кейсов", func() {
-		It("", func() {
-
+		It("Должны прийти два события от модуля misp", func() {
 			mispOutput := mispModule.GetDataReceptionChannel()
 
-			fmt.Println("TEST 2.1, mispOutput = ", <-mispOutput)
-			fmt.Println("TEST 2.2, mispOutput = ", <-mispOutput)
+			var err error
 
+			for count := 0; count < 2; count++ {
+				mop := <-mispOutput
+
+				fmt.Println(count, ". TEST , mispOutput = ", mop)
+
+				if mop.Command == "send event id" {
+					fmt.Println("Sending event id", mop.EventId, " to NATS")
+
+					//natsSendData := func(conf confighandler.AppConfigNATS, eventId string)
+					if err = natsSendData(confApp.AppConfigNATS, mop.EventId); err != nil {
+						break
+					}
+				}
+			}
+
+			Expect(err).ShouldNot(HaveOccurred())
 			Expect(true).Should(BeTrue())
 		})
 	})
