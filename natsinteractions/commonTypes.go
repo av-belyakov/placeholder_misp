@@ -9,7 +9,8 @@ type ModuleNATS struct {
 }
 
 type SettingsOutputChan struct {
-	Data []byte
+	MsgId string
+	Data  []byte
 }
 
 type SettingsInputChan struct {

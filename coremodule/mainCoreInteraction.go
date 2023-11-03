@@ -12,8 +12,6 @@ import (
 	"placeholder_misp/nkckiinteractions"
 	"placeholder_misp/redisinteractions"
 	rules "placeholder_misp/rulesinteraction"
-
-	"github.com/google/uuid"
 )
 
 func CoreHandler(
@@ -34,18 +32,31 @@ func CoreHandler(
 	for {
 		select {
 		case data := <-natsChanReception:
-			uuidCase := uuid.New().String()
+			//uuidCase := uuid.New().String()
 
-			storageApp.SetRawDataHiveFormatMessage(uuidCase, data.Data)
+			storageApp.SetRawDataHiveFormatMessage(data.MsgId, data.Data)
+
+			/*
+
+				нужно как то посторатся и вернуть data.MsgId через
+
+				natsmodule.SendingDataInput(natsinteractions.SettingsInputChan{
+						Command: data.Command,
+						EventId: data.EventId,
+					})
+					в модуль обработки NATS сообщений
+
+
+			*/
 
 			//формирование итоговых документов в формате MISP
 			chanCreateMispFormat, chanDone := NewMispFormat(mispmodule, logging)
 
 			//обработчик сообщений из TheHive (выполняется разбор сообщения и его разбор на основе правил)
-			go HandlerMessageFromHive(data.Data, uuidCase, storageApp, listRule, chanCreateMispFormat, chanDone, logging, counting)
+			go HandlerMessageFromHive(data.Data, data.MsgId, storageApp, listRule, chanCreateMispFormat, chanDone, logging, counting)
 
 			// отправка сообщения в Elasticshearch
-			esmodule.SendingData(elasticsearchinteractions.SettingsInputChan{UUID: uuidCase})
+			esmodule.SendingData(elasticsearchinteractions.SettingsInputChan{UUID: data.MsgId})
 
 			// отправка сообщения в НКЦКИ (пока заглушка)
 			//nkckimodule.SendingData(procMsg.Message)
