@@ -2,14 +2,12 @@ package testaddnewelements_test
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
 	"os"
 	"path"
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/nats-io/nats.go"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
@@ -60,7 +58,7 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		return newResult, nil
 	}
 
-	natsSendData := func(conf confighandler.AppConfigNATS, eventId string) error {
+	/*natsSendData := func(conf confighandler.AppConfigNATS, eventId string) error {
 		nc, err := nats.Connect(
 			fmt.Sprintf("%s:%d", conf.Host, conf.Port),
 			nats.MaxReconnects(-1),
@@ -94,7 +92,7 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		}
 
 		return nil
-	}
+	}*/
 
 	BeforeAll(func() {
 		logging = make(chan datamodels.MessageLogging)
@@ -147,6 +145,8 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 			}
 		}()
 
+		taskId := uuid.New().String()
+
 		//инициализируем модуль временного хранения информации
 		storageApp = memorytemporarystorage.NewTemporaryStorage()
 
@@ -162,10 +162,11 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		mispModule, errMisp = mispinteractions.HandlerMISP(confApp.AppConfigMISP, storageApp, logging)
 
 		//формирование итоговых документов в формате MISP
-		chanCreateMispFormat, chanDone = coremodule.NewMispFormat(mispModule, logging)
+		chanCreateMispFormat, chanDone = coremodule.NewMispFormat(taskId, mispModule, logging)
 
 		//обработчик сообщений из TheHive (выполняется разбор сообщения и его разбор на основе правил)
-		coremodule.HandlerMessageFromHive(exampleByte, uuid.New().String(), storageApp, listRules, chanCreateMispFormat, chanDone, logging, counting)
+		hmfh := coremodule.NewHandlerMessageFromHive(storageApp, listRules, logging, counting)
+		go hmfh.HandlerMessageFromHive(chanCreateMispFormat, exampleByte, taskId, chanDone)
 	})
 
 	Context("Тест 1. Проверка инициализации модулей", func() {
@@ -194,12 +195,13 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 				fmt.Println(count, ". TEST , mispOutput = ", mop)
 
 				if mop.Command == "send event id" {
-					fmt.Println("Sending event id", mop.EventId, " to NATS")
+					fmt.Println("__#######$$$$$$$$$$$%%%%%%%%%%%%%%______________________________")
+					fmt.Println("Sending event id", mop.EventId, " to NATS, taskId:", mop.TaskId)
 
 					//natsSendData := func(conf confighandler.AppConfigNATS, eventId string)
-					if err = natsSendData(confApp.AppConfigNATS, mop.EventId); err != nil {
+					/*if err = natsSendData(confApp.AppConfigNATS, mop.EventId); err != nil {
 						break
-					}
+					}*/
 				}
 			}
 

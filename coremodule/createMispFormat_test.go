@@ -195,9 +195,11 @@ var _ = Describe("CreateMispFormat", Ordered, func() {
 			}()
 
 			//формирование итоговых документов в формате MISP
-			chanCreateMispFormat, chanDone := coremodule.NewMispFormat(moduleMisp, logging)
+			chanCreateMispFormat, chanDone := coremodule.NewMispFormat(uuidTask, moduleMisp, logging)
 
-			go coremodule.HandlerMessageFromHive(exampleByte, uuidTask, storageApp, listRule, chanCreateMispFormat, chanDone, logging, counting)
+			hmfh := coremodule.NewHandlerMessageFromHive(storageApp, listRule, logging, counting)
+			go hmfh.HandlerMessageFromHive(chanCreateMispFormat, exampleByte, uuidTask, chanDone)
+			//go coremodule.HandlerMessageFromHive(exampleByte, uuidTask, storageApp, listRule, chanCreateMispFormat, chanDone, logging, counting)
 
 			go func() {
 				for {

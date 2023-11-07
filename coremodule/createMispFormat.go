@@ -127,6 +127,7 @@ func init() {
 }
 
 func NewMispFormat(
+	taskId string,
 	mispmodule *mispinteractions.ModuleMISP,
 	logging chan<- datamodels.MessageLogging) (chan ChanInputCreateMispFormat, chan bool) {
 
@@ -230,6 +231,7 @@ func NewMispFormat(
 					//тут отправляем сформированные по формату MISP пользовательские структуры
 					mispmodule.SendingDataInput(mispinteractions.SettingsChanInputMISP{
 						Command:   "add event",
+						TaskId:    taskId,
 						CaseId:    caseId,
 						UserEmail: userEmail,
 						MajorData: map[string]interface{}{

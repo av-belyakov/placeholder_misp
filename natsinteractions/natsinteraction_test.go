@@ -22,10 +22,12 @@ import (
 
 var _ = Describe("Natsinteraction", Ordered, func() {
 	var (
-		errConn    error
-		closeCtx   context.CancelFunc
-		mnats      *natsinteractions.ModuleNATS
-		chanLog    chan<- datamodels.MessageLogging
+		errConn  error
+		closeCtx context.CancelFunc
+		mnats    *natsinteractions.ModuleNATS
+		chanLog  chan<- datamodels.MessageLogging
+		counting chan datamodels.DataCounterSettings
+
 		storageApp *memorytemporarystorage.CommonStorageTemporary
 	)
 
@@ -46,6 +48,9 @@ var _ = Describe("Natsinteraction", Ordered, func() {
 	BeforeAll(func() {
 		chanLog = make(chan<- datamodels.MessageLogging)
 		//инициализируем модуль временного хранения информации
+		//канал для подсчета обработанных кейсов
+		counting = make(chan datamodels.DataCounterSettings)
+
 		storageApp = memorytemporarystorage.NewTemporaryStorage()
 
 		mnats, errConn = natsinteractions.NewClientNATS(confighandler.AppConfigNATS{
@@ -54,7 +59,8 @@ var _ = Describe("Natsinteraction", Ordered, func() {
 			Port: 4222,
 		},
 			storageApp,
-			chanLog)
+			chanLog,
+			counting)
 	})
 
 	Context("Тест 1. Проверка замены некоторых значений в json файле", func() {

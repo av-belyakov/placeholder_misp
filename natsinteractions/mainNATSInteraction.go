@@ -17,9 +17,9 @@ import (
 )
 
 var (
-	mnats ModuleNATS
-	once  sync.Once
 	ns    *natsStorage
+	once  sync.Once
+	mnats ModuleNATS
 )
 
 type natsStorage struct {
@@ -87,7 +87,7 @@ func init() {
 	mnats.chanOutputNATS = make(chan SettingsOutputChan)
 	mnats.chanInputNATS = make(chan SettingsInputChan)
 
-	//инициируем хранилище
+	//инициируем хранилище для дескрипторов сообщений NATS
 	ns = NewStorageNATS()
 }
 
@@ -128,18 +128,18 @@ func NewClientNATS(
 	// обработка данных приходящих в модуль от ядра приложения
 	go func() {
 		for data := range mnats.chanInputNATS {
-			/*
+			//получаем дескриптор соединения с NATS для отправки eventId
+			ncd, ok := ns.getElement(data.TaskId)
+			if !ok {
+				_, f, l, _ := runtime.Caller(0)
 
-			   здесь из канала нужно получить msgId, по нему найти
-			   в хранилище natsStorage дискриптор для ответа с помощью
+				logging <- datamodels.MessageLogging{
+					MsgData: fmt.Sprintf("connection descriptor for task id '%s' not found %s:%d", data.TaskId, f, l-2),
+					MsgType: "error",
+				}
 
-			   nm, ok := ns.setElement(m)
-
-			   и отправить ответ назад в go-webhook с помощью
-			   			nc.Publish(m.Reply, []byte("I will help you"))
-			   				или
-			   			m.Respond([]byte("answer is 42"))
-			*/
+				continue
+			}
 
 			nrm := datamodels.NewResponseMessage()
 
@@ -151,8 +151,6 @@ func NewClientNATS(
 				})
 			}
 
-			// Далее нужно сделать Marchal для ResponseMessageFromMispToTheHave и отправить
-			// в TheHive через Webhook и NATS
 			res, err := json.Marshal(nrm.GetResponseMessageFromMispToTheHave())
 			if err != nil {
 				_, f, l, _ := runtime.Caller(0)
@@ -165,16 +163,8 @@ func NewClientNATS(
 				continue
 			}
 
-			//err = nc.Publish("setcustomfield", res)
-			err = nc.Publish("main_caseupdate", res)
-			if err != nil {
-				_, f, l, _ := runtime.Caller(0)
-
-				logging <- datamodels.MessageLogging{
-					MsgData: fmt.Sprintf("%s %s:%d", err.Error(), f, l-2),
-					MsgType: "error",
-				}
-			}
+			//отправляем в NATS пакет с eventId для добавления его в TheHive
+			ncd.Respond(res)
 		}
 	}()
 
@@ -184,27 +174,11 @@ func NewClientNATS(
 			Data:  m.Data,
 		}
 
-		/*
-						похоже надо так
-
-						nc.Subscribe("foo", func(m *nats.Msg) {
-							nc.Publish(m.Reply, []byte("I will help you"))
-						})
-
-						или вот так
-
-						// Responding to a request message
-						nc.Subscribe("request", func(m *nats.Msg) {
-			    			m.Respond([]byte("answer is 42"))
-						})
-		*/
-
-		//сетчик принятых кейсов
+		//счетчик принятых кейсов
 		counting <- datamodels.DataCounterSettings{
 			DataType: "update accepted events",
 			Count:    1,
 		}
-
 	})
 
 	return &mnats, nil

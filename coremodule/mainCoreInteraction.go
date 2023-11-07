@@ -28,32 +28,19 @@ func CoreHandler(
 	natsChanReception := natsmodule.GetDataReceptionChannel()
 	mispChanReception := mispmodule.GetDataReceptionChannel()
 	redisChanReception := redismodule.GetDataReceptionChannel()
+	hmfh := NewHandlerMessageFromHive(storageApp, listRule, logging, counting)
 
 	for {
 		select {
 		case data := <-natsChanReception:
-			//uuidCase := uuid.New().String()
-
 			storageApp.SetRawDataHiveFormatMessage(data.MsgId, data.Data)
 
-			/*
-
-				нужно как то посторатся и вернуть data.MsgId через
-
-				natsmodule.SendingDataInput(natsinteractions.SettingsInputChan{
-						Command: data.Command,
-						EventId: data.EventId,
-					})
-					в модуль обработки NATS сообщений
-
-
-			*/
-
 			//формирование итоговых документов в формате MISP
-			chanCreateMispFormat, chanDone := NewMispFormat(mispmodule, logging)
+			chanCreateMispFormat, chanDone := NewMispFormat(data.MsgId, mispmodule, logging)
 
 			//обработчик сообщений из TheHive (выполняется разбор сообщения и его разбор на основе правил)
-			go HandlerMessageFromHive(data.Data, data.MsgId, storageApp, listRule, chanCreateMispFormat, chanDone, logging, counting)
+			go hmfh.HandlerMessageFromHive(chanCreateMispFormat, data.Data, data.MsgId, chanDone)
+			//go HandlerMessageFromHive(data.Data, data.MsgId, storageApp, listRule, chanCreateMispFormat, chanDone, logging, counting)
 
 			// отправка сообщения в Elasticshearch
 			esmodule.SendingData(elasticsearchinteractions.SettingsInputChan{UUID: data.MsgId})
@@ -79,6 +66,7 @@ func CoreHandler(
 				natsmodule.SendingDataInput(natsinteractions.SettingsInputChan{
 					Command: data.Command,
 					EventId: data.EventId,
+					TaskId:  data.TaskId,
 				})
 
 				//отправка данных в Redis

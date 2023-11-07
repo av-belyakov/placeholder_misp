@@ -206,6 +206,7 @@ func addEvent(conf confighandler.AppConfigMISP,
 	mmisp.SendingDataOutput(SettingChanOutputMISP{
 		Command: "send event id",
 		EventId: eventId,
+		TaskId:  data.TaskId,
 	})
 }
 
