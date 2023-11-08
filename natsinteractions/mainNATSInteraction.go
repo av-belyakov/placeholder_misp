@@ -158,8 +158,9 @@ func NewClientNATS(
 			if data.Command == "send event id" {
 				nrm.ResponseMessageAddNewCommand(datamodels.ResponseCommandForTheHive{
 					Command: "setcustomfield",
-					Name:    "misp-event-id.string",
-					String:  data.EventId,
+					Name:    "misp-event-id-test.string",
+					//Name:    "misp-event-id.string",
+					String: data.EventId,
 				})
 			}
 
