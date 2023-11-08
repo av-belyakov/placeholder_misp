@@ -173,6 +173,20 @@ func NewClientNATS(
 				fmt.Printf("\t%d. \n\tCommand:%s\n\tName:%s\n\tString:%s\n", k, v.Command, v.Name, v.String)
 			}
 
+			/*
+			   tmpPackage.Success: true
+			   tmpPackage.Service: MISP
+			   tmpPackage.Commands:
+			   	0.
+			   	Command:addtag
+			   	Name:
+			   	String:Webhook: send="MISP"
+			   	1.
+			   	Command:setcustomfield
+			   	Name:misp-event-id.string
+			   	String:19288
+			*/
+
 			res, err := json.Marshal(nrm.GetResponseMessageFromMispToTheHave())
 			if err != nil {
 				_, f, l, _ := runtime.Caller(0)
