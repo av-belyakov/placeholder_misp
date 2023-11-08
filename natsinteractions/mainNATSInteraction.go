@@ -163,7 +163,15 @@ func NewClientNATS(
 				})
 			}
 
-			fmt.Printf("========= CREATE package for sending to TheHive\nPackage:%v\n", nrm.GetResponseMessageFromMispToTheHave())
+			tmpPackage := nrm.GetResponseMessageFromMispToTheHave()
+			fmt.Printf("========= data.Command: '%s'\n", data.Command)
+			fmt.Println("========= CREATE package for sending to TheHive, Package:")
+			fmt.Printf("tmpPackage.Success: %v\n", tmpPackage.Success)
+			fmt.Printf("tmpPackage.Service: %v\n", tmpPackage.Service)
+			fmt.Println("tmpPackage.Commands:")
+			for k, v := range tmpPackage.Commands {
+				fmt.Printf("\t%d. \n\tCommand:%s\n\tName:%s\n\tString:%s", k, v.Command, v.Name, v.String)
+			}
 
 			res, err := json.Marshal(nrm.GetResponseMessageFromMispToTheHave())
 			if err != nil {

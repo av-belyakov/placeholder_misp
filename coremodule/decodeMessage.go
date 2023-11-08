@@ -39,7 +39,11 @@ func (s *HandlerMessageFromHiveSettings) HandlerMessageFromHive(
 	taskId string,
 	cmispfDone chan<- bool,
 ) {
-	listTmp := map[string]interface{}{}
+	var (
+		f   string
+		l   int
+		err error
+	)
 
 	//для записи событий в лог-файл events
 	str, _ := supportingfunctions.NewReadReflectJSONSprint(b)
@@ -48,6 +52,106 @@ func (s *HandlerMessageFromHiveSettings) HandlerMessageFromHive(
 		MsgType: "events",
 	}
 
+	//для карт
+	_, f, l, _ = runtime.Caller(0)
+	listMap := map[string]interface{}{}
+	if err = json.Unmarshal(b, &listMap); err == nil {
+		if len(listMap) == 0 {
+			s.Logging <- datamodels.MessageLogging{
+				MsgData: fmt.Sprintf("'error decoding the json message, it may be empty' %s:%d", f, l+2),
+				MsgType: "error",
+			}
+
+			return
+		}
+
+		nlt := processingReflectMap(s.Logging, cmispf, listMap, &s.ListRule, 0, "")
+		s.StorageApp.SetProcessedDataHiveFormatMessage(taskId, nlt)
+	}
+
+	//для срезов
+	_, f, l, _ = runtime.Caller(0)
+	listSlice := []interface{}{}
+	if err = json.Unmarshal(b, &listSlice); err == nil {
+		if len(listSlice) == 0 {
+			s.Logging <- datamodels.MessageLogging{
+				MsgData: fmt.Sprintf("'error decoding the json message, it may be empty' %s:%d", f, l+2),
+				MsgType: "error",
+			}
+
+			return
+		}
+
+		_ = processingReflectSlice(s.Logging, cmispf, listSlice, &s.ListRule, 0, "")
+	}
+
+	if err != nil {
+		s.Logging <- datamodels.MessageLogging{
+			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l+2),
+			MsgType: "error",
+		}
+
+		return
+	}
+
+	if s.ListRule.Rules.Passany {
+		s.StorageApp.SetAllowedTransferTrueHiveFormatMessage(taskId)
+	} else {
+		//проверяем соответствие сообщения правилам из раздела Pass
+		for _, v := range s.ListRule.Rules.Pass {
+			skipMsg := true
+			for _, value := range v.ListAnd {
+				if !value.StatementExpression {
+					skipMsg = false
+
+					break
+				}
+			}
+
+			if skipMsg {
+				s.StorageApp.SetAllowedTransferTrueHiveFormatMessage(taskId)
+
+				break
+			}
+		}
+	}
+
+	//выполняет очистку значения StatementExpression что равно отсутствию совпадений в правилах Pass
+	s.ListRule.CleanStatementExpressionRulePass()
+
+	isAllowed, _ := s.StorageApp.GetAllowedTransferHiveFormatMessage(taskId)
+	dt := "events do not meet rules"
+	if isAllowed {
+		dt = "update events meet rules"
+	}
+
+	//сетчик обработанных кейсов
+	s.Counting <- datamodels.DataCounterSettings{
+		DataType: dt,
+		Count:    1,
+	}
+
+	//устанавливаем параметр информирующий о завершении обработки модулем
+	s.StorageApp.SetIsProcessedMispHiveFormatMessage(taskId)
+
+	//останавливаем обработчик формирующий MISP формат
+	cmispfDone <- isAllowed
+}
+
+/*func (s *HandlerMessageFromHiveSettings) HandlerMessageFromHive(
+	cmispf chan<- ChanInputCreateMispFormat,
+	b []byte,
+	taskId string,
+	cmispfDone chan<- bool,
+) {
+	//для записи событий в лог-файл events
+	str, _ := supportingfunctions.NewReadReflectJSONSprint(b)
+	s.Logging <- datamodels.MessageLogging{
+		MsgData: fmt.Sprintf("\t---------------\n\tEVENTS:\n%s\n", str),
+		MsgType: "events",
+	}
+
+	listTmp := map[string]interface{}{}
 	if err := json.Unmarshal(b, &listTmp); err != nil {
 		_, f, l, _ := runtime.Caller(0)
 
@@ -119,100 +223,6 @@ func (s *HandlerMessageFromHiveSettings) HandlerMessageFromHive(
 
 	//устанавливаем параметр информирующий о завершении обработки модулем
 	s.StorageApp.SetIsProcessedMispHiveFormatMessage(taskId)
-
-	//останавливаем обработчик формирующий MISP формат
-	cmispfDone <- isAllowed
-}
-
-/*func HandlerMessageFromHive(
-	b []byte,
-	uuidTask string,
-	storageApp *memorytemporarystorage.CommonStorageTemporary,
-	listRule rules.ListRulesProcessingMsgMISP,
-	cmispf chan<- ChanInputCreateMispFormat,
-	cmispfDone chan<- bool,
-	logging chan<- datamodels.MessageLogging,
-	counting chan<- datamodels.DataCounterSettings) {
-	listTmp := map[string]interface{}{}
-
-	//для записи событий в файл events
-	str, _ := supportingfunctions.NewReadReflectJSONSprint(b)
-	logging <- datamodels.MessageLogging{
-		MsgData: fmt.Sprintf("\t---------------\n\tEVENTS:\n%s\n", str),
-		MsgType: "events",
-	}
-
-	if err := json.Unmarshal(b, &listTmp); err != nil {
-		_, f, l, _ := runtime.Caller(0)
-
-		logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-1),
-			MsgType: "error",
-		}
-
-		return
-	}
-
-	if len(listTmp) == 0 {
-		_, f, l, _ := runtime.Caller(0)
-
-		logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("'%s' %s:%d", fmt.Errorf("error decoding the json message, it may be empty"), f, l-1),
-			MsgType: "error",
-		}
-
-		return
-	}
-
-	//сетчик обработанных кейсов
-	counting <- datamodels.DataCounterSettings{
-		DataType: "update processed events",
-		Count:    1,
-	}
-
-	nlt := processingReflectMap(logging, cmispf, listTmp, &listRule, 0, "")
-	storageApp.SetProcessedDataHiveFormatMessage(uuidTask, nlt)
-
-	if listRule.Rules.Passany {
-		storageApp.SetAllowedTransferTrueHiveFormatMessage(uuidTask)
-	} else {
-		//проверяем соответствие сообщения правилам из раздела Pass
-		for _, v := range listRule.Rules.Pass {
-			skipMsg := true
-			for _, value := range v.ListAnd {
-				if !value.StatementExpression {
-					skipMsg = false
-
-					break
-				}
-			}
-
-			if skipMsg {
-				storageApp.SetAllowedTransferTrueHiveFormatMessage(uuidTask)
-
-				break
-			}
-		}
-	}
-
-	//выполняет очистку значения StatementExpression что равно отсудствию совпадений в правилах Pass
-	listRule.CleanStatementExpressionRulePass()
-
-	isAllowed, _ := storageApp.GetAllowedTransferHiveFormatMessage(uuidTask)
-
-	dt := "events do not meet rules"
-	if isAllowed {
-		dt = "update events meet rules"
-	}
-
-	//сетчик обработанных кейсов
-	counting <- datamodels.DataCounterSettings{
-		DataType: dt,
-		Count:    1,
-	}
-
-	//устанавливаем параметр информирующий о завершении обработки модулем
-	storageApp.SetIsProcessedMispHiveFormatMessage(uuidTask)
 
 	//останавливаем обработчик формирующий MISP формат
 	cmispfDone <- isAllowed
