@@ -67,31 +67,29 @@ func (s *HandlerMessageFromHiveSettings) HandlerMessageFromHive(
 
 		nlt := processingReflectMap(s.Logging, cmispf, listMap, &s.ListRule, 0, "")
 		s.StorageApp.SetProcessedDataHiveFormatMessage(taskId, nlt)
-	}
+	} else {
+		// для срезов
+		_, f, l, _ = runtime.Caller(0)
+		listSlice := []interface{}{}
+		if err = json.Unmarshal(b, &listSlice); err == nil {
+			if len(listSlice) == 0 {
+				s.Logging <- datamodels.MessageLogging{
+					MsgData: fmt.Sprintf("'error decoding the json message, it may be empty' %s:%d", f, l+2),
+					MsgType: "error",
+				}
 
-	//для срезов
-	_, f, l, _ = runtime.Caller(0)
-	listSlice := []interface{}{}
-	if err = json.Unmarshal(b, &listSlice); err == nil {
-		if len(listSlice) == 0 {
+				return
+			}
+
+			_ = processingReflectSlice(s.Logging, cmispf, listSlice, &s.ListRule, 0, "")
+		} else {
 			s.Logging <- datamodels.MessageLogging{
-				MsgData: fmt.Sprintf("'error decoding the json message, it may be empty' %s:%d", f, l+2),
+				MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l+2),
 				MsgType: "error",
 			}
 
 			return
 		}
-
-		_ = processingReflectSlice(s.Logging, cmispf, listSlice, &s.ListRule, 0, "")
-	}
-
-	if err != nil {
-		s.Logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l+2),
-			MsgType: "error",
-		}
-
-		return
 	}
 
 	if s.ListRule.Rules.Passany {
