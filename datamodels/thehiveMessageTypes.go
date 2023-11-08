@@ -11,8 +11,8 @@ type ResponseMessageFromMispToTheHave struct {
 // ResponseCommandForTheHive ответы с командами для TheHive
 type ResponseCommandForTheHive struct {
 	Command string `json:"command"`
-	Name    string `json:"name"`
 	String  string `json:"string"`
+	Name    string `json:"name"`
 }
 
 // MainMessageTheHive основное сообщение получаемое через NATS
