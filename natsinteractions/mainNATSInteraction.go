@@ -102,7 +102,6 @@ func NewClientNATS(
 		nats.MaxReconnects(-1),
 		nats.ReconnectWait(3*time.Second))
 	_, f, l, _ := runtime.Caller(0)
-
 	if err != nil {
 		return &mnats, fmt.Errorf("'%s' %s:%d", err.Error(), f, l-4)
 	}
@@ -120,6 +119,19 @@ func NewClientNATS(
 		logging <- datamodels.MessageLogging{
 			MsgData: fmt.Sprintf("the connection to NATS has been re-established %s:%d", f, l-4),
 			MsgType: "info",
+		}
+	})
+
+	nc.Subscribe("main_caseupdate", func(m *nats.Msg) {
+		mnats.chanOutputNATS <- SettingsOutputChan{
+			MsgId: ns.setElement(m),
+			Data:  m.Data,
+		}
+
+		//счетчик принятых кейсов
+		counting <- datamodels.DataCounterSettings{
+			DataType: "update accepted events",
+			Count:    1,
 		}
 	})
 
@@ -151,6 +163,8 @@ func NewClientNATS(
 				})
 			}
 
+			fmt.Printf("========= CREATE package for sending to TheHive\nPackage:%v\n", nrm.GetResponseMessageFromMispToTheHave())
+
 			res, err := json.Marshal(nrm.GetResponseMessageFromMispToTheHave())
 			if err != nil {
 				_, f, l, _ := runtime.Caller(0)
@@ -164,22 +178,16 @@ func NewClientNATS(
 			}
 
 			//отправляем в NATS пакет с eventId для добавления его в TheHive
-			ncd.Respond(res)
+			if err := ncd.Respond(res); err != nil {
+				_, f, l, _ := runtime.Caller(0)
+
+				logging <- datamodels.MessageLogging{
+					MsgData: fmt.Sprintf("%s %s:%d", err.Error(), f, l-2),
+					MsgType: "error",
+				}
+			}
 		}
 	}()
-
-	nc.Subscribe("main_caseupdate", func(m *nats.Msg) {
-		mnats.chanOutputNATS <- SettingsOutputChan{
-			MsgId: ns.setElement(m),
-			Data:  m.Data,
-		}
-
-		//счетчик принятых кейсов
-		counting <- datamodels.DataCounterSettings{
-			DataType: "update accepted events",
-			Count:    1,
-		}
-	})
 
 	return &mnats, nil
 }
