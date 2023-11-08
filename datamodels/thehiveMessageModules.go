@@ -10,11 +10,11 @@ import (
 func NewResponseMessage() *ResponseMessageFromMispToTheHave {
 	return &ResponseMessageFromMispToTheHave{
 		Success: true,
-		Service: "MISP",
+		Service: "MISP_TEST",
 		Commands: []ResponseCommandForTheHive{
 			{
 				Command: "addtag",
-				String:  "Webhook: send=\"MISP-TEST\"",
+				String:  "Webhook: send=\"MISP-WORLD\"",
 				//String: "Webhook: send=\"MISP\"",
 			},
 		},

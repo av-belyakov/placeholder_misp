@@ -1,3 +1,13 @@
+RESPONSE_TO_THEHIVE:
+  service: "MISP"
+  commands: 
+    - command: "addtag"
+      name: ""
+			string:  "Webhook: send=\"MISP-TEST\""
+    - command: "setcustomfield"
+			name:    "misp-event-id-test.string"
+      string: ""
+
 return {
     "success": "Event" in answerFromMisp,
     "service": "MISP",
