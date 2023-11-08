@@ -14,8 +14,8 @@ func NewResponseMessage() *ResponseMessageFromMispToTheHave {
 		Commands: []ResponseCommandForTheHive{
 			{
 				Command: "addtag",
-				String:  "Webhook:MISP",
-				//String: "Webhook: send=\"MISP\"",
+				//String:  "Webhook:MISP",
+				String: "Webhook: send=\"MISP\"",
 			},
 		},
 	}
