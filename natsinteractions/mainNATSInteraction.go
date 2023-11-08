@@ -155,7 +155,7 @@ func NewClientNATS(
 
 			nrm := datamodels.NewResponseMessage()
 
-			if data.Command == "send eventId" {
+			if data.Command == "send event id" {
 				nrm.ResponseMessageAddNewCommand(datamodels.ResponseCommandForTheHive{
 					Command: "setcustomfield",
 					Name:    "misp-event-id.string",
