@@ -28,8 +28,13 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 
 			fmt.Println("conf = ", conf)
 
+			for k, v := range conf.GetListOrganization() {
+				fmt.Printf("%d. OrgName: %s, SourceName: %s\n", k, v.OrgName, v.SourceName)
+			}
+
 			Expect(err).ShouldNot(HaveOccurred())
-			Expect(len(conf.LogList)).Should(Equal(2))
+			Expect(len(conf.GetListLogs())).Should(Equal(5))
+			Expect(len(conf.GetListOrganization())).Should(Equal(12))
 			Expect(conf.LogList[0].PathDirectory).Should(Equal("logs"))
 			Expect(conf.LogList[0].MsgTypeName).Should(Equal("error"))
 		})

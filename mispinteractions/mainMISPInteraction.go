@@ -14,13 +14,6 @@ import (
 
 var mmisp ModuleMISP
 
-type ClientMISP struct {
-	BaseURL  *url.URL
-	Host     string
-	AuthHash string
-	Verify   bool
-}
-
 type RespMISP struct {
 	Event map[string]interface{} `json:"event"`
 }

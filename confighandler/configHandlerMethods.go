@@ -8,6 +8,10 @@ func (conf *ConfigApp) GetListLogs() []LogSet {
 	return conf.LogList
 }
 
+func (conf *ConfigApp) GetListOrganization() []Organization {
+	return conf.Organizations
+}
+
 func (conf *ConfigApp) GetAppRedis() *AppConfigRedis {
 	return &conf.AppConfigRedis
 }

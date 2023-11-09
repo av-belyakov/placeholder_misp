@@ -17,7 +17,7 @@ type CommonStorageTemporary struct {
 
 type TemporaryInputCases struct {
 	Cases map[int]SettingsInputCase
-	mutex sync.Mutex
+	sync.Mutex
 }
 
 // DataCounterStorage
@@ -27,7 +27,7 @@ type DataCounterStorage struct {
 	eventsDoNotMeetRules int
 	eventsMeetRules      int
 	startTime            time.Time
-	mutex                sync.Mutex
+	sync.Mutex
 }
 
 // DataCounter счетчик данных
@@ -61,7 +61,7 @@ type UserSettingsMISP struct {
 // HiveFormatMessages содержит временные данные относящиеся к обработки событий из TheHive
 type HiveFormatMessages struct {
 	Storages map[string]StorageHiveFormatMessages
-	mutex    sync.Mutex
+	sync.Mutex
 }
 
 // StorageHiveFormatMessages хранит сообщение формата TheHave

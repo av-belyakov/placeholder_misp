@@ -1,3 +1,22 @@
+# ORGANIZATIONS содержит настройки организаций в MISP
+# 
+# orgName - наименование организации в полях 'Организация-создатель' и 
+#  'Организация-владелец' MISP
+# sourceName - наименование источника в json сообщении от TheHive
+#
+ORGANIZATIONS:
+  - { orgName: "GCM", sourceName: "gcm" }
+  - { orgName: "CFO-RCM", sourceName: "rcmmsk" }
+  - { orgName: "DFO-RCM", sourceName: "rcmkha" }
+  - { orgName: "SFO-RCM", sourceName: "rcmnvs" }
+  - { orgName: "SKFO-RCM", sourceName: "rcmsta" }
+  - { orgName: "CR-RCM", sourceName: "rcmsr" }
+  - { orgName: "PFO-RCM", sourceName: "rcmniz" }
+  - { orgName: "UralFO-RCM", sourceName: "rcmsve" }
+  - { orgName: "SZFO-RCM", sourceName: "rcmspb" }
+  - { orgName: "KGD-RCM", sourceName: "rcmkgd" }
+  - { orgName: "UFO-RCM", sourceName: "rcmros" }
+  - { orgName: "SMOL-RCM", sourceName: "rcmlnx" }
 LOGGING: 
   - { msgTypeName: "error", writingFile: true, pathDirectory: "logs", writingStdout: false, maxFileSize: 10000 }
   - { msgTypeName: "warning", writingFile: true, pathDirectory: "logs", writingStdout: false, maxFileSize: 10000 }

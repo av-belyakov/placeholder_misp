@@ -11,7 +11,8 @@ type ConfigApp struct {
 }
 
 type CommonAppConfig struct {
-	LogList []LogSet
+	LogList       []LogSet
+	Organizations []Organization
 }
 
 type Logs struct {
@@ -19,42 +20,51 @@ type Logs struct {
 }
 
 type LogSet struct {
-	MsgTypeName   string
-	PathDirectory string
-	MaxFileSize   int
-	WritingStdout bool
-	WritingFile   bool
+	WritingStdout bool   `yaml:"writingStdout"`
+	WritingFile   bool   `yaml:"writingFile"`
+	MaxFileSize   int    `yaml:"maxFileSize"`
+	MsgTypeName   string `yaml:"msgTypeName"`
+	PathDirectory string `yaml:"pathDirectory"`
+}
+
+type Orgs struct {
+	Organizations []Organization
+}
+
+type Organization struct {
+	OrgName    string `yaml:"orgName"`
+	SourceName string `yaml:"sourceName"`
 }
 
 type AppConfigNATS struct {
-	Host string
-	Port int
+	Host string `yaml:"host"`
+	Port int    `yaml:"port"`
 }
 
 type AppConfigMISP struct {
-	Host string
-	Auth string
+	Host string `yaml:"host"`
+	Auth string `yaml:"auth"`
 }
 
 type AppConfigRedis struct {
-	Host string
-	Port int
+	Host string `yaml:"host"`
+	Port int    `yaml:"port"`
 }
 
 type AppConfigElasticSearch struct {
-	Prefix   string
-	Index    string
-	Name     string
-	Authtype string
-	User     string
-	Passwd   string
-	Host     string
-	Port     int
+	Prefix   string `yaml:"prefix"`
+	Index    string `yaml:"index"`
+	Name     string `yaml:"name"`
+	Authtype string `yaml:"authtype"`
+	User     string `yaml:"user"`
+	Passwd   string `yaml:"passwd"`
+	Host     string `yaml:"host"`
+	Port     int    `yaml:"port"`
 }
 
 type AppConfigNKCKI struct {
-	Host string
-	Port int
+	Host string `yaml:"host"`
+	Port int    `yaml:"port"`
 }
 
 type RulesProcMSGMISP struct {

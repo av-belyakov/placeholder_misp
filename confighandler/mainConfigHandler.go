@@ -54,13 +54,21 @@ func NewConfig() (ConfigApp, error) {
 		}
 
 		ls := Logs{}
-
 		if ok := viper.IsSet("LOGGING"); ok {
 			if err := viper.GetViper().Unmarshal(&ls); err != nil {
 				return err
 			}
 
 			conf.CommonAppConfig.LogList = ls.Logging
+		}
+
+		orgs := Orgs{}
+		if ok := viper.IsSet("ORGANIZATIONS"); ok {
+			if err := viper.GetViper().Unmarshal(&orgs); err != nil {
+				return err
+			}
+
+			conf.CommonAppConfig.Organizations = orgs.Organizations
 		}
 
 		return nil

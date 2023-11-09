@@ -13,14 +13,12 @@ func NewTemporaryStorage() *CommonStorageTemporary {
 		cst = CommonStorageTemporary{
 			temporaryInputCase: TemporaryInputCases{
 				Cases: make(map[int]SettingsInputCase),
-				mutex: sync.Mutex{},
 			},
 			HiveFormatMessage: HiveFormatMessages{
 				Storages: make(map[string]StorageHiveFormatMessages),
-				mutex:    sync.Mutex{},
 			},
 			ListUserSettingsMISP: make([]UserSettingsMISP, 0),
-			dataCounter:          DataCounterStorage{mutex: sync.Mutex{}},
+			dataCounter:          DataCounterStorage{},
 		}
 
 		go checkTimeDelete(&cst)
@@ -65,40 +63,40 @@ func (cst *CommonStorageTemporary) GetDataCounter() DataCounter {
 
 // SetStartTimeDataCounter добавляет время начала сетчика
 func (cst *CommonStorageTemporary) SetStartTimeDataCounter(t time.Time) {
-	cst.dataCounter.mutex.Lock()
-	defer cst.dataCounter.mutex.Unlock()
+	cst.dataCounter.Lock()
+	defer cst.dataCounter.Unlock()
 
 	cst.dataCounter.startTime = t
 }
 
 // SetAcceptedEventsDataCounter увеличивает сетчик принятых событий
 func (cst *CommonStorageTemporary) SetAcceptedEventsDataCounter(num int) {
-	cst.dataCounter.mutex.Lock()
-	defer cst.dataCounter.mutex.Unlock()
+	cst.dataCounter.Lock()
+	defer cst.dataCounter.Unlock()
 
 	cst.dataCounter.acceptedEvents += num
 }
 
 // SetProcessedEventsDataCounter увеличивает сетчик обработанных событий
 func (cst *CommonStorageTemporary) SetProcessedEventsDataCounter(num int) {
-	cst.dataCounter.mutex.Lock()
-	defer cst.dataCounter.mutex.Unlock()
+	cst.dataCounter.Lock()
+	defer cst.dataCounter.Unlock()
 
 	cst.dataCounter.processedEvents += num
 }
 
 // SetEventsMeetRulesDataCounter увеличивает сетчик событий соответствующих правилу
 func (cst *CommonStorageTemporary) SetEventsMeetRulesDataCounter(num int) {
-	cst.dataCounter.mutex.Lock()
-	defer cst.dataCounter.mutex.Unlock()
+	cst.dataCounter.Lock()
+	defer cst.dataCounter.Unlock()
 
 	cst.dataCounter.eventsMeetRules += num
 }
 
 // SetEventsDoNotMeetRulesDataCounter увеличивает сетчик событий не соответствующих правилу
 func (cst *CommonStorageTemporary) SetEventsDoNotMeetRulesDataCounter(num int) {
-	cst.dataCounter.mutex.Lock()
-	defer cst.dataCounter.mutex.Unlock()
+	cst.dataCounter.Lock()
+	defer cst.dataCounter.Unlock()
 
 	cst.dataCounter.eventsDoNotMeetRules += num
 }
@@ -112,8 +110,8 @@ func (cst *CommonStorageTemporary) GetTemporaryCase(id int) (SettingsInputCase, 
 
 // SetTemporaryCase добавляет информацию о кейсах во временное хранилище
 func (cst *CommonStorageTemporary) SetTemporaryCase(id int, s SettingsInputCase) {
-	cst.temporaryInputCase.mutex.Lock()
-	defer cst.temporaryInputCase.mutex.Unlock()
+	cst.temporaryInputCase.Lock()
+	defer cst.temporaryInputCase.Unlock()
 
 	s.TimeCreate = time.Now().Unix()
 	cst.temporaryInputCase.Cases[id] = s
@@ -131,8 +129,8 @@ func (cst *CommonStorageTemporary) GetCountHiveFormatMessage() int {
 
 // SetOriginalHaveFormatMessage добавляет сырые данные полученные от TheHive
 func (cst *CommonStorageTemporary) SetRawDataHiveFormatMessage(uuid string, data []byte) {
-	cst.HiveFormatMessage.mutex.Lock()
-	defer cst.HiveFormatMessage.mutex.Unlock()
+	cst.HiveFormatMessage.Lock()
+	defer cst.HiveFormatMessage.Unlock()
 
 	if _, ok := cst.HiveFormatMessage.Storages[uuid]; !ok {
 		cst.HiveFormatMessage.Storages[uuid] = StorageHiveFormatMessages{}
@@ -160,8 +158,8 @@ func (cst *CommonStorageTemporary) GetRawDataHiveFormatMessage(uuid string) ([]b
 
 // SetProcessedDataHiveFormatMessage добавляет данные частично разобранные Unmarshal JSON
 func (cst *CommonStorageTemporary) SetProcessedDataHiveFormatMessage(uuid string, data map[string]interface{}) {
-	cst.HiveFormatMessage.mutex.Lock()
-	defer cst.HiveFormatMessage.mutex.Unlock()
+	cst.HiveFormatMessage.Lock()
+	defer cst.HiveFormatMessage.Unlock()
 
 	if _, ok := cst.HiveFormatMessage.Storages[uuid]; !ok {
 		cst.HiveFormatMessage.Storages[uuid] = StorageHiveFormatMessages{}
@@ -189,8 +187,8 @@ func (cst *CommonStorageTemporary) GetProcessedDataHiveFormatMessage(uuid string
 
 // SetAllowedTransferTrueHiveFormatMessage устанавливает поле информирующее о разрешении пропуска события в TRUE
 func (cst *CommonStorageTemporary) SetAllowedTransferTrueHiveFormatMessage(uuid string) {
-	cst.HiveFormatMessage.mutex.Lock()
-	defer cst.HiveFormatMessage.mutex.Unlock()
+	cst.HiveFormatMessage.Lock()
+	defer cst.HiveFormatMessage.Unlock()
 
 	if _, ok := cst.HiveFormatMessage.Storages[uuid]; !ok {
 		cst.HiveFormatMessage.Storages[uuid] = StorageHiveFormatMessages{}
@@ -309,15 +307,15 @@ func (cst *CommonStorageTemporary) GetListUserSettingsMISP() *CommonStorageTempo
 }
 
 func deleteHiveFormatMessageElement(uuid string, cst *CommonStorageTemporary) {
-	cst.HiveFormatMessage.mutex.Lock()
-	defer cst.HiveFormatMessage.mutex.Unlock()
+	cst.HiveFormatMessage.Lock()
+	defer cst.HiveFormatMessage.Unlock()
 
 	delete(cst.HiveFormatMessage.Storages, uuid)
 }
 
 func deleteTemporaryCase(id int, cst *CommonStorageTemporary) {
-	cst.temporaryInputCase.mutex.Lock()
-	defer cst.temporaryInputCase.mutex.Unlock()
+	cst.temporaryInputCase.Lock()
+	defer cst.temporaryInputCase.Unlock()
 
 	delete(cst.temporaryInputCase.Cases, id)
 }

@@ -7,21 +7,30 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"placeholder_misp/datamodels"
 	"runtime"
 )
 
-// Get это обертка для функции Do()
+type ClientMISP struct {
+	BaseURL  *url.URL
+	Host     string
+	AuthHash string
+	Verify   bool
+}
+
+func (client *ClientMISP) SetAuthData(ah string) {
+	client.AuthHash = ah
+}
+
 func (client *ClientMISP) Get(path string, data []byte) (*http.Response, []byte, error) {
 	return client.Do("GET", path, data)
 }
 
-// Post это обертка для функции Do()
 func (client *ClientMISP) Post(path string, data []byte) (*http.Response, []byte, error) {
 	return client.Do("POST", path, data)
 }
 
-// Delete это обертка для функции Do()
 func (client *ClientMISP) Delete(path string) (*http.Response, []byte, error) {
 	return client.Do("DELETE", path, []byte{})
 }
