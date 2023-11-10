@@ -23,6 +23,10 @@ func (client *ClientMISP) SetAuthData(ah string) {
 	client.AuthHash = ah
 }
 
+func (client *ClientMISP) GetAuthData() string {
+	return client.AuthHash
+}
+
 func (client *ClientMISP) Get(path string, data []byte) (*http.Response, []byte, error) {
 	return client.Do("GET", path, data)
 }

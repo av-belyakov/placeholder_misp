@@ -15,4 +15,5 @@ type NetworkSender interface {
 
 type SetterAuthData interface {
 	SetAuthData(ah string)
+	GetAuthData() string
 }

@@ -140,6 +140,7 @@ func NewMispFormat(
 		var (
 			maxCountObservables, seqNum int
 			userEmail                   string
+			caseSource                  string
 			caseId                      float64
 		)
 		defer func() {
@@ -161,6 +162,13 @@ func NewMispFormat(
 		for {
 			select {
 			case tmf := <-chanInput:
+				//ищем источник события
+				if tmf.FieldBranch == "source" {
+					if source, ok := tmf.Value.(string); ok {
+						caseSource = source
+					}
+				}
+
 				//ищем id события
 				if tmf.FieldBranch == "event.object.caseId" {
 					if cid, ok := tmf.Value.(float64); ok {
@@ -230,10 +238,11 @@ func NewMispFormat(
 
 					//тут отправляем сформированные по формату MISP пользовательские структуры
 					mispmodule.SendingDataInput(mispinteractions.SettingsChanInputMISP{
-						Command:   "add event",
-						TaskId:    taskId,
-						CaseId:    caseId,
-						UserEmail: userEmail,
+						Command:    "add event",
+						TaskId:     taskId,
+						CaseId:     caseId,
+						CaseSource: caseSource,
+						UserEmail:  userEmail,
 						MajorData: map[string]interface{}{
 							"events": eventsMisp,
 							"attributes": getNewListAttributes(
@@ -247,7 +256,7 @@ func NewMispFormat(
 				}
 
 				//очищаем события, список аттрибутов и текущий email пользователя
-				userEmail = ""
+				userEmail, caseSource = "", ""
 				leot.CleanListTags()
 				eventsMisp.CleanEventsMispFormat()
 				listObjectsMisp.CleanListObjectsMisp()

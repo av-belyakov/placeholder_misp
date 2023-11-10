@@ -164,7 +164,7 @@ func main() {
 	redisModule := redisinteractions.HandlerRedis(ctxRedis, confApp.AppConfigRedis, storageApp, logging)
 
 	//инициалиация модуля для взаимодействия с MISP
-	mispModule, err := mispinteractions.HandlerMISP(confApp.AppConfigMISP, storageApp, logging)
+	mispModule, err := mispinteractions.HandlerMISP(confApp.AppConfigMISP, confApp.Organizations, logging)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 		_ = sl.WriteLoggingData(fmt.Sprintf(" '%s' %s:%d", err, f, l-2), "error")

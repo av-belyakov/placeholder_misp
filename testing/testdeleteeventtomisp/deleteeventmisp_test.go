@@ -9,14 +9,12 @@ import (
 
 	"placeholder_misp/confighandler"
 	"placeholder_misp/datamodels"
-	"placeholder_misp/memorytemporarystorage"
 	"placeholder_misp/mispinteractions"
 )
 
 var _ = Describe("Deleteeventmisp", Ordered, func() {
 	var (
-		confApp    confighandler.ConfigApp
-		storageApp *memorytemporarystorage.CommonStorageTemporary
+		confApp confighandler.ConfigApp
 		//redismodule               *redisinteractions.ModuleRedis
 		mispmodule                *mispinteractions.ModuleMISP
 		errConfApp, errMispModule error
@@ -35,10 +33,8 @@ var _ = Describe("Deleteeventmisp", Ordered, func() {
 			Auth: "TvHkjH8jVQEIdvAxjxnL4H6wDoKyV7jobDjndvAo",
 		}
 
-		//инициализируем модуль временного хранения информации
-		storageApp = memorytemporarystorage.NewTemporaryStorage()
 		//redismodule = redisinteractions.HandlerRedis(context.Background(), confApp.AppConfigRedis, storageApp, logging)
-		mispmodule, errMispModule = mispinteractions.HandlerMISP(confApp.AppConfigMISP, storageApp, logging)
+		mispmodule, errMispModule = mispinteractions.HandlerMISP(confApp.AppConfigMISP, confApp.Organizations, logging)
 	})
 
 	Context("Тест 1. Проверка успешной инициализации модулей", func() {

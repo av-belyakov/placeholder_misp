@@ -8,7 +8,6 @@ import (
 
 	"placeholder_misp/confighandler"
 	"placeholder_misp/datamodels"
-	"placeholder_misp/memorytemporarystorage"
 )
 
 var mmisp ModuleMISP
@@ -24,17 +23,65 @@ func init() {
 	}
 }
 
+// NewClientMISP возвращает структуру типа ClientMISP с предустановленными значениями
+func NewClientMISP(h, a string, v bool) (*ClientMISP, error) {
+	urlBase, err := url.Parse("http://" + h)
+	if err != nil {
+		return &ClientMISP{}, err
+	}
+
+	return &ClientMISP{
+		BaseURL:  urlBase,
+		Host:     h,
+		AuthHash: a,
+		Verify:   v,
+	}, nil
+}
+
+// NewStorageAuthorizationDataMISP создает новое хранилище с данными пользователей MISP
+func NewStorageAuthorizationDataMISP() *StorageAuthorizationData {
+	return &StorageAuthorizationData{
+		AuthList:         []UserSettings{},
+		OrganisationList: map[string]OrganisationOptions{},
+	}
+}
+
+// NewHandlerAuthorizationMISP создает новый обработчик соединений с MISP
+func NewHandlerAuthorizationMISP(c ConnectMISPHandler, s *StorageAuthorizationData) *AuthorizationDataMISP {
+	return &AuthorizationDataMISP{
+		c,
+		s,
+	}
+}
+
 func HandlerMISP(
 	conf confighandler.AppConfigMISP,
-	storageApp *memorytemporarystorage.CommonStorageTemporary,
+	organistions []confighandler.Organization,
 	logging chan<- datamodels.MessageLogging) (*ModuleMISP, error) {
 
-	//выполнеяем запрос для получения настроек пользователей через API MISP
-	//и сохраняем полученные параметры во временном хранилище
-	err := getUserMisp(conf, storageApp)
+	client, err := NewClientMISP(conf.Host, conf.Auth, false)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
+		logging <- datamodels.MessageLogging{
+			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
+			MsgType: "error",
+		}
+	}
 
+	connHandler := NewHandlerAuthorizationMISP(client, NewStorageAuthorizationDataMISP())
+
+	err = connHandler.GetListAllOrganisation(organistions)
+	if err != nil {
+		_, f, l, _ := runtime.Caller(0)
+		logging <- datamodels.MessageLogging{
+			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
+			MsgType: "error",
+		}
+	}
+
+	err = connHandler.GetListAllUsers()
+	if err != nil {
+		_, f, l, _ := runtime.Caller(0)
 		logging <- datamodels.MessageLogging{
 			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
 			MsgType: "error",
@@ -44,6 +91,7 @@ func HandlerMISP(
 	//здесь обрабатываем данные из входного канала модуля MISP
 	go func() {
 		for data := range mmisp.GetInputChannel() {
+			authKey := conf.Auth
 
 			// ***********************************
 			// Это логирование только для теста!!!
@@ -55,9 +103,37 @@ func HandlerMISP(
 			//
 			//
 
+			// получаем авторизационный ключ пользователя по его email
+			us, err := connHandler.GetUserData(data.UserEmail)
+			_, f, l, _ := runtime.Caller(0)
+			if err == nil {
+				authKey = us.AuthKey
+			} else {
+				logging <- datamodels.MessageLogging{
+					MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-1),
+					MsgType: "error",
+				}
+
+				us, err = connHandler.CreateNewUser(data.UserEmail, data.CaseSource)
+				_, f, l, _ = runtime.Caller(0)
+				if err != nil {
+					logging <- datamodels.MessageLogging{
+						MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-1),
+						MsgType: "error",
+					}
+				} else {
+					authKey = us.AuthKey
+
+					logging <- datamodels.MessageLogging{
+						MsgData: fmt.Sprintf("'a new user %s has been successfully created' %s:%d", data.UserEmail, f, l-1),
+						MsgType: "info",
+					}
+				}
+			}
+
 			switch data.Command {
 			case "add event":
-				go addEvent(conf, storageApp, data, logging)
+				go addEvent(conf.Host, authKey, data, logging)
 
 			case "del event by id":
 				go delEventById(conf, data.EventId, logging)
@@ -68,26 +144,11 @@ func HandlerMISP(
 	return &mmisp, nil
 }
 
-// NewClientMISP возвращает структуру типа ClientMISP с предустановленными значениями
-func NewClientMISP(h, a string, v bool) (ClientMISP, error) {
-	urlBase, err := url.Parse("http://" + h)
-	if err != nil {
-		return ClientMISP{}, err
-	}
-
-	return ClientMISP{
-		BaseURL:  urlBase,
-		Host:     h,
-		AuthHash: a,
-		Verify:   v,
-	}, nil
-}
-
-func addEvent(conf confighandler.AppConfigMISP,
-	storageApp *memorytemporarystorage.CommonStorageTemporary,
+func addEvent(
+	host string,
+	authKey string,
 	data SettingsChanInputMISP,
 	logging chan<- datamodels.MessageLogging) {
-	authKey := conf.Auth
 
 	// ***********************************
 	// Это логирование только для теста!!!
@@ -99,13 +160,8 @@ func addEvent(conf confighandler.AppConfigMISP,
 	//
 	//
 
-	// получаем авторизационный ключ пользователя по его email
-	if us, ok := storageApp.GetUserSettingsMISP(data.UserEmail); ok {
-		authKey = us.AuthKey
-	}
-
 	//обработка только для события типа 'events'
-	_, resBodyByte, err := sendEventsMispFormat(conf.Host, authKey, data)
+	_, resBodyByte, err := sendEventsMispFormat(host, authKey, data)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 
@@ -162,7 +218,7 @@ func addEvent(conf confighandler.AppConfigMISP,
 	//
 
 	// добавляем event_reports
-	if err := sendEventReportsMispFormat(conf.Host, authKey, eventId, data.CaseId, logging); err != nil {
+	if err := sendEventReportsMispFormat(host, authKey, eventId, data.CaseId, logging); err != nil {
 		_, f, l, _ := runtime.Caller(0)
 
 		logging <- datamodels.MessageLogging{
@@ -179,13 +235,13 @@ func addEvent(conf confighandler.AppConfigMISP,
 	})
 
 	//добавляем атрибуты
-	_, _ = sendAttribytesMispFormat(conf.Host, authKey, eventId, data, logging)
+	_, _ = sendAttribytesMispFormat(host, authKey, eventId, data, logging)
 
 	// добавляем объекты
-	_, _ = sendObjectsMispFormat(conf.Host, authKey, eventId, data, logging)
+	_, _ = sendObjectsMispFormat(host, authKey, eventId, data, logging)
 
 	// добавляем event_tags
-	if err := sendEventTagsMispFormat(conf.Host, authKey, eventId, data, logging); err != nil {
+	if err := sendEventTagsMispFormat(host, authKey, eventId, data, logging); err != nil {
 		_, f, l, _ := runtime.Caller(0)
 
 		logging <- datamodels.MessageLogging{
@@ -202,7 +258,8 @@ func addEvent(conf confighandler.AppConfigMISP,
 	})
 }
 
-func delEventById(conf confighandler.AppConfigMISP,
+func delEventById(
+	conf confighandler.AppConfigMISP,
 	eventId string,
 	logging chan<- datamodels.MessageLogging) {
 
@@ -250,44 +307,7 @@ func delEventById(conf confighandler.AppConfigMISP,
 	//
 	//только для теста, для ОСТАНОВА
 	//
-	mmisp.SendingDataOutput(SettingChanOutputMISP{
-		Command: "TEST STOP",
-	})
-}
-
-// getUserMisp выполнеяет запрос для получения настроек пользователей через API MISP
-// и сохраняет полученные параметры во временном хранилище
-func getUserMisp(conf confighandler.AppConfigMISP, storageApp *memorytemporarystorage.CommonStorageTemporary) error {
-	client, err := NewClientMISP(conf.Host, conf.Auth, false)
-	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		return fmt.Errorf("'%s' %s:%d", err.Error(), f, l-2)
-	}
-
-	_, resByte, err := client.Get("/admin/users", nil)
-	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		return fmt.Errorf("'%s' %s:%d", err.Error(), f, l-2)
-	}
-
-	usmispf := []datamodels.UsersSettingsMispFormat{}
-	err = json.Unmarshal(resByte, &usmispf)
-	if err != nil {
-
-		_, f, l, _ := runtime.Caller(0)
-		return fmt.Errorf("'%s' %s:%d", err.Error(), f, l-2)
-	}
-
-	for _, v := range usmispf {
-		storageApp.AddUserSettingsMISP(memorytemporarystorage.UserSettingsMISP{
-			UserId:  v.User.Id,
-			OrgId:   v.Organisation.Id,
-			OrgName: v.Organisation.Name,
-			Email:   v.User.Email,
-			AuthKey: v.User.Authkey,
-			Role:    v.Role.Name,
-		})
-	}
-
-	return nil
+	//mmisp.SendingDataOutput(SettingChanOutputMISP{
+	//	Command: "TEST STOP",
+	//})
 }

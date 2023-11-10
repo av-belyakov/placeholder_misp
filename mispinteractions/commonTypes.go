@@ -13,12 +13,13 @@ type ModuleMISP struct {
 }
 
 type SettingsChanInputMISP struct {
-	Command   string
-	TaskId    string
-	CaseId    float64
-	EventId   string
-	UserEmail string
-	MajorData map[string]interface{}
+	Command    string
+	TaskId     string
+	CaseId     float64
+	CaseSource string
+	EventId    string
+	UserEmail  string
+	MajorData  map[string]interface{}
 }
 
 type SettingChanOutputMISP struct {
