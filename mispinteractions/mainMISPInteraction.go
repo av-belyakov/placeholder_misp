@@ -118,14 +118,14 @@ func HandlerMISP(
 				_, f, l, _ = runtime.Caller(0)
 				if err != nil {
 					logging <- datamodels.MessageLogging{
-						MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-1),
+						MsgData: fmt.Sprintf("'%s, case id %d' %s:%d", err.Error(), int(data.CaseId), f, l-1),
 						MsgType: "error",
 					}
 				} else {
 					authKey = us.AuthKey
 
 					logging <- datamodels.MessageLogging{
-						MsgData: fmt.Sprintf("'a new user %s has been successfully created' %s:%d", data.UserEmail, f, l-1),
+						MsgData: fmt.Sprintf("'a new user %s has been successfully created'", data.UserEmail),
 						MsgType: "info",
 					}
 				}

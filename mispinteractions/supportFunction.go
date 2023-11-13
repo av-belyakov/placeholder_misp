@@ -101,7 +101,7 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 			_, f, l, _ := runtime.Caller(0)
 
 			logging <- datamodels.MessageLogging{
-				MsgData: fmt.Sprintf("'attributes №%s add, the \"Value\" type property should not be empty' %s:%d", eventId, f, l-1),
+				MsgData: fmt.Sprintf("'attributes for event id №%s is not added, the \"Value\" type property should not be empty' %s:%d", eventId, f, l-1),
 				MsgType: "warning",
 			}
 
