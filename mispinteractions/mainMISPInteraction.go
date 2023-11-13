@@ -163,7 +163,7 @@ func addEvent(
 	//
 	// --------------------- ТОЛЬКО ДЛЯ ОТЛАДКИ ----------------------
 	//
-	/*if data.CaseId == 0 && data.UserEmail == "" {
+	if data.CaseId == 0 && data.UserEmail == "" {
 		if ed, ok := data.MajorData["events"]; !ok {
 			logging <- datamodels.MessageLogging{
 				MsgData: fmt.Sprintf("TEST_ERROR func 'HandlerMISP', reseived command '%s', the properties of \"events\" were not found in the received data. DATA: %v", data.Command, data.MajorData),
@@ -175,7 +175,7 @@ func addEvent(
 				MsgType: "error",
 			}
 		}
-	}*/
+	}
 	//
 	//
 	//
