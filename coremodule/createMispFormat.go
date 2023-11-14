@@ -142,6 +142,7 @@ func NewMispFormat(
 			userEmail                   string
 			caseSource                  string
 			caseId                      float64
+			patterIsNum                 *regexp.Regexp = regexp.MustCompile(`^\d+$`)
 		)
 		defer func() {
 			close(chanInput)
@@ -163,33 +164,71 @@ func NewMispFormat(
 			select {
 			case tmf := <-chanInput:
 				//ищем источник события
-				if tmf.FieldBranch == "source" {
-					if source, ok := tmf.Value.(string); ok {
-						caseSource = source
-					}
+				if source, ok := searchEventSource(tmf); ok {
+					caseSource = source
 				}
 
 				//ищем id события
-				if tmf.FieldBranch == "event.object.caseId" {
-					if cid, ok := tmf.Value.(float64); ok {
-						caseId = cid
-					}
+				if cid, ok := searchCaseId(tmf); ok {
+					caseId = cid
 				}
 
 				// ищем email владельца события
-				if tmf.FieldBranch == "event.object.owner" {
-					if email, ok := tmf.Value.(string); ok {
-						userEmail = email
-					}
+				if uemail, ok := searchOwnerEmail(tmf); ok {
+					userEmail = uemail
 				}
 
-				if strings.Contains(tmf.FieldBranch, "observables") && !strings.Contains(tmf.FieldBranch, "attachment") {
-					if svn.GetValueName(tmf.FieldName) {
+				//для observables которые содержат свойства, являющиеся картами,
+				//такими как свойства 'attachment', 'reports' и т.д. не
+				//осуществлять подсчет свойств
+				isObservables := strings.Contains(tmf.FieldBranch, "observables")
+				countOne := strings.Count(tmf.FieldBranch, ".") <= 1
+
+				//if isObservables && countOne {
+				//	fmt.Println("00000000000000000000 tmf.FieldBranch = ", tmf.FieldBranch)
+				//}
+
+				//isAttachment := strings.Contains(tmf.FieldBranch, "attachment")
+				if isObservables && countOne /*!isAttachment*/ {
+					var newFieldName = tmf.FieldName
+					fmt.Println("BEFORE ++++++++ tmf.FieldName:", tmf.FieldBranch, " seqNum = ", seqNum)
+
+					//сделал проверку на число что бы исключить повторение
+					//имен для свойств являющихся срезами, так как в данной ситуации
+					//имя содержащееся в tmf.FieldName представляет собой числовой
+					//индекс, соответственное, если будет еще одно свойство являющееся
+					//срезом, то может быть совпадение имен и изменение seqNum, а как
+					//результат перескакиванее на другой объект 'observables'
+					//if strings.Contains(tmf.FieldBranch, ".tags") {
+					if patterIsNum.MatchString(tmf.FieldName) {
+						fmt.Println(")))))))))))))))))))))))))))))))))))))))")
+						/*
+
+							Никак с регуляркой не справлюсь
+							не работает этот кусок кода похоже что это из-за
+							перевода строки в tmf.FieldName
+
+							кроме того имя должно формироваться из последнего
+							после точки значения tmf.FieldBranch, так будет красивше
+
+						*/
+
+						newFieldName = tmf.FieldName + "_" + tmf.FieldName
+					} else {
+						fmt.Println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+					}
+
+					//подсчет свойств для объектов типа 'observables' выполняется для
+					//того что бы отделить один объект 'observables' от другого
+					if svn.GetValueName(newFieldName) {
 						svn.CleanValueName()
 						seqNum++
 					}
 
-					svn.SetValueName(tmf.FieldName)
+					fmt.Println("AFTER ++++++++ tmf.FieldName:", tmf.FieldBranch, " seqNum = ", seqNum)
+					fmt.Printf("newFieldName: '%s'\n", newFieldName)
+
+					svn.SetValueName(newFieldName)
 				}
 
 				//обрабатываем свойство observables.attachment
@@ -225,6 +264,19 @@ func NewMispFormat(
 				}
 
 			case isAllowed := <-chanDone:
+				fmt.Println("_________________ listTags: __________________")
+				for k, v := range listTags {
+					fmt.Printf("%d. value[0]'%s', value[1]'%s'\n", k, v[0], v[1])
+				}
+				fmt.Println("______________________________________________")
+				fmt.Println("_____________________---- Attributes ----____________________")
+				for k, v := range getNewListAttributes(
+					listAttributesMisp.GetListAttributesMisp(),
+					listTags) {
+					fmt.Printf("%d.\n%v\n", k, v)
+				}
+				fmt.Println("_____________________-------____________________")
+
 				if !isAllowed {
 					_, f, l, _ := runtime.Caller(0)
 
@@ -271,6 +323,48 @@ func NewMispFormat(
 	return chanInput, chanDone
 }
 
+// searchEventSource выполняет поиск источника события
+func searchEventSource(tmf ChanInputCreateMispFormat) (string, bool) {
+	var (
+		source string
+		ok     bool
+	)
+
+	if tmf.FieldBranch == "source" {
+		source, ok = tmf.Value.(string)
+	}
+
+	return source, ok
+}
+
+// searchCaseId выполняет поиск id кейса
+func searchCaseId(tmf ChanInputCreateMispFormat) (float64, bool) {
+	var (
+		cid float64
+		ok  bool
+	)
+
+	if tmf.FieldBranch == "event.object.caseId" {
+		cid, ok = tmf.Value.(float64)
+	}
+
+	return cid, ok
+}
+
+// searchOwnerEmail выполняет поиск email владельца события
+func searchOwnerEmail(tmf ChanInputCreateMispFormat) (string, bool) {
+	var (
+		email string
+		ok    bool
+	)
+
+	if tmf.FieldBranch == "event.object.owner" {
+		email, ok = tmf.Value.(string)
+	}
+
+	return email, ok
+}
+
 func getNewListAttributes(al map[int]datamodels.AttributesMispFormat, lat map[int][2]string) []datamodels.AttributesMispFormat {
 	nal := make([]datamodels.AttributesMispFormat, 0, len(al))
 
@@ -302,6 +396,13 @@ func getNewListObjects(
 	}
 
 	return nlo
+}
+
+func testSearchFieldBranch(fb string) {
+	patter := regexp.MustCompile(`^misp:([\w\-].*)=\"([\w\-].*)\"$`)
+	if patter.MatchString(fb) {
+		fmt.Println("!!!!!!! ======== В fb содержится что то больше чем observables.<любое значение>", fb)
+	}
 }
 
 func HandlingObservablesTag(tag string) ([2]string, error) {

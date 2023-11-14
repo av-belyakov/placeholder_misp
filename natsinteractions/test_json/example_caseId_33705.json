@@ -71,7 +71,7 @@
                 "Webhook: send=\"MISP\"",
                 "ATs:reason=\"Зафиксированы признаки взаимодействия ВПО класса trojan\"",
                 "ATs:reason=\"Большое количество подозрительной активности с одного IP-адреса\"",
-                "Sensor:id=\"690006\""          
+                "Sensor:id=\"690006\""
             ],
             "customFields": {
                 "external-letter": {
@@ -434,6 +434,185 @@
             "extraData": "",
             "ignoreSimilarity": false,
             "ioc": false,
+            "sighted": false
+        },
+        {
+            "_id": "~78562259136",
+            "_type": "Observable",
+            "reports": {},
+            "sighted": false,
+            "tags": [
+                "39.6 KB"
+            ],
+            "_createdAt": 1699603435587,
+            "data": "ftp://ftp.cloud.gcm/traffic/8030009/1699603033_2023_11_10____10_57_13_995420.pcap",
+            "extraData": "",
+            "ioc": true,
+            "ignoreSimilarity": true,
+            "message": "Download a piece of traffic",
+            "tlp": 2,
+            "_createdBy": "v.kovanko@cloud.gcm",
+            "dataType": "url_pcap",
+            "startDate": 1699603435587
+        },
+        {
+            "message": "Ссылка на Arkime",
+            "_createdAt": 1699603435574,
+            "_id": "~82864193576",
+            "dataType": "url_arkime",
+            "ignoreSimilarity": true,
+            "ioc": false,
+            "_createdBy": "v.kovanko@cloud.gcm",
+            "_type": "Observable",
+            "extraData": "",
+            "startDate": 1699603435574,
+            "sighted": false,
+            "data": "http://anisimova.cloud.gcm:8005/sessions?expression=file%20%3D%3D%20%2Fopt%2Farkime%2Fraw%2F2023_11_10_10_56_29_443059____1699603033_2023_11_10____10_57_13_995420.pcap&date=-1",
+            "reports": {},
+            "tags": [],
+            "tlp": 2
+        },
+        {
+            "_updatedBy": "v.kovanko@cloud.gcm",
+            "data": "94.131.96.116",
+            "reports": {
+                "BIZONE_ThreatVision_1_0": {
+                    "taxonomies": [
+                        {
+                            "level": "info",
+                            "namespace": "ThreatVision",
+                            "predicate": "Results",
+                            "value": "0"
+                        }
+                    ]
+                },
+                "CyberCrime-Tracker_1_0": {
+                    "taxonomies": [
+                        {
+                            "level": "info",
+                            "namespace": "CCT",
+                            "predicate": "C2 Search",
+                            "value": "0 hits"
+                        }
+                    ]
+                },
+                "IKnowWhatYouDownload_0_1": {
+                    "taxonomies": [
+                        {
+                            "level": "safe",
+                            "namespace": "IKnowWhatYouDownload",
+                            "predicate": "count",
+                            "value": "0 download(s)"
+                        }
+                    ]
+                },
+                "MISP_2_1": {
+                    "taxonomies": [
+                        {
+                            "level": "suspicious",
+                            "namespace": "MISP",
+                            "predicate": "Search",
+                            "value": "8 event(s)"
+                        }
+                    ]
+                },
+                "Maltiverse_Report_1_0": {
+                    "taxonomies": [
+                        {
+                            "level": "safe",
+                            "namespace": "Maltiverse",
+                            "predicate": "Report",
+                            "value": "neutral"
+                        }
+                    ]
+                },
+                "NCIRCC_GeoIP_1_0": {
+                    "taxonomies": [
+                        {
+                            "value": "Польша ",
+                            "level": "info",
+                            "namespace": "GeoIP",
+                            "predicate": "Country"
+                        }
+                    ]
+                },
+                "VirusTotal_GetReport_3_0": {
+                    "taxonomies": [
+                        {
+                            "value": "0 detected_url(s)",
+                            "level": "safe",
+                            "namespace": "VT",
+                            "predicate": "GetReport"
+                        }
+                    ]
+                },
+                "ARIADNA_GeoIP_1_0": {
+                    "taxonomies": [
+                        {
+                            "namespace": "Ariadna_GeoIP",
+                            "predicate": "Country",
+                            "value": "Польша ",
+                            "level": "info"
+                        }
+                    ]
+                },
+                "ZPMSig_1_0": {
+                    "taxonomies": [
+                        {
+                            "level": "malicious",
+                            "namespace": "ZPM_Sensor",
+                            "predicate": "IP",
+                            "value": "Found"
+                        }
+                    ]
+                },
+                "URLhaus_2_0": {
+                    "taxonomies": [
+                        {
+                            "value": "No results",
+                            "level": "info",
+                            "namespace": "URLhaus",
+                            "predicate": "Search"
+                        }
+                    ]
+                },
+                "Urlscan_io_Search_0_1_1": {
+                    "taxonomies": [
+                        {
+                            "level": "suspicious",
+                            "namespace": "urlscan.io",
+                            "predicate": "Search",
+                            "value": "2 results"
+                        }
+                    ]
+                },
+                "AbuseIPDB_1_0": {
+                    "taxonomies": [
+                        {
+                            "value": 0,
+                            "level": "safe",
+                            "namespace": "AbuseIPDB",
+                            "predicate": "Records"
+                        }
+                    ]
+                }
+            },
+            "_type": "Observable",
+            "dataType": "ip",
+            "startDate": 1699603435535,
+            "_id": "~82864185384",
+            "extraData": {},
+            "tags": [
+                "external",
+                "geo:iso=\"US\"",
+                "geo:country=\"США\"",
+                "misp:Network activity=\"ip-dst\""
+            ],
+            "tlp": 2,
+            "_createdAt": 1699603435535,
+            "_createdBy": "v.kovanko@cloud.gcm",
+            "_updatedAt": 1699945527191,
+            "ioc": true,
             "sighted": false
         }
     ],
