@@ -80,13 +80,10 @@ func readReflectMapSprint(list map[string]interface{}, num int) string {
 			return str
 		}
 
-		//str += readReflectAnyTypeSprint(k, v, num)
-
 		switch r.Kind() {
 		case reflect.Map:
 			if v, ok := v.(map[string]interface{}); ok {
 				str += fmt.Sprintf("%s%s:\n", ws, k)
-				//str += fmt.Sprintln(k, ":")
 				str += readReflectMapSprint(v, num+1)
 			}
 

@@ -212,7 +212,7 @@ func processingReflectAnySimpleType(
 	r := reflect.TypeOf(anyType)
 
 	if n, ok := name.(int); ok {
-		nameStr = fmt.Sprintln(n)
+		nameStr = fmt.Sprint(n)
 	} else if n, ok := name.(string); ok {
 		nameStr = n
 	}

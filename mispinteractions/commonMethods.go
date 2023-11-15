@@ -102,17 +102,19 @@ func (ad *AuthorizationDataMISP) getListAllUsers() ([]datamodels.UsersSettingsMi
 // и добавляет их в хранилище. Внимание, перед добавлением списка пользователей,
 // данные о пользователях которые оставались в хранилище будут удалены. Но только
 // если при обращении к MISP не будет ошибок
-func (ad *AuthorizationDataMISP) GetListAllUsers() error {
+func (ad *AuthorizationDataMISP) GetListAllUsers() (int, error) {
+	var countUser int
 	lus, err := ad.getListAllUsers()
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
-		return fmt.Errorf("'%s' %s:%d", err.Error(), f, l-2)
+		return countUser, fmt.Errorf("'%s' %s:%d", err.Error(), f, l-2)
 	}
 
 	//очищаем хранилище с данными пользователей
 	ad.Storage.cleanUsers()
 
 	for _, v := range lus {
+		countUser++
 		ad.Storage.setUserSettings(UserSettings{
 			UserId:  v.User.Id,
 			OrgId:   v.Organisation.Id,
@@ -123,7 +125,7 @@ func (ad *AuthorizationDataMISP) GetListAllUsers() error {
 		})
 	}
 
-	return nil
+	return countUser, nil
 }
 
 // GetUserData проверяет наличие пользователя в памяти, если его там нет то
@@ -161,6 +163,32 @@ func (ad *AuthorizationDataMISP) GetUserData(user string) (UserSettings, error) 
 	}
 
 	return UserSettings{}, fmt.Errorf("information about the user '%s' was not found", user)
+}
+
+// только для теста
+func (ad *AuthorizationDataMISP) DelUserData(user string) (int, bool) {
+	ad.Storage.Lock()
+	defer ad.Storage.Unlock()
+
+	var (
+		num     int
+		isExist bool
+	)
+
+	newList := []UserSettings{}
+	for k, v := range ad.Storage.AuthList {
+		if v.Email == user {
+			num = k
+			isExist = true
+
+			newList = append(ad.Storage.AuthList[:k], ad.Storage.AuthList[k+1:]...)
+			break
+		}
+	}
+
+	ad.Storage.AuthList = newList
+
+	return num, isExist
 }
 
 // GetListAllOrganisation получает список всех организаций добавленых в MISP

@@ -184,38 +184,22 @@ func NewMispFormat(
 				isObservables := strings.Contains(tmf.FieldBranch, "observables")
 				countOne := strings.Count(tmf.FieldBranch, ".") <= 1
 
-				//if isObservables && countOne {
-				//	fmt.Println("00000000000000000000 tmf.FieldBranch = ", tmf.FieldBranch)
-				//}
-
-				//isAttachment := strings.Contains(tmf.FieldBranch, "attachment")
-				if isObservables && countOne /*!isAttachment*/ {
+				if isObservables && countOne {
 					var newFieldName = tmf.FieldName
-					fmt.Println("BEFORE ++++++++ tmf.FieldName:", tmf.FieldBranch, " seqNum = ", seqNum)
-
 					//сделал проверку на число что бы исключить повторение
 					//имен для свойств являющихся срезами, так как в данной ситуации
 					//имя содержащееся в tmf.FieldName представляет собой числовой
 					//индекс, соответственное, если будет еще одно свойство являющееся
 					//срезом, то может быть совпадение имен и изменение seqNum, а как
-					//результат перескакиванее на другой объект 'observables'
-					//if strings.Contains(tmf.FieldBranch, ".tags") {
+					//результат будет переход на другой объект 'observables'
 					if patterIsNum.MatchString(tmf.FieldName) {
-						fmt.Println(")))))))))))))))))))))))))))))))))))))))")
-						/*
+						tmp := strings.Split(tmf.FieldBranch, ".")
+						var nameTmp string
+						if len(tmp) > 0 {
+							nameTmp = tmp[len(tmp)-1] + "_"
+						}
 
-							Никак с регуляркой не справлюсь
-							не работает этот кусок кода похоже что это из-за
-							перевода строки в tmf.FieldName
-
-							кроме того имя должно формироваться из последнего
-							после точки значения tmf.FieldBranch, так будет красивше
-
-						*/
-
-						newFieldName = tmf.FieldName + "_" + tmf.FieldName
-					} else {
-						fmt.Println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+						newFieldName = nameTmp + tmf.FieldName
 					}
 
 					//подсчет свойств для объектов типа 'observables' выполняется для
@@ -224,9 +208,6 @@ func NewMispFormat(
 						svn.CleanValueName()
 						seqNum++
 					}
-
-					fmt.Println("AFTER ++++++++ tmf.FieldName:", tmf.FieldBranch, " seqNum = ", seqNum)
-					fmt.Printf("newFieldName: '%s'\n", newFieldName)
 
 					svn.SetValueName(newFieldName)
 				}
@@ -270,9 +251,7 @@ func NewMispFormat(
 				}
 				fmt.Println("______________________________________________")
 				fmt.Println("_____________________---- Attributes ----____________________")
-				for k, v := range getNewListAttributes(
-					listAttributesMisp.GetListAttributesMisp(),
-					listTags) {
+				for k, v := range listAttributesMisp.GetListAttributesMisp() {
 					fmt.Printf("%d.\n%v\n", k, v)
 				}
 				fmt.Println("_____________________-------____________________")

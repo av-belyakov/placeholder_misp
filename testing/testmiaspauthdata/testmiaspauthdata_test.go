@@ -48,6 +48,7 @@ var _ = Describe("Testmiaspauthdata", Ordered, func() {
 		handler         *mispinteractions.AuthorizationDataMISP
 		errGetListOrgs  error
 		errGetListUsers error
+		countUser       int
 	)
 
 	BeforeAll(func() {
@@ -76,7 +77,7 @@ var _ = Describe("Testmiaspauthdata", Ordered, func() {
 		handler = NewHandlerAuthorizationMISP(client, NewStorageAuthorizationDataMISP())
 
 		errGetListOrgs = handler.GetListAllOrganisation(confOrgs)
-		errGetListUsers = handler.GetListAllUsers()
+		countUser, errGetListUsers = handler.GetListAllUsers()
 	})
 
 	Context("Тест 1. Получаем список всех организаций", func() {
@@ -85,10 +86,10 @@ var _ = Describe("Testmiaspauthdata", Ordered, func() {
 
 			orgList := handler.Storage.GetOptionsAllOrganisations()
 
-			fmt.Println("__________________________________________")
-			for k, v := range orgList {
-				fmt.Printf("Key: %s\n  Id: %s\n  Name: %s\n", k, v.Id, v.Name)
-			}
+			//fmt.Println("__________________________________________")
+			//for k, v := range orgList {
+			//	fmt.Printf("Key: %s\n  Id: %s\n  Name: %s\n", k, v.Id, v.Name)
+			//}
 
 			Expect(len(orgList)).Should(Equal(12))
 		})
@@ -97,14 +98,19 @@ var _ = Describe("Testmiaspauthdata", Ordered, func() {
 	Context("Тест 2. Получаем список всех пользователей", func() {
 		It("При выполнения данного действия не должно быть ошибок, список пользователей должен быть больше 0", func() {
 			Expect(errGetListUsers).ShouldNot(HaveOccurred())
+			Expect(countUser).Should(Equal(108))
 
-			userList := handler.Storage.GetSettingsAllUsers()
+			//userList := handler.Storage.GetSettingsAllUsers()
 
-			fmt.Println("____________________ Total users found ______________________")
-			fmt.Println("Users num:", len(userList))
-			fmt.Println("_____________________________________________________________")
+			//for k, v := range userList {
+			//	fmt.Printf("%d.\n%v\n", k, v)
+			//}
 
-			Expect(len(userList)).Should(BeNumerically(">", 0))
+			//fmt.Println("____________________ Total users found ______________________")
+			//fmt.Println("Users num:", len(userList))
+			//fmt.Println("_____________________________________________________________")
+
+			//Expect(len(userList)).Should(BeNumerically(">", 0))
 		})
 	})
 
@@ -128,6 +134,14 @@ var _ = Describe("Testmiaspauthdata", Ordered, func() {
 	})
 
 	Context("Тест 4.Проверяем наличие данных о пользователе", func() {
+		It("В хранилище НЕ ДОЛЖЕН быть найден несуществующий пользователь", func() {
+			_, ok := handler.Storage.GetUserSettingsByEmail("feiigg@dffe.h")
+			Expect(ok).Should(BeFalse())
+		})
+		It("В хранилище ДОЛЖЕН быть найден несуществующий пользователь", func() {
+			_, ok := handler.Storage.GetUserSettingsByEmail("a.shershnev@cloud.gcm")
+			Expect(ok).Should(BeTrue())
+		})
 		It("Должен быть найден пользователь существующий в MISP", func() {
 			us, err := handler.GetUserData("a.shershnev@cloud.gcm")
 			Expect(err).ShouldNot(HaveOccurred())
@@ -140,10 +154,10 @@ var _ = Describe("Testmiaspauthdata", Ordered, func() {
 		})
 	})
 	Context("Тест 5. Создание нового пользователя в MISP при его отсутствии", func() {
-		It("Должен быть успешно создан новый пользователь", func() {
-			/*
-				При создании нового пользователя нужно сделать запись в лог-файл info
-			*/
+		/*It("Должен быть успешно создан новый пользователь", func() {
+
+			//	При создании нового пользователя нужно сделать запись в лог-файл info
+
 			userEmail := "my.testuser@exampleemail.org"
 
 			userset, err := handler.CreateNewUser(userEmail, "rcmkha")
@@ -162,7 +176,53 @@ var _ = Describe("Testmiaspauthdata", Ordered, func() {
 			Expect(err).ShouldNot(HaveOccurred())
 			fmt.Println("userset.AuthKey:", userset.AuthKey)
 			Expect(userset.Email).Should(Equal(userEmail))
+		})*/
+		It("Должен быть успешно найден, в памяти, определенный пользователь", func() {
+			userEmail := "pukucheryaviy@spbfsb.ru"
+
+			us, err := handler.GetUserData(userEmail)
+
+			fmt.Println("DATA for user email", us)
+
+			Expect(err).ShouldNot(HaveOccurred())
+			Expect(us.Email).Should(Equal(userEmail))
 		})
+
+		It("Информация о пользователе должна быть успешно удалена из хранилища приложения", func() {
+			userEmail := "pukucheryaviy@spbfsb.ru"
+
+			//удаляем пользователя
+			num, ok := handler.DelUserData(userEmail)
+			Expect(ok).Should(BeTrue())
+			fmt.Println("USER num = ", num)
+
+			//ищем пользователя в хранилище
+			us, ok := handler.Storage.GetUserSettingsByEmail(userEmail)
+			fmt.Println("user not found", us)
+			Expect(ok).ShouldNot(BeTrue())
+
+			//ищем пользователя в хранилище и MISP
+			s, err := handler.GetUserData(userEmail)
+			fmt.Println("us", s)
+			Expect(err).ShouldNot(HaveOccurred())
+			Expect(s.Email).Should(Equal(userEmail))
+
+			//получаем всех пользователей из хранилища
+			userList := handler.Storage.GetSettingsAllUsers()
+			Expect(len(userList)).Should(Equal(108))
+
+			//ищем УЖЕ находящегося в хранилище пользователя в хранилище и MISP
+			s, err = handler.GetUserData(userEmail)
+			fmt.Println("----------- us", s)
+			Expect(err).ShouldNot(HaveOccurred())
+			Expect(s.Email).Should(Equal(userEmail))
+		})
+
+		/*
+					It("Должен быть успешно найден в MISP, так как в памяти его нет, определенный пользователь", func ()  {
+				//pukucheryaviy@spbfsb.ru
+			})
+		*/
 	})
 
 	/*

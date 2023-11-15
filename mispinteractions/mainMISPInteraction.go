@@ -69,7 +69,6 @@ func HandlerMISP(
 	}
 
 	connHandler := NewHandlerAuthorizationMISP(client, NewStorageAuthorizationDataMISP())
-
 	err = connHandler.GetListAllOrganisation(organistions)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
@@ -79,12 +78,16 @@ func HandlerMISP(
 		}
 	}
 
-	err = connHandler.GetListAllUsers()
-	if err != nil {
+	if countUser, err := connHandler.GetListAllUsers(); err != nil {
 		_, f, l, _ := runtime.Caller(0)
 		logging <- datamodels.MessageLogging{
 			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
 			MsgType: "error",
+		}
+	} else {
+		logging <- datamodels.MessageLogging{
+			MsgData: fmt.Sprintf("at the start of the application, all user information was downloaded %d", countUser),
+			MsgType: "info",
 		}
 	}
 
@@ -104,19 +107,17 @@ func HandlerMISP(
 			//
 
 			// получаем авторизационный ключ пользователя по его email
-			us, err := connHandler.GetUserData(data.UserEmail)
-			_, f, l, _ := runtime.Caller(0)
-			if err == nil {
+			if us, err := connHandler.GetUserData(data.UserEmail); err == nil {
 				authKey = us.AuthKey
 			} else {
+				_, f, l, _ := runtime.Caller(0)
 				logging <- datamodels.MessageLogging{
-					MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-1),
+					MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-3),
 					MsgType: "error",
 				}
 
-				us, err = connHandler.CreateNewUser(data.UserEmail, data.CaseSource)
-				_, f, l, _ = runtime.Caller(0)
-				if err != nil {
+				if us, err = connHandler.CreateNewUser(data.UserEmail, data.CaseSource); err != nil {
+					_, f, l, _ = runtime.Caller(0)
 					logging <- datamodels.MessageLogging{
 						MsgData: fmt.Sprintf("'%s, case id %d' %s:%d", err.Error(), int(data.CaseId), f, l-1),
 						MsgType: "error",
@@ -125,7 +126,7 @@ func HandlerMISP(
 					authKey = us.AuthKey
 
 					logging <- datamodels.MessageLogging{
-						MsgData: fmt.Sprintf("'a new user %s has been successfully created'", data.UserEmail),
+						MsgData: fmt.Sprintf("a new user %s has been successfully created", data.UserEmail),
 						MsgType: "info",
 					}
 				}
