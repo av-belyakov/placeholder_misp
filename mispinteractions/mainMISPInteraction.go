@@ -58,7 +58,6 @@ func HandlerMISP(
 	conf confighandler.AppConfigMISP,
 	organistions []confighandler.Organization,
 	logging chan<- datamodels.MessageLogging) (*ModuleMISP, error) {
-
 	client, err := NewClientMISP(conf.Host, conf.Auth, false)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
@@ -119,7 +118,7 @@ func HandlerMISP(
 				if us, err = connHandler.CreateNewUser(data.UserEmail, data.CaseSource); err != nil {
 					_, f, l, _ = runtime.Caller(0)
 					logging <- datamodels.MessageLogging{
-						MsgData: fmt.Sprintf("'%s, case id %d' %s:%d", err.Error(), int(data.CaseId), f, l-1),
+						MsgData: fmt.Sprintf("'%s, case id %d' %s:%d", err.Error(), int(data.CaseId), f, l-3),
 						MsgType: "error",
 					}
 				} else {
