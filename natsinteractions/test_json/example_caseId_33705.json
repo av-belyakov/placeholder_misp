@@ -54,6 +54,7 @@
             "status": "Resolved",
             "severity": 2,
             "startDate": 1696583100000,
+            "impactStatus": "WithImpact",
             "resolutionStatus": "TruePositive",
             "flag": false,
             "tlp": 2,

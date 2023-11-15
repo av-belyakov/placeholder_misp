@@ -53,7 +53,7 @@
 #      replaceValue: "true"
 #  PASS:
 #    - listAnd:
-#      - searchField: "event.object.stats.impactStatus"
+#      - searchField: "event.object.impactStatus"
 #        searchValue: "WithImpact"
 #      - searchField: "event.object.resolutionStatus"
 #        searchValue: "TruePositive"
@@ -74,11 +74,11 @@ RULES:
   REPLACE:
   PASS:
     - listAnd:
-      - searchField: "event.object.stats.impactStatus"
+      - searchField: "event.object.impactStatus"
         searchValue: "WithImpact"
       - searchField: "event.object.resolutionStatus"
         searchValue: "TruePositive"
       - searchField: "event.object.tlp"
-        searchValue: "not:1"
+        searchValue: "not:3"
     - listAnd:
   PASSANY: false

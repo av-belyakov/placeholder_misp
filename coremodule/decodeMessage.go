@@ -230,11 +230,6 @@ func processingReflectAnySimpleType(
 		return anyType
 	}
 
-	if fieldBranch == "event.object.impactStatus" || fieldBranch == "event.object.resolutionStatus" || fieldBranch == "event.object.tlp" {
-		fmt.Println("------- processingReflectAnySimpleType ---------")
-		fmt.Printf("fieldBranch: '%s', nameStr: '%s'\n\n", fieldBranch, nameStr)
-	}
-
 	switch r.Kind() {
 	case reflect.String:
 		result := reflect.ValueOf(anyType).String()
