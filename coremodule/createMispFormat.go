@@ -245,17 +245,6 @@ func NewMispFormat(
 				}
 
 			case isAllowed := <-chanDone:
-				fmt.Println("_________________ listTags: __________________")
-				for k, v := range listTags {
-					fmt.Printf("%d. value[0]'%s', value[1]'%s'\n", k, v[0], v[1])
-				}
-				fmt.Println("______________________________________________")
-				fmt.Println("_____________________---- Attributes ----____________________")
-				for k, v := range listAttributesMisp.GetListAttributesMisp() {
-					fmt.Printf("%d.\n%v\n", k, v)
-				}
-				fmt.Println("_____________________-------____________________")
-
 				if !isAllowed {
 					_, f, l, _ := runtime.Caller(0)
 
