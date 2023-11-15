@@ -15,19 +15,19 @@ import (
 )
 
 func CoreHandler(
-	natsmodule *natsinteractions.ModuleNATS,
-	mispmodule *mispinteractions.ModuleMISP,
-	redismodule *redisinteractions.ModuleRedis,
-	esmodule *elasticsearchinteractions.ModuleElasticSearch,
-	nkckimodule *nkckiinteractions.ModuleNKCKI,
+	natsModule *natsinteractions.ModuleNATS,
+	mispModule *mispinteractions.ModuleMISP,
+	redisModule *redisinteractions.ModuleRedis,
+	esModule *elasticsearchinteractions.ModuleElasticSearch,
+	nkckiModule *nkckiinteractions.ModuleNKCKI,
 	listRule rules.ListRulesProcessingMsgMISP,
 	storageApp *memorytemporarystorage.CommonStorageTemporary,
 	logging chan<- datamodels.MessageLogging,
 	counting chan<- datamodels.DataCounterSettings) {
 
-	natsChanReception := natsmodule.GetDataReceptionChannel()
-	mispChanReception := mispmodule.GetDataReceptionChannel()
-	redisChanReception := redismodule.GetDataReceptionChannel()
+	natsChanReception := natsModule.GetDataReceptionChannel()
+	mispChanReception := mispModule.GetDataReceptionChannel()
+	redisChanReception := redisModule.GetDataReceptionChannel()
 	hmfh := NewHandlerMessageFromHive(storageApp, listRule, logging, counting)
 
 	for {
@@ -36,17 +36,17 @@ func CoreHandler(
 			storageApp.SetRawDataHiveFormatMessage(data.MsgId, data.Data)
 
 			//формирование итоговых документов в формате MISP
-			chanCreateMispFormat, chanDone := NewMispFormat(data.MsgId, mispmodule, logging)
+			chanCreateMispFormat, chanDone := NewMispFormat(data.MsgId, mispModule, logging)
 
 			//обработчик сообщений из TheHive (выполняется разбор сообщения и его разбор на основе правил)
 			go hmfh.HandlerMessageFromHive(chanCreateMispFormat, data.Data, data.MsgId, chanDone)
 			//go HandlerMessageFromHive(data.Data, data.MsgId, storageApp, listRule, chanCreateMispFormat, chanDone, logging, counting)
 
 			// отправка сообщения в Elasticshearch
-			esmodule.SendingData(elasticsearchinteractions.SettingsInputChan{UUID: data.MsgId})
+			esModule.SendingData(elasticsearchinteractions.SettingsInputChan{UUID: data.MsgId})
 
 			// отправка сообщения в НКЦКИ (пока заглушка)
-			//nkckimodule.SendingData(procMsg.Message)
+			//nkckiModule.SendingData(procMsg.Message)
 
 		case data := <-mispChanReception:
 			switch data.Command {
@@ -63,7 +63,7 @@ func CoreHandler(
 				//
 
 				//отправка eventId в NATS
-				natsmodule.SendingDataInput(natsinteractions.SettingsInputChan{
+				natsModule.SendingDataInput(natsinteractions.SettingsInputChan{
 					Command: data.Command,
 					EventId: data.EventId,
 					TaskId:  data.TaskId,
@@ -82,7 +82,7 @@ func CoreHandler(
 				//
 
 				//обработка запроса на добавления новой связки caseId:eventId в Redis
-				redismodule.SendingDataInput(redisinteractions.SettingsChanInputRedis{
+				redisModule.SendingDataInput(redisinteractions.SettingsChanInputRedis{
 					Command: "set case id",
 					Data:    fmt.Sprintf("%s:%s", data.CaseId, data.EventId),
 				})
@@ -124,7 +124,7 @@ func CoreHandler(
 				//
 				//
 
-				mispmodule.SendingDataInput(mispinteractions.SettingsChanInputMISP{
+				mispModule.SendingDataInput(mispinteractions.SettingsChanInputMISP{
 					Command: "del event by id",
 					EventId: eventId,
 				})

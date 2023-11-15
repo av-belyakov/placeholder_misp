@@ -222,14 +222,6 @@ var _ = Describe("CreateMispFormat", Ordered, func() {
 			fmt.Println("reseived data: ", <-mispOutput)
 			cd <- struct{}{}
 
-			/*
-				Объект с 219-236 стр. файла "example_caseId_33705.json"
-				в боевом приложении игнорируется
-
-				Объект с 297-324 стр. файла "example_caseId_33705.json"
-				в боевом приложении игнорируется
-			*/
-
 			Expect(true).Should(BeTrue())
 		}, SpecTimeout(time.Second*15))
 	})

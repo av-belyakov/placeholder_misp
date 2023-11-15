@@ -1,0 +1,248 @@
+package testprocessingrules_test
+
+import (
+	"bufio"
+	"encoding/json"
+	"fmt"
+	"os"
+	"path"
+	"placeholder_misp/coremodule"
+	"placeholder_misp/datamodels"
+	"placeholder_misp/memorytemporarystorage"
+	"placeholder_misp/mispinteractions"
+	rules "placeholder_misp/rulesinteraction"
+	"placeholder_misp/supportingfunctions"
+	"sync"
+	"time"
+
+	"github.com/google/uuid"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+)
+
+var _ = Describe("Processingrules", Ordered, func() {
+	var (
+		listRule rules.ListRulesProcessingMsgMISP
+		//storageApp                        *memorytemporarystorage.CommonStorageTemporary
+		logging chan datamodels.MessageLogging
+		//mispOutput                        <-chan mispinteractions.SettingChanOutputMISP
+		moduleMisp  *mispinteractions.ModuleMISP
+		exampleByte []byte
+		counting    chan datamodels.DataCounterSettings
+		errReadFile, errGetRule/*, errHMisp*/ error
+	)
+
+	readFileJson := func(fpath, fname string) ([]byte, error) {
+		var newResult []byte
+
+		rootPath, err := supportingfunctions.GetRootPath("placeholder_misp")
+		if err != nil {
+			return newResult, err
+		}
+
+		//fmt.Println("func 'readFileJson', path = ", path.Join(rootPath, fpath, fname))
+
+		f, err := os.OpenFile(path.Join(rootPath, fpath, fname), os.O_RDONLY, os.ModePerm)
+		if err != nil {
+			return newResult, err
+		}
+		defer f.Close()
+
+		sc := bufio.NewScanner(f)
+		for sc.Scan() {
+			newResult = append(newResult, sc.Bytes()...)
+		}
+
+		return newResult, nil
+	}
+
+	BeforeAll(func() {
+		//канал для логирования
+		logging = make(chan datamodels.MessageLogging)
+		//канал для подсчета обработанных кейсов
+		counting = make(chan datamodels.DataCounterSettings)
+
+		//читаем тестовый файл
+		exampleByte, errReadFile = readFileJson("natsinteractions/test_json", "example_caseId_33705.json")
+
+		//инициализация списка правил
+		listRule, _, errGetRule = rules.GetRuleProcessingMsgForMISP("rules", "mispmsgrule.yaml")
+
+		//эмулируем результат инициализации модуля MISP
+		moduleMisp = &mispinteractions.ModuleMISP{
+			ChanInputMISP:  make(chan mispinteractions.SettingsChanInputMISP),
+			ChanOutputMISP: make(chan mispinteractions.SettingChanOutputMISP),
+		}
+	})
+
+	Context("Тест 0. Проверка функции PassRuleHandler", func() {
+		It("Должны быть успешно найдены все элементы из правила", func() {
+			list := map[string]interface{}{
+				"event.object.resolutionStatus":   "TruePositive",
+				"event.object.stats.impactStatus": "WithImpact",
+				"event.object.tlp":                2,
+			}
+
+			for fieldBranch, v := range list {
+				coremodule.PassRuleHandler(listRule.Rules.Pass, fieldBranch, v)
+			}
+
+			fmt.Println("----------------------- Equal rules --------------------------")
+			var count int
+			for _, v := range listRule.Rules.Pass {
+				for _, value := range v.ListAnd {
+					fmt.Printf("field '%s' is exist '%v'\n", value.SearchField, value.StatementExpression)
+
+					if value.StatementExpression {
+						count++
+					}
+				}
+			}
+			fmt.Println("--------------------------------------------------------------")
+
+			Expect(count).Should(Equal(3))
+		})
+	})
+
+	Context("Тест 1. Чтение тестового JSON файла", func() {
+		It("При чтении тестового файла ошибок быть не должно", func() {
+			fmt.Println("count example byte", len(exampleByte))
+
+			Expect(errReadFile).ShouldNot(HaveOccurred())
+		})
+	})
+
+	Context("Тест 2. Проверка формирования правил фильтрации", func() {
+		It("При формировании правил фильтрации ошибки быть не должно", func() {
+			fmt.Println("Rules Pass:", listRule.Rules.Pass)
+
+			Expect(errGetRule).ShouldNot(HaveOccurred())
+		})
+
+		//It("При инициализации модуля взаимодействия с MISP ошибки быть не должно", func() {
+		//	Expect(errHMisp).ShouldNot(HaveOccurred())
+		//})
+	})
+
+	Context("Тест 3. Формирование итоговых документов и проверка их соответствия правилам", func() {
+		It("При выполнении формирования документов, соответствующих формату MISP ошибок быть не должно", func(ctx SpecContext) {
+			done := make(chan struct{})
+
+			var wg sync.WaitGroup
+			wg.Add(1)
+
+			//вывод логов и счетчиков
+			go func() {
+				fmt.Println("function SHOW Logs and Counts is START")
+
+				for {
+					select {
+					case log := <-logging:
+						if log.MsgType == "warning" {
+							fmt.Println("___ Log = ", log.MsgData, " ____")
+						}
+
+						if log.MsgType == "STOP TEST" {
+							fmt.Println("-== STOP function SHOW Logs and Counts ==-")
+
+							done <- struct{}{}
+
+							return
+						}
+					case numData := <-counting:
+						fmt.Printf("Counter processed object, type:%s, count:%d\n", numData.DataType, numData.Count)
+					}
+				}
+			}()
+
+			go func() {
+				fmt.Println("function SHOW Major Data is START")
+
+				for {
+					select {
+					case data := <-moduleMisp.GetInputChannel():
+						fmt.Println("@@@@_________________ Приняты данные для отправки в MISP _________________@@@@")
+
+						if d, ok := data.MajorData["events"]; ok {
+							b, err := json.Marshal(d)
+							if err != nil {
+								fmt.Println("__________ ERROR ___________")
+								fmt.Println(err)
+							}
+
+							str, err := supportingfunctions.NewReadReflectJSONSprint(b)
+							if err != nil {
+								fmt.Println("__________ ERROR ___________")
+								fmt.Println(err)
+							}
+
+							fmt.Println("________________ events _________________")
+							fmt.Println(str)
+						}
+
+						/*if d, ok := data.MajorData["attributes"]; ok {
+							b, err := json.Marshal(d)
+							if err != nil {
+								fmt.Println("__________ ERROR ___________")
+								fmt.Println(err)
+							}
+
+							str, err := supportingfunctions.NewReadReflectJSONSprint(b)
+							if err != nil {
+								fmt.Println("__________ ERROR ___________")
+								fmt.Println(err)
+							}
+
+							fmt.Println("________________ attributes _________________")
+							fmt.Println(str)
+						}*/
+
+						/*if d, ok := data.MajorData["objects"]; ok {
+							b, err := json.Marshal(d)
+							if err != nil {
+								fmt.Println("__________ ERROR ___________")
+								fmt.Println(err)
+							}
+
+							str, err := supportingfunctions.NewReadReflectJSONSprint(b)
+							if err != nil {
+								fmt.Println("__________ ERROR ___________")
+								fmt.Println(err)
+							}
+
+							fmt.Println("________________ objects _________________")
+							fmt.Println(str)
+						}*/
+					case <-done:
+						fmt.Println("-== STOP function SHOW Major Data ==-")
+
+						wg.Done()
+
+						return
+					}
+				}
+			}()
+
+			// инициализируем модуль временного хранения информации
+			storageApp := memorytemporarystorage.NewTemporaryStorage()
+
+			hmfh := coremodule.NewHandlerMessageFromHive(storageApp, listRule, logging, counting)
+
+			msgId := uuid.New().String()
+
+			// формирование итоговых документов в формате MISP
+			chanCreateMispFormat, chanDone := coremodule.NewMispFormat(msgId, moduleMisp, logging)
+			// обработчик сообщений из TheHive (выполняется разбор сообщения и его разбор на основе правил)
+			go hmfh.HandlerMessageFromHive(chanCreateMispFormat, exampleByte, msgId, chanDone)
+
+			wg.Wait()
+			Expect(true).Should(BeTrue())
+		}, SpecTimeout(time.Second*15))
+	})
+
+	/*Context("", func(){
+		It("", func ()  {
+
+		})
+	})*/
+})

@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"runtime"
 	"strconv"
+	"strings"
 
 	"placeholder_misp/datamodels"
 	"placeholder_misp/memorytemporarystorage"
@@ -145,11 +146,19 @@ func PassRuleHandler(rulePass []rules.PassListAnd, fn string, cv interface{}) {
 				continue
 			}
 
-			if cvstr != v.SearchValue {
-				continue
-			}
+			if strings.Contains(v.SearchValue, "not:") && v.SearchValue[:4] == "not:" {
+				if cvstr == v.SearchValue[4:] {
+					continue
+				}
 
-			rulePass[key].ListAnd[k].StatementExpression = true
+				rulePass[key].ListAnd[k].StatementExpression = true
+			} else {
+				if cvstr != v.SearchValue {
+					continue
+				}
+
+				rulePass[key].ListAnd[k].StatementExpression = true
+			}
 		}
 	}
 }
@@ -221,6 +230,11 @@ func processingReflectAnySimpleType(
 		return anyType
 	}
 
+	if fieldBranch == "event.object.impactStatus" || fieldBranch == "event.object.resolutionStatus" || fieldBranch == "event.object.tlp" {
+		fmt.Println("------- processingReflectAnySimpleType ---------")
+		fmt.Printf("fieldBranch: '%s', nameStr: '%s'\n\n", fieldBranch, nameStr)
+	}
+
 	switch r.Kind() {
 	case reflect.String:
 		result := reflect.ValueOf(anyType).String()
@@ -235,7 +249,7 @@ func processingReflectAnySimpleType(
 			}
 		}
 
-		PassRuleHandler(listRule.Rules.Pass, nameStr, ncv)
+		PassRuleHandler(listRule.Rules.Pass, fieldBranch, ncv)
 
 		chanOutMispFormat <- ChanInputCreateMispFormat{
 			FieldName:   nameStr,
@@ -258,7 +272,7 @@ func processingReflectAnySimpleType(
 			}
 		}
 
-		PassRuleHandler(listRule.Rules.Pass, nameStr, ncv)
+		PassRuleHandler(listRule.Rules.Pass, fieldBranch, ncv)
 
 		chanOutMispFormat <- ChanInputCreateMispFormat{
 			FieldName:   nameStr,
@@ -281,7 +295,7 @@ func processingReflectAnySimpleType(
 			}
 		}
 
-		PassRuleHandler(listRule.Rules.Pass, nameStr, ncv)
+		PassRuleHandler(listRule.Rules.Pass, fieldBranch, ncv)
 
 		chanOutMispFormat <- ChanInputCreateMispFormat{
 			FieldName:   nameStr,
@@ -304,7 +318,7 @@ func processingReflectAnySimpleType(
 			}
 		}
 
-		PassRuleHandler(listRule.Rules.Pass, nameStr, ncv)
+		PassRuleHandler(listRule.Rules.Pass, fieldBranch, ncv)
 
 		chanOutMispFormat <- ChanInputCreateMispFormat{
 			FieldName:   nameStr,
@@ -327,7 +341,7 @@ func processingReflectAnySimpleType(
 			}
 		}
 
-		PassRuleHandler(listRule.Rules.Pass, nameStr, ncv)
+		PassRuleHandler(listRule.Rules.Pass, fieldBranch, ncv)
 
 		chanOutMispFormat <- ChanInputCreateMispFormat{
 			FieldName:   nameStr,
