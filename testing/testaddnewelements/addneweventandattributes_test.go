@@ -25,7 +25,7 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		logging                        chan datamodels.MessageLogging
 		counting                       chan datamodels.DataCounterSettings
 		confApp                        confighandler.ConfigApp
-		listRules                      rules.ListRulesProcessingMsgMISP
+		listRules                      *rules.ListRule
 		mispModule                     *mispinteractions.ModuleMISP
 		storageApp                     *memorytemporarystorage.CommonStorageTemporary
 		chanCreateMispFormat           chan coremodule.ChanInputCreateMispFormat
@@ -150,8 +150,8 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		//инициализируем модуль временного хранения информации
 		storageApp = memorytemporarystorage.NewTemporaryStorage()
 
-		// инициализируем модуль чтения правил обработки MISP сообщений
-		listRules, _, errRules = rules.GetRuleProcessingMsgForMISP("rules", "mispmsgrule.yaml")
+		//инициализация списка правил
+		listRules, _, errRules = rules.NewListRule("placeholder_misp", "rules", "mispmsgrule.yaml")
 
 		//читаем тестовый файл
 		//"example_caseId_33705.json" совпадает с правилами

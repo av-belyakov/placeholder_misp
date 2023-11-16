@@ -10,7 +10,7 @@ import (
 )
 
 var _ = Describe("Readrule", func() {
-	printRuleResult := func(r rules.ListRulesProcessingMsgMISP) string {
+	printRuleResult := func(r *rules.ListRule) string {
 		resultPrint := fmt.Sprintln("RULES:")
 
 		resultPrint += fmt.Sprintln("  REPLACE:")
@@ -38,7 +38,8 @@ var _ = Describe("Readrule", func() {
 
 	Context("Тест 1. Чтение нового тестового файла, в другом формате", func() {
 		It("Новый тестовый файл должен быть успешно прочитан", func() {
-			r, lw, err := rules.GetRuleProcessingMsgForMISP("rules", "mispmsgrule_test.yaml")
+			//инициализация списка правил
+			r, lw, err := rules.NewListRule("placeholder_misp", "rules", "mispmsgrule.yaml")
 
 			fmt.Println("NEW RULES FILE: ")
 			fmt.Println("LIST WARNING: ", lw)

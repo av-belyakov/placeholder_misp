@@ -20,7 +20,7 @@ func CoreHandler(
 	redisModule *redisinteractions.ModuleRedis,
 	esModule *elasticsearchinteractions.ModuleElasticSearch,
 	nkckiModule *nkckiinteractions.ModuleNKCKI,
-	listRule rules.ListRulesProcessingMsgMISP,
+	listRule *rules.ListRule,
 	storageApp *memorytemporarystorage.CommonStorageTemporary,
 	logging chan<- datamodels.MessageLogging,
 	counting chan<- datamodels.DataCounterSettings) {

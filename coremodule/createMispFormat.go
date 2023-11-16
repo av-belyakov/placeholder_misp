@@ -372,13 +372,6 @@ func getNewListObjects(
 	return nlo
 }
 
-func testSearchFieldBranch(fb string) {
-	patter := regexp.MustCompile(`^misp:([\w\-].*)=\"([\w\-].*)\"$`)
-	if patter.MatchString(fb) {
-		fmt.Println("!!!!!!! ======== В fb содержится что то больше чем observables.<любое значение>", fb)
-	}
-}
-
 func HandlingObservablesTag(tag string) ([2]string, error) {
 	nl := [2]string{}
 	patter := regexp.MustCompile(`^misp:([\w\-].*)=\"([\w\-].*)\"$`)

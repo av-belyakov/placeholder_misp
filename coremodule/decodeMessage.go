@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"reflect"
 	"runtime"
-	"strconv"
-	"strings"
 
 	"placeholder_misp/datamodels"
 	"placeholder_misp/memorytemporarystorage"
@@ -16,14 +14,14 @@ import (
 
 type HandlerMessageFromHiveSettings struct {
 	StorageApp *memorytemporarystorage.CommonStorageTemporary
-	ListRule   rules.ListRulesProcessingMsgMISP
+	ListRule   *rules.ListRule
 	Logging    chan<- datamodels.MessageLogging
 	Counting   chan<- datamodels.DataCounterSettings
 }
 
 func NewHandlerMessageFromHive(
 	storageApp *memorytemporarystorage.CommonStorageTemporary,
-	listRule rules.ListRulesProcessingMsgMISP,
+	listRule *rules.ListRule,
 	logging chan<- datamodels.MessageLogging,
 	counting chan<- datamodels.DataCounterSettings) *HandlerMessageFromHiveSettings {
 	return &HandlerMessageFromHiveSettings{
@@ -66,7 +64,7 @@ func (s *HandlerMessageFromHiveSettings) HandlerMessageFromHive(
 			return
 		}
 
-		nlt := processingReflectMap(s.Logging, cmispf, listMap, &s.ListRule, 0, "")
+		nlt := processingReflectMap(s.Logging, cmispf, listMap, s.ListRule, 0, "")
 		s.StorageApp.SetProcessedDataHiveFormatMessage(taskId, nlt)
 	} else {
 		// для срезов
@@ -82,7 +80,7 @@ func (s *HandlerMessageFromHiveSettings) HandlerMessageFromHive(
 				return
 			}
 
-			_ = processingReflectSlice(s.Logging, cmispf, listSlice, &s.ListRule, 0, "")
+			_ = processingReflectSlice(s.Logging, cmispf, listSlice, s.ListRule, 0, "")
 		} else {
 			s.Logging <- datamodels.MessageLogging{
 				MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l+2),
@@ -93,26 +91,9 @@ func (s *HandlerMessageFromHiveSettings) HandlerMessageFromHive(
 		}
 	}
 
-	if s.ListRule.Rules.Passany {
+	//проверяем что бы хотя бы одно правило разрешало пропуск кейса
+	if s.ListRule.GetRulePassany() || s.ListRule.SomePassRuleIsTrue() {
 		s.StorageApp.SetAllowedTransferTrueHiveFormatMessage(taskId)
-	} else {
-		//проверяем соответствие сообщения правилам из раздела Pass
-		for _, v := range s.ListRule.Rules.Pass {
-			skipMsg := true
-			for _, value := range v.ListAnd {
-				if !value.StatementExpression {
-					skipMsg = false
-
-					break
-				}
-			}
-
-			if skipMsg {
-				s.StorageApp.SetAllowedTransferTrueHiveFormatMessage(taskId)
-
-				break
-			}
-		}
 	}
 
 	//выполняет очистку значения StatementExpression что равно отсутствию совпадений в правилах Pass
@@ -137,83 +118,12 @@ func (s *HandlerMessageFromHiveSettings) HandlerMessageFromHive(
 	cmispfDone <- isAllowed
 }
 
-func PassRuleHandler(rulePass []rules.PassListAnd, fn string, cv interface{}) {
-	cvstr := fmt.Sprint(cv)
-
-	for key, value := range rulePass {
-		for k, v := range value.ListAnd {
-			if fn != v.SearchField {
-				continue
-			}
-
-			if strings.Contains(v.SearchValue, "not:") && v.SearchValue[:4] == "not:" {
-				if cvstr == v.SearchValue[4:] {
-					continue
-				}
-
-				rulePass[key].ListAnd[k].StatementExpression = true
-			} else {
-				if cvstr != v.SearchValue {
-					continue
-				}
-
-				rulePass[key].ListAnd[k].StatementExpression = true
-			}
-		}
-	}
-}
-
-func ReplacementRuleHandler(lr *rules.ListRulesProcessingMsgMISP, svt, fn string, cv interface{}) (interface{}, int, error) {
-	getReplaceValue := func(svt, rv string) (interface{}, error) {
-		switch svt {
-		case "string":
-			return rv, nil
-
-		case "int":
-			return strconv.ParseInt(rv, 10, 64)
-
-		case "uint":
-			return strconv.ParseUint(rv, 10, 64)
-
-		case "float":
-			return strconv.ParseFloat(rv, 64)
-
-		case "bool":
-			return strconv.ParseBool(rv)
-		}
-
-		return rv, nil
-	}
-
-	for k, v := range lr.Rules.Replace {
-		if v.SearchValue != fmt.Sprint(cv) {
-			continue
-		}
-
-		if v.SearchField != "" {
-			if v.SearchField == fn {
-				nv, err := getReplaceValue(svt, v.ReplaceValue)
-
-				return nv, k, err
-			}
-
-			continue
-		}
-
-		nv, err := getReplaceValue(svt, v.ReplaceValue)
-
-		return nv, k, err
-	}
-
-	return cv, 0, nil
-}
-
 func processingReflectAnySimpleType(
 	logging chan<- datamodels.MessageLogging,
 	chanOutMispFormat chan<- ChanInputCreateMispFormat,
 	name interface{},
 	anyType interface{},
-	listRule *rules.ListRulesProcessingMsgMISP,
+	lr *rules.ListRule,
 	num int,
 	fieldBranch string) interface{} {
 
@@ -234,7 +144,7 @@ func processingReflectAnySimpleType(
 	case reflect.String:
 		result := reflect.ValueOf(anyType).String()
 
-		ncv, num, err := ReplacementRuleHandler(listRule, "string", nameStr, result)
+		ncv, num, err := lr.ReplacementRuleHandler("string", nameStr, result)
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
 
@@ -244,7 +154,7 @@ func processingReflectAnySimpleType(
 			}
 		}
 
-		PassRuleHandler(listRule.Rules.Pass, fieldBranch, ncv)
+		lr.PassRuleHandler(fieldBranch, ncv)
 
 		chanOutMispFormat <- ChanInputCreateMispFormat{
 			FieldName:   nameStr,
@@ -257,7 +167,7 @@ func processingReflectAnySimpleType(
 	case reflect.Int, reflect.Int16, reflect.Int32, reflect.Int64:
 		result := reflect.ValueOf(anyType).Int()
 
-		ncv, num, err := ReplacementRuleHandler(listRule, "int", nameStr, result)
+		ncv, num, err := lr.ReplacementRuleHandler("int", nameStr, result)
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
 
@@ -267,7 +177,7 @@ func processingReflectAnySimpleType(
 			}
 		}
 
-		PassRuleHandler(listRule.Rules.Pass, fieldBranch, ncv)
+		lr.PassRuleHandler(fieldBranch, ncv)
 
 		chanOutMispFormat <- ChanInputCreateMispFormat{
 			FieldName:   nameStr,
@@ -280,7 +190,7 @@ func processingReflectAnySimpleType(
 	case reflect.Uint, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		result := reflect.ValueOf(anyType).Uint()
 
-		ncv, num, err := ReplacementRuleHandler(listRule, "uint", nameStr, result)
+		ncv, num, err := lr.ReplacementRuleHandler("uint", nameStr, result)
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
 
@@ -290,7 +200,7 @@ func processingReflectAnySimpleType(
 			}
 		}
 
-		PassRuleHandler(listRule.Rules.Pass, fieldBranch, ncv)
+		lr.PassRuleHandler(fieldBranch, ncv)
 
 		chanOutMispFormat <- ChanInputCreateMispFormat{
 			FieldName:   nameStr,
@@ -303,7 +213,7 @@ func processingReflectAnySimpleType(
 	case reflect.Float32, reflect.Float64:
 		result := reflect.ValueOf(anyType).Float()
 
-		ncv, num, err := ReplacementRuleHandler(listRule, "float", nameStr, result)
+		ncv, num, err := lr.ReplacementRuleHandler("float", nameStr, result)
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
 
@@ -313,7 +223,7 @@ func processingReflectAnySimpleType(
 			}
 		}
 
-		PassRuleHandler(listRule.Rules.Pass, fieldBranch, ncv)
+		lr.PassRuleHandler(fieldBranch, ncv)
 
 		chanOutMispFormat <- ChanInputCreateMispFormat{
 			FieldName:   nameStr,
@@ -326,7 +236,7 @@ func processingReflectAnySimpleType(
 	case reflect.Bool:
 		result := reflect.ValueOf(anyType).Bool()
 
-		ncv, num, err := ReplacementRuleHandler(listRule, "bool", nameStr, result)
+		ncv, num, err := lr.ReplacementRuleHandler("bool", nameStr, result)
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
 
@@ -336,7 +246,7 @@ func processingReflectAnySimpleType(
 			}
 		}
 
-		PassRuleHandler(listRule.Rules.Pass, fieldBranch, ncv)
+		lr.PassRuleHandler(fieldBranch, ncv)
 
 		chanOutMispFormat <- ChanInputCreateMispFormat{
 			FieldName:   nameStr,
@@ -355,7 +265,7 @@ func processingReflectMap(
 	logging chan<- datamodels.MessageLogging,
 	chanOutMispFormat chan<- ChanInputCreateMispFormat,
 	l map[string]interface{},
-	lr *rules.ListRulesProcessingMsgMISP,
+	lr *rules.ListRule,
 	num int,
 	fieldBranch string) map[string]interface{} {
 
@@ -405,7 +315,7 @@ func processingReflectSlice(
 	logging chan<- datamodels.MessageLogging,
 	chanOutMispFormat chan<- ChanInputCreateMispFormat,
 	l []interface{},
-	lr *rules.ListRulesProcessingMsgMISP,
+	lr *rules.ListRule,
 	num int,
 	fieldBranch string) []interface{} {
 

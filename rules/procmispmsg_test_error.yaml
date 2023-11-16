@@ -3,7 +3,7 @@
 RULES:
   REPLACE:
     - searchField: "patternId"
-      searchValue: "" # ошибка пустое значение
+      searchValue: ""
       replaceValue: "null"
     - searchField: "country"
       searchValue: "EN"
@@ -11,16 +11,19 @@ RULES:
     - searchField: ""
       searchValue: "T1110"
       replaceValue: "null"
-    - searchField: "patternId"
-      searchValue: "" # ошибка пустое значение
-      replaceValue: "" # ошибка пустое значение  
+      # ошибка хотя бы одно из полей 'searchField' или
+      # 'searchValue' должно быть заполнено
+    - searchField: ""
+      searchValue: ""
+      replaceValue: ""  
   PASS:
-    - searchField: "impactStatus"
-      searchValue: "WithImpact"
-    - searchField: "" # ошибка пустое значение
-      searchValue: "TruePositive"
-    - searchField: "impactStatus"
-      searchValue: "" # ошибка пустое значение
-    - searchField: "resolutionStatus"
-      searchValue: "null"
+    - listAnd:
+      - searchField: "impactStatus"
+        searchValue: "WithImpact"
+      - searchField: "" # ошибка пустое значение
+        searchValue: "TruePositive"
+      - searchField: "impactStatus"
+        searchValue: "" # ошибка пустое значение
+      - searchField: "resolutionStatus"
+        searchValue: "null"
   PASSANY: false  

@@ -23,7 +23,7 @@ import (
 
 var _ = Describe("CreateMispFormat", Ordered, func() {
 	var (
-		listRule                          rules.ListRulesProcessingMsgMISP
+		lr                                *rules.ListRule
 		storageApp                        *memorytemporarystorage.CommonStorageTemporary
 		logging                           chan datamodels.MessageLogging
 		mispOutput                        <-chan mispinteractions.SettingChanOutputMISP
@@ -85,7 +85,7 @@ var _ = Describe("CreateMispFormat", Ordered, func() {
 		exampleByte, errReadFile = readFileJson("natsinteractions/test_json", "example_caseId_33705.json")
 
 		//инициализация списка правил
-		listRule, _, errGetRule = rules.GetRuleProcessingMsgForMISP("rules", "mispmsgrule.yaml")
+		lr, _, errGetRule = rules.NewListRule("placeholder_misp", "rules", "mispmsgrule.yaml")
 
 		//инициализируем модуль временного хранения информации
 		storageApp = memorytemporarystorage.NewTemporaryStorage()
@@ -197,9 +197,8 @@ var _ = Describe("CreateMispFormat", Ordered, func() {
 			//формирование итоговых документов в формате MISP
 			chanCreateMispFormat, chanDone := coremodule.NewMispFormat(uuidTask, moduleMisp, logging)
 
-			hmfh := coremodule.NewHandlerMessageFromHive(storageApp, listRule, logging, counting)
+			hmfh := coremodule.NewHandlerMessageFromHive(storageApp, lr, logging, counting)
 			go hmfh.HandlerMessageFromHive(chanCreateMispFormat, exampleByte, uuidTask, chanDone)
-			//go coremodule.HandlerMessageFromHive(exampleByte, uuidTask, storageApp, listRule, chanCreateMispFormat, chanDone, logging, counting)
 
 			go func() {
 				for {

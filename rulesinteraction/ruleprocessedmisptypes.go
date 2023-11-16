@@ -1,9 +1,15 @@
 package rules
 
-// ListRulesProcessingMsgMISP содержит список правил обработки сообщений предназначенных для MISP
-// Rules основной список правил полученный из конфигурационного файла
-type ListRulesProcessingMsgMISP struct {
-	Rules RuleSetProcessingMsgMISP
+// ListRule содержит список правил
+type ListRule struct {
+	Rules RuleOptions `yaml:"RULES"`
+}
+
+// RuleOptions содержит опции правил
+type RuleOptions struct {
+	Passany bool          `yaml:"PASSANY"`
+	Pass    []PassListAnd `yaml:"PASS"`
+	Replace []RuleReplace `yaml:"REPLACE"`
 }
 
 // RuleSetProcessingMsgMISP содержит правила обработки сообщений
@@ -18,7 +24,7 @@ type RuleSetProcessingMsgMISP struct {
 
 // PassListAnd список правил
 type PassListAnd struct {
-	ListAnd []RulePass
+	ListAnd []RulePass `yaml:"listAnd"`
 }
 
 // RulePassany содержит тип правила для пропуска всех сообщений
@@ -32,8 +38,8 @@ type RulePassany struct {
 // SearchValue искомое значение
 // StatementExpression утверждение выражения
 type RulePass struct {
-	SearchField         string
-	SearchValue         string
+	SearchField         string `yaml:"searchField"`
+	SearchValue         string `yaml:"searchValue"`
 	StatementExpression bool
 }
 
@@ -42,16 +48,7 @@ type RulePass struct {
 // SearchValue искомое значение
 // ReplaceValue заменяемое значение
 type RuleReplace struct {
-	SearchField, SearchValue, ReplaceValue string
-}
-
-// CleanStatementExpressionRulePass приводит поле StatementExpression к значению false
-// это поле проверяется на соответствие заданным правилам обрабатываемым значениям
-// обязательно нужно выполнять данный метод после проверки значения StatementExpression
-func (lr *ListRulesProcessingMsgMISP) CleanStatementExpressionRulePass() {
-	for k, v := range lr.Rules.Pass {
-		for key := range v.ListAnd {
-			lr.Rules.Pass[k].ListAnd[key].StatementExpression = false
-		}
-	}
+	SearchField  string `yaml:"searchField"`
+	SearchValue  string `yaml:"searchValue"`
+	ReplaceValue string `yaml:"replaceValue"`
 }

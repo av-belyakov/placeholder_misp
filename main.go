@@ -24,15 +24,17 @@ import (
 	"placeholder_misp/supportingfunctions"
 )
 
+const ROOT_DIR = "placeholder_misp"
+
 var (
-	err                  error
-	sl                   simplelogger.SimpleLoggerSettings
-	confApp              confighandler.ConfigApp
-	listRulesProcMISPMsg rules.ListRulesProcessingMsgMISP
-	listWarning          []string
-	storageApp           *memorytemporarystorage.CommonStorageTemporary
-	logging              chan datamodels.MessageLogging
-	counting             chan datamodels.DataCounterSettings
+	err        error
+	sl         simplelogger.SimpleLoggerSettings
+	confApp    confighandler.ConfigApp
+	lr         *rules.ListRule
+	warnings   []string
+	storageApp *memorytemporarystorage.CommonStorageTemporary
+	logging    chan datamodels.MessageLogging
+	counting   chan datamodels.DataCounterSettings
 )
 
 func getAppName(pf string, nl int) (string, error) {
@@ -90,7 +92,7 @@ func init() {
 	}
 
 	//инициализируем модуль чтения правил обработки MISP сообщений
-	listRulesProcMISPMsg, listWarning, err = rules.GetRuleProcessingMsgForMISP(confApp.RulesProcMSGMISP.Directory, confApp.RulesProcMSGMISP.File)
+	lr, warnings, err = rules.NewListRule(ROOT_DIR, confApp.RulesProcMSGMISP.Directory, confApp.RulesProcMSGMISP.File)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 		_ = sl.WriteLoggingData(fmt.Sprintf("%v %s:%d", err, f, l-2), "error")
@@ -99,10 +101,10 @@ func init() {
 	}
 
 	//если есть какие либо логические ошибки в файле с YAML правилами для обработки сообщений поступающих от NATS
-	if len(listWarning) > 0 {
+	if len(warnings) > 0 {
 		var warningStr string
 
-		for _, v := range listWarning {
+		for _, v := range warnings {
 			warningStr += fmt.Sprintln(v)
 		}
 
@@ -111,7 +113,7 @@ func init() {
 	}
 
 	// проверяем наличие правил Pass или Passany
-	if len(listRulesProcMISPMsg.Rules.Pass) == 0 && !listRulesProcMISPMsg.Rules.Passany {
+	if len(lr.GetRulePass()) == 0 && !lr.GetRulePassany() {
 		msg := "there are no rules for handling messages received from NATS or all rules have failed validation"
 		_, f, l, _ := runtime.Caller(0)
 		_ = sl.WriteLoggingData(fmt.Sprintf(" '%s' %s:%d", msg, f, l-3), "error")
@@ -219,5 +221,5 @@ func main() {
 
 	_ = sl.WriteLoggingData("application '"+appName+"' is started", "info")
 
-	coremodule.CoreHandler(natsModule, mispModule, redisModule, esModule, nkckiModule, listRulesProcMISPMsg, storageApp, logging, counting)
+	coremodule.CoreHandler(natsModule, mispModule, redisModule, esModule, nkckiModule, lr, storageApp, logging, counting)
 }

@@ -84,7 +84,8 @@ var _ = Describe("Natsinteraction", Ordered, func() {
 
 			chanOutMispFormat := make(chan coremodule.ChanInputCreateMispFormat)
 
-			lr, lw, err := rules.GetRuleProcessingMsgForMISP("rules", "procmispmsg_test.yaml")
+			//инициализация списка правил
+			lr, lw, err := rules.NewListRule("placeholder_misp", "rules", "mispmsgrule.yaml")
 
 			fmt.Println("list verification warning:")
 			fmt.Println(printVerificationWarning(lw))

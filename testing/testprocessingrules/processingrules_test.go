@@ -22,7 +22,7 @@ import (
 
 var _ = Describe("Processingrules", Ordered, func() {
 	var (
-		listRule rules.ListRulesProcessingMsgMISP
+		lr *rules.ListRule
 		//storageApp                        *memorytemporarystorage.CommonStorageTemporary
 		logging chan datamodels.MessageLogging
 		//mispOutput                        <-chan mispinteractions.SettingChanOutputMISP
@@ -66,7 +66,7 @@ var _ = Describe("Processingrules", Ordered, func() {
 		exampleByte, errReadFile = readFileJson("natsinteractions/test_json", "example_caseId_33705.json")
 
 		//инициализация списка правил
-		listRule, _, errGetRule = rules.GetRuleProcessingMsgForMISP("rules", "mispmsgrule.yaml")
+		lr, _, errGetRule = rules.NewListRule("placeholder_misp", "rules", "mispmsgrule.yaml")
 
 		//эмулируем результат инициализации модуля MISP
 		moduleMisp = &mispinteractions.ModuleMISP{
@@ -75,21 +75,27 @@ var _ = Describe("Processingrules", Ordered, func() {
 		}
 	})
 
+	BeforeEach(func() {
+		//выполняет очистку значения StatementExpression что равно отсутствию совпадений в правилах Pass
+		lr.CleanStatementExpressionRulePass()
+	})
+
 	Context("Тест 0. Проверка функции PassRuleHandler", func() {
 		It("Должны быть успешно найдены все элементы из правила", func() {
 			list := map[string]interface{}{
-				"event.object.resolutionStatus":   "TruePositive",
-				"event.object.stats.impactStatus": "WithImpact",
-				"event.object.tlp":                2,
+				"event.object.resolutionStatus": "TruePositive",
+				"event.object.impactStatus":     "WithImpact",
+				"event.object.tlp":              "not:3",
 			}
 
 			for fieldBranch, v := range list {
-				coremodule.PassRuleHandler(listRule.Rules.Pass, fieldBranch, v)
+				lr.PassRuleHandler(fieldBranch, v)
+				//coremodule.PassRuleHandler(listRule.Rules.Pass, fieldBranch, v)
 			}
 
 			fmt.Println("----------------------- Equal rules --------------------------")
 			var count int
-			for _, v := range listRule.Rules.Pass {
+			for _, v := range lr.GetRulePass() {
 				for _, value := range v.ListAnd {
 					fmt.Printf("field '%s' is exist '%v'\n", value.SearchField, value.StatementExpression)
 
@@ -112,9 +118,9 @@ var _ = Describe("Processingrules", Ordered, func() {
 		})
 	})
 
-	Context("Тест 2. Проверка формирования правил фильтрации", func() {
+	Context("Тест 2.1. Проверка формирования правил фильтрации", func() {
 		It("При формировании правил фильтрации ошибки быть не должно", func() {
-			fmt.Println("Rules Pass:", listRule.Rules.Pass)
+			fmt.Println("Rules Pass:", lr.GetRulePass())
 
 			Expect(errGetRule).ShouldNot(HaveOccurred())
 		})
@@ -122,6 +128,40 @@ var _ = Describe("Processingrules", Ordered, func() {
 		//It("При инициализации модуля взаимодействия с MISP ошибки быть не должно", func() {
 		//	Expect(errHMisp).ShouldNot(HaveOccurred())
 		//})
+	})
+
+	Context("Тест 2.2. Проверка формирования правил фильтрации на основе НОВОГО конструктора", func() {
+		It("Не должно быть ошибок при формировании правил фильтрации", func() {
+			r, warnings, err := rules.NewListRule("placeholder_misp", "rules", "mispmsgrule.yaml")
+
+			//fmt.Println()
+			//fmt.Println("Rules warnings 1111 START")
+			//for k, v := range warnings {
+			//	fmt.Printf("%d. %s\n", k, v)
+			//}
+			//fmt.Println("Rules warnings 1111 END")
+
+			fmt.Println("-------- LIST RULE ---------", r, "------------------")
+
+			Expect(len(warnings)).Should(Equal(0))
+			Expect(err).ShouldNot(HaveOccurred())
+		})
+
+		It("Должны быть ошибки при формировании правил на основе невалидного файла", func() {
+			_, warnings, err := rules.NewListRule("placeholder_misp", "rules", "procmispmsg_test_error.yaml")
+
+			//fmt.Println()
+			//fmt.Println("Rules warnings 2222 START")
+			//for k, v := range warnings {
+			//	fmt.Printf("%d. %s\n", k, v)
+			//}
+			//fmt.Println("Rules warnings 2222 END")
+
+			Expect(len(warnings)).ShouldNot(Equal(0))
+
+			//нет ошибок так как они возможны только при чтении или парсинге файла
+			Expect(err).ShouldNot(HaveOccurred())
+		})
 	})
 
 	Context("Тест 3. Формирование итоговых документов и проверка их соответствия правилам", func() {
@@ -226,7 +266,7 @@ var _ = Describe("Processingrules", Ordered, func() {
 			// инициализируем модуль временного хранения информации
 			storageApp := memorytemporarystorage.NewTemporaryStorage()
 
-			hmfh := coremodule.NewHandlerMessageFromHive(storageApp, listRule, logging, counting)
+			hmfh := coremodule.NewHandlerMessageFromHive(storageApp, lr, logging, counting)
 
 			msgId := uuid.New().String()
 
@@ -236,6 +276,15 @@ var _ = Describe("Processingrules", Ordered, func() {
 			go hmfh.HandlerMessageFromHive(chanCreateMispFormat, exampleByte, msgId, chanDone)
 
 			wg.Wait()
+
+			//
+			//тест может нормально не проходить потому что в hmfh.HandlerMessageFromHive
+			//есть еще один метод lr.CleanStatementExpressionRulePass()
+			//который выполняет очистку значения StatementExpression
+			//по этому перед тестом его рекомендуется отключить
+			//
+
+			Expect(lr.SomePassRuleIsTrue()).Should(BeTrue())
 			Expect(true).Should(BeTrue())
 		}, SpecTimeout(time.Second*15))
 	})
