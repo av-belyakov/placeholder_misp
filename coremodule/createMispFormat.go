@@ -10,12 +10,21 @@ import (
 	"placeholder_misp/mispinteractions"
 )
 
+// ChanInputCreateMispFormat
+// ExclusionRuleWorked - информирует что сработало правило исключения значения из списка
+// передаваемых данных
+// UUID - уникальный идентификатор в формате UUID
+// FieldName - наименование поля
+// ValueType - тип передаваемого значения (string, int и т.д.)
+// Value - любые передаваемые данные
+// FieldBranch - 'путь' до значения в как в JSON формате, например 'event.details.customFields.class'
 type ChanInputCreateMispFormat struct {
-	UUID        string
-	FieldName   string
-	ValueType   string
-	Value       interface{}
-	FieldBranch string
+	ExclusionRuleWorked bool
+	UUID                string
+	FieldName           string
+	ValueType           string
+	Value               interface{}
+	FieldBranch         string
 }
 
 type FieldsNameMapping struct {
@@ -138,11 +147,12 @@ func NewMispFormat(
 
 	go func() {
 		var (
-			maxCountObservables, seqNum int
-			userEmail                   string
-			caseSource                  string
-			caseId                      float64
-			patterIsNum                 *regexp.Regexp = regexp.MustCompile(`^\d+$`)
+			maxCountObservables int
+			seqNumObservable    int
+			userEmail           string
+			caseSource          string
+			caseId              float64
+			patterIsNum         *regexp.Regexp = regexp.MustCompile(`^\d+$`)
 		)
 		defer func() {
 			close(chanInput)
@@ -178,6 +188,26 @@ func NewMispFormat(
 					userEmail = uemail
 				}
 
+				/*
+					!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+								!!!!!! Обязательно прочитать !!!!!!!
+							В пятницу не успеваю сделать полностью, не говоря о том что бы
+							протестировать
+
+
+
+						Значение tmf.ExclusionRuleWorked содержит bool тип, если TRUE, то
+						передоваемые в tmf.Value данные данные не желательны в сообщении
+						отправляемом в MISP. А это означает что ВЕСЬ объект в MISP не нужен.
+						Соответственно весь объект надо исключить.
+						Это в первую очередь касается объектов типа "observables". По начальному
+						значению, до '.' из tmf.FieldBranch можем определить к какому объекту
+						относится данное не желательное значение, а по maxCountObservables
+						порядковый номер объекта. Соответственно этот объект нужно как то
+						исключить из отправки модулю MISP когда будет отправлятся метод
+						mispmodule.SendingDataInput из стр. 290
+				*/
+
 				//для observables которые содержат свойства, являющиеся картами,
 				//такими как свойства 'attachment', 'reports' и т.д. не
 				//осуществлять подсчет свойств
@@ -190,7 +220,7 @@ func NewMispFormat(
 					//имен для свойств являющихся срезами, так как в данной ситуации
 					//имя содержащееся в tmf.FieldName представляет собой числовой
 					//индекс, соответственное, если будет еще одно свойство являющееся
-					//срезом, то может быть совпадение имен и изменение seqNum, а как
+					//срезом, то может быть совпадение имен и изменение seqNumObservable, а как
 					//результат будет переход на другой объект 'observables'
 					if patterIsNum.MatchString(tmf.FieldName) {
 						tmp := strings.Split(tmf.FieldBranch, ".")
@@ -206,7 +236,7 @@ func NewMispFormat(
 					//того что бы отделить один объект 'observables' от другого
 					if svn.GetValueName(newFieldName) {
 						svn.CleanValueName()
-						seqNum++
+						seqNumObservable++
 					}
 
 					svn.SetValueName(newFieldName)
@@ -214,7 +244,7 @@ func NewMispFormat(
 
 				//обрабатываем свойство observables.attachment
 				if strings.Contains(tmf.FieldBranch, "attachment") {
-					listAttributeTmp.AddAttribute(tmf.FieldBranch, tmf.Value, seqNum)
+					listAttributeTmp.AddAttribute(tmf.FieldBranch, tmf.Value, seqNumObservable)
 				}
 
 				//обрабатываем свойство event.object.tags, оно ответственно за
@@ -230,7 +260,7 @@ func NewMispFormat(
 					if tag, ok := tmf.Value.(string); ok {
 						result, err := HandlingObservablesTag(tag)
 						if err == nil {
-							listTags[seqNum] = result
+							listTags[seqNumObservable] = result
 						}
 					}
 				}
@@ -240,7 +270,7 @@ func NewMispFormat(
 				if ok {
 					//основной обработчик путей из tmf.FieldBranch
 					for _, f := range lf {
-						f(tmf.Value, seqNum)
+						f(tmf.Value, seqNumObservable)
 					}
 				}
 

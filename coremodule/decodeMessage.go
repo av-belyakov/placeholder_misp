@@ -157,10 +157,11 @@ func processingReflectAnySimpleType(
 		lr.PassRuleHandler(fieldBranch, ncv)
 
 		chanOutMispFormat <- ChanInputCreateMispFormat{
-			FieldName:   nameStr,
-			ValueType:   "string",
-			Value:       ncv,
-			FieldBranch: fieldBranch,
+			FieldName:           nameStr,
+			ValueType:           "string",
+			Value:               ncv,
+			FieldBranch:         fieldBranch,
+			ExclusionRuleWorked: lr.ExcludeRuleHandler(fieldBranch, ncv),
 		}
 
 		return ncv
@@ -180,10 +181,11 @@ func processingReflectAnySimpleType(
 		lr.PassRuleHandler(fieldBranch, ncv)
 
 		chanOutMispFormat <- ChanInputCreateMispFormat{
-			FieldName:   nameStr,
-			ValueType:   "int",
-			Value:       ncv,
-			FieldBranch: fieldBranch,
+			FieldName:           nameStr,
+			ValueType:           "int",
+			Value:               ncv,
+			FieldBranch:         fieldBranch,
+			ExclusionRuleWorked: lr.ExcludeRuleHandler(fieldBranch, ncv),
 		}
 
 		return ncv
@@ -203,10 +205,11 @@ func processingReflectAnySimpleType(
 		lr.PassRuleHandler(fieldBranch, ncv)
 
 		chanOutMispFormat <- ChanInputCreateMispFormat{
-			FieldName:   nameStr,
-			ValueType:   "uint",
-			Value:       ncv,
-			FieldBranch: fieldBranch,
+			FieldName:           nameStr,
+			ValueType:           "uint",
+			Value:               ncv,
+			FieldBranch:         fieldBranch,
+			ExclusionRuleWorked: lr.ExcludeRuleHandler(fieldBranch, ncv),
 		}
 
 		return ncv
@@ -226,10 +229,11 @@ func processingReflectAnySimpleType(
 		lr.PassRuleHandler(fieldBranch, ncv)
 
 		chanOutMispFormat <- ChanInputCreateMispFormat{
-			FieldName:   nameStr,
-			ValueType:   "float",
-			Value:       ncv,
-			FieldBranch: fieldBranch,
+			FieldName:           nameStr,
+			ValueType:           "float",
+			Value:               ncv,
+			FieldBranch:         fieldBranch,
+			ExclusionRuleWorked: lr.ExcludeRuleHandler(fieldBranch, ncv),
 		}
 
 		return ncv
@@ -249,10 +253,11 @@ func processingReflectAnySimpleType(
 		lr.PassRuleHandler(fieldBranch, ncv)
 
 		chanOutMispFormat <- ChanInputCreateMispFormat{
-			FieldName:   nameStr,
-			ValueType:   "bool",
-			Value:       ncv,
-			FieldBranch: fieldBranch,
+			FieldName:           nameStr,
+			ValueType:           "bool",
+			Value:               ncv,
+			FieldBranch:         fieldBranch,
+			ExclusionRuleWorked: lr.ExcludeRuleHandler(fieldBranch, ncv),
 		}
 
 		return ncv

@@ -93,18 +93,18 @@ var _ = Describe("Processingrules", Ordered, func() {
 				//coremodule.PassRuleHandler(listRule.Rules.Pass, fieldBranch, v)
 			}
 
-			fmt.Println("----------------------- Equal rules --------------------------")
+			//fmt.Println("----------------------- Equal rules --------------------------")
 			var count int
 			for _, v := range lr.GetRulePass() {
 				for _, value := range v.ListAnd {
-					fmt.Printf("field '%s' is exist '%v'\n", value.SearchField, value.StatementExpression)
+					//		fmt.Printf("field '%s' is exist '%v'\n", value.SearchField, value.StatementExpression)
 
 					if value.StatementExpression {
 						count++
 					}
 				}
 			}
-			fmt.Println("--------------------------------------------------------------")
+			//fmt.Println("--------------------------------------------------------------")
 
 			Expect(count).Should(Equal(3))
 		})
@@ -112,7 +112,7 @@ var _ = Describe("Processingrules", Ordered, func() {
 
 	Context("Тест 1. Чтение тестового JSON файла", func() {
 		It("При чтении тестового файла ошибок быть не должно", func() {
-			fmt.Println("count example byte", len(exampleByte))
+			//fmt.Println("count example byte", len(exampleByte))
 
 			Expect(errReadFile).ShouldNot(HaveOccurred())
 		})
@@ -120,7 +120,7 @@ var _ = Describe("Processingrules", Ordered, func() {
 
 	Context("Тест 2.1. Проверка формирования правил фильтрации", func() {
 		It("При формировании правил фильтрации ошибки быть не должно", func() {
-			fmt.Println("Rules Pass:", lr.GetRulePass())
+			//fmt.Println("Rules Pass:", lr.GetRulePass())
 
 			Expect(errGetRule).ShouldNot(HaveOccurred())
 		})
@@ -132,7 +132,7 @@ var _ = Describe("Processingrules", Ordered, func() {
 
 	Context("Тест 2.2. Проверка формирования правил фильтрации на основе НОВОГО конструктора", func() {
 		It("Не должно быть ошибок при формировании правил фильтрации", func() {
-			r, warnings, err := rules.NewListRule("placeholder_misp", "rules", "mispmsgrule.yaml")
+			_, warnings, err := rules.NewListRule("placeholder_misp", "rules", "mispmsgrule.yaml")
 
 			//fmt.Println()
 			//fmt.Println("Rules warnings 1111 START")
@@ -141,7 +141,7 @@ var _ = Describe("Processingrules", Ordered, func() {
 			//}
 			//fmt.Println("Rules warnings 1111 END")
 
-			fmt.Println("-------- LIST RULE ---------", r, "------------------")
+			//fmt.Println("-------- LIST RULE ---------", r, "------------------")
 
 			Expect(len(warnings)).Should(Equal(0))
 			Expect(err).ShouldNot(HaveOccurred())
@@ -277,12 +277,14 @@ var _ = Describe("Processingrules", Ordered, func() {
 
 			wg.Wait()
 
+			// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			//
 			//тест может нормально не проходить потому что в hmfh.HandlerMessageFromHive
 			//есть еще один метод lr.CleanStatementExpressionRulePass()
 			//который выполняет очистку значения StatementExpression
 			//по этому перед тестом его рекомендуется отключить
 			//
+			// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 			Expect(lr.SomePassRuleIsTrue()).Should(BeTrue())
 			Expect(true).Should(BeTrue())

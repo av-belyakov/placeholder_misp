@@ -40,7 +40,6 @@ func CoreHandler(
 
 			//обработчик сообщений из TheHive (выполняется разбор сообщения и его разбор на основе правил)
 			go hmfh.HandlerMessageFromHive(chanCreateMispFormat, data.Data, data.MsgId, chanDone)
-			//go HandlerMessageFromHive(data.Data, data.MsgId, storageApp, listRule, chanCreateMispFormat, chanDone, logging, counting)
 
 			// отправка сообщения в Elasticshearch
 			esModule.SendingData(elasticsearchinteractions.SettingsInputChan{UUID: data.MsgId})

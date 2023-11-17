@@ -30,6 +30,24 @@
 # ЛОГИКА обработки списка объектов "ИЛИ" для первого уровня вложения и логика "И" для 
 # второго уровня вложения. 
 # 
+#   Правила из раздела EXCLUDE должны содержать список из вложенных объектов, состоящих
+# из определенных свойств. Они отвечают за исключение сообщения из списка передаваемых
+# в MISP. Эти правила применяются только для свойств содержащих массив объектов.
+# Поля searchField и searchValue являются обязательными. При этом поле searchField
+# должно содержать значение начинающееся с имени свойства содержащего массив объектов,
+# а следом, через '.' должно идти имя свойства или последовательность свойств
+# в которых нужно найти определенное значение. Поле searchValue может быть пустым,
+# тогда будет выполнен поиск пустого свойства из поля searchField. Поле accurateComparison
+# содержит тригер, определяющий тип поиска значения из поля searchValue.
+# При значении поля accurateComparison 'false' поиск осуществляется 
+# по наличию содержимого. Например, если searchValue содержит значение
+# 'example', то в указанном из поля searchField свойстве будет выполнятся поиск
+# наличия значения 'example' в любом тексте, если оно есть то правило применяется.
+# В противоположность, значение 'true' поля accurateComparison требует осуществлять
+# 'строгое' сравнение, то есть содержимое в искомом свойстве должно содержать
+# только значение 'example' и ничего больше.
+# ЛОГИКА обработки списка объектов "ИЛИ". 
+#
 #   Список параметров правил:
 # - searchField - поле поиска (обязательно для правил PASS)
 # - searchValue - значение поиска (обязательно для правил PASS)
@@ -65,6 +83,16 @@
 #      - searchField: "event.object.base"
 #        searchValue: "not:"
 #    - listAnd:
+#  EXCLUDE:
+#    - searchField: "observables.tlp"
+#      searchValue: "2"
+#      accurateComparison: true
+#    - searchField: "observables.data"
+#      searchValue: "ftp.cloud.gcm"
+#      accurateComparison: false
+#    - searchField: "observables.data"
+#      searchValue: "anisimova.cloud.gcm"
+#      accurateComparison: false
 #  PASSANY: true
 #
 
@@ -81,4 +109,14 @@ RULES:
       - searchField: "event.object.tlp"
         searchValue: "not:3"
     - listAnd:
+  EXCLUDE:
+    - searchField: "observables.tlp"
+      searchValue: "3"
+      accurateComparison: true
+    - searchField: "observables.data"
+      searchValue: "ftp.cloud.gcm"
+      accurateComparison: false
+    - searchField: "observables.data"
+      searchValue: "anisimova.cloud.gcm"
+      accurateComparison: false
   PASSANY: false

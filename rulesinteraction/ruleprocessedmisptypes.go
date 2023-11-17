@@ -10,21 +10,20 @@ type RuleOptions struct {
 	Passany bool          `yaml:"PASSANY"`
 	Pass    []PassListAnd `yaml:"PASS"`
 	Replace []RuleReplace `yaml:"REPLACE"`
+	Exclude []RuleExclude `yaml:"EXCLUDE"`
 }
 
-// RuleSetProcessingMsgMISP содержит правила обработки сообщений
-// Passany тип правила для пропуска всех сообщений
-// Pass тип правила для пропуска сообщений подходящих под определенные критерии
-// Replace тип правила для замены определенных значений подходящих под определенные критерии
-type RuleSetProcessingMsgMISP struct {
-	Passany bool
-	Pass    []PassListAnd
-	Replace []RuleReplace
-}
-
-// PassListAnd список правил
+// PassListAnd список правил с логикой 'И'
 type PassListAnd struct {
 	ListAnd []RulePass `yaml:"listAnd"`
+}
+
+// CommonRuleFields общие поля которые могут использоватся для описания большинства типов правил
+// SearchField искомое поле
+// SearchValue искомое значение
+type CommonRuleFields struct {
+	SearchField string `yaml:"searchField"`
+	SearchValue string `yaml:"searchValue"`
 }
 
 // RulePassany содержит тип правила для пропуска всех сообщений
@@ -34,21 +33,24 @@ type RulePassany struct {
 }
 
 // RulePass содержит тип правила для пропуска сообщений подходящих под определенные критерии
-// SearchField искомое поле
-// SearchValue искомое значение
 // StatementExpression утверждение выражения
 type RulePass struct {
-	SearchField         string `yaml:"searchField"`
-	SearchValue         string `yaml:"searchValue"`
+	CommonRuleFields    `mapstructure:",squash"`
 	StatementExpression bool
 }
 
 // RuleReplace содержит тип правила для замены определенных значений
-// SearchField искомое поле
-// SearchValue искомое значение
 // ReplaceValue заменяемое значение
 type RuleReplace struct {
-	SearchField  string `yaml:"searchField"`
-	SearchValue  string `yaml:"searchValue"`
-	ReplaceValue string `yaml:"replaceValue"`
+	CommonRuleFields `mapstructure:",squash"`
+	ReplaceValue     string `yaml:"replaceValue"`
+}
+
+// RuleExclude содержит тип правила для исключения объекта из списка объектов
+// предназначенных для передачи
+// AccurateComparison содержит тригер, информирующий о типе поиска, 'true' является
+// 'строгим' поиском, 'false', нет
+type RuleExclude struct {
+	CommonRuleFields   `mapstructure:",squash"`
+	AccurateComparison bool `yaml:"accurateComparison"`
 }
