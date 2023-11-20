@@ -69,5 +69,4 @@ var _ = Describe("Readrule", Ordered, func() {
 			Expect(errGetRule).ShouldNot(HaveOccurred())
 		})
 	})
-
 })

@@ -56,8 +56,90 @@ func (svn *storageValueName) CleanValueName() {
 	*svn = storageValueName{}
 }
 
+// ExclusionRules содержит информацию об объектах которые нужно исключить из
+// передачи в MISP
+type ExclusionRules []ExclusionRule
+
+// ExclusionRule
+// SequenceNumber - порядковый номер в списке объектов
+// NameList - наименование объекта
+type ExclusionRule struct {
+	SequenceNumber int
+	NameList       string
+}
+
+// Add добавляет информацию об объекте подлежащего исключению из списка передаваемых в MISP
+func (er *ExclusionRules) Add(sn int, n string) {
+	var isExist bool
+	n = getObjName(n)
+
+	for _, v := range *er {
+		if v.SequenceNumber == sn && v.NameList == n {
+			isExist = true
+
+			break
+		}
+	}
+
+	if !isExist {
+		*er = append(*er, ExclusionRule{SequenceNumber: sn, NameList: n})
+	}
+}
+
+// SearchObjectName ищет, и возвращает список с информацией об объектах которые нужно
+// исключить из передачи в MISP
+func (er *ExclusionRules) SearchObjectName(objName string) []ExclusionRule {
+	list := []ExclusionRule{}
+
+	for _, v := range *er {
+		if v.NameList != getObjName(objName) {
+			continue
+		}
+
+		list = append(list, v)
+	}
+
+	return list
+}
+
+// SearchSeqNum ищет, и возвращает список с информацией об объектах которые нужно
+// исключить из передачи в MISP
+func (er *ExclusionRules) SearchSeqNum(sn int) []ExclusionRule {
+	list := []ExclusionRule{}
+
+	for _, v := range *er {
+		if v.SequenceNumber != sn {
+			continue
+		}
+
+		list = append(list, v)
+	}
+
+	return list
+}
+
+// Clean выполняет очистку списка
+func (er *ExclusionRules) Clean() {
+	er = &ExclusionRules{}
+}
+
+func NewExclusionRules() *ExclusionRules {
+	return &ExclusionRules{}
+}
+
+func getObjName(objName string) string {
+	l := strings.Split(objName, ".")
+
+	if len(l) == 0 {
+		return ""
+	}
+
+	return l[0]
+}
+
 var (
 	eventsMisp         datamodels.EventsMispFormat
+	exclusionRules     *ExclusionRules
 	listObjectsMisp    *datamodels.ListObjectsMispFormat
 	listAttributeTmp   *datamodels.ListAttributeTmp
 	listAttributesMisp *datamodels.ListAttributesMispFormat
@@ -76,6 +158,7 @@ var (
 
 func init() {
 	eventsMisp = datamodels.NewEventMisp()
+	exclusionRules = NewExclusionRules()
 	listObjectsMisp = datamodels.NewListObjectsMispFormat()
 	listAttributeTmp = datamodels.NewListAttributeTmp()
 	listAttributesMisp = datamodels.NewListAttributesMispFormat()
@@ -188,26 +271,6 @@ func NewMispFormat(
 					userEmail = uemail
 				}
 
-				/*
-					!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-								!!!!!! Обязательно прочитать !!!!!!!
-							В пятницу не успеваю сделать полностью, не говоря о том что бы
-							протестировать
-
-
-
-						Значение tmf.ExclusionRuleWorked содержит bool тип, если TRUE, то
-						передоваемые в tmf.Value данные данные не желательны в сообщении
-						отправляемом в MISP. А это означает что ВЕСЬ объект в MISP не нужен.
-						Соответственно весь объект надо исключить.
-						Это в первую очередь касается объектов типа "observables". По начальному
-						значению, до '.' из tmf.FieldBranch можем определить к какому объекту
-						относится данное не желательное значение, а по maxCountObservables
-						порядковый номер объекта. Соответственно этот объект нужно как то
-						исключить из отправки модулю MISP когда будет отправлятся метод
-						mispmodule.SendingDataInput из стр. 290
-				*/
-
 				//для observables которые содержат свойства, являющиеся картами,
 				//такими как свойства 'attachment', 'reports' и т.д. не
 				//осуществлять подсчет свойств
@@ -240,6 +303,10 @@ func NewMispFormat(
 					}
 
 					svn.SetValueName(newFieldName)
+
+					if tmf.ExclusionRuleWorked {
+						exclusionRules.Add(seqNumObservable, tmf.FieldBranch)
+					}
 				}
 
 				//обрабатываем свойство observables.attachment
@@ -275,6 +342,9 @@ func NewMispFormat(
 				}
 
 			case isAllowed := <-chanDone:
+				//удаляем те объекты Attributes которые соответствуют правилам EXCLUDE
+				delElementAttributes(exclusionRules, listAttributesMisp)
+
 				if !isAllowed {
 					_, f, l, _ := runtime.Caller(0)
 
@@ -309,6 +379,7 @@ func NewMispFormat(
 				userEmail, caseSource = "", ""
 				leot.CleanListTags()
 				eventsMisp.CleanEventsMispFormat()
+				exclusionRules.Clean()
 				listObjectsMisp.CleanListObjectsMisp()
 				listAttributeTmp.CleanAttribute()
 				listAttributesMisp.CleanListAttributesMisp()
@@ -325,6 +396,12 @@ func NewMispFormat(
 	}()
 
 	return chanInput, chanDone
+}
+
+func delElementAttributes(er *ExclusionRules, la *datamodels.ListAttributesMispFormat) {
+	for _, v := range er.SearchObjectName("observables") {
+		la.DelElementListAttributesMisp(v.SequenceNumber)
+	}
 }
 
 // searchEventSource выполняет поиск источника события

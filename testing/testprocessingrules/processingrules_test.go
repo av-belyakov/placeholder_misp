@@ -220,6 +220,13 @@ var _ = Describe("Processingrules", Ordered, func() {
 							fmt.Println(str)
 						}
 
+						if d, ok := data.MajorData["attributes"]; ok {
+							if l, ok := d.([]datamodels.AttributesMispFormat); ok {
+								fmt.Println("___________ MISP type: ATTRIBUTES ___________")
+								fmt.Println("+++++++++++++++ Length: ", len(l))
+								fmt.Println("_____________________________________________")
+							}
+						}
 						/*if d, ok := data.MajorData["attributes"]; ok {
 							b, err := json.Marshal(d)
 							if err != nil {

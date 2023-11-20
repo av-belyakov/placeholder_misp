@@ -97,6 +97,10 @@ func (s *HandlerMessageFromHiveSettings) HandlerMessageFromHive(
 	}
 
 	//выполняет очистку значения StatementExpression что равно отсутствию совпадений в правилах Pass
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	// ВРЕМЕННО ЗАКОМЕНТИРОВАЛ
+	// не забыть снять коментарий
+	//
 	s.ListRule.CleanStatementExpressionRulePass()
 
 	isAllowed, _ := s.StorageApp.GetAllowedTransferHiveFormatMessage(taskId)
