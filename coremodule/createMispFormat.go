@@ -406,20 +406,21 @@ func NewMispFormat(
 				//удаляем те объекты Attributes которые соответствуют правилам EXCLUDE
 				delElementAttributes(exclusionRules, listAttributesMisp, logging)
 
-				fmt.Println("==================== exclusionRules =====================")
-				for k, v := range exclusionRules.SearchObjectName("observables") {
-					fmt.Printf("%d. %d\n", k+1, v.SequenceNumber)
-				}
+				//fmt.Println("==================== exclusionRules =====================")
+				//for k, v := range exclusionRules.SearchObjectName("observables") {
+				//	fmt.Printf("%d. %d\n", k+1, v.SequenceNumber)
+				//}
 
-				fmt.Println("____________________ Attributes _______________________")
-				i := 1
-				for k, v := range getNewListAttributes(
-					listAttributesMisp.GetListAttributesMisp(),
-					listTags) {
-					fmt.Printf("%d. num: %d, Value: %s\n", i, k, v.Value)
-					i++
-				}
-				fmt.Println("_______________________________________________________")
+				//fmt.Println("____________________ Attributes _______________________")
+				//i := 1
+				//for k, v := range getNewListAttributes(
+				//	listAttributesMisp.GetListAttributesMisp(),
+				//	listTags) {
+				//	fmt.Printf("%d. num: %d, Value: %s\n", i, k, v.Value)
+				//	i++
+				//}
+				//fmt.Println("_______________________________________________________")
+
 				if !isAllowed {
 					_, f, l, _ := runtime.Caller(0)
 
