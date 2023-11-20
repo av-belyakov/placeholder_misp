@@ -38,11 +38,20 @@ func (lambda *ListAttributesMispFormat) CleanListAttributesMisp() {
 	lambda.attributes = map[int]AttributesMispFormat{}
 }
 
-func (lambda *ListAttributesMispFormat) DelElementListAttributesMisp(num int) {
+func (lambda *ListAttributesMispFormat) DelElementListAttributesMisp(num int) (AttributesMispFormat, bool) {
 	lambda.Lock()
 	defer lambda.Unlock()
 
-	delete(lambda.attributes, num)
+	var (
+		ok   bool
+		attr AttributesMispFormat
+	)
+
+	if attr, ok = lambda.attributes[num]; ok {
+		delete(lambda.attributes, num)
+	}
+
+	return attr, ok
 }
 
 func (lamisp *ListAttributesMispFormat) GetListAttributesMisp() map[int]AttributesMispFormat {

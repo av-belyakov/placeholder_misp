@@ -101,7 +101,7 @@ func (s *HandlerMessageFromHiveSettings) HandlerMessageFromHive(
 	// ВРЕМЕННО ЗАКОМЕНТИРОВАЛ
 	// не забыть снять коментарий
 	//
-	s.ListRule.CleanStatementExpressionRulePass()
+	//s.ListRule.CleanStatementExpressionRulePass()
 
 	isAllowed, _ := s.StorageApp.GetAllowedTransferHiveFormatMessage(taskId)
 	dt := "events do not meet rules"

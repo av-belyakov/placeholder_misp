@@ -138,30 +138,101 @@ func getObjName(objName string) string {
 }
 
 var (
-	eventsMisp         datamodels.EventsMispFormat
-	exclusionRules     *ExclusionRules
-	listObjectsMisp    *datamodels.ListObjectsMispFormat
-	listAttributeTmp   *datamodels.ListAttributeTmp
-	listAttributesMisp *datamodels.ListAttributesMispFormat
+//eventsMisp         datamodels.EventsMispFormat
+//exclusionRules     *ExclusionRules
+//listObjectsMisp    *datamodels.ListObjectsMispFormat
+//listAttributeTmp   *datamodels.ListAttributeTmp
+//listAttributesMisp *datamodels.ListAttributesMispFormat
 
-	//		пока не нужны, временно отключаем
-	//galaxyClustersMisp datamodels.GalaxyClustersMispFormat
-	//galaxyElementMisp  datamodels.GalaxyElementMispFormat
-	//usersMisp          datamodels.UsersMispFormat
-	//organizationsMisp  datamodels.OrganisationsMispFormat
-	//serversMisp        datamodels.ServersMispFormat
-	//feedsMisp          datamodels.FeedsMispFormat
-	//tagsMisp           datamodels.TagsMispFormat
+//		пока не нужны, временно отключаем
+//galaxyClustersMisp datamodels.GalaxyClustersMispFormat
+//galaxyElementMisp  datamodels.GalaxyElementMispFormat
+//usersMisp          datamodels.UsersMispFormat
+//organizationsMisp  datamodels.OrganisationsMispFormat
+//serversMisp        datamodels.ServersMispFormat
+//feedsMisp          datamodels.FeedsMispFormat
+//tagsMisp           datamodels.TagsMispFormat
 
-	listHandlerMisp map[string][]func(interface{}, int)
+// listHandlerMisp map[string][]func(interface{}, int)
 )
 
 func init() {
-	eventsMisp = datamodels.NewEventMisp()
-	exclusionRules = NewExclusionRules()
-	listObjectsMisp = datamodels.NewListObjectsMispFormat()
-	listAttributeTmp = datamodels.NewListAttributeTmp()
-	listAttributesMisp = datamodels.NewListAttributesMispFormat()
+	//eventsMisp = datamodels.NewEventMisp()
+	//exclusionRules = NewExclusionRules()
+	//listObjectsMisp = datamodels.NewListObjectsMispFormat()
+	//listAttributeTmp = datamodels.NewListAttributeTmp()
+	//listAttributesMisp = datamodels.NewListAttributesMispFormat()
+
+	/*galaxyClustersMisp = datamodels.GalaxyClustersMispFormat{
+		Description:   "3",
+		GalaxyElement: []datamodels.GalaxyElementMispFormat{},
+	}
+	usersMisp = datamodels.UsersMispFormat{
+		Newsread:     "0",
+		ChangePw:     "0",
+		CurrentLogin: "0",
+		LastLogin:    "0",
+		DateCreated:  "0",
+		DateModified: "0",
+	}
+	organizationsMisp = datamodels.OrganisationsMispFormat{
+		DateCreated:  "0",
+		DateModified: "0",
+	}
+	serversMisp = datamodels.ServersMispFormat{}
+	feedsMisp = datamodels.FeedsMispFormat{
+		Distribution: "3",
+		SourceFormat: "misp",
+		InputSource:  "network",
+	}
+	tagsMisp = datamodels.TagsMispFormat{
+		Exportable:     true,
+		IsGalaxy:       true,
+		IsCustomGalaxy: true,
+		Inherited:      1,
+	}
+
+	listHandlerMisp = map[string][]func(interface{}, int){
+		//event -> events
+		"event.object.title":     {eventsMisp.SetValueInfoEventsMisp},
+		"event.object.startDate": {eventsMisp.SetValueTimestampEventsMisp},
+		"event.details.endDate":  {eventsMisp.SetValueDateEventsMisp},
+		"event.object.tlp":       {eventsMisp.SetValueDistributionEventsMisp},
+		"event.object.severity":  {eventsMisp.SetValueThreatLevelIdEventsMisp},
+		"event.organisationId":   {eventsMisp.SetValueOrgIdEventsMisp},
+		"event.object.updatedAt": {eventsMisp.SetValueSightingTimestampEventsMisp},
+		"event.object.owner":     {eventsMisp.SetValueEventCreatorEmailEventsMisp},
+		//observables -> attributes
+		"observables._id":        {listAttributesMisp.SetValueObjectIdAttributesMisp},
+		"observables.data":       {listAttributesMisp.SetValueValueAttributesMisp},
+		"observables.dataType":   {listObjectsMisp.SetValueNameObjectsMisp},
+		"observables._createdAt": {listAttributesMisp.SetValueTimestampAttributesMisp},
+		"observables.message":    {listAttributesMisp.SetValueCommentAttributesMisp},
+		"observables.startDate": {
+			listAttributesMisp.SetValueFirstSeenAttributesMisp,
+			listObjectsMisp.SetValueFirstSeenObjectsMisp,
+			listObjectsMisp.SetValueTimestampObjectsMisp,
+		},
+		//observables.attachment -> objects
+		"observables.attachment.size": {listObjectsMisp.SetValueSizeObjectsMisp},
+	}*/
+}
+
+func NewMispFormat(
+	taskId string,
+	mispmodule *mispinteractions.ModuleMISP,
+	logging chan<- datamodels.MessageLogging) (chan ChanInputCreateMispFormat, chan bool) {
+
+	//канал принимающий данные необходимые для заполнения MISP форматов
+	chanInput := make(chan ChanInputCreateMispFormat)
+	//останавливает обработчик канала chanInput (при завершении декодировании сообщения)
+	chanDone := make(chan bool)
+
+	eventsMisp := datamodels.NewEventMisp()
+	//exclusionRules := NewExclusionRules()
+	listObjectsMisp := datamodels.NewListObjectsMispFormat()
+	listAttributeTmp := datamodels.NewListAttributeTmp()
+	listAttributesMisp := datamodels.NewListAttributesMispFormat()
 
 	/*galaxyClustersMisp = datamodels.GalaxyClustersMispFormat{
 		Description:   "3",
@@ -192,7 +263,7 @@ func init() {
 		Inherited:      1,
 	}*/
 
-	listHandlerMisp = map[string][]func(interface{}, int){
+	listHandlerMisp := map[string][]func(interface{}, int){
 		//event -> events
 		"event.object.title":     {eventsMisp.SetValueInfoEventsMisp},
 		"event.object.startDate": {eventsMisp.SetValueTimestampEventsMisp},
@@ -216,17 +287,6 @@ func init() {
 		//observables.attachment -> objects
 		"observables.attachment.size": {listObjectsMisp.SetValueSizeObjectsMisp},
 	}
-}
-
-func NewMispFormat(
-	taskId string,
-	mispmodule *mispinteractions.ModuleMISP,
-	logging chan<- datamodels.MessageLogging) (chan ChanInputCreateMispFormat, chan bool) {
-
-	//канал принимающий данные необходимые для заполнения MISP форматов
-	chanInput := make(chan ChanInputCreateMispFormat)
-	//останавливает обработчик канала chanInput (при завершении декодировании сообщения)
-	chanDone := make(chan bool)
 
 	go func() {
 		var (
@@ -244,6 +304,7 @@ func NewMispFormat(
 
 		svn := NewStorageValueName()
 		leot := datamodels.NewListEventObjectTags()
+		exclusionRules := NewExclusionRules()
 
 		for key := range listHandlerMisp {
 			if strings.Contains(key, "observables") {
@@ -343,8 +404,22 @@ func NewMispFormat(
 
 			case isAllowed := <-chanDone:
 				//удаляем те объекты Attributes которые соответствуют правилам EXCLUDE
-				delElementAttributes(exclusionRules, listAttributesMisp)
+				delElementAttributes(exclusionRules, listAttributesMisp, logging)
 
+				fmt.Println("==================== exclusionRules =====================")
+				for k, v := range exclusionRules.SearchObjectName("observables") {
+					fmt.Printf("%d. %d\n", k+1, v.SequenceNumber)
+				}
+
+				fmt.Println("____________________ Attributes _______________________")
+				i := 1
+				for k, v := range getNewListAttributes(
+					listAttributesMisp.GetListAttributesMisp(),
+					listTags) {
+					fmt.Printf("%d. num: %d, Value: %s\n", i, k, v.Value)
+					i++
+				}
+				fmt.Println("_______________________________________________________")
 				if !isAllowed {
 					_, f, l, _ := runtime.Caller(0)
 
@@ -379,7 +454,7 @@ func NewMispFormat(
 				userEmail, caseSource = "", ""
 				leot.CleanListTags()
 				eventsMisp.CleanEventsMispFormat()
-				exclusionRules.Clean()
+				//exclusionRules.Clean()
 				listObjectsMisp.CleanListObjectsMisp()
 				listAttributeTmp.CleanAttribute()
 				listAttributesMisp.CleanListAttributesMisp()
@@ -398,9 +473,14 @@ func NewMispFormat(
 	return chanInput, chanDone
 }
 
-func delElementAttributes(er *ExclusionRules, la *datamodels.ListAttributesMispFormat) {
+func delElementAttributes(er *ExclusionRules, la *datamodels.ListAttributesMispFormat, logging chan<- datamodels.MessageLogging) {
 	for _, v := range er.SearchObjectName("observables") {
-		la.DelElementListAttributesMisp(v.SequenceNumber)
+		if attr, ok := la.DelElementListAttributesMisp(v.SequenceNumber); ok {
+			logging <- datamodels.MessageLogging{
+				MsgData: fmt.Sprintf("'an attribute with a value of '%s' has been removed'", attr.Value),
+				MsgType: "warning",
+			}
+		}
 	}
 }
 
