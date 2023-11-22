@@ -32,6 +32,15 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 				fmt.Printf("%d. OrgName: %s, SourceName: %s\n", k, v.OrgName, v.SourceName)
 			}
 
+			fmt.Println("------------------------ ZABBIX -------------------------")
+			fmt.Println("IsTransmit:", conf.GetCommonApp().Zabbix.IsTransmit)
+			fmt.Println("TimeInterval:", conf.GetCommonApp().Zabbix.TimeInterval)
+			fmt.Println("Handshake:", conf.GetCommonApp().Zabbix.Handshake)
+			fmt.Println("NetworkHost:", conf.GetCommonApp().Zabbix.NetworkHost)
+			fmt.Println("NetworkPort:", conf.GetCommonApp().Zabbix.NetworkPort)
+			fmt.Println("ZabbixHost:", conf.GetCommonApp().Zabbix.ZabbixHost)
+			fmt.Println("ZabbixKey:", conf.GetCommonApp().Zabbix.ZabbixKey)
+
 			Expect(err).ShouldNot(HaveOccurred())
 			Expect(len(conf.GetListLogs())).Should(Equal(5))
 			Expect(len(conf.GetListOrganization())).Should(Equal(12))

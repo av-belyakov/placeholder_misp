@@ -1,8 +1,28 @@
-# ORGANIZATIONS содержит настройки организаций в MISP
-# 
-# orgName - наименование организации в полях 'Организация-создатель' и 
+#    ORGANIZATIONS настройки организаций в MISP
+#
+# orgName - наименование организации в полях 'Организация-создатель' и
 #  'Организация-владелец' MISP
 # sourceName - наименование источника в json сообщении от TheHive
+#
+#    LOGGING настройки логирования
+#
+# msgTypeName - тип сообщения, от этого зависит в какой лог-файл будет отправлятся
+#  сообщение, а также с каким префиксом оно будет дублироватся в консоль
+# writingFile - нужно ли записывать сообщение в файл или только выводить в консоль
+# writingStdout - нужно ли выводить сообщение в консоль
+# pathDirectory - директория для записи лог-файлов
+# maxFileSize - максимальный размер файла, после которого будет создаваться новый
+#  файл, а текущий будет архивироваться
+#
+#    ZABBIX настройки подключения к серверу Zabbix
+#
+# isTransmit - триггер включения/отключения передачи
+# networkHost - хост в формате ip или domainname для подклчения к серверу
+# networkPort - сетевой порт
+# zabbixHost - приемник сообщений
+# zabbixKey - ключ приемника
+# timeInterval - временной интервал в минутах, нужен для подтверждения активности модуля
+# handshake - сообщение которое будет отправлятся для подтверждения активности
 #
 ORGANIZATIONS:
   - { orgName: "GCM", sourceName: "gcm" }
@@ -17,9 +37,47 @@ ORGANIZATIONS:
   - { orgName: "KGD-RCM", sourceName: "rcmkgd" }
   - { orgName: "UFO-RCM", sourceName: "rcmros" }
   - { orgName: "SMOL-RCM", sourceName: "rcmlnx" }
-LOGGING: 
-  - { msgTypeName: "error", writingFile: true, pathDirectory: "logs", writingStdout: false, maxFileSize: 10000 }
-  - { msgTypeName: "warning", writingFile: true, pathDirectory: "logs", writingStdout: false, maxFileSize: 10000 }
-  - { msgTypeName: "info", writingFile: true, pathDirectory: "logs", writingStdout: true, maxFileSize: 10000 }
-  - { msgTypeName: "events", writingFile: true, pathDirectory: "logs", writingStdout: false, maxFileSize: 10000 }
-  - { msgTypeName: "testing", writingFile: true, pathDirectory: "logs", writingStdout: false, maxFileSize: 10000 }
+LOGGING:
+  - {
+      msgTypeName: "error",
+      writingFile: true,
+      pathDirectory: "logs",
+      writingStdout: false,
+      maxFileSize: 10000,
+    }
+  - {
+      msgTypeName: "warning",
+      writingFile: true,
+      pathDirectory: "logs",
+      writingStdout: false,
+      maxFileSize: 10000,
+    }
+  - {
+      msgTypeName: "info",
+      writingFile: true,
+      pathDirectory: "logs",
+      writingStdout: true,
+      maxFileSize: 10000,
+    }
+  - {
+      msgTypeName: "events",
+      writingFile: true,
+      pathDirectory: "logs",
+      writingStdout: false,
+      maxFileSize: 10000,
+    }
+  - {
+      msgTypeName: "testing",
+      writingFile: true,
+      pathDirectory: "logs",
+      writingStdout: false,
+      maxFileSize: 10000,
+    }
+ZABBIX:
+  isTransmit: true
+  networkHost: "zabbix.cloud.gcm"
+  networkPort: 10051
+  zabbixHost: "sib-server"
+  zabbixKey: "test_bav"
+  timeInterval: 10
+  handshake: "I'm still alive"

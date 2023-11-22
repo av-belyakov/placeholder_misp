@@ -86,7 +86,7 @@
 #    - listAnd:
 #  EXCLUDE:
 #    - searchField: "observables.tlp"
-#      searchValue: "2"
+#      searchValue: "3"
 #      accurateComparison: true
 #    - searchField: "observables.data"
 #      searchValue: "ftp.cloud.gcm"
@@ -114,8 +114,8 @@ RULES:
     - searchField: "observables.tlp"
       searchValue: "3"
       accurateComparison: true
-    - searchField: "observables.data"
-      searchValue: "ftp.cloud.gcm"
+    - searchField: "observables.dataType"
+      searchValue: "url_pcap"
       accurateComparison: false
     - searchField: "observables.data"
       searchValue: "anisimova.cloud.gcm"

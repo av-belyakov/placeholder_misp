@@ -58,42 +58,6 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		return newResult, nil
 	}
 
-	/*natsSendData := func(conf confighandler.AppConfigNATS, eventId string) error {
-		nc, err := nats.Connect(
-			fmt.Sprintf("%s:%d", conf.Host, conf.Port),
-			nats.MaxReconnects(-1),
-			nats.ReconnectWait(3*time.Second))
-		if err != nil {
-			return err
-		}
-
-		nrm := datamodels.NewResponseMessage()
-		nrm.ResponseMessageAddNewCommand(datamodels.ResponseCommandForTheHive{
-			Command: "setcustomfield",
-			Name:    "misp-event-id.string",
-			String:  eventId,
-		})
-
-		fmt.Println("________________________________________")
-		fmt.Println("nrm.GetResponseMessageFromMispToTheHave(): ", nrm.GetResponseMessageFromMispToTheHave())
-		fmt.Println("________________________________________")
-
-		// Далее нужно сделать Marchal для ResponseMessageFromMispToTheHave и отправить
-		// в TheHive через Webhook и NATS
-		res, err := json.Marshal(nrm.GetResponseMessageFromMispToTheHave())
-		if err != nil {
-			return err
-		}
-
-		//err = nc.Publish("setcustomfield", res)
-		err = nc.Publish("main_caseupdate", res)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	}*/
-
 	BeforeAll(func() {
 		logging = make(chan datamodels.MessageLogging)
 		counting = make(chan datamodels.DataCounterSettings)

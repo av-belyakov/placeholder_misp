@@ -13,6 +13,7 @@ type ConfigApp struct {
 type CommonAppConfig struct {
 	LogList       []LogSet
 	Organizations []Organization
+	Zabbix        ZabbixOptions
 }
 
 type Logs struct {
@@ -34,6 +35,20 @@ type Orgs struct {
 type Organization struct {
 	OrgName    string `yaml:"orgName"`
 	SourceName string `yaml:"sourceName"`
+}
+
+type ZabbixSet struct {
+	Zabbix ZabbixOptions
+}
+
+type ZabbixOptions struct {
+	IsTransmit   bool   `yaml:"isTransmit"`
+	TimeInterval int    `yaml:"timeInterval"`
+	NetworkPort  int    `yaml:"networkPort"`
+	NetworkHost  string `yaml:"networkHost"`
+	ZabbixHost   string `yaml:"zabbixHost"`
+	ZabbixKey    string `yaml:"zabbixKey"`
+	Handshake    string `yaml:"handshake"`
 }
 
 type AppConfigNATS struct {
