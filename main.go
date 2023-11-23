@@ -242,7 +242,10 @@ func main() {
 	go counterHandler(iz, storageApp, counting)
 
 	//взаимодействие с Zabbix
-	go interactionZabbix(confApp, hz, iz, logging)
+	commOpt := confApp.GetCommonApp()
+	if commOpt.Zabbix.IsTransmit {
+		go interactionZabbix(confApp, hz, iz, logging)
+	}
 
 	//инициализация модуля для взаимодействия с NATS (Данный модуль обязателен для взаимодействия)
 	natsModule, err := natsinteractions.NewClientNATS(confApp.AppConfigNATS, storageApp, logging, counting)
