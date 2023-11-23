@@ -97,6 +97,8 @@ func counterHandler(
 	iz chan<- string,
 	storageApp *memorytemporarystorage.CommonStorageTemporary,
 	counting <-chan datamodels.DataCounterSettings) {
+	var ae, emr int
+
 	for d := range counting {
 		switch d.DataType {
 		case "update accepted events":
@@ -113,7 +115,12 @@ func counterHandler(
 		d, h, m, s := supportingfunctions.GetDifference(dc.StartTime, time.Now())
 
 		log.Printf("\tсобытий принятых/обработанных: %d/%d, соответствие/не соответствие правилам: %d/%d, время со старта приложения: дней %d, часов %d, минут %d, секунд %d\n", dc.AcceptedEvents, dc.ProcessedEvents, dc.EventsMeetRules, dc.EventsDoNotMeetRules, d, h, m, s)
-		iz <- fmt.Sprintf("событий принятых: %d, соответствие правилам: %d, время со старта приложения: дней %d, часов %d, минут %d, секунд %d\n", dc.AcceptedEvents, dc.EventsMeetRules, d, h, m, s)
+		if ae != dc.AcceptedEvents || emr != dc.EventsMeetRules {
+			iz <- fmt.Sprintf("событий принятых: %d, соответствие правилам: %d, время со старта приложения: дней %d, часов %d, минут %d, секунд %d\n", dc.AcceptedEvents, dc.EventsMeetRules, d, h, m, s)
+
+			ae = dc.AcceptedEvents
+			emr = dc.EventsMeetRules
+		}
 	}
 }
 
