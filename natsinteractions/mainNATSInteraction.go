@@ -158,23 +158,10 @@ func NewClientNATS(
 			if data.Command == "send event id" {
 				nrm.ResponseMessageAddNewCommand(datamodels.ResponseCommandForTheHive{
 					Command: "setcustomfield",
-					//Name:    "misp-event-id-test.string",
-					Name:   "misp-event-id.string",
-					String: data.EventId,
+					Name:    "misp-event-id.string",
+					String:  data.EventId,
 				})
 			}
-
-			/*
-				tmpPackage := nrm.GetResponseMessageFromMispToTheHave()
-				fmt.Printf("========= data.Command: '%s', EventId: '%s'\n", data.Command, data.EventId)
-				fmt.Println("========= CREATE package for sending to TheHive, Package:")
-				fmt.Printf("tmpPackage.Success: %v\n", tmpPackage.Success)
-				fmt.Printf("tmpPackage.Service: %v\n", tmpPackage.Service)
-				fmt.Println("tmpPackage.Commands:")
-				for k, v := range tmpPackage.Commands {
-					fmt.Printf("\t%d. \n\tCommand:%s\n\tName:%s\n\tString:%s\n", k, v.Command, v.Name, v.String)
-				}
-			*/
 
 			res, err := json.Marshal(nrm.GetResponseMessageFromMispToTheHave())
 			if err != nil {

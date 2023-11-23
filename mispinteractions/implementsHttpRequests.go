@@ -89,10 +89,18 @@ func (client *ClientMISP) Do(method, path string, data []byte) (*http.Response, 
 
 		mferr := datamodels.MispFormatError{Errors: map[string]interface{}{}}
 		if err := json.Unmarshal(resBodyByte, &mferr); err != nil {
-			return resp, resBodyByte, fmt.Errorf(" '%s: %v' %s:%d", resp.Status, err, f, l-1)
+			lerr := []interface{}{}
+			if err := json.Unmarshal(resBodyByte, &lerr); err == nil {
+				return resp, resBodyByte, fmt.Errorf("message from MISP: '%s: err - %v' %s:%d", resp.Status, lerr, f, l-1)
+			}
+
+			var serr string
+			if err := json.Unmarshal(resBodyByte, &serr); err == nil {
+				return resp, resBodyByte, fmt.Errorf("message from MISP: '%s: err - %s' %s:%d", resp.Status, serr, f, l-1)
+			}
 		}
 
-		return resp, resBodyByte, fmt.Errorf(" '%s: msg - %s, url - %s, err - %v' %s:%d", resp.Status, mferr.Message, mferr.URL, mferr.Errors, f, l-1)
+		return resp, resBodyByte, fmt.Errorf("message from MISP: '%s: msg - %s, url - %s, err - %v' %s:%d", resp.Status, mferr.Message, mferr.URL, mferr.Errors, f, l-1)
 	}
 
 	return resp, resBodyByte, err

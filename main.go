@@ -22,6 +22,7 @@ import (
 	"placeholder_misp/redisinteractions"
 	rules "placeholder_misp/rulesinteraction"
 	"placeholder_misp/supportingfunctions"
+	"placeholder_misp/zabbixinteractions"
 )
 
 const ROOT_DIR = "placeholder_misp"
@@ -31,8 +32,10 @@ var (
 	sl         simplelogger.SimpleLoggerSettings
 	confApp    confighandler.ConfigApp
 	lr         *rules.ListRule
+	hz         *zabbixinteractions.HandlerZabbixConnection
 	warnings   []string
 	storageApp *memorytemporarystorage.CommonStorageTemporary
+	iz         chan string
 	logging    chan datamodels.MessageLogging
 	counting   chan datamodels.DataCounterSettings
 )
@@ -75,7 +78,81 @@ func getLoggerSettings(cls []confighandler.LogSet) []simplelogger.MessageTypeSet
 	return loggerConf
 }
 
+// loggingHandler обработчик логов
+func loggingHandler(
+	iz chan<- string,
+	sl simplelogger.SimpleLoggerSettings,
+	logging <-chan datamodels.MessageLogging) {
+	for msg := range logging {
+		_ = sl.WriteLoggingData(msg.MsgData, msg.MsgType)
+
+		if msg.MsgType == "error" || msg.MsgType == "info" {
+			iz <- msg.MsgData
+		}
+	}
+}
+
+// counterHandler обработчик счетчиков
+func counterHandler(
+	iz chan<- string,
+	storageApp *memorytemporarystorage.CommonStorageTemporary,
+	counting <-chan datamodels.DataCounterSettings) {
+	for d := range counting {
+		switch d.DataType {
+		case "update accepted events":
+			storageApp.SetAcceptedEventsDataCounter(d.Count)
+		case "update processed events":
+			storageApp.SetProcessedEventsDataCounter(d.Count)
+		case "update events meet rules":
+			storageApp.SetEventsMeetRulesDataCounter(d.Count)
+		case "events do not meet rules":
+			storageApp.SetEventsDoNotMeetRulesDataCounter(d.Count)
+		}
+
+		dc := storageApp.GetDataCounter()
+		d, h, m, s := supportingfunctions.GetDifference(dc.StartTime, time.Now())
+
+		msg := fmt.Sprintf("событий принятых/обработанных: %d/%d, соответствие/не соответствие правилам: %d/%d, время со старта приложения: дней %d, часов %d, минут %d, секунд %d\n", dc.AcceptedEvents, dc.ProcessedEvents, dc.EventsMeetRules, dc.EventsDoNotMeetRules, d, h, m, s)
+
+		log.Printf("\t%s", msg)
+		iz <- msg
+	}
+}
+
+// interactionZabbix осуществляет взаимодействие с Zabbix
+func interactionZabbix(
+	confApp confighandler.ConfigApp,
+	hz *zabbixinteractions.HandlerZabbixConnection,
+	iz <-chan string,
+	logging chan<- datamodels.MessageLogging) {
+	co := confApp.GetCommonApp()
+	t := time.Tick(time.Duration(co.Zabbix.TimeInterval) * time.Minute)
+
+	for {
+		select {
+		case <-t:
+			if _, err := hz.SendData([]string{co.Zabbix.Handshake}); err != nil {
+				_, f, l, _ := runtime.Caller(0)
+				logging <- datamodels.MessageLogging{
+					MsgData: fmt.Sprintf("'%v' %s:%d", err, f, l-1),
+					MsgType: "error",
+				}
+			}
+
+		case msg := <-iz:
+			if _, err := hz.SendData([]string{msg}); err != nil {
+				_, f, l, _ := runtime.Caller(0)
+				logging <- datamodels.MessageLogging{
+					MsgData: fmt.Sprintf("'%v' %s:%d", err, f, l-1),
+					MsgType: "error",
+				}
+			}
+		}
+	}
+}
+
 func init() {
+	iz = make(chan string)
 	logging = make(chan datamodels.MessageLogging)
 	counting = make(chan datamodels.DataCounterSettings)
 
@@ -126,6 +203,12 @@ func init() {
 
 	//добавляем время инициализации счетчика хранения
 	storageApp.SetStartTimeDataCounter(time.Now())
+
+	commOpt := confApp.GetCommonApp()
+	host := fmt.Sprintf("%s:%d", commOpt.Zabbix.NetworkHost, commOpt.Zabbix.NetworkPort)
+
+	//инициализируем модуль связи с Zabbix
+	hz = zabbixinteractions.NewHandlerZabbixConnection(host, commOpt.Zabbix.ZabbixHost, commOpt.Zabbix.ZabbixKey)
 }
 
 func main() {
@@ -153,23 +236,13 @@ func main() {
 	log.Printf("Placeholder_misp application, version %s is running. Application status is '%s'\n", appVersion, appStatus)
 
 	// логирование данных
-	go func() {
-		for msg := range logging {
-			_ = sl.WriteLoggingData(msg.MsgData, msg.MsgType)
+	go loggingHandler(iz, sl, logging)
 
-			/*
-				здесь нужно дополнительно сделат
-					отправку логов в zabbix
+	//вывод данных счетчика
+	go counterHandler(iz, storageApp, counting)
 
-				Сделал модуль взаимодействия с Zabbix
-				Добавил в конфигурационный файл дополнительные
-				настрйки для Zabbix и протестировал его
-
-				Теперь нужно сделать инициализацию модуля Zabbix
-				и отправку сообщений
-			*/
-		}
-	}()
+	//взаимодействие с Zabbix
+	go interactionZabbix(confApp, hz, iz, logging)
 
 	//инициализация модуля для взаимодействия с NATS (Данный модуль обязателен для взаимодействия)
 	natsModule, err := natsinteractions.NewClientNATS(confApp.AppConfigNATS, storageApp, logging, counting)
@@ -205,28 +278,10 @@ func main() {
 		_ = sl.WriteLoggingData(fmt.Sprintf(" '%s' %s:%d", err, f, l-2), "error")
 	}
 
-	//вывод данных счетчика
-	go func() {
-		for d := range counting {
-			switch d.DataType {
-			case "update accepted events":
-				storageApp.SetAcceptedEventsDataCounter(d.Count)
-			case "update processed events":
-				storageApp.SetProcessedEventsDataCounter(d.Count)
-			case "update events meet rules":
-				storageApp.SetEventsMeetRulesDataCounter(d.Count)
-			case "events do not meet rules":
-				storageApp.SetEventsDoNotMeetRulesDataCounter(d.Count)
-			}
-
-			dc := storageApp.GetDataCounter()
-			d, h, m, s := supportingfunctions.GetDifference(dc.StartTime, time.Now())
-
-			log.Printf("\tсобытий принятых/обработанных: %d/%d, соответствие/не соответствие правилам: %d/%d, время со старта приложения: дней %d, часов %d, минут %d, секунд %d\n", dc.AcceptedEvents, dc.ProcessedEvents, dc.EventsMeetRules, dc.EventsDoNotMeetRules, d, h, m, s)
-		}
-	}()
-
-	_ = sl.WriteLoggingData("application '"+appName+"' is started", "info")
+	logging <- datamodels.MessageLogging{
+		MsgData: "application '" + appName + "' is started",
+		MsgType: "info",
+	}
 
 	coremodule.CoreHandler(natsModule, mispModule, redisModule, esModule, nkckiModule, lr, storageApp, logging, counting)
 }

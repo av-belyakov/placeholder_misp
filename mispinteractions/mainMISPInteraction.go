@@ -106,27 +106,29 @@ func HandlerMISP(
 			//
 
 			// получаем авторизационный ключ пользователя по его email
-			if us, err := connHandler.GetUserData(data.UserEmail); err == nil {
-				authKey = us.AuthKey
-			} else {
-				_, f, l, _ := runtime.Caller(0)
-				logging <- datamodels.MessageLogging{
-					MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-3),
-					MsgType: "error",
-				}
-
-				if us, err = connHandler.CreateNewUser(data.UserEmail, data.CaseSource); err != nil {
-					_, f, l, _ = runtime.Caller(0)
+			if data.UserEmail != "" {
+				if us, err := connHandler.GetUserData(data.UserEmail); err == nil {
+					authKey = us.AuthKey
+				} else {
+					_, f, l, _ := runtime.Caller(0)
 					logging <- datamodels.MessageLogging{
-						MsgData: fmt.Sprintf("'%s, case id %d' %s:%d", err.Error(), int(data.CaseId), f, l-3),
+						MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-3),
 						MsgType: "error",
 					}
-				} else {
-					authKey = us.AuthKey
 
-					logging <- datamodels.MessageLogging{
-						MsgData: fmt.Sprintf("a new user %s has been successfully created", data.UserEmail),
-						MsgType: "info",
+					if us, err = connHandler.CreateNewUser(data.UserEmail, data.CaseSource); err != nil {
+						_, f, l, _ = runtime.Caller(0)
+						logging <- datamodels.MessageLogging{
+							MsgData: fmt.Sprintf("'%s, case id %d' %s:%d", err.Error(), int(data.CaseId), f, l-3),
+							MsgType: "error",
+						}
+					} else {
+						authKey = us.AuthKey
+
+						logging <- datamodels.MessageLogging{
+							MsgData: fmt.Sprintf("a new user %s has been successfully created", data.UserEmail),
+							MsgType: "info",
+						}
 					}
 				}
 			}
@@ -134,21 +136,21 @@ func HandlerMISP(
 			//
 			// --------------------- ТОЛЬКО ДЛЯ ОТЛАДКИ ----------------------
 			//
-			if data.CaseId == 0 || data.UserEmail == "" {
-				if ed, ok := data.MajorData["events"]; !ok {
-					logging <- datamodels.MessageLogging{
-						MsgData: fmt.Sprintf("TEST_ERROR func 'HandlerMISP', reseived command '%s', the properties of \"events\" were not found in the received data. DATA: %v", data.Command, data.MajorData),
-						MsgType: "error",
-					}
-				} else {
-					logging <- datamodels.MessageLogging{
-						MsgData: fmt.Sprintf("TEST_ERROR func 'HandlerMISP', reseived command '%s', data object '%v'", data.Command, ed),
-						MsgType: "error",
-					}
-				}
-			}
+			//if data.CaseId == 0 || data.UserEmail == "" {
+			//	if ed, ok := data.MajorData["events"]; !ok {
+			//		logging <- datamodels.MessageLogging{
+			//			MsgData: fmt.Sprintf("TEST_ERROR func 'HandlerMISP', reseived command '%s', the properties of \"events\" were not found in the received data. DATA: %v", data.Command, data.MajorData),
+			//			MsgType: "error",
+			//		}
+			//	} else {
+			//		logging <- datamodels.MessageLogging{
+			//			MsgData: fmt.Sprintf("TEST_ERROR func 'HandlerMISP', reseived command '%s', data object '%v'", data.Command, ed),
+			//			MsgType: "error",
+			//		}
+			//	}
+			//}
 			//
-			//
+			// ----------------------------------------------------------------
 			//
 
 			switch data.Command {

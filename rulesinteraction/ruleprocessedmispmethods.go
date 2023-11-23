@@ -314,8 +314,6 @@ func (lr *ListRule) verification() []string {
 		warning = append(warning, fmt.Sprintf("warning: rule type 'PASSANY' is '%v', however rule type 'PASS' is empty too", lr.Rules.Passany))
 	}
 
-	fmt.Println(lr.Rules.Exclude)
-
 	lr.Rules.Pass = rp
 	lr.Rules.Replace = rr
 	lr.Rules.Exclude = re
