@@ -131,6 +131,10 @@ func interactionZabbix(
 	for {
 		select {
 		case <-t:
+			if !co.Zabbix.IsTransmit {
+				continue
+			}
+
 			if _, err := hz.SendData([]string{co.Zabbix.Handshake}); err != nil {
 				_, f, l, _ := runtime.Caller(0)
 				logging <- datamodels.MessageLogging{
@@ -140,6 +144,10 @@ func interactionZabbix(
 			}
 
 		case msg := <-iz:
+			if !co.Zabbix.IsTransmit {
+				continue
+			}
+
 			if _, err := hz.SendData([]string{msg}); err != nil {
 				_, f, l, _ := runtime.Caller(0)
 				logging <- datamodels.MessageLogging{
@@ -242,10 +250,7 @@ func main() {
 	go counterHandler(iz, storageApp, counting)
 
 	//взаимодействие с Zabbix
-	commOpt := confApp.GetCommonApp()
-	if commOpt.Zabbix.IsTransmit {
-		go interactionZabbix(confApp, hz, iz, logging)
-	}
+	go interactionZabbix(confApp, hz, iz, logging)
 
 	//инициализация модуля для взаимодействия с NATS (Данный модуль обязателен для взаимодействия)
 	natsModule, err := natsinteractions.NewClientNATS(confApp.AppConfigNATS, storageApp, logging, counting)

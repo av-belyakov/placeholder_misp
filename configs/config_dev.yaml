@@ -3,7 +3,7 @@ RULES_PROC_MSG_FOR_MISP:
   file: mispmsgrule.yaml
 REDIS:
   host: "192.168.9.208"
-  port: 26379
+  port: 6379
 NATS:
   host: nats.cloud.gcm
   port: 4222
