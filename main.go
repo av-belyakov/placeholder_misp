@@ -112,10 +112,8 @@ func counterHandler(
 		dc := storageApp.GetDataCounter()
 		d, h, m, s := supportingfunctions.GetDifference(dc.StartTime, time.Now())
 
-		msg := fmt.Sprintf("событий принятых/обработанных: %d/%d, соответствие/не соответствие правилам: %d/%d, время со старта приложения: дней %d, часов %d, минут %d, секунд %d\n", dc.AcceptedEvents, dc.ProcessedEvents, dc.EventsMeetRules, dc.EventsDoNotMeetRules, d, h, m, s)
-
-		log.Printf("\t%s", msg)
-		iz <- msg
+		log.Printf("\tсобытий принятых/обработанных: %d/%d, соответствие/не соответствие правилам: %d/%d, время со старта приложения: дней %d, часов %d, минут %d, секунд %d\n", dc.AcceptedEvents, dc.ProcessedEvents, dc.EventsMeetRules, dc.EventsDoNotMeetRules, d, h, m, s)
+		iz <- fmt.Sprintf("событий обработанных: %d, соответствие правилам: %d, время со старта приложения: дней %d, часов %d, минут %d, секунд %d\n", dc.ProcessedEvents, dc.EventsMeetRules, d, h, m, s)
 	}
 }
 
