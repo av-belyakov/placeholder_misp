@@ -137,6 +137,11 @@ func NewConfig() (ConfigApp, error) {
 			conf.AppConfigRedis.Port = viper.GetInt("REDIS.port")
 		}
 
+		//Настройки для взаимодействия с TheHive
+		if viper.IsSet("THEHIVE.send") {
+			conf.AppConfigTheHive.Send = viper.GetBool("THEHIVE.send")
+		}
+
 		// Настройки для модуля подключения к ElasticSearch
 		if viper.IsSet("ElasticSearch.host") {
 			conf.AppConfigElasticSearch.Host = viper.GetString("ElasticSearch.host")

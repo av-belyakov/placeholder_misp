@@ -171,7 +171,7 @@ func getAnalysis() string {
 }
 
 func getDistributionEvent() string {
-	return "3"
+	return "2"
 }
 
 func getThreatLevelId() string {

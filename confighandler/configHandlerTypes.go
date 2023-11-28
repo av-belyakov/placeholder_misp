@@ -5,6 +5,7 @@ type ConfigApp struct {
 	AppConfigNATS
 	AppConfigMISP
 	AppConfigRedis
+	AppConfigTheHive
 	AppConfigElasticSearch
 	AppConfigNKCKI
 	RulesProcMSGMISP
@@ -64,6 +65,10 @@ type AppConfigMISP struct {
 type AppConfigRedis struct {
 	Host string `yaml:"host"`
 	Port int    `yaml:"port"`
+}
+
+type AppConfigTheHive struct {
+	Send bool `yaml:"send"`
 }
 
 type AppConfigElasticSearch struct {

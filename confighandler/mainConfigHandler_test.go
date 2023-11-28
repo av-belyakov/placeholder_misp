@@ -46,6 +46,7 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 			Expect(len(conf.GetListOrganization())).Should(Equal(12))
 			Expect(conf.LogList[0].PathDirectory).Should(Equal("logs"))
 			Expect(conf.LogList[0].MsgTypeName).Should(Equal("error"))
+			Expect(conf.GetAppTheHive().Send).Should(BeTrue())
 		})
 
 		It("Должно быть получено содержимое файла 'config_prod.yaml' при пустом значении переменной GO_PHMISP_MAIN", func() {

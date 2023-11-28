@@ -10,6 +10,8 @@ NATS:
 MISP:
   host: misp-center.cloud.gcm
   auth: Z2PwRBdP5lFP7rdDJBzxmSahaLEwIvJoeOuwhRYQ
+THEHIVE:
+  send: true
 ElasticSearch:
   host: datahook.cloud.gcm
   port: 9200

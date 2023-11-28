@@ -259,7 +259,7 @@ func main() {
 	go interactionZabbix(confApp, hz, iz, logging)
 
 	//инициализация модуля для взаимодействия с NATS (Данный модуль обязателен для взаимодействия)
-	natsModule, err := natsinteractions.NewClientNATS(confApp.AppConfigNATS, storageApp, logging, counting)
+	natsModule, err := natsinteractions.NewClientNATS(confApp.AppConfigNATS, confApp.AppConfigTheHive, storageApp, logging, counting)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 		_ = sl.WriteLoggingData(fmt.Sprintf(" '%s' %s:%d", err, f, l-2), "error")

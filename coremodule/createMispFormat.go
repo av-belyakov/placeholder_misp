@@ -138,12 +138,6 @@ func getObjName(objName string) string {
 }
 
 var (
-//eventsMisp         datamodels.EventsMispFormat
-//exclusionRules     *ExclusionRules
-//listObjectsMisp    *datamodels.ListObjectsMispFormat
-//listAttributeTmp   *datamodels.ListAttributeTmp
-//listAttributesMisp *datamodels.ListAttributesMispFormat
-
 //		пока не нужны, временно отключаем
 //galaxyClustersMisp datamodels.GalaxyClustersMispFormat
 //galaxyElementMisp  datamodels.GalaxyElementMispFormat
@@ -157,12 +151,6 @@ var (
 )
 
 func init() {
-	//eventsMisp = datamodels.NewEventMisp()
-	//exclusionRules = NewExclusionRules()
-	//listObjectsMisp = datamodels.NewListObjectsMispFormat()
-	//listAttributeTmp = datamodels.NewListAttributeTmp()
-	//listAttributesMisp = datamodels.NewListAttributesMispFormat()
-
 	/*galaxyClustersMisp = datamodels.GalaxyClustersMispFormat{
 		Description:   "3",
 		GalaxyElement: []datamodels.GalaxyElementMispFormat{},
@@ -229,7 +217,6 @@ func NewMispFormat(
 	chanDone := make(chan bool)
 
 	eventsMisp := datamodels.NewEventMisp()
-	//exclusionRules := NewExclusionRules()
 	listObjectsMisp := datamodels.NewListObjectsMispFormat()
 	listAttributeTmp := datamodels.NewListAttributeTmp()
 	listAttributesMisp := datamodels.NewListAttributesMispFormat()
@@ -276,7 +263,7 @@ func NewMispFormat(
 		//observables -> attributes
 		"observables._id":        {listAttributesMisp.SetValueObjectIdAttributesMisp},
 		"observables.data":       {listAttributesMisp.SetValueValueAttributesMisp},
-		"observables.dataType":   {listObjectsMisp.SetValueNameObjectsMisp},
+		"observables.dataType":   {listObjectsMisp.SetValueNameObjectsMisp, listAttributesMisp.HandlingValueDataTypeAttributesMisp},
 		"observables._createdAt": {listAttributesMisp.SetValueTimestampAttributesMisp},
 		"observables.message":    {listAttributesMisp.SetValueCommentAttributesMisp},
 		"observables.startDate": {
@@ -386,7 +373,7 @@ func NewMispFormat(
 				//обрабатываем свойство observables.tags
 				if tmf.FieldBranch == "observables.tags" {
 					if tag, ok := tmf.Value.(string); ok {
-						result, err := HandlingObservablesTag(tag)
+						result, err := CheckObservablesTag(tag)
 						if err == nil {
 							listTags[seqNumObservable] = result
 						}
@@ -441,6 +428,8 @@ func NewMispFormat(
 						UserEmail:  userEmail,
 						MajorData: map[string]interface{}{
 							"events": eventsMisp,
+							//getNewListAttributes влияет на поля Category и Type
+							//типа Attributes
 							"attributes": getNewListAttributes(
 								listAttributesMisp.GetListAttributesMisp(),
 								listTags),
@@ -558,21 +547,4 @@ func getNewListObjects(
 	}
 
 	return nlo
-}
-
-func HandlingObservablesTag(tag string) ([2]string, error) {
-	nl := [2]string{}
-	patter := regexp.MustCompile(`^misp:([\w\-].*)=\"([\w\-].*)\"$`)
-
-	if !patter.MatchString(tag) {
-		return nl, fmt.Errorf("the accepted value does not match the regular expression")
-	}
-
-	result := patter.FindAllStringSubmatch(tag, -1)
-
-	if len(result) > 0 && len(result[0]) == 3 {
-		nl = [2]string{result[0][1], result[0][2]}
-	}
-
-	return nl, nil
 }

@@ -18,7 +18,7 @@ func createNewAttributesMisp() AttributesMispFormat {
 		Category:       "Other",
 		Type:           "other",
 		Timestamp:      "0",
-		Distribution:   "3",
+		Distribution:   getDistributionAttributes(),
 		Uuid:           uuid.New().String(),
 		FirstSeen:      fmt.Sprint(time.Now().Format(time.RFC3339)),
 		LastSeen:       fmt.Sprint(time.Now().Format(time.RFC3339)),
@@ -316,6 +316,29 @@ func (lamisp *ListAttributesMispFormat) HandlingValueEventIdAttributesMisp(v int
 	lamisp.attributes[num] = tmp
 }
 
+// HandlingValueDataTypeAttributesMisp изменяет некоторые поля объекта типа Attributes
+// при этом на эти поля возможно вляиние других функций корректировщиков, например,
+// функции getNewListAttributes, которая применяется для совмещения списков Attributes
+// и Tags
+func (lamisp *ListAttributesMispFormat) HandlingValueDataTypeAttributesMisp(v interface{}, num int) {
+	snortSidCategory := func(lamisp *ListAttributesMispFormat, num int) {
+		lamisp.SetValueCategoryAttributesMisp("Network activity", num)
+	}
+	snortSidType := func(lamisp *ListAttributesMispFormat, num int) {
+		lamisp.SetValueTypeAttributesMisp("snort", num)
+	}
+
+	collection := map[string][]func(lamisp *ListAttributesMispFormat, num int){
+		"snort_sid": {snortSidCategory, snortSidType},
+	}
+
+	if l, ok := collection[fmt.Sprint(v)]; ok {
+		for _, f := range l {
+			f(lamisp, num)
+		}
+	}
+}
+
 func HandlingListTags(l []string) [][2]string {
 	nl := make([][2]string, 0, len(l))
 	patter := regexp.MustCompile(`^misp:([\w\-].*)=\"([\w\-].*)\"$`)
@@ -332,4 +355,8 @@ func HandlingListTags(l []string) [][2]string {
 	}
 
 	return nl
+}
+
+func getDistributionAttributes() string {
+	return "2"
 }

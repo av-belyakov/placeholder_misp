@@ -93,6 +93,7 @@ func init() {
 
 func NewClientNATS(
 	conf confighandler.AppConfigNATS,
+	confTheHive confighandler.AppConfigTheHive,
 	storageApp *memorytemporarystorage.CommonStorageTemporary,
 	logging chan<- datamodels.MessageLogging,
 	counting chan<- datamodels.DataCounterSettings) (*ModuleNATS, error) {
@@ -140,6 +141,11 @@ func NewClientNATS(
 	// обработка данных приходящих в модуль от ядра приложения
 	go func() {
 		for data := range mnats.chanInputNATS {
+			//не отправляем eventId в TheHive
+			if !confTheHive.Send {
+				continue
+			}
+
 			//получаем дескриптор соединения с NATS для отправки eventId
 			ncd, ok := ns.getElement(data.TaskId)
 			if !ok {

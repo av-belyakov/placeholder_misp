@@ -24,6 +24,10 @@ func (conf *ConfigApp) GetAppMISP() *AppConfigMISP {
 	return &conf.AppConfigMISP
 }
 
+func (conf *ConfigApp) GetAppTheHive() *AppConfigTheHive {
+	return &conf.AppConfigTheHive
+}
+
 func (conf *ConfigApp) GetAppES() *AppConfigElasticSearch {
 	return &conf.AppConfigElasticSearch
 }
