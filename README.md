@@ -1,4 +1,4 @@
-Placeholder_MISP v0.9.4
+Placeholder_MISP v0.9.5
 
 Сервис выполняет сделующие действия:
 

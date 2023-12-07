@@ -321,15 +321,25 @@ func (lamisp *ListAttributesMispFormat) HandlingValueEventIdAttributesMisp(v int
 // функции getNewListAttributes, которая применяется для совмещения списков Attributes
 // и Tags
 func (lamisp *ListAttributesMispFormat) HandlingValueDataTypeAttributesMisp(v interface{}, num int) {
-	snortSidCategory := func(lamisp *ListAttributesMispFormat, num int) {
+	networkActivityCategory := func(lamisp *ListAttributesMispFormat, num int) {
 		lamisp.SetValueCategoryAttributesMisp("Network activity", num)
 	}
 	snortSidType := func(lamisp *ListAttributesMispFormat, num int) {
 		lamisp.SetValueTypeAttributesMisp("snort", num)
 	}
 
+	urlType := func(lamisp *ListAttributesMispFormat, num int) {
+		lamisp.SetValueTypeAttributesMisp("url", num)
+	}
+
+	domainType := func(lamisp *ListAttributesMispFormat, num int) {
+		lamisp.SetValueTypeAttributesMisp("domain", num)
+	}
+
 	collection := map[string][]func(lamisp *ListAttributesMispFormat, num int){
-		"snort_sid": {snortSidCategory, snortSidType},
+		"snort_sid": {networkActivityCategory, snortSidType},
+		"url":       {networkActivityCategory, urlType},
+		"domain":    {networkActivityCategory, domainType},
 	}
 
 	if l, ok := collection[fmt.Sprint(v)]; ok {
