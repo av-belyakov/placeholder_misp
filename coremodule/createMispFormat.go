@@ -261,9 +261,18 @@ func NewMispFormat(
 		"event.object.updatedAt": {eventsMisp.SetValueSightingTimestampEventsMisp},
 		"event.object.owner":     {eventsMisp.SetValueEventCreatorEmailEventsMisp},
 		//observables -> attributes
-		"observables._id":        {listAttributesMisp.SetValueObjectIdAttributesMisp},
-		"observables.data":       {listAttributesMisp.SetValueValueAttributesMisp},
-		"observables.dataType":   {listObjectsMisp.SetValueNameObjectsMisp, listAttributesMisp.HandlingValueDataTypeAttributesMisp},
+		"observables._id":  {listAttributesMisp.SetValueObjectIdAttributesMisp},
+		"observables.data": {listAttributesMisp.SetValueValueAttributesMisp},
+		"observables.dataType": {
+			listObjectsMisp.SetValueNameObjectsMisp,
+			//здесь выполняем автоподстановку значений для полей Type и Category
+			//объекта AttributesMisp на основе определенной логике и уже предустановленных
+			//значений, при этом значения, заданные пользователем для этих полей, обрабатываются
+			//отдельно и хранятся в listTags, а после закрытия канала совмещаются с
+			//объектами AttributesMisp и следовательно перезаписывают значения выполненные
+			//через автоподстановку
+			listAttributesMisp.HandlingValueDataTypeAttributesMisp,
+		},
 		"observables._createdAt": {listAttributesMisp.SetValueTimestampAttributesMisp},
 		"observables.message":    {listAttributesMisp.SetValueCommentAttributesMisp},
 		"observables.startDate": {
@@ -523,9 +532,11 @@ func getNewListAttributes(al map[int]datamodels.AttributesMispFormat, lat map[in
 		if elem, ok := lat[k]; ok {
 			v.Category = elem[0]
 			v.Type = elem[1]
-			nal = append(nal, v)
+		}
 
-			continue
+		//выключаем автоматическую коореляцию с другими событиями для MISP
+		if v.Type == "other" || v.Type == "snort" {
+			v.DisableCorrelation = true
 		}
 
 		nal = append(nal, v)

@@ -129,8 +129,17 @@ func (lamisp *ListAttributesMispFormat) SetValueValueAttributesMisp(v interface{
 		tmp = createNewAttributesMisp()
 	}
 
-	tmp.Value = fmt.Sprint(v)
+	value := fmt.Sprint(v)
+
+	tmp.Value = value
 	lamisp.attributes[num] = tmp
+
+	//дополнительно, если значение подподает под рег. вырожение типа "8030073:193.29.19.55"
+	//то устанавливаем дополнительное значение типа в поле "object_relation"
+	patter := regexp.MustCompile(`^[\d]+:((25[0-5]|2[0-4]\d|[01]?\d\d?)[.]){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$`)
+	if patter.MatchString(value) {
+		lamisp.SetValueObjectRelationAttributesMisp("ip_home", num)
+	}
 }
 
 func (lamisp *ListAttributesMispFormat) SetValueUuidAttributesMisp(v interface{}, num int) {
@@ -321,25 +330,53 @@ func (lamisp *ListAttributesMispFormat) HandlingValueEventIdAttributesMisp(v int
 // функции getNewListAttributes, которая применяется для совмещения списков Attributes
 // и Tags
 func (lamisp *ListAttributesMispFormat) HandlingValueDataTypeAttributesMisp(v interface{}, num int) {
+	//--- categories ---
 	networkActivityCategory := func(lamisp *ListAttributesMispFormat, num int) {
 		lamisp.SetValueCategoryAttributesMisp("Network activity", num)
 	}
+	payloadDeliveryCategory := func(lamisp *ListAttributesMispFormat, num int) {
+		lamisp.SetValueCategoryAttributesMisp("Payload delivery", num)
+	}
+
+	//--- types ---
 	snortSidType := func(lamisp *ListAttributesMispFormat, num int) {
 		lamisp.SetValueTypeAttributesMisp("snort", num)
 	}
-
 	urlType := func(lamisp *ListAttributesMispFormat, num int) {
 		lamisp.SetValueTypeAttributesMisp("url", num)
 	}
-
 	domainType := func(lamisp *ListAttributesMispFormat, num int) {
 		lamisp.SetValueTypeAttributesMisp("domain", num)
+	}
+	md5Type := func(lamisp *ListAttributesMispFormat, num int) {
+		lamisp.SetValueTypeAttributesMisp("md5", num)
+	}
+	sha1Type := func(lamisp *ListAttributesMispFormat, num int) {
+		lamisp.SetValueTypeAttributesMisp("sha1", num)
+	}
+	sha224Type := func(lamisp *ListAttributesMispFormat, num int) {
+		lamisp.SetValueTypeAttributesMisp("sha224", num)
+	}
+	sha256Type := func(lamisp *ListAttributesMispFormat, num int) {
+		lamisp.SetValueTypeAttributesMisp("sha256", num)
+	}
+	sha512Type := func(lamisp *ListAttributesMispFormat, num int) {
+		lamisp.SetValueTypeAttributesMisp("sha512", num)
+	}
+	filenameType := func(lamisp *ListAttributesMispFormat, num int) {
+		lamisp.SetValueTypeAttributesMisp("filename", num)
 	}
 
 	collection := map[string][]func(lamisp *ListAttributesMispFormat, num int){
 		"snort_sid": {networkActivityCategory, snortSidType},
-		"url":       {networkActivityCategory, urlType},
+		"url":       {payloadDeliveryCategory, urlType},
 		"domain":    {networkActivityCategory, domainType},
+		"md5":       {payloadDeliveryCategory, md5Type},
+		"sha1":      {payloadDeliveryCategory, sha1Type},
+		"sha224":    {payloadDeliveryCategory, sha224Type},
+		"sha256":    {payloadDeliveryCategory, sha256Type},
+		"sha512":    {payloadDeliveryCategory, sha512Type},
+		"filename":  {payloadDeliveryCategory, filenameType},
 	}
 
 	if l, ok := collection[fmt.Sprint(v)]; ok {
