@@ -5,7 +5,9 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+
 	// "placeholder_misp"
+	"placeholder_misp/coremodule"
 )
 
 var _ = Describe("Testing/Testdatatime/HandlingDataTime", func() {
@@ -32,6 +34,16 @@ var _ = Describe("Testing/Testdatatime/HandlingDataTime", func() {
 
 			Expect(err).ShouldNot(HaveOccurred())
 			Expect(len(str)).Should(Equal(16))
+		})
+	})
+
+	Context("Test 2", func() {
+		It("need is true", func() {
+			v := coremodule.GetTypeNameObservablesTag("type:sha256")
+			Expect(v).Should(Equal("sha256"))
+
+			v = coremodule.GetTypeNameObservablesTag("example:md5")
+			Expect(v).Should(Equal("md5"))
 		})
 	})
 })

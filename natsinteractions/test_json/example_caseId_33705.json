@@ -304,6 +304,25 @@
             "_type": "Observable"
         },
         {
+            "sighted": false,
+            "_createdBy": "d.-----------------@cloud.gcm",
+            "dataType": "other",
+            "startDate": 1696584054130,
+            "_id": "~1111111111111111",
+            "extraData": "",
+            "tags": [
+                "type:sha256"
+            ],
+            "tlp": 2,
+            "data": "3913a866c8d02ed92880cfbe45a8a8c4",
+            "reports": {},
+            "ignoreSimilarity": false,
+            "ioc": false,
+            "message": "",
+            "_createdAt": 1696584054130,
+            "_type": "Observable"
+        },
+        {
             "extraData": "",
             "ignoreSimilarity": false,
             "_id": "~79668891792",

@@ -382,9 +382,22 @@ func NewMispFormat(
 				//обрабатываем свойство observables.tags
 				if tmf.FieldBranch == "observables.tags" {
 					if tag, ok := tmf.Value.(string); ok {
-						result, err := CheckObservablesTag(tag)
+						//проверка значения на соответствию определенному шаблону
+						//начинающемуся на misp: при этом значения целеком берутся из
+						//этого шаблона
+						result, err := CheckMISPObservablesTag(tag)
 						if err == nil {
 							listTags[seqNumObservable] = result
+						} else {
+							result := GetTypeNameObservablesTag(tag)
+							if result != "" {
+								//автоматическая обработка значения tag
+								//при этом выполняется поиск подходящего под
+								//шаблон значения и его добавления в свойства
+								//Category и Type объекта AttributesMisp
+								listAttributesMisp.AutoSetValueCategoryAttributesMisp(result, seqNumObservable)
+								listAttributesMisp.AutoSetValueTypeAttributesMisp(result, seqNumObservable)
+							}
 						}
 					}
 				}
