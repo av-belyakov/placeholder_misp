@@ -137,19 +137,6 @@ func getObjName(objName string) string {
 	return l[0]
 }
 
-var (
-//		пока не нужны, временно отключаем
-//galaxyClustersMisp datamodels.GalaxyClustersMispFormat
-//galaxyElementMisp  datamodels.GalaxyElementMispFormat
-//usersMisp          datamodels.UsersMispFormat
-//organizationsMisp  datamodels.OrganisationsMispFormat
-//serversMisp        datamodels.ServersMispFormat
-//feedsMisp          datamodels.FeedsMispFormat
-//tagsMisp           datamodels.TagsMispFormat
-
-// listHandlerMisp map[string][]func(interface{}, int)
-)
-
 func init() {
 	/*galaxyClustersMisp = datamodels.GalaxyClustersMispFormat{
 		Description:   "3",
@@ -391,13 +378,6 @@ func NewMispFormat(
 						} else {
 							result := GetTypeNameObservablesTag(tag)
 							if result != "" {
-								//автоматическая обработка значения tag
-								//при этом выполняется поиск подходящего под
-								//шаблон значения и его добавления в свойства
-								//Category и Type объекта AttributesMisp
-								//listAttributesMisp.AutoSetValueCategoryAttributesMisp(result, seqNumObservable)
-								//listAttributesMisp.AutoSetValueTypeAttributesMisp(result, seqNumObservable)
-
 								//добавляем значение из tags в поле object_relation
 								listAttributesMisp.SetValueObjectRelationAttributesMisp(result, seqNumObservable)
 							}
@@ -551,7 +531,7 @@ func getNewListAttributes(al map[int]datamodels.AttributesMispFormat, lat map[in
 		}
 
 		//выключаем автоматическую коореляцию с другими событиями для MISP
-		if v.Type == "other" || v.Type == "snort" {
+		if (v.Type == "other" || v.Type == "snort") && v.ObjectRelation == "" {
 			v.DisableCorrelation = true
 		}
 
