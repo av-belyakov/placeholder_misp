@@ -411,66 +411,6 @@ func (lamisp *ListAttributesMispFormat) HandlingValueDataTypeAttributesMisp(i in
 
 	//выполняем автоматическое изменение значения свойства Type
 	lamisp.AutoSetValueTypeAttributesMisp(fmt.Sprint(i), num)
-	/*
-		//--- categories ---
-		networkActivityCategory := func(lamisp *ListAttributesMispFormat, num int) {
-			lamisp.SetValueCategoryAttributesMisp("Network activity", num)
-		}
-		payloadDeliveryCategory := func(lamisp *ListAttributesMispFormat, num int) {
-			lamisp.SetValueCategoryAttributesMisp("Payload delivery", num)
-		}
-
-		//--- types ---
-		snortSidType := func(lamisp *ListAttributesMispFormat, num int) {
-			lamisp.SetValueTypeAttributesMisp("snort", num)
-		}
-		urlType := func(lamisp *ListAttributesMispFormat, num int) {
-			lamisp.SetValueTypeAttributesMisp("url", num)
-		}
-		domainType := func(lamisp *ListAttributesMispFormat, num int) {
-			lamisp.SetValueTypeAttributesMisp("domain", num)
-		}
-		md5Type := func(lamisp *ListAttributesMispFormat, num int) {
-			lamisp.SetValueTypeAttributesMisp("md5", num)
-		}
-		sha1Type := func(lamisp *ListAttributesMispFormat, num int) {
-			lamisp.SetValueTypeAttributesMisp("sha1", num)
-		}
-		sha224Type := func(lamisp *ListAttributesMispFormat, num int) {
-			lamisp.SetValueTypeAttributesMisp("sha224", num)
-		}
-		sha256Type := func(lamisp *ListAttributesMispFormat, num int) {
-			lamisp.SetValueTypeAttributesMisp("sha256", num)
-		}
-		sha512Type := func(lamisp *ListAttributesMispFormat, num int) {
-			lamisp.SetValueTypeAttributesMisp("sha512", num)
-		}
-		filenameType := func(lamisp *ListAttributesMispFormat, num int) {
-			lamisp.SetValueTypeAttributesMisp("filename", num)
-		}
-		ja3Type := func(lamisp *ListAttributesMispFormat, num int) {
-			lamisp.SetValueTypeAttributesMisp("ja3-fingerprint-md5", num)
-		}
-
-		collection := map[string][]func(lamisp *ListAttributesMispFormat, num int){
-			"snort_sid": {networkActivityCategory, snortSidType},
-			"url":       {payloadDeliveryCategory, urlType},
-			"domain":    {networkActivityCategory, domainType},
-			"md5":       {payloadDeliveryCategory, md5Type},
-			"sha1":      {payloadDeliveryCategory, sha1Type},
-			"sha224":    {payloadDeliveryCategory, sha224Type},
-			"sha256":    {payloadDeliveryCategory, sha256Type},
-			"sha512":    {payloadDeliveryCategory, sha512Type},
-			"filename":  {payloadDeliveryCategory, filenameType},
-			"ja3":       {payloadDeliveryCategory, ja3Type},
-		}
-
-		if l, ok := collection[fmt.Sprint(v)]; ok {
-			for _, f := range l {
-				f(lamisp, num)
-			}
-		}
-	*/
 }
 
 func HandlingListTags(l []string) [][2]string {

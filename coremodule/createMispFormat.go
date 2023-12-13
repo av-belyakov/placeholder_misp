@@ -395,8 +395,11 @@ func NewMispFormat(
 								//при этом выполняется поиск подходящего под
 								//шаблон значения и его добавления в свойства
 								//Category и Type объекта AttributesMisp
-								listAttributesMisp.AutoSetValueCategoryAttributesMisp(result, seqNumObservable)
-								listAttributesMisp.AutoSetValueTypeAttributesMisp(result, seqNumObservable)
+								//listAttributesMisp.AutoSetValueCategoryAttributesMisp(result, seqNumObservable)
+								//listAttributesMisp.AutoSetValueTypeAttributesMisp(result, seqNumObservable)
+
+								//добавляем значение из tags в поле object_relation
+								listAttributesMisp.SetValueObjectRelationAttributesMisp(result, seqNumObservable)
 							}
 						}
 					}
