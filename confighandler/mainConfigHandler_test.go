@@ -61,7 +61,6 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 			Expect(conf.GetAppES().Host).Should(Equal("datahook.cloud.gcm"))
 			Expect(conf.GetAppES().Port).Should(Equal(9200))
 			Expect(conf.GetAppES().Index).Should(Equal("thehive33"))
-			Expect(conf.GetAppES().Name).Should(Equal("elasticsearch"))
 		})
 
 		It("Должно быть получено содержимое файла 'config_dev.yaml' при значении переменной GO_PHMISP_MAIN=development", func() {

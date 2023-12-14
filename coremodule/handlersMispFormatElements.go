@@ -3,6 +3,7 @@ package coremodule
 import (
 	"fmt"
 	"regexp"
+	"strings"
 )
 
 // CheckMISPObservablesTag проверяет соответствие "observables.tags" значению
@@ -25,21 +26,27 @@ func CheckMISPObservablesTag(tag string) ([2]string, error) {
 }
 
 func GetTypeNameObservablesTag(tag string) string {
-	result := make([][]string, 0)
-	patternOne := regexp.MustCompile(`^type:([\w\-].*)$`)
-	//это просто для примера с целью дальнейшего расширения
-	patternTwo := regexp.MustCompile(`^example:([\w\-].*)$`)
-
-	switch {
-	case patternOne.MatchString(tag):
-		result = patternOne.FindAllStringSubmatch(tag, -1)
-
-	case patternTwo.MatchString(tag):
-		result = patternTwo.FindAllStringSubmatch(tag, -1)
+	if !strings.Contains(tag, ":") {
+		return tag
 	}
 
-	if len(result) > 0 && len(result[0]) >= 2 {
-		return result[0][1]
+	patterns := []*regexp.Regexp{
+		regexp.MustCompile(`^type:([\w\-].*)$`),
+
+		//это просто для примера с целью дальнейшего расширения
+		regexp.MustCompile(`^example:([\w\-].*)$`),
+	}
+
+	for _, v := range patterns {
+		if !v.MatchString(tag) {
+			continue
+		}
+
+		result := v.FindAllStringSubmatch(tag, -1)
+
+		if len(result) > 0 && len(result[0]) >= 2 {
+			return result[0][1]
+		}
 	}
 
 	return ""

@@ -368,7 +368,9 @@ func NewMispFormat(
 
 				//обрабатываем свойство observables.tags
 				if tmf.FieldBranch == "observables.tags" {
-					if tag, ok := tmf.Value.(string); ok {
+					listTags = handlerObservablesTags(tmf.Value, listTags, listAttributesMisp, seqNumObservable)
+
+					/*if tag, ok := tmf.Value.(string); ok {
 						//проверка значения на соответствию определенному шаблону
 						//начинающемуся на misp: при этом значения целеком берутся из
 						//этого шаблона
@@ -380,9 +382,15 @@ func NewMispFormat(
 							if result != "" {
 								//добавляем значение из tags в поле object_relation
 								listAttributesMisp.SetValueObjectRelationAttributesMisp(result, seqNumObservable)
+
+								//Добавляем в свойство Category соответствующее значение
+								//если наименование похоже на наименование типа хеширования
+								if checkHashName(result) {
+									listAttributesMisp.AutoSetValueCategoryAttributesMisp(result, seqNumObservable)
+								}
 							}
 						}
-					}
+					}*/
 				}
 
 				//проверяем есть ли путь до обрабатываемого свойства в списке обработчиков
@@ -479,6 +487,40 @@ func delElementAttributes(er *ExclusionRules, la *datamodels.ListAttributesMispF
 	}
 }
 
+// обрабатывает значение свойства observables.tags
+func handlerObservablesTags(v interface{},
+	listTags map[int][2]string,
+	listAttributesMisp *datamodels.ListAttributesMispFormat,
+	seqNumObservable int) map[int][2]string {
+	tag, ok := v.(string)
+	if !ok {
+		return listTags
+	}
+
+	//проверка значения на соответствию определенному шаблону
+	//начинающемуся на misp: при этом значения целеком берутся из
+	//этого шаблона
+	result, err := CheckMISPObservablesTag(tag)
+	if err == nil {
+		listTags[seqNumObservable] = result
+	} else {
+		result := GetTypeNameObservablesTag(tag)
+		if result == "" {
+			return listTags
+		}
+		//добавляем значение из tags в поле object_relation
+		listAttributesMisp.SetValueObjectRelationAttributesMisp(result, seqNumObservable)
+
+		//Добавляем в свойство Category соответствующее значение
+		//если наименование похоже на наименование типа хеширования
+		if checkHashName(result) {
+			listAttributesMisp.AutoSetValueCategoryAttributesMisp(result, seqNumObservable)
+		}
+	}
+
+	return listTags
+}
+
 // searchEventSource выполняет поиск источника события
 func searchEventSource(tmf ChanInputCreateMispFormat) (string, bool) {
 	var (
@@ -554,4 +596,24 @@ func getNewListObjects(
 	}
 
 	return nlo
+}
+
+func checkHashName(name string) bool {
+	list := []string{
+		"md5",
+		"sha1",
+		"sha224",
+		"sha256",
+		"sha384",
+		"sha512",
+		"ja3",
+	}
+
+	for _, v := range list {
+		if name == v {
+			return true
+		}
+	}
+
+	return false
 }

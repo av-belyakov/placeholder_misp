@@ -122,6 +122,7 @@ func (lamisp *ListAttributesMispFormat) AutoSetValueCategoryAttributesMisp(v str
 		"sha512":    payloadDeliveryCategory,
 		"filename":  payloadDeliveryCategory,
 		"ja3":       payloadDeliveryCategory,
+		"ip_home":   networkActivityCategory,
 	}
 
 	if f, ok := collection[v]; ok {
@@ -175,6 +176,9 @@ func (lamisp *ListAttributesMispFormat) AutoSetValueTypeAttributesMisp(v string,
 	ja3Type := func(lamisp *ListAttributesMispFormat, num int) {
 		lamisp.SetValueTypeAttributesMisp("ja3-fingerprint-md5", num)
 	}
+	ipHome := func(lamisp *ListAttributesMispFormat, num int) {
+		lamisp.SetValueTypeAttributesMisp("ip_home", num)
+	}
 
 	collection := map[string]func(lamisp *ListAttributesMispFormat, num int){
 		"snort_sid": snortSidType,
@@ -187,6 +191,7 @@ func (lamisp *ListAttributesMispFormat) AutoSetValueTypeAttributesMisp(v string,
 		"sha512":    sha512Type,
 		"filename":  filenameType,
 		"ja3":       ja3Type,
+		"ip_home":   ipHome,
 	}
 
 	if f, ok := collection[v]; ok {
@@ -214,7 +219,12 @@ func (lamisp *ListAttributesMispFormat) SetValueValueAttributesMisp(v interface{
 	//то устанавливаем дополнительное значение типа в поле "object_relation"
 	patter := regexp.MustCompile(`^[\d]+:((25[0-5]|2[0-4]\d|[01]?\d\d?)[.]){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$`)
 	if patter.MatchString(value) {
-		lamisp.SetValueObjectRelationAttributesMisp("ip_home", num)
+		//lamisp.SetValueObjectRelationAttributesMisp("ip_home", num)
+		//выполняем автоматическое изменение значения свойства Category
+		lamisp.AutoSetValueCategoryAttributesMisp("ip_home", num)
+
+		//выполняем автоматическое изменение значения свойства Type
+		lamisp.AutoSetValueTypeAttributesMisp("ip_home", num)
 	}
 }
 
