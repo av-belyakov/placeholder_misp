@@ -42,7 +42,7 @@ func CoreHandler(
 			go hmfh.HandlerMessageFromHive(chanCreateMispFormat, data.Data, data.MsgId, chanDone)
 
 			// отправка сообщения в Elasticshearch
-			esModule.SendingData(elasticsearchinteractions.SettingsInputChan{UUID: data.MsgId})
+			esModule.HandlerData(elasticsearchinteractions.SettingsInputChan{UUID: data.MsgId})
 
 			// отправка сообщения в НКЦКИ (пока заглушка)
 			//nkckiModule.SendingData(procMsg.Message)

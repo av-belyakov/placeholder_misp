@@ -279,11 +279,7 @@ func main() {
 	}
 
 	//инициализация модуля для взаимодействия с ElasticSearch
-	esModule, err := elasticsearchinteractions.HandlerElasticSearch(confApp.AppConfigElasticSearch, storageApp, logging)
-	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		_ = sl.WriteLoggingData(fmt.Sprintf(" '%s' %s:%d", err, f, l-2), "error")
-	}
+	esModule := elasticsearchinteractions.HandlerElasticSearch(confApp.AppConfigElasticSearch, storageApp, logging)
 
 	// инициализация модуля для взаимодействия с NKCKI
 	nkckiModule, err := nkckiinteractions.NewClientNKCKI(confApp.AppConfigNKCKI, logging)

@@ -20,7 +20,7 @@ ElasticSearch:
   name: elasticsearch
   authtype: basic
   user: writer
-  passwd: 1zex3TvB
+  passwd: XxZqesYXuk8C
 NKCKI:
   host: 127.0.0.1
   port: 12000

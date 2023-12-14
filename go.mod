@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/av-belyakov/simplelogger v0.0.0-20231004094742-af2a9650e1d7
-	github.com/elastic/go-elasticsearch/v8 v8.9.0
+	github.com/elastic/go-elasticsearch/v8 v8.11.1
 	github.com/google/uuid v1.3.0
 	github.com/nats-io/nats.go v1.27.0
 	github.com/onsi/ginkgo/v2 v2.11.0
@@ -16,7 +16,7 @@ require (
 require (
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
-	github.com/elastic/elastic-transport-go/v8 v8.0.0-20230329154755-1a3c63de0db6 // indirect
+	github.com/elastic/elastic-transport-go/v8 v8.3.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect

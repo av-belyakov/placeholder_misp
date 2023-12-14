@@ -2,6 +2,7 @@ package main_test
 
 import (
 	"fmt"
+	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -37,7 +38,16 @@ var _ = Describe("Testing/Testdatatime/HandlingDataTime", func() {
 		})
 	})
 
-	Context("Test 2", func() {
+	Context("Тест 2. Получаем текущий год и месяц", func() {
+		It("Должны быть успешно получены текущие год и месяц", func() {
+			t := time.Now()
+
+			Expect(t.Year()).Should(Equal(2023))
+			Expect(int(t.Month())).Should(Equal(12))
+		})
+	})
+
+	Context("Test 3", func() {
 		It("need is true", func() {
 			v := coremodule.GetTypeNameObservablesTag("type:sha256")
 			Expect(v).Should(Equal("sha256"))
