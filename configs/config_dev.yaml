@@ -13,12 +13,11 @@ MISP:
 THEHIVE:
   send: false
 ElasticSearch:
+  send: false
   host: datahook.cloud.gcm
   port: 9200
-  prefix: test
-  index: thehive33
-  name: elasticsearch
-  authtype: basic
+  prefix:
+  index: "module_placeholder_thehive_case"
   user: writer
   passwd: XxZqesYXuk8C
 NKCKI:

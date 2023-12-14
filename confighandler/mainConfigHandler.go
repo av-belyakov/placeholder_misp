@@ -22,12 +22,11 @@ func NewConfig() (ConfigApp, error) {
 		"GO_PHMISP_NPORT":      "",
 		"GO_PHMISP_REDISHOST":  "",
 		"GO_PHMISP_REDISPORT":  "",
+		"GO_PHMISP_ESSEND":     "",
 		"GO_PHMISP_ESHOST":     "",
 		"GO_PHMISP_ESPORT":     "",
 		"GO_PHMISP_ESPREFIX":   "",
 		"GO_PHMISP_ESINDEX":    "",
-		"GO_PHMISP_ESNAME":     "",
-		"GO_PHMISP_ESAUTHTYPE": "",
 		"GO_PHMISP_ESUSER":     "",
 		"GO_PHMISP_ESPASSWD":   "",
 		"GO_PHMISP_NKCKIHOST":  "",
@@ -143,6 +142,9 @@ func NewConfig() (ConfigApp, error) {
 		}
 
 		// Настройки для модуля подключения к ElasticSearch
+		if viper.IsSet("ElasticSearch.send") {
+			conf.AppConfigElasticSearch.Send = viper.GetBool("ElasticSearch.send")
+		}
 		if viper.IsSet("ElasticSearch.host") {
 			conf.AppConfigElasticSearch.Host = viper.GetString("ElasticSearch.host")
 		}
@@ -154,12 +156,6 @@ func NewConfig() (ConfigApp, error) {
 		}
 		if viper.IsSet("ElasticSearch.index") {
 			conf.AppConfigElasticSearch.Index = viper.GetString("ElasticSearch.index")
-		}
-		if viper.IsSet("ElasticSearch.name") {
-			conf.AppConfigElasticSearch.Name = viper.GetString("ElasticSearch.name")
-		}
-		if viper.IsSet("ElasticSearch.authtype") {
-			conf.AppConfigElasticSearch.Authtype = viper.GetString("ElasticSearch.authtype")
 		}
 		if viper.IsSet("ElasticSearch.user") {
 			conf.AppConfigElasticSearch.User = viper.GetString("ElasticSearch.user")
@@ -261,6 +257,15 @@ func NewConfig() (ConfigApp, error) {
 	}
 
 	//Настройки для модуля подключения к ElasticSearch
+	if envList["GO_PHMISP_ESSEND"] != "" {
+		if envList["GO_PHMISP_ESSEND"] == "true" {
+			conf.AppConfigElasticSearch.Send = true
+		}
+
+		if envList["GO_PHMISP_ESSEND"] == "false" {
+			conf.AppConfigElasticSearch.Send = false
+		}
+	}
 	if envList["GO_PHMISP_ESHOST"] != "" {
 		conf.AppConfigElasticSearch.Host = envList["GO_PHMISP_ESHOST"]
 	}
@@ -274,12 +279,6 @@ func NewConfig() (ConfigApp, error) {
 	}
 	if envList["GO_PHMISP_ESINDEX"] != "" {
 		conf.AppConfigElasticSearch.Index = envList["GO_PHMISP_ESINDEX"]
-	}
-	if envList["GO_PHMISP_ESNAME"] != "" {
-		conf.AppConfigElasticSearch.Name = envList["GO_PHMISP_ESNAME"]
-	}
-	if envList["GO_PHMISP_ESAUTHTYPE"] != "" {
-		conf.AppConfigElasticSearch.Authtype = envList["GO_PHMISP_ESAUTHTYPE"]
 	}
 	if envList["GO_PHMISP_ESUSER"] != "" {
 		conf.AppConfigElasticSearch.User = envList["GO_PHMISP_ESUSER"]

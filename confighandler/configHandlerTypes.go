@@ -72,14 +72,13 @@ type AppConfigTheHive struct {
 }
 
 type AppConfigElasticSearch struct {
-	Prefix   string `yaml:"prefix"`
-	Index    string `yaml:"index"`
-	Name     string `yaml:"name"`
-	Authtype string `yaml:"authtype"`
-	User     string `yaml:"user"`
-	Passwd   string `yaml:"passwd"`
-	Host     string `yaml:"host"`
-	Port     int    `yaml:"port"`
+	Send   bool   `yaml:"send"`
+	Prefix string `yaml:"prefix"`
+	Index  string `yaml:"index"`
+	User   string `yaml:"user"`
+	Passwd string `yaml:"passwd"`
+	Host   string `yaml:"host"`
+	Port   int    `yaml:"port"`
 }
 
 type AppConfigNKCKI struct {

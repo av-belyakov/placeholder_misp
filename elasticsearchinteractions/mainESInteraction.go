@@ -36,9 +36,13 @@ type handlerSendData struct {
 func (hsd handlerSendData) sendingData(uuid string) {
 	defer hsd.storageApp.SetIsProcessedElasticsearshHiveFormatMessage(uuid)
 
+	if !hsd.conf.Send {
+		return
+	}
+
 	es, err := elasticsearch.NewClient(elasticsearch.Config{
 		Addresses: []string{fmt.Sprintf("http://%s:%d", hsd.conf.Host, hsd.conf.Port)},
-		Username:  hsd.conf.Name,
+		Username:  hsd.conf.User,
 		Password:  hsd.conf.Passwd,
 	})
 	if err != nil {
@@ -64,7 +68,7 @@ func (hsd handlerSendData) sendingData(uuid string) {
 
 	t := time.Now()
 	buf := bytes.NewReader(b)
-	res, err := es.API.Index(fmt.Sprintf("module_placeholder_thehive_case_%d_%d", t.Year(), int(t.Month())), buf)
+	res, err := es.API.Index(fmt.Sprintf("%s%s_%d_%d", hsd.conf.Prefix, hsd.conf.Index, t.Year(), int(t.Month())), buf)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 		hsd.logging <- datamodels.MessageLogging{
