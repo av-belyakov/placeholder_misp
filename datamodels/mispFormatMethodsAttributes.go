@@ -416,11 +416,17 @@ func (lamisp *ListAttributesMispFormat) HandlingValueEventIdAttributesMisp(v int
 // функции getNewListAttributes, которая применяется для совмещения списков Attributes
 // и Tags
 func (lamisp *ListAttributesMispFormat) HandlingValueDataTypeAttributesMisp(i interface{}, num int) {
+	v := fmt.Sprint(i)
+
 	//выполняем автоматическое изменение значения свойства Category
-	lamisp.AutoSetValueCategoryAttributesMisp(fmt.Sprint(i), num)
+	lamisp.AutoSetValueCategoryAttributesMisp(v, num)
 
 	//выполняем автоматическое изменение значения свойства Type
-	lamisp.AutoSetValueTypeAttributesMisp(fmt.Sprint(i), num)
+	lamisp.AutoSetValueTypeAttributesMisp(v, num)
+
+	if v == "ip_home" {
+		lamisp.SetValueObjectRelationAttributesMisp(v, num)
+	}
 }
 
 func HandlingListTags(l []string) [][2]string {
