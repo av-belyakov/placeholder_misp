@@ -33,6 +33,8 @@ func CoreHandler(
 	for {
 		select {
 		case data := <-natsChanReception:
+			storageApp.SetRawDataHiveFormatMessage(data.MsgId, data.Data)
+
 			//формирование итоговых документов в формате MISP
 			chanCreateMispFormat, chanDone := NewMispFormat(data.MsgId, mispModule, logging)
 
