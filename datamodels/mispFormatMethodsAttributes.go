@@ -177,7 +177,7 @@ func (lamisp *ListAttributesMispFormat) AutoSetValueTypeAttributesMisp(v string,
 		lamisp.SetValueTypeAttributesMisp("ja3-fingerprint-md5", num)
 	}
 	ipHome := func(lamisp *ListAttributesMispFormat, num int) {
-		lamisp.SetValueTypeAttributesMisp("ip_home", num)
+		lamisp.SetValueTypeAttributesMisp("other", num)
 	}
 
 	collection := map[string]func(lamisp *ListAttributesMispFormat, num int){

@@ -17,6 +17,7 @@ var es ModuleElasticSearch
 
 type SettingsInputChan struct {
 	UUID string
+	Data []byte
 }
 
 // ModuleElasticSearch инициализированный модуль
@@ -105,6 +106,9 @@ func HandlerElasticSearch(
 
 	go func() {
 		for data := range es.chanInputElasticSearch {
+
+			//получаем  data.Data и сохраняем ее в Redis list
+
 			go hsd.sendingData(data.UUID)
 		}
 	}()
@@ -115,13 +119,3 @@ func HandlerElasticSearch(
 func (es ModuleElasticSearch) HandlerData(data SettingsInputChan) {
 	es.chanInputElasticSearch <- data
 }
-
-/*
-func (es ModuleElasticSearch) GetDataReceptionChannel() <-chan interface{} {
-	return es.chanOutputElasticSearch
-}
-
-func (es ModuleElasticSearch) GettingData() interface{} {
-	return <-es.chanOutputElasticSearch
-}
-*/

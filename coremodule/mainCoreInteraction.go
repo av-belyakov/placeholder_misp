@@ -14,6 +14,10 @@ import (
 	rules "placeholder_misp/rulesinteraction"
 )
 
+type InputDataSender interface {
+	TestSend()
+}
+
 func CoreHandler(
 	natsModule *natsinteractions.ModuleNATS,
 	mispModule *mispinteractions.ModuleMISP,
@@ -25,6 +29,10 @@ func CoreHandler(
 	logging chan<- datamodels.MessageLogging,
 	counting chan<- datamodels.DataCounterSettings) {
 
+	listRedisChanReception := map[string]InputDataSender{
+		"found event id": mispModule.SendingDataInput,
+	}
+
 	natsChanReception := natsModule.GetDataReceptionChannel()
 	mispChanReception := mispModule.GetDataReceptionChannel()
 	redisChanReception := redisModule.GetDataReceptionChannel()
@@ -33,8 +41,6 @@ func CoreHandler(
 	for {
 		select {
 		case data := <-natsChanReception:
-			storageApp.SetRawDataHiveFormatMessage(data.MsgId, data.Data)
-
 			//формирование итоговых документов в формате MISP
 			chanCreateMispFormat, chanDone := NewMispFormat(data.MsgId, mispModule, logging)
 
@@ -42,7 +48,10 @@ func CoreHandler(
 			go hmfh.HandlerMessageFromHive(chanCreateMispFormat, data.Data, data.MsgId, chanDone)
 
 			// отправка сообщения в Elasticshearch
-			esModule.HandlerData(elasticsearchinteractions.SettingsInputChan{UUID: data.MsgId})
+			esModule.HandlerData(elasticsearchinteractions.SettingsInputChan{
+				UUID: data.MsgId,
+				Data: data.Data,
+			})
 
 			// отправка сообщения в НКЦКИ (пока заглушка)
 			//nkckiModule.SendingData(procMsg.Message)
@@ -88,6 +97,10 @@ func CoreHandler(
 			}
 
 		case data := <-redisChanReception:
+			if f, ok := listRedisChanReception[data.CommandResult]; ok {
+				f()
+			}
+
 			switch data.CommandResult {
 			case "found event id":
 				// ***********************************

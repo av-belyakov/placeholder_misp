@@ -26,6 +26,8 @@ type SettingChanOutputMISP struct {
 	Command, CaseId, EventId, TaskId string
 }
 
+func (nmisp ModuleMISP) TestSend() {}
+
 func (mmisp ModuleMISP) GetDataReceptionChannel() <-chan SettingChanOutputMISP {
 	return mmisp.ChanOutputMISP
 }
