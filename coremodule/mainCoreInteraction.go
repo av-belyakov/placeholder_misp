@@ -14,9 +14,11 @@ import (
 	rules "placeholder_misp/rulesinteraction"
 )
 
+/*
 type InputDataSender interface {
 	TestSend()
 }
+*/
 
 func CoreHandler(
 	natsModule *natsinteractions.ModuleNATS,
@@ -29,9 +31,11 @@ func CoreHandler(
 	logging chan<- datamodels.MessageLogging,
 	counting chan<- datamodels.DataCounterSettings) {
 
-	listRedisChanReception := map[string]InputDataSender{
-		"found event id": mispModule.SendingDataInput,
-	}
+	/*
+		listRedisChanReception := map[string]InputDataSender{
+			"found event id": mispModule.SendingDataInput,
+		}
+	*/
 
 	natsChanReception := natsModule.GetDataReceptionChannel()
 	mispChanReception := mispModule.GetDataReceptionChannel()
@@ -97,9 +101,9 @@ func CoreHandler(
 			}
 
 		case data := <-redisChanReception:
-			if f, ok := listRedisChanReception[data.CommandResult]; ok {
+			/*if f, ok := listRedisChanReception[data.CommandResult]; ok {
 				f()
-			}
+			}*/
 
 			switch data.CommandResult {
 			case "found event id":
