@@ -498,7 +498,7 @@ func handlerObservablesTags(v interface{},
 	}
 
 	//проверка значения на соответствию определенному шаблону
-	//начинающемуся на misp: при этом значения целеком берутся из
+	//начинающемуся на misp: при этом значения целиком берутся из
 	//этого шаблона
 	result, err := CheckMISPObservablesTag(tag)
 	if err == nil {
@@ -563,6 +563,9 @@ func searchOwnerEmail(tmf ChanInputCreateMispFormat) (string, bool) {
 	return email, ok
 }
 
+// getNewListAttributes устанавливает значения в свойствах Category и Type и в том
+// числе изменяет состояние свойства DisableCorrelation (которое по умолчанию ВЫКЛЮЧЕНО)
+// на значение информирующее MISP нужно ли выполнять корреляцию или нет
 func getNewListAttributes(al map[int]datamodels.AttributesMispFormat, lat map[int][2]string) []datamodels.AttributesMispFormat {
 	nal := make([]datamodels.AttributesMispFormat, 0, len(al))
 
@@ -570,10 +573,14 @@ func getNewListAttributes(al map[int]datamodels.AttributesMispFormat, lat map[in
 		if elem, ok := lat[k]; ok {
 			v.Category = elem[0]
 			v.Type = elem[1]
+
+			//очищаем данное свойство, являющееся вспомогательным, так как оно может
+			//быть заполненно ранее, а приоритетным являются значения в Category и Type
+			v.ObjectRelation = ""
 		}
 
 		//выключаем автоматическую коореляцию с другими событиями для MISP
-		if (v.Type == "other" || v.Type == "snort") && v.ObjectRelation == "" {
+		if (v.Type == "other" || v.Type == "snort") && (v.ObjectRelation == "" || v.ObjectRelation == "snort") {
 			v.DisableCorrelation = true
 		}
 
