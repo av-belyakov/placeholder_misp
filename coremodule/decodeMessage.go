@@ -70,18 +70,7 @@ func (s *HandlerMessageFromHiveSettings) HandlerMessageFromHive(
 		// для срезов
 		_, f, l, _ = runtime.Caller(0)
 		listSlice := []interface{}{}
-		if err = json.Unmarshal(b, &listSlice); err == nil {
-			if len(listSlice) == 0 {
-				s.Logging <- datamodels.MessageLogging{
-					MsgData: fmt.Sprintf("'error decoding the json message, it may be empty' %s:%d", f, l+2),
-					MsgType: "error",
-				}
-
-				return
-			}
-
-			_ = processingReflectSlice(s.Logging, cmispf, listSlice, s.ListRule, 0, "")
-		} else {
+		if err = json.Unmarshal(b, &listSlice); err != nil {
 			s.Logging <- datamodels.MessageLogging{
 				MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l+2),
 				MsgType: "error",
@@ -89,6 +78,23 @@ func (s *HandlerMessageFromHiveSettings) HandlerMessageFromHive(
 
 			return
 		}
+
+		if len(listSlice) == 0 {
+			s.Logging <- datamodels.MessageLogging{
+				MsgData: fmt.Sprintf("'error decoding the json message, it may be empty' %s:%d", f, l+2),
+				MsgType: "error",
+			}
+
+			return
+		}
+
+		_ = processingReflectSlice(s.Logging, cmispf, listSlice, s.ListRule, 0, "")
+	}
+
+	// сетчик обработанных кейсов
+	s.Counting <- datamodels.DataCounterSettings{
+		DataType: "update processed events",
+		Count:    1,
 	}
 
 	//проверяем что бы хотя бы одно правило разрешало пропуск кейса
@@ -109,7 +115,7 @@ func (s *HandlerMessageFromHiveSettings) HandlerMessageFromHive(
 		dt = "update events meet rules"
 	}
 
-	//сетчик обработанных кейсов
+	//сетчик кейсов соответствующих или не соответствующих правилам
 	s.Counting <- datamodels.DataCounterSettings{
 		DataType: dt,
 		Count:    1,
