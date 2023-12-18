@@ -11,6 +11,7 @@ type ModuleRedis struct {
 type SettingsChanInputRedis struct {
 	Command string
 	Data    string
+	RawData []byte
 }
 
 type SettingChanOutputRedis struct {

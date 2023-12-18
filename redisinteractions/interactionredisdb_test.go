@@ -1,8 +1,11 @@
 package redisinteractions_test
 
 import (
+	"bufio"
 	"context"
 	"fmt"
+	"os"
+	"path"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -12,10 +15,39 @@ import (
 	"placeholder_misp/datamodels"
 	"placeholder_misp/memorytemporarystorage"
 	"placeholder_misp/redisinteractions"
+	"placeholder_misp/supportingfunctions"
 )
 
 var _ = Describe("Interactionredisdb", Ordered, func() {
-	var module *redisinteractions.ModuleRedis
+	var (
+		errReadFile error
+		exampleByte []byte
+		module      *redisinteractions.ModuleRedis
+	)
+
+	readFileJson := func(fpath, fname string) ([]byte, error) {
+		var newResult []byte
+
+		rootPath, err := supportingfunctions.GetRootPath("placeholder_misp")
+		if err != nil {
+			return newResult, err
+		}
+
+		//fmt.Println("func 'readFileJson', path = ", path.Join(rootPath, fpath, fname))
+
+		f, err := os.OpenFile(path.Join(rootPath, fpath, fname), os.O_RDONLY, os.ModePerm)
+		if err != nil {
+			return newResult, err
+		}
+		defer f.Close()
+
+		sc := bufio.NewScanner(f)
+		for sc.Scan() {
+			newResult = append(newResult, sc.Bytes()...)
+		}
+
+		return newResult, nil
+	}
 
 	BeforeAll(func() {
 		// инициализация модуля конфига
@@ -23,6 +55,8 @@ var _ = Describe("Interactionredisdb", Ordered, func() {
 
 		// канал для логирования
 		logging := make(chan datamodels.MessageLogging)
+
+		exampleByte, errReadFile = readFileJson("natsinteractions/test_json", "example_caseId_33705_1.json")
 
 		// инициализируем модуль временного хранения информации
 		storageApp := memorytemporarystorage.NewTemporaryStorage()
@@ -35,6 +69,12 @@ var _ = Describe("Interactionredisdb", Ordered, func() {
 				fmt.Println("LOGGING: ", log)
 			}
 		}()
+	})
+
+	Context("Тест 0. Чтение тестового файла с кейсом", func() {
+		It("При чтении файла ошибок быть не должно", func() {
+			Expect(errReadFile).ShouldNot(HaveOccurred())
+		})
 	})
 
 	Context("Тест 1. Тестируем взаимодействие с СУБД Redis", func() {
@@ -96,5 +136,29 @@ var _ = Describe("Interactionredisdb", Ordered, func() {
 			Expect(ok).Should(BeTrue())
 			Expect(strRes).Should(Equal("112340"))
 		}, SpecTimeout(time.Second*5))
+
+		Context("Тест 2. Тестируем возможность добавления кейса (формат RAW) из TheHive в List", func() {
+			It("При добавлении RAW формата не должно быть ошибок", func() {
+				module.SendingDataInput(redisinteractions.SettingsChanInputRedis{
+					Command: "set raw case",
+					//caseId:eventId
+					//Data: "14012:893",
+					RawData: exampleByte,
+				})
+
+			})
+			It("Из БД должен быть успешно получен кейс в RAW формате", func() {
+				module.SendingDataInput(redisinteractions.SettingsChanInputRedis{
+					Command: "get next raw case",
+				})
+
+				chanOutput := module.GetDataReceptionChannel()
+				data := <-chanOutput
+
+				fmt.Println("RECEIVED DATA = ", data.Result)
+
+				Expect(data.CommandResult).Should(Equal("sending next raw case"))
+			})
+		})
 	})
 })

@@ -10,6 +10,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -65,6 +66,7 @@ var _ = Describe("Testelasticsearch", Ordered, func() {
 		fmt.Println("file length: ", len(exampleByte))
 
 		es, errConn = elasticsearch.NewClient(elasticsearch.Config{
+
 			Addresses: []string{"http://datahook.cloud.gcm:9200"},
 			Username:  "writer",
 			Password:  "XxZqesYXuk8C",
@@ -100,15 +102,37 @@ var _ = Describe("Testelasticsearch", Ordered, func() {
 		It("При записи не должно быть ошибок", func() {
 			buf := bytes.NewReader(exampleByte)
 
-			//res, err := es.Create("my_test_thehive_case_gcm_2023", "1999", buf)
+			t := time.Now()
+			prefix := ""
+			index := "module_placeholder_thehive_case"
 
-			res, err := es.API.Index("my_test_thehive_case_gcm_2023", buf /*, es.Index.WithDocumentID("1000004")*/)
+			str := fmt.Sprintf("%s%s_%d_%d", prefix, index, t.Year(), int(t.Month()))
+
+			fmt.Println("string reguest:", str)
+
+			//res, err := es.Create("my_test_thehive_case_gcm_2023", "1999", buf)
+			//module_placeholder_thehive_case
+			res, err := es.API.Index(str, buf)
+			//res, err := es.API.Index("my_test_thehive_case_gcm_2023", buf /*, es.Index.WithDocumentID("1000004")*/)
 			defer res.Body.Close()
 			Expect(err).ShouldNot(HaveOccurred())
 
-			fmt.Println("____________________ INDEX response: ", res)
+			r := map[string]interface{}{}
+			err = json.NewDecoder(res.Body).Decode(&r)
+
+			fmt.Println("____________________ INDEX response: ")
+			for k, v := range r {
+				fmt.Printf("%s: %v", k, v)
+			}
+
+			if res.StatusCode != http.StatusCreated && res.StatusCode != http.StatusOK {
+				if e, ok := r["error"]; ok {
+					fmt.Println("Error:", e)
+				}
+			}
 
 			Expect(res.StatusCode).Should(Equal(http.StatusCreated))
+			Expect(err).ShouldNot(HaveOccurred())
 		})
 	})
 

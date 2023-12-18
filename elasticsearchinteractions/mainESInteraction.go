@@ -2,6 +2,7 @@ package elasticsearchinteractions
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"placeholder_misp/confighandler"
@@ -84,8 +85,22 @@ func (hsd handlerSendData) sendingData(uuid string) {
 		return
 	}
 
+	var errMsg string
+	r := map[string]interface{}{}
+	if err = json.NewDecoder(res.Body).Decode(&r); err != nil {
+		_, f, l, _ := runtime.Caller(0)
+		hsd.logging <- datamodels.MessageLogging{
+			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
+			MsgType: "error",
+		}
+	}
+
+	if e, ok := r["error"]; ok {
+		errMsg = fmt.Sprintln(e)
+	}
+
 	hsd.logging <- datamodels.MessageLogging{
-		MsgData: fmt.Sprintf("received from module Elsaticsearch: %d %s", res.StatusCode, res.Status()),
+		MsgData: fmt.Sprintf("received from module Elsaticsearch: %s (%s)", res.Status(), errMsg),
 		MsgType: "warning",
 	}
 }

@@ -35,6 +35,12 @@ func CoreHandler(
 		case data := <-natsChanReception:
 			storageApp.SetRawDataHiveFormatMessage(data.MsgId, data.Data)
 
+			//добавляем raw данные по кейсу из thehive в Redis
+			redisModule.SendingDataInput(redisinteractions.SettingsChanInputRedis{
+				Command: "set raw case",
+				RawData: data.Data,
+			})
+
 			//формирование итоговых документов в формате MISP
 			chanCreateMispFormat, chanDone := NewMispFormat(data.MsgId, mispModule, logging)
 
@@ -52,37 +58,16 @@ func CoreHandler(
 
 		case data := <-mispChanReception:
 			switch data.Command {
-			//отправка данных в NATS
+			//отправка eventId в NATS
 			case "send event id":
-				// ***********************************
-				// Это логирование только для теста!!!
-				// ***********************************
-				logging <- datamodels.MessageLogging{
-					MsgData: fmt.Sprintf("TEST_INFO func 'CoreHandler', отправляем полученный event id: %s в модуль NATS", data.EventId),
-					MsgType: "testing",
-				}
-				//
-				//
-
-				//отправка eventId в NATS
 				natsModule.SendingDataInput(natsinteractions.SettingsInputChan{
 					Command: data.Command,
 					EventId: data.EventId,
 					TaskId:  data.TaskId,
 				})
 
-				//отправка данных в Redis
+			//отправка данных в Redis
 			case "set new event id":
-				// ***********************************
-				// Это логирование только для теста!!!
-				// ***********************************
-				logging <- datamodels.MessageLogging{
-					MsgData: fmt.Sprintf("TEST_INFO func 'CoreHandler', надо отправить инфу CaseID '%s' и EventId '%s' to REDIS DB", data.CaseId, data.EventId),
-					MsgType: "testing",
-				}
-				//
-				//
-
 				//обработка запроса на добавления новой связки caseId:eventId в Redis
 				redisModule.SendingDataInput(redisinteractions.SettingsChanInputRedis{
 					Command: "set case id",
@@ -92,18 +77,8 @@ func CoreHandler(
 
 		case data := <-redisChanReception:
 			switch data.CommandResult {
+			//получаем eventId из Redis для удаления события в MISP
 			case "found event id":
-				// ***********************************
-				// Это логирование только для теста!!!
-				// ***********************************
-				logging <- datamodels.MessageLogging{
-					MsgData: fmt.Sprintf("TEST_INFO func 'CoreHandler', здесь, получаем event id: '%v' из Redis для удаления события в MISP", data.Result),
-					MsgType: "testing",
-				}
-				//
-				//
-
-				// Здесь, получаем eventId из Redis для удаления события в MISP
 				eventId, ok := data.Result.(string)
 				if !ok {
 					_, f, l, _ := runtime.Caller(0)
@@ -115,16 +90,6 @@ func CoreHandler(
 
 					break
 				}
-
-				// ***********************************
-				// Это логирование только для теста!!!
-				// ***********************************
-				logging <- datamodels.MessageLogging{
-					MsgData: fmt.Sprintf("TEST_INFO func 'CoreHandler', отправляем event id: '%s' в MISP для удаления события", eventId),
-					MsgType: "testing",
-				}
-				//
-				//
 
 				mispModule.SendingDataInput(mispinteractions.SettingsChanInputMISP{
 					Command: "del event by id",

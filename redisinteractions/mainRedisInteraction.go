@@ -112,6 +112,23 @@ func HandlerRedis(
 				}
 				//
 				//
+
+			case "set raw case":
+				/*
+
+					Тут нужно добавить RAW данные кейса из TheHive в List
+
+
+
+				*/
+
+			case "get next raw case":
+				/*
+
+					запрос на получение из БД следующего кейса в формате RAW
+					ответ должен содержать CommandResult = "sending next raw case"
+
+				*/
 			}
 		}
 	}()
