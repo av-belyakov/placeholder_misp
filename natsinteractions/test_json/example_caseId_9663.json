@@ -1,322 +1,351 @@
 {
-    ttp: [
-        
+    "ttp": [
+        {
+            "extraData": {
+                "pattern": {},
+                "systemRequirements": [],
+                "tactics": [
+                    "initial-access"
+                ],
+                "dataSources": [
+                    "Application Log: Application Log Content",
+                    "Network Traffic: Network Traffic Content"
+                ],
+                "description": "Adversaries may attempt to take advantage of a weakness in an Internet-facing computer or program using software, data, or commands in order to cause unintended or unanticipated behavior. The weakness in the system can be a bug, a glitch, or a design vulnerability. These applications are often websites, but can include databases (like SQL)(Citation: NVD CVE-2016-6662), standard services (like SMB(Citation: CIS Multiple SMB Vulnerabilities) or SSH), network device administration and management protocols (like SNMP and Smart Install(Citation: US-CERT TA18-106A Network Infrastructure Devices 2018)(Citation: Cisco Blog Legacy Device Attacks)), and any other applications with Internet accessible open sockets, such as web servers and related services.(Citation: NVD CVE-2014-7169) Depending on the flaw being exploited this may include [Exploitation for Defense Evasion](https://attack.mitre.org/techniques/T1211). If an application is hosted on cloud-based infrastructure and/or is containerized, then exploiting it may lead to compromise of the underlying instance or container. This can allow an adversary a path to access the cloud or container APIs, exploit container host access via [Escape to Host](https://attack.mitre.org/techniques/T1611), or take advantage of weak identity and access management policies. For websites and databases, the OWASP top 10 and CWE top 25 highlight the most common web-based vulnerabilities.(Citation: OWASP Top 10)(Citation: CWE top 25)",
+                "name": "Exploit Public-Facing Application",
+                "patternType": "attack-pattern",
+                "permissionsRequired": [],
+                "_createdBy": "admin@thehive.local",
+                "extraData": {},
+                "revoked": false,
+                "version": "2.3",
+                "_createdAt": 1647277031402,
+                "_id": "~114912",
+                "_type": "Pattern",
+                "defenseBypassed": {},
+                "platforms": [
+                    "Windows",
+                    "IaaS",
+                    "Network",
+                    "Linux",
+                    "macOS",
+                    "Containers"
+                ],
+                "detection": "Monitor application logs for abnormal behavior that may indicate attempted or successful exploitation. Use deep packet inspection to look for artifacts of common exploit traffic, such as SQL injection. Web Application Firewalls may detect improper inputs attempting exploitation.",
+                "patternId": "T1190",
+                "remoteSupport": false,
+                "url": "https://attack.mitre.org/techniques/T1190"
+            },
+            "occurDate": 1702709951000,
+            "patternId": "T1190",
+            "tactic": "Initial Access",
+            "_createdAt": 1702709876522,
+            "_createdBy": "polyakov@mail.rcm",
+            "_id": "~271749352"
+        },
+        {
+            "_createdBy": "polyakov@mail.rcm",
+            "_id": "~354033680",
+            "extraData": {
+                "pattern": {},
+                "_createdAt": 1647277102300,
+                "defenseBypassed": {},
+                "patternType": "attack-pattern",
+                "platforms": [
+                    "Linux",
+                    "Windows",
+                    "macOS"
+                ],
+                "revoked": false,
+                "systemRequirements": [
+                    "Adversary access to Web server with vulnerability or account to upload and serve the Web shell file."
+                ],
+                "_createdBy": "admin@thehive.local",
+                "capecId": "CAPEC-650",
+                "permissionsRequired": [
+                    "SYSTEM",
+                    "User"
+                ],
+                "remoteSupport": false,
+                "patternId": "T1505.003",
+                "tactics": [
+                    "persistence"
+                ],
+                "url": "https://attack.mitre.org/techniques/T1505/003",
+                "_id": "~299248",
+                "_type": "Pattern",
+                "capecUrl": "https://capec.mitre.org/data/definitions/650.html",
+                "description": "Adversaries may backdoor web servers with web shells to establish persistent access to systems. A Web shell is a Web script that is placed on an openly accessible Web server to allow an adversary to use the Web server as a gateway into a network. A Web shell may provide a set of functions to execute or a command-line interface on the system that hosts the Web server. In addition to a server-side script, a Web shell may have a client interface program that is used to talk to the Web server (ex: [China Chopper](https://attack.mitre.org/software/S0020) Web shell client).(Citation: Lee 2013) ",
+                "version": "1.2",
+                "dataSources": [
+                    "File: File Creation",
+                    "File: File Modification",
+                    "Process: Process Creation",
+                    "Network Traffic: Network Traffic Content",
+                    "Network Traffic: Network Traffic Flow",
+                    "Application Log: Application Log Content"
+                ],
+                "detection": "Web shells can be difficult to detect. Unlike other forms of persistent remote access, they do not initiate connections. The portion of the Web shell that is on the server may be small and innocuous looking. The PHP version of the China Chopper Web shell, for example, is the following short payload: (Citation: Lee 2013) <code>&lt;?php @eval($_POST['password']);&gt;</code> Nevertheless, detection mechanisms exist. Process monitoring may be used to detect Web servers that perform suspicious actions such as spawning cmd.exe or accessing files that are not in the Web directory.(Citation: NSA Cyber Mitigating Web Shells) File monitoring may be used to detect changes to files in the Web directory of a Web server that do not match with updates to the Web server's content and may indicate implantation of a Web shell script.(Citation: NSA Cyber Mitigating Web Shells) Log authentication attempts to the server and any unusual traffic patterns to or from the server and internal network. (Citation: US-CERT Alert TA15-314A Web Shells)",
+                "extraData": {},
+                "name": "Web Shell"
+            },
+            "patternParent": {
+                "_type": "Pattern",
+                "patternId": "T1505",
+                "patternType": "attack-pattern",
+                "url": "https://attack.mitre.org/techniques/T1505",
+                "_createdBy": "admin@thehive.local",
+                "_id": "~143504",
+                "revoked": false,
+                "systemRequirements": [],
+                "tactics": [
+                    "persistence"
+                ],
+                "extraData": {},
+                "name": "Server Software Component",
+                "detection": "Consider monitoring application logs for abnormal behavior that may indicate suspicious installation of application software components. Consider monitoring file locations associated with the installation of new application software components such as paths from which applications typically load such extensible components. Process monitoring may be used to detect servers components that perform suspicious actions such as running cmd.exe or accessing files. Log authentication attempts to the server and any unusual traffic patterns to or from the server and internal network. (Citation: US-CERT Alert TA15-314A Web Shells) ",
+                "defenseBypassed": {},
+                "description": "Adversaries may abuse legitimate extensible development features of servers to establish persistent access to systems. Enterprise server applications may include features that allow developers to write and install software or scripts to extend the functionality of the main application. Adversaries may install malicious components to extend and abuse server applications.",
+                "permissionsRequired": [
+                    "Administrator",
+                    "SYSTEM",
+                    "root"
+                ],
+                "platforms": [
+                    "Windows",
+                    "Linux",
+                    "macOS"
+                ],
+                "remoteSupport": false,
+                "version": "1.2",
+                "_createdAt": 1647277038727,
+                "dataSources": [
+                    "File: File Creation",
+                    "File: File Modification",
+                    "Process: Process Creation",
+                    "Network Traffic: Network Traffic Content",
+                    "Network Traffic: Network Traffic Flow",
+                    "Application Log: Application Log Content"
+                ]
+            },
+            "occurDate": 1702709951000,
+            "patternId": "T1505.003",
+            "tactic": "Persistence",
+            "_createdAt": 1702709876659
+        }
+    ],
+    "source": "rcmros",
+    "event": {
+        "rootId": "~354021392",
+        "organisationId": "~41058528",
+        "organisation": "РЦМ в ЮФО",
+        "objectId": "~354021392",
+        "details": {
+            "endDate": 1702887120326,
+            "customFields": {
+                "event-source": {
+                    "string": "Заслон-ПМ. Ведомственное СОА",
+                    "order": 4
+                },
+                "first-time": {
+                    "date": 1702686056000,
+                    "order": 2
+                },
+                "last-time": {
+                    "date": 1702686059000,
+                    "order": 3
+                },
+                "ncircc-class-attack": {
+                    "order": 0,
+                    "string": "Попытки внедрения ВПО;attack"
+                },
+                "b2mid": {
+                    "integer": 57625,
+                    "order": 1
+                }
+            },
+            "resolutionStatus": "TruePositive",
+            "summary": "Web-shell",
+            "status": "Resolved",
+            "impactStatus": "WithImpact"
+        },
+        "objectType": "case",
+        "base": true,
+        "startDate": 1702887120368,
+        "requestId": "d5ebb65a9dc38361:-71fbee6f:18af3b1468f:-8000:296493",
+        "object": {
+            "updatedBy": "polyakov@mail.rcm",
+            "_type": "case",
+            "endDate": 1702887120326,
+            "impactStatus": "WithImpact",
+            "tags": [
+                "geo:alpha2=\"US\"",
+                "Sensor:id=630102",
+                "NCIRCC:attack=\"Попытки внедрения ВПО\"",
+                "Object:name=\"ЮФУ (Западный)\"",
+                "Object:id=630102"
+            ],
+            "id": "~354021392",
+            "permissions": {},
+            "createdAt": 1702709874604,
+            "resolutionStatus": "TruePositive",
+            "owner": "polyakov@mail.rcm",
+            "stats": {},
+            "tlp": 2,
+            "pap": 2,
+            "updatedAt": 1702887120363,
+            "summary": "Web-shell",
+            "createdBy": "polyakov@mail.rcm",
+            "title": "B2M-57625 Попытки внедрения ВПО",
+            "status": "Resolved",
+            "caseId": 9663,
+            "flag": true,
+            "_id": "~354021392",
+            "description": "В период с 03:20:56 по 03:20:59 2023-12-16 (мск) в ходе сетевого взаимодействия IP-адреса 178.236.247.245 (США) с контролируемым IP-адресом 195.208.245.251 зафиксированы компьютерные воздействия (количество: 12), свидетельствующие об осуществлении компьютерной атаки, нацеленной на получение несанкционированного доступа к контролируемому веб-сайту «южное-созвездие.рф»  методом внедрения программного кода по протоколу прикладного уровня «HTTP» (порт 80/TCP) с использованием специального программного обеспечения типа «Metasploit». В результате КА злоумышленником загружен файл 745c4.php, представляющий собой веб-шелл (http://южное-созвездие.рф/6a1d5/745c4.php). ",
+            "severity": 2,
+            "startDate": 1702709949863,
+            "customFields": {
+                "b2mid": {
+                    "integer": 57625,
+                    "order": 1
+                },
+                "event-source": {
+                    "order": 4,
+                    "string": "Заслон-ПМ. Ведомственное СОА"
+                },
+                "first-time": {
+                    "date": 1702686056000,
+                    "order": 2
+                },
+                "last-time": {
+                    "date": 1702686059000,
+                    "order": 3
+                },
+                "ncircc-class-attack": {
+                    "order": 0,
+                    "string": "Попытки внедрения ВПО;attack"
+                }
+            }
+        },
+        "operation": "update"
+    },
+    "observables": [
+        {
+            "_createdAt": 1702709875465,
+            "_type": "Observable",
+            "dataType": "ip",
+            "ignoreSimilarity": false,
+            "sighted": false,
+            "tlp": 2,
+            "_id": "~313008248",
+            "message": "Источник активности",
+            "reports": {},
+            "ioc": true,
+            "data": "178.236.247.245",
+            "extraData": {},
+            "startDate": 1702709875465,
+            "tags": [
+                "misp:Network activity=\"ip-src\"",
+                "b2m:ip_ext=178.236.247.245"
+            ],
+            "_createdBy": "polyakov@mail.rcm"
+        },
+        {
+            "extraData": {},
+            "ioc": false,
+            "_createdBy": "polyakov@mail.rcm",
+            "data": "/dbdata/dump/events/57625/B2M-57625.pcap",
+            "sighted": false,
+            "startDate": 1702709875333,
+            "dataType": "url_pcap",
+            "ignoreSimilarity": false,
+            "tlp": 2,
+            "_createdAt": 1702709875333,
+            "_id": "~501547008",
+            "reports": {},
+            "tags": [
+                "misp:Network activity=\"attachment\"",
+                "b2m:dumpfile=\"main\""
+            ],
+            "_type": "Observable",
+            "message": "Основной фрагмент сетевого трафика с указанной активностью"
+        },
+        {
+            "_type": "Observable",
+            "extraData": {},
+            "reports": {},
+            "sighted": false,
+            "_createdBy": "polyakov@mail.rcm",
+            "data": "http://южное-созвездие.рф/6a1d5/745c4.php",
+            "ioc": true,
+            "message": "Выявлено в ходе анализа фрагмента сетевого взаимодействия",
+            "_createdAt": 1702709875936,
+            "_id": "~271745256",
+            "dataType": "url",
+            "startDate": 1702709875936,
+            "ignoreSimilarity": false,
+            "tags": [
+                "misp:Network activity=\"url\""
+            ],
+            "tlp": 2
+        },
+        {
+            "data": "2025801,2025802,91500266",
+            "ioc": false,
+            "startDate": 1702709874914,
+            "_id": "~230830104",
+            "_type": "Observable",
+            "extraData": {},
+            "ignoreSimilarity": false,
+            "tags": [
+                "misp:Network activity=\"snort\""
+            ],
+            "tlp": 2,
+            "_createdAt": 1702709874914,
+            "_createdBy": "polyakov@mail.rcm",
+            "dataType": "snort_sid",
+            "message": "Идентификаторы сработавших сигнатур",
+            "reports": {},
+            "sighted": false
+        },
+        {
+            "data": "южное-созвездие.рф",
+            "ignoreSimilarity": false,
+            "message": "Выявлено в ходе анализа фрагмента сетевого взаимодействия",
+            "sighted": false,
+            "tlp": 2,
+            "_createdAt": 1702709875805,
+            "_createdBy": "polyakov@mail.rcm",
+            "dataType": "other",
+            "ioc": false,
+            "tags": [
+                "b2m:targeting-data-other"
+            ],
+            "_id": "~641396920",
+            "_type": "Observable",
+            "extraData": {},
+            "reports": {},
+            "startDate": 1702709875805
+        },
+        {
+            "_createdBy": "polyakov@mail.rcm",
+            "_type": "Observable",
+            "sighted": false,
+            "_createdAt": 1702709875603,
+            "dataType": "ip_home",
+            "tags": [
+                "misp:Network activity=\"ip-dst\"",
+                "b2m:ip_home=195.208.245.251"
+            ],
+            "extraData": {},
+            "ignoreSimilarity": false,
+            "ioc": false,
+            "_id": "~271741160",
+            "data": "630102:195.208.245.251",
+            "message": "Контролируемый IP-адрес",
+            "reports": {},
+            "startDate": 1702709875603,
+            "tlp": 2
+        }
     ]
-  1.
-    extraData:
-      pattern:
-        systemRequirements:
-        tactics:
-          1. "initial-access"
-        dataSources:
-          1. "Application Log: Application Log Content"
-          2. "Network Traffic: Network Traffic Content"
-        "description": "Adversaries may attempt to take advantage of a weakness in an Internet-facing computer or program using software, data, or commands in order to cause unintended or unanticipated behavior. The weakness in the system can be a bug, a glitch, or a design vulnerability. These applications are often websites, but can include databases (like SQL)(Citation: NVD CVE-2016-6662), standard services (like SMB(Citation: CIS Multiple SMB Vulnerabilities) or SSH), network device administration and management protocols (like SNMP and Smart Install(Citation: US-CERT TA18-106A Network Infrastructure Devices 2018)(Citation: Cisco Blog Legacy Device Attacks)), and any other applications with Internet accessible open sockets, such as web servers and related services.(Citation: NVD CVE-2014-7169) Depending on the flaw being exploited this may include [Exploitation for Defense Evasion](https://attack.mitre.org/techniques/T1211). 
-
-If an application is hosted on cloud-based infrastructure and/or is containerized, then exploiting it may lead to compromise of the underlying instance or container. This can allow an adversary a path to access the cloud or container APIs, exploit container host access via [Escape to Host](https://attack.mitre.org/techniques/T1611), or take advantage of weak identity and access management policies.
-
-For websites and databases, the OWASP top 10 and CWE top 25 highlight the most common web-based vulnerabilities.(Citation: OWASP Top 10)(Citation: CWE top 25)"
-        "name": "Exploit Public-Facing Application"
-        "patternType": "attack-pattern"
-        permissionsRequired:
-        "_createdBy": "admin@thehive.local"
-        extraData:
-        "revoked": false
-        "version": "2.3"
-        "_createdAt": 1647277031402
-        "_id": "~114912"
-        "_type": "Pattern"
-        defenseBypassed:
-        platforms:
-          1. "Windows"
-          2. "IaaS"
-          3. "Network"
-          4. "Linux"
-          5. "macOS"
-          6. "Containers"
-        "detection": "Monitor application logs for abnormal behavior that may indicate attempted or successful exploitation. Use deep packet inspection to look for artifacts of common exploit traffic, such as SQL injection. Web Application Firewalls may detect improper inputs attempting exploitation."
-        "patternId": "T1190"
-        "remoteSupport": false
-        "url": "https://attack.mitre.org/techniques/T1190"
-    "occurDate": 1702709951000
-    "patternId": "T1190"
-    "tactic": "Initial Access"
-    "_createdAt": 1702709876522
-    "_createdBy": "polyakov@mail.rcm"
-    "_id": "~271749352"
-  2.
-    "_createdBy": "polyakov@mail.rcm"
-    "_id": "~354033680"
-    extraData:
-      pattern:
-        "_createdAt": 1647277102300
-        defenseBypassed:
-        "patternType": "attack-pattern"
-        platforms:
-          1. "Linux"
-          2. "Windows"
-          3. "macOS"
-        "revoked": false
-        systemRequirements:
-          1. "Adversary access to Web server with vulnerability or account to upload and serve the Web shell file."
-        "_createdBy": "admin@thehive.local"
-        "capecId": "CAPEC-650"
-        permissionsRequired:
-          1. "SYSTEM"
-          2. "User"
-        "remoteSupport": false
-        "patternId": "T1505.003"
-        tactics:
-          1. "persistence"
-        "url": "https://attack.mitre.org/techniques/T1505/003"
-        "_id": "~299248"
-        "_type": "Pattern"
-        "capecUrl": "https://capec.mitre.org/data/definitions/650.html"
-        "description": "Adversaries may backdoor web servers with web shells to establish persistent access to systems. A Web shell is a Web script that is placed on an openly accessible Web server to allow an adversary to use the Web server as a gateway into a network. A Web shell may provide a set of functions to execute or a command-line interface on the system that hosts the Web server.
-
-In addition to a server-side script, a Web shell may have a client interface program that is used to talk to the Web server (ex: [China Chopper](https://attack.mitre.org/software/S0020) Web shell client).(Citation: Lee 2013) "
-        "version": "1.2"
-        dataSources:
-          1. "File: File Creation"
-          2. "File: File Modification"
-          3. "Process: Process Creation"
-          4. "Network Traffic: Network Traffic Content"
-          5. "Network Traffic: Network Traffic Flow"
-          6. "Application Log: Application Log Content"
-        "detection": "Web shells can be difficult to detect. Unlike other forms of persistent remote access, they do not initiate connections. The portion of the Web shell that is on the server may be small and innocuous looking. The PHP version of the China Chopper Web shell, for example, is the following short payload: (Citation: Lee 2013) 
-
-<code>&lt;?php @eval($_POST['password']);&gt;</code>
-
-Nevertheless, detection mechanisms exist. Process monitoring may be used to detect Web servers that perform suspicious actions such as spawning cmd.exe or accessing files that are not in the Web directory.(Citation: NSA Cyber Mitigating Web Shells)
-
-File monitoring may be used to detect changes to files in the Web directory of a Web server that do not match with updates to the Web server's content and may indicate implantation of a Web shell script.(Citation: NSA Cyber Mitigating Web Shells)
-
-Log authentication attempts to the server and any unusual traffic patterns to or from the server and internal network. (Citation: US-CERT Alert TA15-314A Web Shells)"
-        extraData:
-        "name": "Web Shell"
-      patternParent:
-        "_type": "Pattern"
-        "patternId": "T1505"
-        "patternType": "attack-pattern"
-        "url": "https://attack.mitre.org/techniques/T1505"
-        "_createdBy": "admin@thehive.local"
-        "_id": "~143504"
-        "revoked": false
-        systemRequirements:
-        tactics:
-          1. "persistence"
-        extraData:
-        "name": "Server Software Component"
-        "detection": "Consider monitoring application logs for abnormal behavior that may indicate suspicious installation of application software components. Consider monitoring file locations associated with the installation of new application software components such as paths from which applications typically load such extensible components.
-
-Process monitoring may be used to detect servers components that perform suspicious actions such as running cmd.exe or accessing files. Log authentication attempts to the server and any unusual traffic patterns to or from the server and internal network. (Citation: US-CERT Alert TA15-314A Web Shells) "
-        defenseBypassed:
-        "description": "Adversaries may abuse legitimate extensible development features of servers to establish persistent access to systems. Enterprise server applications may include features that allow developers to write and install software or scripts to extend the functionality of the main application. Adversaries may install malicious components to extend and abuse server applications."
-        permissionsRequired:
-          1. "Administrator"
-          2. "SYSTEM"
-          3. "root"
-        platforms:
-          1. "Windows"
-          2. "Linux"
-          3. "macOS"
-        "remoteSupport": false
-        "version": "1.2"
-        "_createdAt": 1647277038727
-        dataSources:
-          1. "File: File Creation"
-          2. "File: File Modification"
-          3. "Process: Process Creation"
-          4. "Network Traffic: Network Traffic Content"
-          5. "Network Traffic: Network Traffic Flow"
-          6. "Application Log: Application Log Content"
-    "occurDate": 1702709951000
-    "patternId": "T1505.003"
-    "tactic": "Persistence"
-    "_createdAt": 1702709876659
-"source": "rcmros"
-event:
-  "rootId": "~354021392"
-  "organisationId": "~41058528"
-  "organisation": "РЦМ в ЮФО"
-  "objectId": "~354021392"
-  details:
-    "endDate": 1702887120326
-    customFields:
-      event-source:
-        "string": "Заслон-ПМ. Ведомственное СОА"
-        "order": 4
-      first-time:
-        "date": 1702686056000
-        "order": 2
-      last-time:
-        "date": 1702686059000
-        "order": 3
-      ncircc-class-attack:
-        "order": 0
-        "string": "Попытки внедрения ВПО;attack"
-      b2mid:
-        "integer": 57625
-        "order": 1
-    "resolutionStatus": "TruePositive"
-    "summary": "Web-shell"
-    "status": "Resolved"
-    "impactStatus": "WithImpact"
-  "objectType": "case"
-  "base": true
-  "startDate": 1702887120368
-  "requestId": "d5ebb65a9dc38361:-71fbee6f:18af3b1468f:-8000:296493"
-  object:
-    "updatedBy": "polyakov@mail.rcm"
-    "_type": "case"
-    "endDate": 1702887120326
-    "impactStatus": "WithImpact"
-    tags:
-      1. "geo:alpha2="US""
-      2. "Sensor:id=630102"
-      3. "NCIRCC:attack="Попытки внедрения ВПО""
-      4. "Object:name="ЮФУ (Западный)""
-      5. "Object:id=630102"
-    "id": "~354021392"
-    permissions:
-    "createdAt": 1702709874604
-    "resolutionStatus": "TruePositive"
-    "owner": "polyakov@mail.rcm"
-    stats:
-    "tlp": 2
-    "pap": 2
-    "updatedAt": 1702887120363
-    "summary": "Web-shell"
-    "createdBy": "polyakov@mail.rcm"
-    "title": "B2M-57625 Попытки внедрения ВПО"
-    "status": "Resolved"
-    "caseId": 9663
-    "flag": true
-    "_id": "~354021392"
-    "description": "В период с 03:20:56 по 03:20:59 2023-12-16 (мск) в ходе сетевого взаимодействия IP-адреса 178.236.247.245 (США) с контролируемым IP-адресом 195.208.245.251 зафиксированы компьютерные воздействия (количество: 12), свидетельствующие об осуществлении компьютерной атаки, нацеленной на получение несанкционированного доступа к контролируемому веб-сайту «южное-созвездие.рф»  методом внедрения программного кода по протоколу прикладного уровня «HTTP» (порт 80/TCP) с использованием специального программного обеспечения типа «Metasploit». В результате КА злоумышленником загружен файл 745c4.php, представляющий собой веб-шелл (http://южное-созвездие.рф/6a1d5/745c4.php). "
-    "severity": 2
-    "startDate": 1702709949863
-    customFields:
-      b2mid:
-        "integer": 57625
-        "order": 1
-      event-source:
-        "order": 4
-        "string": "Заслон-ПМ. Ведомственное СОА"
-      first-time:
-        "date": 1702686056000
-        "order": 2
-      last-time:
-        "date": 1702686059000
-        "order": 3
-      ncircc-class-attack:
-        "order": 0
-        "string": "Попытки внедрения ВПО;attack"
-  "operation": "update"
-observables:
-  1.
-    "_createdAt": 1702709875465
-    "_type": "Observable"
-    "dataType": "ip"
-    "ignoreSimilarity": false
-    "sighted": false
-    "tlp": 2
-    "_id": "~313008248"
-    "message": "Источник активности"
-    reports:
-    "ioc": true
-    "data": "178.236.247.245"
-    extraData:
-    "startDate": 1702709875465
-    tags:
-      1. "misp:Network activity="ip-src""
-      2. "b2m:ip_ext=178.236.247.245"
-    "_createdBy": "polyakov@mail.rcm"
-  2.
-    extraData:
-    "ioc": false
-    "_createdBy": "polyakov@mail.rcm"
-    "data": "/dbdata/dump/events/57625/B2M-57625.pcap"
-    "sighted": false
-    "startDate": 1702709875333
-    "dataType": "url_pcap"
-    "ignoreSimilarity": false
-    "tlp": 2
-    "_createdAt": 1702709875333
-    "_id": "~501547008"
-    reports:
-    tags:
-      1. "misp:Network activity="attachment""
-      2. "b2m:dumpfile="main""
-    "_type": "Observable"
-    "message": "Основной фрагмент сетевого трафика с указанной активностью"
-  3.
-    "_type": "Observable"
-    extraData:
-    reports:
-    "sighted": false
-    "_createdBy": "polyakov@mail.rcm"
-    "data": "http://южное-созвездие.рф/6a1d5/745c4.php"
-    "ioc": true
-    "message": "Выявлено в ходе анализа фрагмента сетевого взаимодействия"
-    "_createdAt": 1702709875936
-    "_id": "~271745256"
-    "dataType": "url"
-    "startDate": 1702709875936
-    "ignoreSimilarity": false
-    tags:
-      1. "misp:Network activity="url""
-    "tlp": 2
-  4.
-    "data": "2025801,2025802,91500266"
-    "ioc": false
-    "startDate": 1702709874914
-    "_id": "~230830104"
-    "_type": "Observable"
-    extraData:
-    "ignoreSimilarity": false
-    tags:
-      1. "misp:Network activity="snort""
-    "tlp": 2
-    "_createdAt": 1702709874914
-    "_createdBy": "polyakov@mail.rcm"
-    "dataType": "snort_sid"
-    "message": "Идентификаторы сработавших сигнатур"
-    reports:
-    "sighted": false
-  5.
-    "data": "южное-созвездие.рф"
-    "ignoreSimilarity": false
-    "message": "Выявлено в ходе анализа фрагмента сетевого взаимодействия"
-    "sighted": false
-    "tlp": 2
-    "_createdAt": 1702709875805
-    "_createdBy": "polyakov@mail.rcm"
-    "dataType": "other"
-    "ioc": false
-    tags:
-      1. "b2m:targeting-data-other"
-    "_id": "~641396920"
-    "_type": "Observable"
-    extraData:
-    reports:
-    "startDate": 1702709875805
-  6.
-    "_createdBy": "polyakov@mail.rcm"
-    "_type": "Observable"
-    "sighted": false
-    "_createdAt": 1702709875603
-    "dataType": "ip_home"
-    tags:
-      1. "misp:Network activity="ip-dst""
-      2. "b2m:ip_home=195.208.245.251"
-    extraData:
-    "ignoreSimilarity": false
-    "ioc": false
-    "_id": "~271741160"
-    "data": "630102:195.208.245.251"
-    "message": "Контролируемый IP-адрес"
-    reports:
-    "startDate": 1702709875603
-    "tlp": 2
 }

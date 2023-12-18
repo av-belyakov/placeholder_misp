@@ -13,6 +13,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	"placeholder_misp/confighandler"
 	"placeholder_misp/coremodule"
 	"placeholder_misp/datamodels"
 	"placeholder_misp/memorytemporarystorage"
@@ -74,7 +75,7 @@ var _ = Describe("CreateMispFormat", Ordered, func() {
 
 	BeforeAll(func() {
 		//инициализация модуля конфига
-		//ca, _ := confighandler.NewConfig()
+		ca, _ := confighandler.NewConfig()
 
 		//канал для логирования
 		logging = make(chan datamodels.MessageLogging)
@@ -82,7 +83,7 @@ var _ = Describe("CreateMispFormat", Ordered, func() {
 		counting = make(chan datamodels.DataCounterSettings)
 
 		//читаем тестовый файл
-		exampleByte, errReadFile = readFileJson("natsinteractions/test_json", "example_caseId_33705.json")
+		exampleByte, errReadFile = readFileJson("natsinteractions/test_json", "example_caseId_9663.json")
 
 		//инициализация списка правил
 		lr, _, errGetRule = rules.NewListRule("placeholder_misp", "rules", "mispmsgrule.yaml")
@@ -95,12 +96,11 @@ var _ = Describe("CreateMispFormat", Ordered, func() {
 			ChanOutputMISP: make(chan mispinteractions.SettingChanOutputMISP),
 		}
 
-		/*
-			//инициализация модуля для взаимодействия с MISP
-			moduleMisp, errHMisp = mispinteractions.HandlerMISP(*ca.GetAppMISP(), storageApp, logging)
+		//инициализация модуля для взаимодействия с MISP
+		moduleMisp, errHMisp = mispinteractions.HandlerMISP(*ca.GetAppMISP(), ca.GetListOrganization(), logging)
 
-			mispOutput = moduleMisp.GetDataReceptionChannel()
-		*/
+		mispOutput = moduleMisp.GetDataReceptionChannel()
+
 	})
 
 	Context("Тест 1. Чтение тестового JSON файла", func() {

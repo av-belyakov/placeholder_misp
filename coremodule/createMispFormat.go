@@ -300,6 +300,8 @@ func NewMispFormat(
 		for {
 			select {
 			case tmf := <-chanInput:
+				fmt.Println("func 'NewMispFormat', FieldBranch:", tmf.FieldBranch, " Value:", tmf.Value)
+
 				//ищем источник события
 				if source, ok := searchEventSource(tmf); ok {
 					caseSource = source

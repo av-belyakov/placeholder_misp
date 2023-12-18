@@ -269,17 +269,17 @@ func main() {
 
 	// инициализация модуля для взаимодействия с СУБД Redis
 	ctxRedis := context.Background()
-	redisModule := redisinteractions.HandlerRedis(ctxRedis, confApp.AppConfigRedis, storageApp, logging)
+	redisModule := redisinteractions.HandlerRedis(ctxRedis, *confApp.GetAppRedis(), storageApp, logging)
 
 	//инициалиация модуля для взаимодействия с MISP
-	mispModule, err := mispinteractions.HandlerMISP(confApp.AppConfigMISP, confApp.Organizations, logging)
+	mispModule, err := mispinteractions.HandlerMISP(*confApp.GetAppMISP(), confApp.GetListOrganization(), logging)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 		_ = sl.WriteLoggingData(fmt.Sprintf(" '%s' %s:%d", err, f, l-2), "error")
 	}
 
 	//инициализация модуля для взаимодействия с ElasticSearch
-	esModule := elasticsearchinteractions.HandlerElasticSearch(confApp.AppConfigElasticSearch, storageApp, logging)
+	esModule := elasticsearchinteractions.HandlerElasticSearch(*confApp.GetAppES(), storageApp, logging)
 
 	// инициализация модуля для взаимодействия с NKCKI
 	nkckiModule, err := nkckiinteractions.NewClientNKCKI(confApp.AppConfigNKCKI, logging)

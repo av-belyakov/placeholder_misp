@@ -120,10 +120,12 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		//читаем тестовый файл
 		//"example_caseId_33705.json" совпадает с правилами
 		//"example_caseId_33807.json" НЕ совпадает с правилами
-		exampleByte, errReadFile = readFileJson("natsinteractions/test_json", "example_caseId_33705.json")
+		exampleByte, errReadFile = readFileJson("natsinteractions/test_json", "example_caseId_9663.json")
+
+		//9663
 
 		//инициалиация модуля для взаимодействия с MISP
-		mispModule, errMisp = mispinteractions.HandlerMISP(confApp.AppConfigMISP, confApp.Organizations, logging)
+		mispModule, errMisp = mispinteractions.HandlerMISP(*confApp.GetAppMISP(), confApp.Organizations, logging)
 
 		//формирование итоговых документов в формате MISP
 		chanCreateMispFormat, chanDone = coremodule.NewMispFormat(taskId, mispModule, logging)

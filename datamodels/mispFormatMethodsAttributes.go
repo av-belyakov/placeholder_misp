@@ -202,7 +202,6 @@ func (lamisp *ListAttributesMispFormat) AutoSetValueTypeAttributesMisp(v string,
 func (lamisp *ListAttributesMispFormat) SetValueValueAttributesMisp(v interface{}, num int) {
 	var tmp AttributesMispFormat
 	lamisp.Lock()
-	defer lamisp.Unlock()
 
 	if attr, ok := lamisp.attributes[num]; ok {
 		tmp = attr
@@ -215,16 +214,27 @@ func (lamisp *ListAttributesMispFormat) SetValueValueAttributesMisp(v interface{
 	tmp.Value = value
 	lamisp.attributes[num] = tmp
 
+	//надо разблокировать Mutex до того как использовать lamisp.AutoSetValueCategoryAttributesMisp и
+	//AutoSetValueTypeAttributesMisp так как эти два метода используют методы
+	//AutoSetValueCategoryAttributesMisp и AutoSetValueTypeAttributesMisp вызывающие
+	//повторную блокировку Mutex
+	lamisp.Unlock()
+
 	//дополнительно, если значение подподает под рег. вырожение типа "8030073:193.29.19.55"
 	//то устанавливаем дополнительное значение типа в поле "object_relation"
 	patter := regexp.MustCompile(`^[\d]+:((25[0-5]|2[0-4]\d|[01]?\d\d?)[.]){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$`)
 	if patter.MatchString(value) {
-		//lamisp.SetValueObjectRelationAttributesMisp("ip_home", num)
 		//выполняем автоматическое изменение значения свойства Category
 		lamisp.AutoSetValueCategoryAttributesMisp("ip_home", num)
 
 		//выполняем автоматическое изменение значения свойства Type
 		lamisp.AutoSetValueTypeAttributesMisp("ip_home", num)
+
+		np := regexp.MustCompile(`^([\d]+):([\d]+\.[\d]+\.[\d]+\.[\d]+)$`)
+		result := np.FindAllStringSubmatch(value, -1)
+		if len(result) > 0 && len(result[0]) == 3 {
+			lamisp.SetValueValueAttributesMisp(result[0][2], num)
+		}
 	}
 }
 
