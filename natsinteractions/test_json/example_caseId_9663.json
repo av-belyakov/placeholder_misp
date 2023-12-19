@@ -136,10 +136,15 @@
     ],
     "source": "rcmros",
     "event": {
+        "base": true,
+        "startDate": 1702887120368,
         "rootId": "~354021392",
-        "organisationId": "~41058528",
         "organisation": "РЦМ в ЮФО",
+        "organisationId": "~41058528",
         "objectId": "~354021392",
+        "objectType": "case",
+        "operation": "update",
+        "requestId": "d5ebb65a9dc38361:-71fbee6f:18af3b1468f:-8000:296493",
         "details": {
             "endDate": 1702887120326,
             "customFields": {
@@ -169,10 +174,6 @@
             "status": "Resolved",
             "impactStatus": "WithImpact"
         },
-        "objectType": "case",
-        "base": true,
-        "startDate": 1702887120368,
-        "requestId": "d5ebb65a9dc38361:-71fbee6f:18af3b1468f:-8000:296493",
         "object": {
             "updatedBy": "polyakov@mail.rcm",
             "_type": "case",
@@ -226,8 +227,7 @@
                     "string": "Попытки внедрения ВПО;attack"
                 }
             }
-        },
-        "operation": "update"
+        }
     },
     "observables": [
         {

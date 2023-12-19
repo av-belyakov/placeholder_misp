@@ -42,17 +42,17 @@ type SourceMessageTheHive struct {
 // OrganisationId - уникальный идентификатор организации
 // Organisation - наименование организации
 type EventMessageTheHive struct {
-	Operation      string       `json:"operation"`
-	ObjectId       string       `json:"objectId"`
-	ObjectType     string       `json:"objectType"`
 	Base           bool         `json:"base"`
 	StartDate      uint64       `json:"startDate"`
 	RootId         string       `json:"rootId"`
+	Organisation   string       `json:"organisation"`
+	OrganisationId string       `json:"organisationId"`
+	ObjectId       string       `json:"objectId"`
+	ObjectType     string       `json:"objectType"`
+	Operation      string       `json:"operation"`
 	RequestId      string       `json:"requestId"`
 	Details        EventDetails `json:"details"`
 	Object         EventObject  `json:"object"`
-	OrganisationId string       `json:"organisationId"`
-	Organisation   string       `json:"organisation"`
 }
 
 // EventDetails детальная информация о событии

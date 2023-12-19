@@ -3,6 +3,13 @@
     "event": {
         "rootId": "~79667703952",
         "objectId": "~79667703952",
+        "objectType": "case",
+        "base": true,
+        "startDate": 1696587472810,
+        "requestId": "61717d2adbd8fccf:12435d50:18b03eaa998:-8000:21114",
+        "organisationId": "~4192",
+        "operation": "update",
+        "organisation": "GCM",
         "details": {
             "customFields": {
                 "class-attack": {
@@ -39,10 +46,6 @@
             "impactStatus": "WithImpact",
             "endDate": 1696587472764
         },
-        "objectType": "case",
-        "base": true,
-        "startDate": 1696587472810,
-        "requestId": "61717d2adbd8fccf:12435d50:18b03eaa998:-8000:21114",
         "object": {
             "summary": "ТЕСТ! НЕ ДОБАВЛЯТЬ В ZK",
             "updatedBy": "d.zablotsky@cloud.gcm",
@@ -105,10 +108,7 @@
             "_type": "case",
             "description": "[Тестовый кейс для улучшения работы в MISP",
             "owner": "d.zablotsky@cloud.gcm"
-        },
-        "organisationId": "~4192",
-        "operation": "update",
-        "organisation": "GCM"
+        }
     },
     "observables": [
         {
@@ -388,7 +388,7 @@
             "message": "n affected versions of WordPress, due to an issue in wp_validate_redirect() and URL sanitization, an arbitrary external link can be crafted leading to unintended/open redirect when clicked. This has been patched in version 5.4.2, along with all the previously affected versions via a minor release (5.3.4, 5.2.7, 5.1.6, 5.0.10, 4.9.15, 4.8.14, 4.7.18, 4.6.19, 4.5.22, 4.4.23, 4.3.24, 4.2.28, 4.1.31, 4.0.31, 3.9.32, 3.8.34, 3.7.34).",
             "sighted": false,
             "tags": [
-              "misp:Payload delivery=\"filename\""
+                "misp:Payload delivery=\"filename\""
             ],
             "_updatedAt": 1700479476991,
             "data": "WordPress.exe",
@@ -407,7 +407,7 @@
             "ioc": false,
             "message": "Ссылка на Arkime",
             "tags": [
-              "misp:Payload installation=\"filename\""
+                "misp:Payload installation=\"filename\""
             ],
             "_id": "~81224433840",
             "ignoreSimilarity": false,
