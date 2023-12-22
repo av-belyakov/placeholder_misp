@@ -410,6 +410,12 @@ func NewMispFormat(
 					//добавляем case id в поле Info
 					eventsMisp.Info += fmt.Sprintf(" :::TheHive case id '%d':::", int(caseId))
 
+					listAttributes := getNewListAttributes(listAttributesMisp.GetListAttributesMisp(), listTags)
+
+					//выполняем некоторые преобразования со свойствами Category,
+					//Type и ObjectRelation
+					alignmentListAttributes(&listAttributes)
+
 					//тут отправляем сформированные по формату MISP пользовательские структуры
 					mispmodule.SendingDataInput(mispinteractions.SettingsChanInputMISP{
 						Command:    "add event",
@@ -421,9 +427,7 @@ func NewMispFormat(
 							"events": eventsMisp,
 							//getNewListAttributes влияет на поля Category и Type
 							//типа Attributes
-							"attributes": getNewListAttributes(
-								listAttributesMisp.GetListAttributesMisp(),
-								listTags),
+							"attributes": listAttributes,
 							"objects": getNewListObjects(
 								listObjectsMisp.GetListObjectsMisp(),
 								listAttributeTmp.GetListAttribute()),
@@ -486,6 +490,7 @@ func handlerObservablesTags(v interface{},
 		if result == "" {
 			return listTags
 		}
+
 		//добавляем значение из tags в поле object_relation
 		listAttributesMisp.SetValueObjectRelationAttributesMisp(result, seqNumObservable)
 
@@ -581,6 +586,16 @@ func getNewListObjects(
 	}
 
 	return nlo
+}
+
+// alignmentListAttributes выполняем некоторые преобразования со
+// свойствами Category,Type и ObjectRelation
+func alignmentListAttributes(list *[]datamodels.AttributesMispFormat) {
+	for _, v := range *list {
+		if v.Type == "snort" {
+			v.ObjectRelation = ""
+		}
+	}
 }
 
 func checkHashName(name string) bool {

@@ -147,6 +147,10 @@
         "requestId": "d5ebb65a9dc38361:-71fbee6f:18af3b1468f:-8000:296493",
         "details": {
             "endDate": 1702887120326,
+            "resolutionStatus": "TruePositive",
+            "summary": "Web-shell",
+            "status": "Resolved",
+            "impactStatus": "WithImpact",
             "customFields": {
                 "event-source": {
                     "string": "Заслон-ПМ. Ведомственное СОА",
@@ -168,11 +172,7 @@
                     "integer": 57625,
                     "order": 1
                 }
-            },
-            "resolutionStatus": "TruePositive",
-            "summary": "Web-shell",
-            "status": "Resolved",
-            "impactStatus": "WithImpact"
+            }
         },
         "object": {
             "updatedBy": "polyakov@mail.rcm",

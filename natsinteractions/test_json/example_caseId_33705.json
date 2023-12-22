@@ -11,10 +11,55 @@
         "operation": "update",
         "organisation": "GCM",
         "details": {
+            "endDate": 1696587472764,
+            "resolutionStatus": "TruePositive",
+            "summary": "ТЕСТ! НЕ ДОБАВЛЯТЬ В ZK",
+            "status": "Resolved",
+            "impactStatus": "WithImpact",
             "customFields": {
+                "attack-type": {
+                    "order": 7,
+                    "string": "Распределенная КА"
+                },
                 "class-attack": {
                     "order": 0,
                     "string": "Вирусное заражение"
+                },
+                "event-source": {
+                    "string": "Заслон-ПМ. Ведомственное СОА",
+                    "order": 4
+                },
+                "first-time": {
+                    "date": 1702686056000,
+                    "order": 2
+                },
+                "last-time": {
+                    "date": 1702686059000,
+                    "order": 3
+                },
+                "ncircc-class-attack": {
+                    "order": 3,
+                    "string": "Не отправлять в НКЦКИ"
+                },
+                "ncircc-bulletin-id": {
+                    "order": 4,
+                    "string": "WRNG-23-12-2023"
+                },
+                "ir-name": {
+                    "order": 0,
+                    "string": "ООО \"Миранда-Медиа\""
+                },
+                "sphere": {
+                    "order": 0,
+                    "string": "Связь"
+                },
+                "id-soa": {
+                    "order": 14,
+                    "string": "220034"
+                },
+                "state": {
+                    "order": 13,
+                    "string": "Республика Крым"
                 },
                 "external-letter": {
                     "order": 1
@@ -25,50 +70,40 @@
                 "inner-letter": {
                     "order": 2
                 },
-                "ncircc-class-attack": {
-                    "order": 3,
-                    "string": "Не отправлять в НКЦКИ"
-                },
                 "notification": {
                     "order": 5
                 },
                 "report": {
                     "order": 6
                 },
-                "attack-type": {
-                    "order": 7,
-                    "string": "Распределенная КА"
+                "b2mid": {
+                    "integer": 57625,
+                    "order": 1
                 }
-            },
-            "resolutionStatus": "TruePositive",
-            "summary": "ТЕСТ! НЕ ДОБАВЛЯТЬ В ZK",
-            "status": "Resolved",
-            "impactStatus": "WithImpact",
-            "endDate": 1696587472764
+            }
         },
         "object": {
-            "summary": "ТЕСТ! НЕ ДОБАВЛЯТЬ В ZK",
-            "updatedBy": "d.zablotsky@cloud.gcm",
-            "endDate": 1696587472763,
-            "_id": "~79667703952",
-            "createdBy": "d.zablotsky@cloud.gcm",
+            "flag": false,
             "caseId": 33705,
-            "title": "TEST MISP_2",
-            "status": "Resolved",
             "severity": 2,
+            "tlp": 2,
+            "pap": 2,
             "startDate": 1696583100000,
+            "endDate": 1696587472763,
+            "createdAt": 1702709874604,
+            "updatedAt": 1696587472802,
+            "_id": "~79667703952",
+            "id": "~354021392",
+            "createdBy": "d.zablotsky@cloud.gcm",
+            "updatedBy": "d.zablotsky@cloud.gcm",
+            "_type": "case",
+            "title": "TEST MISP_2",
+            "description": "[Тестовый кейс для улучшения работы в MISP",
             "impactStatus": "WithImpact",
             "resolutionStatus": "TruePositive",
-            "flag": false,
-            "tlp": 2,
-            "stats": {
-                "impactStatus": "WithImpact"
-            },
-            "permissions": {
-                "id": "~79667703952",
-                "createdAt": 1696583267911,
-                "pap": 2
-            },
+            "status": "Resolved",
+            "summary": "ТЕСТ! НЕ ДОБАВЛЯТЬ В ZK",
+            "owner": "d.zablotsky@cloud.gcm",
             "tags": [
                 "ATs:reason=\"Зафиксирована подозрительная активность по признакам НКЦКИ\"",
                 "ATs:geoip=\"Китай\"",
@@ -77,6 +112,14 @@
                 "ATs:reason=\"Большое количество подозрительной активности с одного IP-адреса\"",
                 "Sensor:id=\"690006\""
             ],
+            "stats": {
+                "impactStatus": "WithImpact"
+            },
+            "permissions": {
+                "id": "~79667703952",
+                "createdAt": 1696583267911,
+                "pap": 2
+            },
             "customFields": {
                 "external-letter": {
                     "order": 1
@@ -103,11 +146,7 @@
                     "order": 0,
                     "string": "Вирусное заражение"
                 }
-            },
-            "updatedAt": 1696587472802,
-            "_type": "case",
-            "description": "[Тестовый кейс для улучшения работы в MISP",
-            "owner": "d.zablotsky@cloud.gcm"
+            }
         }
     },
     "observables": [
@@ -533,8 +572,38 @@
             "tlp": 2
         },
         {
+            "ioc": true,
+            "sighted": false,
+            "ignoreSimilarity": true,
+            "tlp": 2,
+            "_createdAt": 1699603435535,
+            "_updatedAt": 1699945527191,
+            "startDate": 1699603435535,
+            "_createdBy": "v.kovanko@cloud.gcm",
             "_updatedBy": "v.kovanko@cloud.gcm",
+            "_id": "~82864185384",
+            "_type": "Observable",
             "data": "94.131.96.116",
+            "dataType": "ip",
+            "message": "Ссылка на Arkime",
+            "extraData": {},
+            "attachment": {
+                "contentType": "text/plain",
+                "hashes": [
+                    "c29438b04791184d3eba39bdb7cf99560ab62068fee9509d50cf59723c398ac1",
+                    "58861ef4c118cc3270b9871734ee54852a1374e5",
+                    "7c531394dc2f483bc6c6c628c02e0788"
+                ],
+                "id": "c29438b04791184d3eba39bdb7cf99560ab62068fee9509d50cf59723c398ac1",
+                "name": "n[n.txt",
+                "size": 817
+            },
+            "tags": [
+                "external",
+                "geo:iso=\"US\"",
+                "geo:country=\"США\"",
+                "misp:Network activity=\"ip-dst\""
+            ],
             "reports": {
                 "BIZONE_ThreatVision_1_0": {
                     "taxonomies": [
@@ -639,10 +708,10 @@
                 "Urlscan_io_Search_0_1_1": {
                     "taxonomies": [
                         {
+                            "value": false,
                             "level": "suspicious",
                             "namespace": "urlscan.io",
-                            "predicate": "Search",
-                            "value": "2 results"
+                            "predicate": "Search"
                         }
                     ]
                 },
@@ -656,24 +725,7 @@
                         }
                     ]
                 }
-            },
-            "_type": "Observable",
-            "dataType": "ip",
-            "startDate": 1699603435535,
-            "_id": "~82864185384",
-            "extraData": {},
-            "tags": [
-                "external",
-                "geo:iso=\"US\"",
-                "geo:country=\"США\"",
-                "misp:Network activity=\"ip-dst\""
-            ],
-            "tlp": 2,
-            "_createdAt": 1699603435535,
-            "_createdBy": "v.kovanko@cloud.gcm",
-            "_updatedAt": 1699945527191,
-            "ioc": true,
-            "sighted": false
+            }
         }
     ],
     "ttp": [
@@ -789,13 +841,26 @@
             "occurDate": "1698271187000"
         },
         {
+            "occurDate": 1696458360000,
+            "_createdAt": 1696513394035,
+            "_id": "~1493225472",
+            "_createdBy": "zsiem@rcm.lcl",
+            "patternId": "T1496",
+            "tactic": "impact",
             "extraData": {
                 "pattern": {
                     "remoteSupport": false,
-                    "systemRequirements": [],
+                    "revoked": false,
+                    "_createdAt": 1633310416346,
+                    "_createdBy": "admin@thehive.local",
+                    "_id": "~4780280",
+                    "_type": "Pattern",
+                    "description": "Adversaries may leverage the resources of co-opted systems in order to solve resource intensive problems which may impact system and/or hosted service availability. One common purpose for Resource Hijacking is to validate transactions of cryptocurrency networks and earn virtual currency. Adversaries may consume enough system resources to negatively impact and/or cause affected machines to become unresponsive.(Citation: Kaspersky Lazarus Under The Hood Blog 2017) Servers and cloud-based(Citation: CloudSploit - Unused AWS Regions) systems are common targets because of the high potential for available resources, but user endpoint systems may also be compromised and used for Resource Hijacking and cryptocurrency mining. Containerized environments may also be targeted due to the ease of deployment via exposed APIs and the potential for scaling mining activities by deploying or compromising multiple containers within an environment or cluster.(Citation: Unit 42 Hildegard Malware)(Citation: Trend Micro Exposed Docker APIs) Additionally, some cryptocurrency mining malware kills off processes for competing malware to ensure it’s not competing for resources.(Citation: Trend Micro War of Crypto Miners)",
+                    "name": "Resource Hijacking",
+                    "patternId": "T1496",
+                    "patternType": "attack-pattern",
+                    "url": "https://attack.mitre.org/techniques/T1496",
                     "version": "1.2",
-                    "defenseBypassed": {},
-                    "extraData": {},
                     "platforms": [
                         "Windows",
                         "IaaS",
@@ -803,16 +868,10 @@
                         "macOS",
                         "Containers"
                     ],
-                    "patternId": "T1496",
                     "permissionsRequired": [
                         "User",
                         "Administrator"
                     ],
-                    "revoked": false,
-                    "tactics": [
-                        "impact"
-                    ],
-                    "_createdAt": "1633310416346",
                     "dataSources": [
                         "Process: Process Creation",
                         "Command: Command Execution",
@@ -821,22 +880,15 @@
                         "Network Traffic: Network Traffic Flow",
                         "Sensor Health: Host Status"
                     ],
-                    "description": "Adversaries may leverage the resources of co-opted systems in order to solve resource intensive problems which may impact system and/or hosted service availability. One common purpose for Resource Hijacking is to validate transactions of cryptocurrency networks and earn virtual currency. Adversaries may consume enough system resources to negatively impact and/or cause affected machines to become unresponsive.(Citation: Kaspersky Lazarus Under The Hood Blog 2017) Servers and cloud-based(Citation: CloudSploit - Unused AWS Regions) systems are common targets because of the high potential for available resources, but user endpoint systems may also be compromised and used for Resource Hijacking and cryptocurrency mining. Containerized environments may also be targeted due to the ease of deployment via exposed APIs and the potential for scaling mining activities by deploying or compromising multiple containers within an environment or cluster.(Citation: Unit 42 Hildegard Malware)(Citation: Trend Micro Exposed Docker APIs) Additionally, some cryptocurrency mining malware kills off processes for competing malware to ensure it’s not competing for resources.(Citation: Trend Micro War of Crypto Miners)",
-                    "patternType": "attack-pattern",
-                    "_type": "Pattern",
+                    "systemRequirements": [],
+                    "defenseBypassed": {},
+                    "extraData": {},
+                    "tactics": [
+                        "impact"
+                    ],
                     "detection": "Consider monitoring process resource usage to determine anomalous activity associated with malicious hijacking of computer resources such as CPU, memory, and graphics processing resources. Monitor for suspicious use of network resources associated with cryptocurrency mining software. Monitor for common cryptomining software process names and files on local systems that may indicate compromise and resource usage.",
-                    "name": "Resource Hijacking",
-                    "_createdBy": "admin@thehive.local",
-                    "_id": "~4780280",
-                    "url": "https://attack.mitre.org/techniques/T1496"
                 }
-            },
-            "occurDate": "1696458360000",
-            "patternId": "T1496",
-            "tactic": "impact",
-            "_createdAt": "1696513394035",
-            "_createdBy": "zsiem@rcm.lcl",
-            "_id": "~1493225472"
+            }
         }
     ]
 }

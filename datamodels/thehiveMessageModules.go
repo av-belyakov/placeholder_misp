@@ -2,6 +2,7 @@ package datamodels
 
 import (
 	"fmt"
+	"time"
 
 	"placeholder_misp/supportingfunctions"
 )
@@ -30,6 +31,11 @@ func (rm *ResponseMessageFromMispToTheHave) GetResponseMessageFromMispToTheHave(
 	return *rm
 }
 
+// Get возвращает MainMessageTheHive
+func (mm *MainMessageTheHive) Get() *MainMessageTheHive {
+	return mm
+}
+
 func (mm MainMessageTheHive) ToStringBeautiful(num int) string {
 	var str string
 
@@ -44,103 +50,23 @@ func (mm MainMessageTheHive) ToStringBeautiful(num int) string {
 	return str
 }
 
-func (sm SourceMessageTheHive) ToStringBeautiful(num int) string {
-	return fmt.Sprintf("source: '%s'\n", sm.Source)
+// GetSource возвращает содержимое поля Source
+func (s *SourceMessageTheHive) GetSource() string {
+	return s.Source
 }
 
-func (em EventMessageTheHive) ToStringBeautiful(num int) string {
-	var str string
-
-	ws := supportingfunctions.GetWhitespace(num)
-
-	str += fmt.Sprintf("%soperation: '%s'\n", ws, em.Operation)
-	str += fmt.Sprintf("%sobjectId: '%s'\n", ws, em.ObjectId)
-	str += fmt.Sprintf("%sobjectType: '%s'\n", ws, em.ObjectType)
-	str += fmt.Sprintf("%sbase: '%v'\n", ws, em.Base)
-	str += fmt.Sprintf("%sstartDate: '%d'\n", ws, em.StartDate)
-	str += fmt.Sprintf("%srootId: '%s'\n", ws, em.RootId)
-	str += fmt.Sprintf("%srequestId: '%s'\n", ws, em.RequestId)
-	str += fmt.Sprintf("%sdetails:\n", ws)
-	str += em.Details.ToStringBeautiful(num + 1)
-	str += fmt.Sprintf("%sobject:\n", ws)
-	str += em.Object.ToStringBeautiful(num + 1)
-	str += fmt.Sprintf("%sorganisationId: '%s'\n", ws, em.OrganisationId)
-	str += fmt.Sprintf("%sorganisation: '%s'\n", ws, em.Organisation)
-
-	return str
+// SetValueSource устанавливает СТРОКОВОЕ значение для поля Source
+func (s *SourceMessageTheHive) SetValueSource(v string) {
+	s.Source = v
 }
 
-func (ed EventDetails) ToStringBeautiful(num int) string {
-	var str string
-
-	ws := supportingfunctions.GetWhitespace(num)
-
-	str += fmt.Sprintf("%sendDate: '%d'\n", ws, ed.EndDate)
-	str += fmt.Sprintf("%sresolutionStatus: '%s'\n", ws, ed.ResolutionStatus)
-	str += fmt.Sprintf("%ssummary: '%s'\n", ws, ed.Summary)
-	str += fmt.Sprintf("%sstatus: '%s'\n", ws, ed.Status)
-	str += fmt.Sprintf("%simpactStatus: '%s'\n", ws, ed.ImpactStatus)
-	str += ed.CustomFields.ToStringBeautiful(num)
-
-	return str
+// SetAnySource устанавливает ЛЮБОЕ значение для поля Source
+func (s *SourceMessageTheHive) SetAnySource(i interface{}) {
+	s.Source = fmt.Sprint(i)
 }
 
-func (eo EventObject) ToStringBeautiful(num int) string {
-	var str string
-
-	ws := supportingfunctions.GetWhitespace(num)
-
-	str += fmt.Sprintf("%s_id: '%s'\n", ws, eo.UnderliningId)
-	str += fmt.Sprintf("%sid: '%s'\n", ws, eo.Id)
-	str += fmt.Sprintf("%screatedBy: '%s'\n", ws, eo.CreatedBy)
-	str += fmt.Sprintf("%supdatedBy: '%s'\n", ws, eo.UpdatedBy)
-	str += fmt.Sprintf("%screatedAt: '%d'\n", ws, eo.CreatedAt)
-	str += fmt.Sprintf("%supdatedAt: '%d'\n", ws, eo.UpdatedAt)
-	str += fmt.Sprintf("%s_type: '%s'\n", ws, eo.UnderliningType)
-	str += fmt.Sprintf("%scaseId: '%d'\n", ws, eo.CaseId)
-	str += fmt.Sprintf("%stitle: '%s'\n", ws, eo.Title)
-	str += fmt.Sprintf("%sdescription: '%s'\n", ws, eo.Description)
-	str += fmt.Sprintf("%sseverity: '%d'\n", ws, eo.Severity)
-	str += fmt.Sprintf("%sstartDate: '%d'\n", ws, eo.StartDate)
-	str += fmt.Sprintf("%sendDate: '%d'\n", ws, eo.EndDate)
-	str += fmt.Sprintf("%simpactStatus: '%s'\n", ws, eo.ImpactStatus)
-	str += fmt.Sprintf("%sresolutionStatus: '%s'\n", ws, eo.ResolutionStatus)
-	str += fmt.Sprintf("%stags: \n%s", ws, func(l []string) string {
-		var str string
-		ws := supportingfunctions.GetWhitespace(num + 1)
-
-		for k, v := range l {
-			str += fmt.Sprintf("%s%d. '%s'\n", ws, k+1, v)
-		}
-		return str
-	}(eo.Tags))
-	str += fmt.Sprintf("%sflag: '%v'\n", ws, eo.Flag)
-	str += fmt.Sprintf("%stlp: '%d'\n", ws, eo.Tlp)
-	str += fmt.Sprintf("%spap: '%d'\n", ws, eo.Pap)
-	str += fmt.Sprintf("%sstatus: '%s'\n", ws, eo.Status)
-	str += fmt.Sprintf("%ssummary: '%s'\n", ws, eo.Summary)
-	str += fmt.Sprintf("%sowner: '%s'\n", ws, eo.Owner)
-	str += eo.CustomFields.ToStringBeautiful(num)
-	str += fmt.Sprintf("%sstats: \n%s", ws, func(l map[string]interface{}) string {
-		var str string
-		ws := supportingfunctions.GetWhitespace(num + 1)
-
-		for k, v := range l {
-			str += fmt.Sprintf("%s%s: '%v'\n", ws, k, v)
-		}
-		return str
-	}(eo.Stats))
-	str += fmt.Sprintf("%spermissions: \n%s", ws, func(l []string) string {
-		var str string
-		ws := supportingfunctions.GetWhitespace(num + 1)
-
-		for k, v := range l {
-			str += fmt.Sprintf("%s%d. '%s'\n", ws, k+1, v)
-		}
-		return str
-	}(eo.Permissions))
-
-	return str
+func (s SourceMessageTheHive) ToStringBeautiful(num int) string {
+	return fmt.Sprintf("source: '%s'\n", s.Source)
 }
 
 func (cf CustomFields) ToStringBeautiful(num int) string {
@@ -148,11 +74,11 @@ func (cf CustomFields) ToStringBeautiful(num int) string {
 	ws := supportingfunctions.GetWhitespace(num)
 
 	str += fmt.Sprintf("%scustomFields:\n", ws)
-	for key, value := range cf {
+	for key /*, value*/ := range cf {
 		str += fmt.Sprintf("%s%s:\n", supportingfunctions.GetWhitespace(num+1), key)
-		for k, v := range value {
-			str += fmt.Sprintf("%s%s: '%v'\n", supportingfunctions.GetWhitespace(num+2), k, v)
-		}
+		//for k, v := range value {
+		//	str += fmt.Sprintf("%s%s: '%v'\n", supportingfunctions.GetWhitespace(num+2), k, v)
+		//}
 	}
 
 	return str
@@ -328,6 +254,33 @@ func (ped PatternExtraData) ToStringBeautiful(num int) string {
 	str += fmt.Sprintf("%sversion: '%s'\n", ws, ped.Version)
 
 	return str
+}
+
+// Set устанавливает значения CustomFieldStringType
+func (cf *CustomFieldStringType) Set(order int, value interface{}) {
+	cf.Order = order
+	cf.String = fmt.Sprint(value)
+}
+
+// Get возвращает значения CustomFieldStringType
+func (cf *CustomFieldStringType) Get() (int, string) {
+	return cf.Order, cf.String
+}
+
+// Set устанавливает значения CustomFieldDateType, при этом
+// значение value должно быть типа uint64
+func (cf *CustomFieldDateType) Set(order int, value interface{}) {
+	cf.Order = order
+	if v, ok := value.(uint64); ok {
+		cf.Date = v
+	}
+}
+
+// Get возвращает значения CustomFieldDateType
+func (cf *CustomFieldDateType) Get() (int, string) {
+	t := time.UnixMilli(int64(cf.Date))
+
+	return cf.Order, t.String()
 }
 
 /*

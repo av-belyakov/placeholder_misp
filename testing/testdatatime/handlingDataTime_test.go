@@ -56,4 +56,28 @@ var _ = Describe("Testing/Testdatatime/HandlingDataTime", func() {
 			Expect(v).Should(Equal("md5"))
 		})
 	})
+
+	Context("Тест 4. Проверка преобразования даты в формате Unix в строковое значение даты", func() {
+		It("При преобразовании в строковую дату ошибки быть не должно, дата должна соответствовать определенному значению", func() {
+			/*
+			   // Some valid layouts are invalid time values, due to format specifiers
+			   	// such as _ for space padding and Z for zone information.
+			   	// For example the RFC3339 layout 2006-01-02T15:04:05Z07:00
+			   	// contains both Z and a time zone offset in order to handle both valid options:
+			   	// 2006-01-02T15:04:05Z
+			   	// 2006-01-02T15:04:05+07:00
+			   	t, _ = time.Parse(time.RFC3339, "2006-01-02T15:04:05Z")
+			   	fmt.Println(t)
+			   	t, _ = time.Parse(time.RFC3339, "2006-01-02T15:04:05+07:00")
+			*/
+
+			t := time.UnixMilli(1702686056000).UTC()
+			fmt.Println("UTC Datetime:", t.String())
+
+			t = time.UnixMilli(1702686056000)
+			fmt.Println("Datetime:", t.String())
+
+			Expect(true).Should(BeTrue())
+		})
+	})
 })
