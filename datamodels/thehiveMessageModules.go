@@ -69,87 +69,6 @@ func (s SourceMessageTheHive) ToStringBeautiful(num int) string {
 	return fmt.Sprintf("source: '%s'\n", s.Source)
 }
 
-func (cf CustomFields) ToStringBeautiful(num int) string {
-	var str string
-	ws := supportingfunctions.GetWhitespace(num)
-
-	str += fmt.Sprintf("%scustomFields:\n", ws)
-	for key /*, value*/ := range cf {
-		str += fmt.Sprintf("%s%s:\n", supportingfunctions.GetWhitespace(num+1), key)
-		//for k, v := range value {
-		//	str += fmt.Sprintf("%s%s: '%v'\n", supportingfunctions.GetWhitespace(num+2), k, v)
-		//}
-	}
-
-	return str
-}
-
-func (om ObservablesMessageTheHive) ToStringBeautiful(num int) string {
-	var str string
-
-	for _, v := range om.Observables {
-		str += v.ToStringBeautiful(num)
-	}
-
-	return str
-}
-
-func (om ObservableMessage) ToStringBeautiful(num int) string {
-	var str string
-	ws := supportingfunctions.GetWhitespace(num)
-
-	str += fmt.Sprintf("%s_createdAt: '%d'\n", ws, om.CreatedAt)
-	str += fmt.Sprintf("%s_createdBy: '%s'\n", ws, om.CreatedBy)
-	str += fmt.Sprintf("%s_id: '%s'\n", ws, om.UnderliningId)
-	str += fmt.Sprintf("%s_type: '%s'\n", ws, om.UnderliningType)
-	str += fmt.Sprintf("%s_updatedAt: '%d'\n", ws, om.UpdatedAt)
-	str += fmt.Sprintf("%s_updatedBy: '%s'\n", ws, om.UpdatedBy)
-	str += fmt.Sprintf("%sdata: '%s'\n", ws, om.Data)
-	str += fmt.Sprintf("%sdataType: '%s'\n", ws, om.DataType)
-	str += fmt.Sprintf("%signoreSimilarity: '%v'\n", ws, om.IgnoreSimilarity)
-	str += fmt.Sprintf("%sextraData: \n%s", ws, func(l map[string]interface{}) string {
-		var str string
-		ws := supportingfunctions.GetWhitespace(num + 1)
-
-		for k, v := range l {
-			str += fmt.Sprintf("%s%s: '%v'\n", ws, k, v)
-		}
-		return str
-	}(om.ExtraData))
-	str += fmt.Sprintf("%sioc: '%v'\n", ws, om.Ioc)
-	str += fmt.Sprintf("%smessage: '%s'\n", ws, om.Message)
-	str += fmt.Sprintf("%ssighted: '%v'\n", ws, om.Sighted)
-	str += fmt.Sprintf("%sstartDate: '%d'\n", ws, om.StartDate)
-	str += fmt.Sprintf("%stags: \n%s", ws, func(l []string) string {
-		var str string
-		ws := supportingfunctions.GetWhitespace(num + 1)
-
-		for k, v := range l {
-			str += fmt.Sprintf("%s%d. '%s'\n", ws, k+1, v)
-		}
-		return str
-	}(om.Tags))
-	str += fmt.Sprintf("%stlp: '%d'\n", ws, om.Tlp)
-	str += fmt.Sprintf("%sreports: \n%s", ws, func(l map[string]map[string][]map[string]interface{}) string {
-		var str string
-		for key, value := range l {
-			str += fmt.Sprintf("%s%s:\n", supportingfunctions.GetWhitespace(num+1), key)
-			for k, v := range value {
-				str += fmt.Sprintf("%s%s:\n", supportingfunctions.GetWhitespace(num+2), k)
-				for i, j := range v {
-					str += fmt.Sprintf("%s%d.\n", supportingfunctions.GetWhitespace(num+3), i+1)
-					for n, m := range j {
-						str += fmt.Sprintf("%s%s: %v\n", supportingfunctions.GetWhitespace(num+4), n, m)
-					}
-				}
-			}
-		}
-		return str
-	}(om.Reports))
-
-	return str
-}
-
 func (tm TtpsMessageTheHive) ToStringBeautiful(num int) string {
 	return fmt.Sprintf("%sttp: \n%s", supportingfunctions.GetWhitespace(num), func(l []TtpMessage) string {
 		var str string
@@ -202,21 +121,21 @@ func (ped PatternExtraData) ToStringBeautiful(num int) string {
 		}
 		return str
 	}(ped.DataSources))
-	str += fmt.Sprintf("%sdefenseBypassed: \n%v", ws, func(l []string) string {
+	/*str += fmt.Sprintf("%sdefenseBypassed: \n%v", ws, func(l []string) string {
 		var str string
 		for k, v := range l {
 			str += fmt.Sprintf("%s%d. '%s'\n", supportingfunctions.GetWhitespace(num+1), k+1, v)
 		}
 		return str
-	}(ped.DefenseBypassed))
+	}(ped.DefenseBypassed))*/
 	str += fmt.Sprintf("%sdescription: '%s'\n", ws, ped.Description)
-	str += fmt.Sprintf("%sextraData: \n%s", ws, func(l map[string]interface{}) string {
+	/*str += fmt.Sprintf("%sextraData: \n%s", ws, func(l map[string]interface{}) string {
 		var str string
 		for k, v := range l {
 			str += fmt.Sprintf("%s%s: '%v'\n", supportingfunctions.GetWhitespace(num+1), k, v)
 		}
 		return str
-	}(ped.ExtraData))
+	}(ped.ExtraData))*/
 	str += fmt.Sprintf("%sname: '%s'\n", ws, ped.Name)
 	str += fmt.Sprintf("%spatternId: '%s'\n", ws, ped.PatternId)
 	str += fmt.Sprintf("%spatternType: '%s'\n", ws, ped.PatternType)
@@ -236,13 +155,13 @@ func (ped PatternExtraData) ToStringBeautiful(num int) string {
 	}(ped.Platforms))
 	str += fmt.Sprintf("%sremoteSupport: '%v'\n", ws, ped.RemoteSupport)
 	str += fmt.Sprintf("%srevoked: '%v'\n", ws, ped.Revoked)
-	str += fmt.Sprintf("%ssystemRequirements: \n%s", ws, func(l []string) string {
+	/*str += fmt.Sprintf("%ssystemRequirements: \n%s", ws, func(l []string) string {
 		var str string
 		for k, v := range l {
 			str += fmt.Sprintf("%s%d. '%s'\n", supportingfunctions.GetWhitespace(num+1), k+1, v)
 		}
 		return str
-	}(ped.SystemRequirements))
+	}(ped.SystemRequirements))*/
 	str += fmt.Sprintf("%stactics: \n%s", ws, func(l []string) string {
 		var str string
 		for k, v := range l {
@@ -256,15 +175,24 @@ func (ped PatternExtraData) ToStringBeautiful(num int) string {
 	return str
 }
 
+// Get возвращает значения CustomFieldStringType, где 1 и 3 значение это
+// наименование поля
+func (cf *CustomFieldStringType) Get() (string, int, string, string) {
+	return "order", cf.Order, "string", cf.String
+}
+
 // Set устанавливает значения CustomFieldStringType
 func (cf *CustomFieldStringType) Set(order int, value interface{}) {
 	cf.Order = order
 	cf.String = fmt.Sprint(value)
 }
 
-// Get возвращает значения CustomFieldStringType
-func (cf *CustomFieldStringType) Get() (int, string) {
-	return cf.Order, cf.String
+// Get возвращает значения CustomFieldDateType, где 1 и 3 значение это
+// наименование поля
+func (cf *CustomFieldDateType) Get() (string, int, string, string) {
+	t := time.UnixMilli(int64(cf.Date))
+
+	return "order", cf.Order, "date", t.String()
 }
 
 // Set устанавливает значения CustomFieldDateType, при этом
@@ -274,13 +202,6 @@ func (cf *CustomFieldDateType) Set(order int, value interface{}) {
 	if v, ok := value.(uint64); ok {
 		cf.Date = v
 	}
-}
-
-// Get возвращает значения CustomFieldDateType
-func (cf *CustomFieldDateType) Get() (int, string) {
-	t := time.UnixMilli(int64(cf.Date))
-
-	return cf.Order, t.String()
 }
 
 /*

@@ -15,7 +15,7 @@ func (e *EventMessageTheHive) GetBase() bool {
 	return e.Base
 }
 
-// SetValueBase устанавливает СТРОКОВОЕ значение для поля Base
+// SetValueBase устанавливает BOOL значение для поля Base
 func (e *EventMessageTheHive) SetValueBase(v bool) {
 	e.Base = v
 }
@@ -31,7 +31,7 @@ func (e *EventMessageTheHive) GetStartDate() uint64 {
 	return e.StartDate
 }
 
-// SetValueStartDate устанавливает СТРОКОВОЕ значение для поля StartDate
+// SetValueStartDate устанавливает UINT64 значение для поля StartDate
 func (e *EventMessageTheHive) SetValueStartDate(v uint64) {
 	e.StartDate = v
 }
@@ -47,7 +47,7 @@ func (e *EventMessageTheHive) GetRootId() string {
 	return e.RootId
 }
 
-// SetValueRootId устанавливает СТРОКОВОЕ значение для поля RootId
+// SetValueRootId устанавливает STRING значение для поля RootId
 func (e *EventMessageTheHive) SetValueRootId(v string) {
 	e.RootId = v
 }
@@ -61,7 +61,7 @@ func (e *EventMessageTheHive) GetOrganisation() string {
 	return e.Organisation
 }
 
-// SetValueOrganisation устанавливает СТРОКОВОЕ значение для поля Organisation
+// SetValueOrganisation устанавливает STRING значение для поля Organisation
 func (e *EventMessageTheHive) SetValueOrganisation(v string) {
 	e.Organisation = v
 }
@@ -75,7 +75,7 @@ func (e *EventMessageTheHive) GetOrganisationId() string {
 	return e.OrganisationId
 }
 
-// SetValueOrganisationId устанавливает СТРОКОВОЕ значение для поля OrganisationId
+// SetValueOrganisationId устанавливает STRING значение для поля OrganisationId
 func (e *EventMessageTheHive) SetValueOrganisationId(v string) {
 	e.OrganisationId = v
 }
@@ -89,7 +89,7 @@ func (e *EventMessageTheHive) GetObjectId() string {
 	return e.ObjectId
 }
 
-// SetValueObjectId устанавливает СТРОКОВОЕ значение для поля ObjectId
+// SetValueObjectId устанавливает STRING значение для поля ObjectId
 func (e *EventMessageTheHive) SetValueObjectId(v string) {
 	e.ObjectId = v
 }
@@ -103,7 +103,7 @@ func (e *EventMessageTheHive) GetObjectType() string {
 	return e.ObjectType
 }
 
-// SetValueObjectType устанавливает СТРОКОВОЕ значение для поля ObjectType
+// SetValueObjectType устанавливает STRING значение для поля ObjectType
 func (e *EventMessageTheHive) SetValueObjectType(v string) {
 	e.ObjectType = v
 }
@@ -117,7 +117,7 @@ func (e *EventMessageTheHive) GetOperation() string {
 	return e.Operation
 }
 
-// SetValueOperation устанавливает СТРОКОВОЕ значение для поля Operation
+// SetValueOperation устанавливает STRING значение для поля Operation
 func (e *EventMessageTheHive) SetValueOperation(v string) {
 	e.Operation = v
 }
@@ -131,7 +131,7 @@ func (e *EventMessageTheHive) GetRequestId() string {
 	return e.RequestId
 }
 
-// SetValueRequestId устанавливает СТРОКОВОЕ значение для поля RequestId
+// SetValueRequestId устанавливает STRING значение для поля RequestId
 func (e *EventMessageTheHive) SetValueRequestId(v string) {
 	e.RequestId = v
 }
@@ -145,7 +145,7 @@ func (e *EventMessageTheHive) GetDetails() EventDetails {
 	return e.Details
 }
 
-// SetValueDetails устанавливает СТРОКОВОЕ значение для поля Details
+// SetValueDetails устанавливает значение типа EventDetails для поля Details
 func (e *EventMessageTheHive) SetValueDetails(v EventDetails) {
 	e.Details = v
 }
@@ -154,7 +154,7 @@ func (e *EventMessageTheHive) GetObject() EventObject {
 	return e.Object
 }
 
-// SetValueObject устанавливает СТРОКОВОЕ значение для поля Object
+// SetValueObject устанавливает значение типа EventObject для поля Object
 func (e *EventMessageTheHive) SetValueObject(v EventObject) {
 	e.Object = v
 }
@@ -185,7 +185,7 @@ func (e *EventDetails) GetEndDate() uint64 {
 	return e.EndDate
 }
 
-// SetValueEndDate устанавливает СТРОКОВОЕ значение для поля EndDate
+// SetValueEndDate устанавливает UINT64 значение для поля EndDate
 func (e *EventDetails) SetValueEndDate(v uint64) {
 	e.EndDate = v
 }
@@ -201,7 +201,7 @@ func (e *EventDetails) GetResolutionStatus() string {
 	return e.ResolutionStatus
 }
 
-// SetValueResolutionStatus устанавливает СТРОКОВОЕ значение для поля ResolutionStatus
+// SetValueResolutionStatus устанавливает STRING значение для поля ResolutionStatus
 func (e *EventDetails) SetValueResolutionStatus(v string) {
 	e.ResolutionStatus = v
 }
@@ -215,7 +215,7 @@ func (e *EventDetails) GetSummary() string {
 	return e.Summary
 }
 
-// SetValueSummary устанавливает СТРОКОВОЕ значение для поля Summary
+// SetValueSummary устанавливает STRING значение для поля Summary
 func (e *EventDetails) SetValueSummary(v string) {
 	e.Summary = v
 }
@@ -229,7 +229,7 @@ func (e *EventDetails) GetStatus() string {
 	return e.Status
 }
 
-// SetValueStatus устанавливает СТРОКОВОЕ значение для поля Status
+// SetValueStatus устанавливает STRING значение для поля Status
 func (e *EventDetails) SetValueStatus(v string) {
 	e.Status = v
 }
@@ -243,7 +243,7 @@ func (e *EventDetails) GetImpactStatus() string {
 	return e.ImpactStatus
 }
 
-// SetValueImpactStatus устанавливает СТРОКОВОЕ значение для поля ImpactStatus
+// SetValueImpactStatus устанавливает STRING значение для поля ImpactStatus
 func (e *EventDetails) SetValueImpactStatus(v string) {
 	e.ImpactStatus = v
 }
@@ -263,7 +263,7 @@ func (ed EventDetails) ToStringBeautiful(num int) string {
 	str += fmt.Sprintf("%ssummary: '%s'\n", ws, ed.Summary)
 	str += fmt.Sprintf("%sstatus: '%s'\n", ws, ed.Status)
 	str += fmt.Sprintf("%simpactStatus: '%s'\n", ws, ed.ImpactStatus)
-	str += ed.CustomFields.ToStringBeautiful(num)
+	str += fmt.Sprintf("%scustomFields: \n%s", ws, CustomFieldsfuncToStringBeautiful(ed.CustomFields, num))
 
 	return str
 }
@@ -272,7 +272,7 @@ func (e *EventObject) GetFlag() bool {
 	return e.Flag
 }
 
-// SetValueFlag устанавливает СТРОКОВОЕ значение для поля Flag
+// SetValueFlag устанавливает BOOL значение для поля Flag
 func (e *EventObject) SetValueFlag(v bool) {
 	e.Flag = v
 }
@@ -288,7 +288,7 @@ func (e *EventObject) GetCaseId() int {
 	return e.CaseId
 }
 
-// SetValueCaseId устанавливает СТРОКОВОЕ значение для поля CaseId
+// SetValueCaseId устанавливает INT значение для поля CaseId
 func (e *EventObject) SetValueCaseId(v int) {
 	e.CaseId = v
 }
@@ -304,7 +304,7 @@ func (e *EventObject) GetTlp() int {
 	return e.Tlp
 }
 
-// SetValueTlp устанавливает СТРОКОВОЕ значение для поля Tlp
+// SetValueTlp устанавливает INT значение для поля Tlp
 func (e *EventObject) SetValueTlp(v int) {
 	e.Tlp = v
 }
@@ -320,7 +320,7 @@ func (e *EventObject) GetPap() int {
 	return e.Pap
 }
 
-// SetValuePap устанавливает СТРОКОВОЕ значение для поля Pap
+// SetValuePap устанавливает INT значение для поля Pap
 func (e *EventObject) SetValuePap(v int) {
 	e.Pap = v
 }
@@ -336,7 +336,7 @@ func (e *EventObject) GetStartDate() uint64 {
 	return e.StartDate
 }
 
-// SetValueStartDate устанавливает СТРОКОВОЕ значение для поля StartDate
+// SetValueStartDate устанавливает UINT64 значение для поля StartDate
 func (e *EventObject) SetValueStartDate(v uint64) {
 	e.StartDate = v
 }
@@ -352,7 +352,7 @@ func (e *EventObject) GetEndDate() uint64 {
 	return e.EndDate
 }
 
-// SetValueEndDate устанавливает СТРОКОВОЕ значение для поля EndDate
+// SetValueEndDate устанавливает UINT64 значение для поля EndDate
 func (e *EventObject) SetValueEndDate(v uint64) {
 	e.EndDate = v
 }
@@ -368,7 +368,7 @@ func (e *EventObject) GetCreatedAt() uint64 {
 	return e.CreatedAt
 }
 
-// SetValueCreatedAt устанавливает СТРОКОВОЕ значение для поля CreatedAt
+// SetValueCreatedAt устанавливает UINT64 значение для поля CreatedAt
 func (e *EventObject) SetValueCreatedAt(v uint64) {
 	e.CreatedAt = v
 }
@@ -384,7 +384,7 @@ func (e *EventObject) GetUpdatedAt() uint64 {
 	return e.UpdatedAt
 }
 
-// SetValueUpdatedAt устанавливает СТРОКОВОЕ значение для поля UpdatedAt
+// SetValueUpdatedAt устанавливает UINT64 значение для поля UpdatedAt
 func (e *EventObject) SetValueUpdatedAt(v uint64) {
 	e.UpdatedAt = v
 }
@@ -400,7 +400,7 @@ func (e *EventObject) GetUnderliningId() string {
 	return e.UnderliningId
 }
 
-// SetValueUnderliningId устанавливает СТРОКОВОЕ значение для поля UnderliningId
+// SetValueUnderliningId устанавливает STRING значение для поля UnderliningId
 func (e *EventObject) SetValueUnderliningId(v string) {
 	e.UnderliningId = v
 }
@@ -414,7 +414,7 @@ func (e *EventObject) GetId() string {
 	return e.Id
 }
 
-// SetValueId устанавливает СТРОКОВОЕ значение для поля Id
+// SetValueId устанавливает STRING значение для поля Id
 func (e *EventObject) SetValueId(v string) {
 	e.Id = v
 }
@@ -428,7 +428,7 @@ func (e *EventObject) GetCreatedBy() string {
 	return e.CreatedBy
 }
 
-// SetValueCreatedBy устанавливает СТРОКОВОЕ значение для поля CreatedBy
+// SetValueCreatedBy устанавливает STRING значение для поля CreatedBy
 func (e *EventObject) SetValueCreatedBy(v string) {
 	e.CreatedBy = v
 }
@@ -442,7 +442,7 @@ func (e *EventObject) GetUpdatedBy() string {
 	return e.UpdatedBy
 }
 
-// SetValueUpdatedBy устанавливает СТРОКОВОЕ значение для поля UpdatedBy
+// SetValueUpdatedBy устанавливает STRING значение для поля UpdatedBy
 func (e *EventObject) SetValueUpdatedBy(v string) {
 	e.UpdatedBy = v
 }
@@ -456,7 +456,7 @@ func (e *EventObject) GetUnderliningType() string {
 	return e.ImpactStatus
 }
 
-// SetValueUnderliningType устанавливает СТРОКОВОЕ значение для поля UnderliningType
+// SetValueUnderliningType устанавливает STRING значение для поля UnderliningType
 func (e *EventObject) SetValueUnderliningType(v string) {
 	e.UnderliningType = v
 }
@@ -470,7 +470,7 @@ func (e *EventObject) GetTitle() string {
 	return e.Title
 }
 
-// SetValueTitle устанавливает СТРОКОВОЕ значение для поля Title
+// SetValueTitle устанавливает STRING значение для поля Title
 func (e *EventObject) SetValueTitle(v string) {
 	e.Title = v
 }
@@ -480,17 +480,112 @@ func (e *EventObject) SetAnyTitle(i interface{}) {
 	e.Title = fmt.Sprint(i)
 }
 
-/*
-для этого объекта осталось
+func (e *EventObject) GetDescription() string {
+	return e.Description
+}
 
-	Description      string   `json:"description"`
-	ImpactStatus     string   `json:"impactStatus"`
-	ResolutionStatus string   `json:"resolutionStatus"`
-	Status           string   `json:"status"`
-	Summary          string   `json:"summary"`
-	Owner            string   `json:"owner"`
-	Tags             []string `json:"tags"`
-*/
+// SetValueDescription устанавливает STRING значение для поля Description
+func (e *EventObject) SetValueDescription(v string) {
+	e.Description = v
+}
+
+// SetAnyDescription устанавливает ЛЮБОЕ значение для поля Description
+func (e *EventObject) SetAnyDescription(i interface{}) {
+	e.Description = fmt.Sprint(i)
+}
+
+func (e *EventObject) GetImpactStatus() string {
+	return e.ImpactStatus
+}
+
+// SetValueImpactStatus устанавливает STRING значение для поля ImpactStatus
+func (e *EventObject) SetValueImpactStatus(v string) {
+	e.ImpactStatus = v
+}
+
+// SetAnyImpactStatus устанавливает ЛЮБОЕ значение для поля ImpactStatus
+func (e *EventObject) SetAnyImpactStatus(i interface{}) {
+	e.ImpactStatus = fmt.Sprint(i)
+}
+
+func (e *EventObject) GetImpactResolutionStatus() string {
+	return e.ResolutionStatus
+}
+
+// SetValueResolutionStatus устанавливает STRING значение для поля ResolutionStatus
+func (e *EventObject) SetValueResolutionStatus(v string) {
+	e.ResolutionStatus = v
+}
+
+// SetAnyResolutionStatus устанавливает ЛЮБОЕ значение для поля ResolutionStatus
+func (e *EventObject) SetAnyResolutionStatus(i interface{}) {
+	e.ResolutionStatus = fmt.Sprint(i)
+}
+
+func (e *EventObject) GetStatus() string {
+	return e.Status
+}
+
+// SetValueStatus устанавливает STRING значение для поля Status
+func (e *EventObject) SetValueStatus(v string) {
+	e.Status = v
+}
+
+// SetAnyStatus устанавливает ЛЮБОЕ значение для поля Status
+func (e *EventObject) SetAnyStatus(i interface{}) {
+	e.Status = fmt.Sprint(i)
+}
+
+func (e *EventObject) GetSummary() string {
+	return e.Summary
+}
+
+// SetValueSummary устанавливает STRING значение для поля Summary
+func (e *EventObject) SetValueSummary(v string) {
+	e.Summary = v
+}
+
+// SetAnySummary устанавливает ЛЮБОЕ значение для поля Summary
+func (e *EventObject) SetAnySummary(i interface{}) {
+	e.Summary = fmt.Sprint(i)
+}
+
+func (e *EventObject) GetOwner() string {
+	return e.Owner
+}
+
+// SetValueOwner устанавливает STRING значение для поля Owner
+func (e *EventObject) SetValueOwner(v string) {
+	e.Owner = v
+}
+
+// SetAnyOwner устанавливает ЛЮБОЕ значение для поля Owner
+func (e *EventObject) SetAnyOwner(i interface{}) {
+	e.Owner = fmt.Sprint(i)
+}
+
+func (e *EventObject) GetTags() []string {
+	return e.Tags
+}
+
+// SetValueTags устанавливает STRING значение для поля Tags
+func (e *EventObject) SetValueTags(v string) {
+	e.Tags = append(e.Tags, v)
+}
+
+// SetAnyTags устанавливает ЛЮБОЕ значение для поля Tags
+func (e *EventObject) SetAnyTags(i interface{}) {
+	e.Tags = append(e.Tags, fmt.Sprint(i))
+}
+
+func (e *EventObject) GetCustomFields() map[string]CustomerFields {
+	return e.CustomFields
+}
+
+// SetValueCustomFields устанавливает STRING значение для поля CustomFields
+func (e *EventObject) SetValueCustomFields(v map[string]CustomerFields) {
+	e.CustomFields = v
+}
 
 func (eo EventObject) ToStringBeautiful(num int) string {
 	var str string
@@ -527,17 +622,8 @@ func (eo EventObject) ToStringBeautiful(num int) string {
 	str += fmt.Sprintf("%sstatus: '%s'\n", ws, eo.Status)
 	str += fmt.Sprintf("%ssummary: '%s'\n", ws, eo.Summary)
 	str += fmt.Sprintf("%sowner: '%s'\n", ws, eo.Owner)
-	str += eo.CustomFields.ToStringBeautiful(num)
-	/*str += fmt.Sprintf("%sstats: \n%s", ws, func(l map[string]interface{}) string {
-		var str string
-		ws := supportingfunctions.GetWhitespace(num + 1)
-
-		for k, v := range l {
-			str += fmt.Sprintf("%s%s: '%v'\n", ws, k, v)
-		}
-		return str
-	}(eo.Stats))
-	str += fmt.Sprintf("%spermissions: \n%s", ws, func(l []string) string {
+	str += fmt.Sprintf("%scustomFields: \n%s", ws, CustomFieldsfuncToStringBeautiful(eo.CustomFields, num))
+	/*str += fmt.Sprintf("%spermissions: \n%s", ws, func(l []string) string {
 		var str string
 		ws := supportingfunctions.GetWhitespace(num + 1)
 
@@ -547,5 +633,19 @@ func (eo EventObject) ToStringBeautiful(num int) string {
 		return str
 	}(eo.Permissions))*/
 
+	return str
+}
+
+func CustomFieldsfuncToStringBeautiful(l map[string]CustomerFields, num int) string {
+	var str string
+	ws := supportingfunctions.GetWhitespace(num + 2)
+
+	for k, v := range l {
+		str += fmt.Sprintf("%s%s:\n", supportingfunctions.GetWhitespace(num+1), k)
+
+		nameOne, dataOne, nameTwo, dataTwo := v.Get()
+		str += fmt.Sprintf("%s%s: %s\n", ws, nameOne, dataOne)
+		str += fmt.Sprintf("%s%s: %s\n", ws, nameTwo, dataTwo)
+	}
 	return str
 }

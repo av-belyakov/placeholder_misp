@@ -34,12 +34,12 @@ type EventMessageTheHive struct {
 // ImpactStatus - краткое описание воздействия
 // CustomFields - настраиваемые поля
 type EventDetails struct {
-	EndDate          uint64 `json:"endDate"`
-	ResolutionStatus string `json:"resolutionStatus"`
-	Summary          string `json:"summary"`
-	Status           string `json:"status"`
-	ImpactStatus     string `json:"impactStatus"`
-	CustomFields     `json:"customFields"`
+	EndDate          uint64                    `json:"endDate"`
+	ResolutionStatus string                    `json:"resolutionStatus"`
+	Summary          string                    `json:"summary"`
+	Status           string                    `json:"status"`
+	ImpactStatus     string                    `json:"impactStatus"`
+	CustomFields     map[string]CustomerFields `json:"customFields"`
 }
 
 // EventObject объект события
@@ -69,29 +69,29 @@ type EventDetails struct {
 // Stats - статистика
 // Permissions - разрешения
 type EventObject struct {
-	Flag             bool     `json:"flag"`
-	CaseId           int      `json:"caseId"`
-	Severity         int      `json:"severity"`
-	Tlp              int      `json:"tlp"`
-	Pap              int      `json:"pap"`
-	StartDate        uint64   `json:"startDate"`
-	EndDate          uint64   `json:"endDate"`
-	CreatedAt        uint64   `json:"createdAt"`
-	UpdatedAt        uint64   `json:"updatedAt"`
-	UnderliningId    string   `json:"_id"`
-	Id               string   `json:"id"`
-	CreatedBy        string   `json:"createdBy"`
-	UpdatedBy        string   `json:"updatedBy"`
-	UnderliningType  string   `json:"_type"`
-	Title            string   `json:"title"`
-	Description      string   `json:"description"`
-	ImpactStatus     string   `json:"impactStatus"`
-	ResolutionStatus string   `json:"resolutionStatus"`
-	Status           string   `json:"status"`
-	Summary          string   `json:"summary"`
-	Owner            string   `json:"owner"`
-	Tags             []string `json:"tags"`
-	CustomFields     `json:"customFields"`
+	Flag             bool                      `json:"flag"`
+	CaseId           int                       `json:"caseId"`
+	Severity         int                       `json:"severity"`
+	Tlp              int                       `json:"tlp"`
+	Pap              int                       `json:"pap"`
+	StartDate        uint64                    `json:"startDate"`
+	EndDate          uint64                    `json:"endDate"`
+	CreatedAt        uint64                    `json:"createdAt"`
+	UpdatedAt        uint64                    `json:"updatedAt"`
+	UnderliningId    string                    `json:"_id"`
+	Id               string                    `json:"id"`
+	CreatedBy        string                    `json:"createdBy"`
+	UpdatedBy        string                    `json:"updatedBy"`
+	UnderliningType  string                    `json:"_type"`
+	Title            string                    `json:"title"`
+	Description      string                    `json:"description"`
+	ImpactStatus     string                    `json:"impactStatus"`
+	ResolutionStatus string                    `json:"resolutionStatus"`
+	Status           string                    `json:"status"`
+	Summary          string                    `json:"summary"`
+	Owner            string                    `json:"owner"`
+	Tags             []string                  `json:"tags"`
+	CustomFields     map[string]CustomerFields `json:"customFields"`
 	//данное поле редко используемое, думаю пока оно не требует реализации
 	//Stats            map[string]interface{} `json:"stats"`
 	//данное поле редко используемое, думаю пока оно не требует реализации
