@@ -28,7 +28,7 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		listRules                      *rules.ListRule
 		mispModule                     *mispinteractions.ModuleMISP
 		storageApp                     *memorytemporarystorage.CommonStorageTemporary
-		chanCreateMispFormat           chan coremodule.ChanInputCreateMispFormat
+		chanCreateMispFormat           chan datamodels.ChanOutputDecodeJSON
 		chanDone                       chan bool
 		exampleByte                    []byte
 		errReadFile, errMisp, errRules error

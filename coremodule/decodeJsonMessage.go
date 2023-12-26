@@ -7,135 +7,133 @@ import (
 	"runtime"
 
 	"placeholder_misp/datamodels"
-	"placeholder_misp/memorytemporarystorage"
 	rules "placeholder_misp/rulesinteraction"
 	"placeholder_misp/supportingfunctions"
 )
 
-type HandlerMessageFromHiveSettings struct {
-	StorageApp *memorytemporarystorage.CommonStorageTemporary
-	ListRule   *rules.ListRule
-	Logging    chan<- datamodels.MessageLogging
-	Counting   chan<- datamodels.DataCounterSettings
+type DecodeJsonMessageSettings struct {
+	ListRule *rules.ListRule
+	Logging  chan<- datamodels.MessageLogging
+	Counting chan<- datamodels.DataCounterSettings
 }
 
-func NewHandlerMessageFromHive(
-	storageApp *memorytemporarystorage.CommonStorageTemporary,
+func NewDecodeJsonMessageSettings(
 	listRule *rules.ListRule,
 	logging chan<- datamodels.MessageLogging,
-	counting chan<- datamodels.DataCounterSettings) *HandlerMessageFromHiveSettings {
-	return &HandlerMessageFromHiveSettings{
-		StorageApp: storageApp,
-		ListRule:   listRule,
-		Logging:    logging,
-		Counting:   counting,
+	counting chan<- datamodels.DataCounterSettings) *DecodeJsonMessageSettings {
+	return &DecodeJsonMessageSettings{
+		ListRule: listRule,
+		Logging:  logging,
+		Counting: counting,
 	}
 }
 
-func (s *HandlerMessageFromHiveSettings) HandlerMessageFromHive(
-	cmispf chan<- datamodels.ChanOutputDecodeJSON,
-	b []byte,
-	taskId string,
-	cmispfDone chan<- bool,
-) {
-	var (
-		f   string
-		l   int
-		err error
-	)
+func (s *DecodeJsonMessageSettings) HandlerJsonMessage(b []byte, id string) (chan datamodels.ChanOutputDecodeJSON, chan bool) {
+	chanOutputJsonData := make(chan datamodels.ChanOutputDecodeJSON)
+	chanDone := make(chan bool)
 
-	//для записи событий в лог-файл events
+	//ПРЕДНАЗНАЧЕНО для записи событий в лог-файл events
 	str, _ := supportingfunctions.NewReadReflectJSONSprint(b)
 	s.Logging <- datamodels.MessageLogging{
 		MsgData: fmt.Sprintf("\t---------------\n\tEVENTS:\n%s\n", str),
 		MsgType: "events",
 	}
 
-	//для карт
-	_, f, l, _ = runtime.Caller(0)
-	listMap := map[string]interface{}{}
-	if err = json.Unmarshal(b, &listMap); err == nil {
-		if len(listMap) == 0 {
-			s.Logging <- datamodels.MessageLogging{
-				MsgData: fmt.Sprintf("'error decoding the json message, it may be empty' %s:%d", f, l+2),
-				MsgType: "error",
-			}
+	go func() {
+		var (
+			f         string
+			l         int
+			err       error
+			isAllowed bool
+		)
 
-			return
-		}
-
-		nlt := processingReflectMap(s.Logging, cmispf, listMap, s.ListRule, 0, "")
-		s.StorageApp.SetProcessedDataHiveFormatMessage(taskId, nlt)
-	} else {
-		// для срезов
+		//для карт
 		_, f, l, _ = runtime.Caller(0)
-		listSlice := []interface{}{}
-		if err = json.Unmarshal(b, &listSlice); err != nil {
-			s.Logging <- datamodels.MessageLogging{
-				MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l+2),
-				MsgType: "error",
+		listMap := map[string]interface{}{}
+		if err = json.Unmarshal(b, &listMap); err == nil {
+			if len(listMap) == 0 {
+				s.Logging <- datamodels.MessageLogging{
+					MsgData: fmt.Sprintf("'error decoding the json message, it may be empty' %s:%d", f, l+2),
+					MsgType: "error",
+				}
+
+				return
 			}
 
-			return
-		}
+			_ = reflectMap(s.Logging, chanOutputJsonData, listMap, s.ListRule, 0, "", id)
+		} else {
+			// для срезов
+			_, f, l, _ = runtime.Caller(0)
+			listSlice := []interface{}{}
+			if err = json.Unmarshal(b, &listSlice); err != nil {
+				s.Logging <- datamodels.MessageLogging{
+					MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l+2),
+					MsgType: "error",
+				}
 
-		if len(listSlice) == 0 {
-			s.Logging <- datamodels.MessageLogging{
-				MsgData: fmt.Sprintf("'error decoding the json message, it may be empty' %s:%d", f, l+2),
-				MsgType: "error",
+				return
 			}
 
-			return
+			if len(listSlice) == 0 {
+				s.Logging <- datamodels.MessageLogging{
+					MsgData: fmt.Sprintf("'error decoding the json message, it may be empty' %s:%d", f, l+2),
+					MsgType: "error",
+				}
+
+				return
+			}
+
+			_ = reflectSlice(s.Logging, chanOutputJsonData, listSlice, s.ListRule, 0, "", id)
 		}
 
-		_ = processingReflectSlice(s.Logging, cmispf, listSlice, s.ListRule, 0, "")
-	}
+		// сетчик обработанных кейсов
+		s.Counting <- datamodels.DataCounterSettings{
+			DataType: "update processed events",
+			Count:    1,
+		}
 
-	// сетчик обработанных кейсов
-	s.Counting <- datamodels.DataCounterSettings{
-		DataType: "update processed events",
-		Count:    1,
-	}
+		//проверяем что бы хотя бы одно правило разрешало пропуск кейса
+		if s.ListRule.GetRulePassany() || s.ListRule.SomePassRuleIsTrue() {
+			isAllowed = true
+		}
 
-	//проверяем что бы хотя бы одно правило разрешало пропуск кейса
-	if s.ListRule.GetRulePassany() || s.ListRule.SomePassRuleIsTrue() {
-		s.StorageApp.SetAllowedTransferTrueHiveFormatMessage(taskId)
-	}
+		//выполняет очистку значения StatementExpression что равно отсутствию совпадений в правилах Pass
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		// ВРЕМЕННО ЗАКОМЕНТИРОВАЛ
+		// не забыть снять коментарий
+		//
+		s.ListRule.CleanStatementExpressionRulePass()
 
-	//выполняет очистку значения StatementExpression что равно отсутствию совпадений в правилах Pass
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// ВРЕМЕННО ЗАКОМЕНТИРОВАЛ
-	// не забыть снять коментарий
-	//
-	s.ListRule.CleanStatementExpressionRulePass()
+		dt := "events do not meet rules"
+		if isAllowed {
+			dt = "update events meet rules"
+		}
 
-	isAllowed, _ := s.StorageApp.GetAllowedTransferHiveFormatMessage(taskId)
-	dt := "events do not meet rules"
-	if isAllowed {
-		dt = "update events meet rules"
-	}
+		//сетчик кейсов соответствующих или не соответствующих правилам
+		s.Counting <- datamodels.DataCounterSettings{
+			DataType: dt,
+			Count:    1,
+		}
 
-	//сетчик кейсов соответствующих или не соответствующих правилам
-	s.Counting <- datamodels.DataCounterSettings{
-		DataType: dt,
-		Count:    1,
-	}
+		//останавливаем обработчик формирующий MISP формат
+		chanDone <- isAllowed
 
-	//устанавливаем параметр информирующий о завершении обработки модулем
-	s.StorageApp.SetIsProcessedMispHiveFormatMessage(taskId)
+		close(chanOutputJsonData)
+		close(chanDone)
+	}()
 
-	//останавливаем обработчик формирующий MISP формат
-	cmispfDone <- isAllowed
+	return chanOutputJsonData, chanDone
 }
 
-func processingReflectAnySimpleType(
+func reflectAnySimpleType(
 	logging chan<- datamodels.MessageLogging,
 	chanOutMispFormat chan<- datamodels.ChanOutputDecodeJSON,
 	name interface{},
 	anyType interface{},
 	lr *rules.ListRule,
 	num int,
-	fieldBranch string) interface{} {
+	fieldBranch string,
+	id string) interface{} {
 
 	var nameStr string
 	r := reflect.TypeOf(anyType)
@@ -167,6 +165,7 @@ func processingReflectAnySimpleType(
 		lr.PassRuleHandler(fieldBranch, ncv)
 
 		chanOutMispFormat <- datamodels.ChanOutputDecodeJSON{
+			UUID:                id,
 			FieldName:           nameStr,
 			ValueType:           "string",
 			Value:               ncv,
@@ -191,6 +190,7 @@ func processingReflectAnySimpleType(
 		lr.PassRuleHandler(fieldBranch, ncv)
 
 		chanOutMispFormat <- datamodels.ChanOutputDecodeJSON{
+			UUID:                id,
 			FieldName:           nameStr,
 			ValueType:           "int",
 			Value:               ncv,
@@ -215,6 +215,7 @@ func processingReflectAnySimpleType(
 		lr.PassRuleHandler(fieldBranch, ncv)
 
 		chanOutMispFormat <- datamodels.ChanOutputDecodeJSON{
+			UUID:                id,
 			FieldName:           nameStr,
 			ValueType:           "uint",
 			Value:               ncv,
@@ -239,6 +240,7 @@ func processingReflectAnySimpleType(
 		lr.PassRuleHandler(fieldBranch, ncv)
 
 		chanOutMispFormat <- datamodels.ChanOutputDecodeJSON{
+			UUID:                id,
 			FieldName:           nameStr,
 			ValueType:           "float",
 			Value:               ncv,
@@ -263,6 +265,7 @@ func processingReflectAnySimpleType(
 		lr.PassRuleHandler(fieldBranch, ncv)
 
 		chanOutMispFormat <- datamodels.ChanOutputDecodeJSON{
+			UUID:                id,
 			FieldName:           nameStr,
 			ValueType:           "bool",
 			Value:               ncv,
@@ -276,13 +279,14 @@ func processingReflectAnySimpleType(
 	return anyType
 }
 
-func processingReflectMap(
+func reflectMap(
 	logging chan<- datamodels.MessageLogging,
 	chanOutMispFormat chan<- datamodels.ChanOutputDecodeJSON,
 	l map[string]interface{},
 	lr *rules.ListRule,
 	num int,
-	fieldBranch string) map[string]interface{} {
+	fieldBranch string,
+	id string) map[string]interface{} {
 
 	var (
 		newMap  map[string]interface{}
@@ -308,31 +312,32 @@ func processingReflectMap(
 		switch r.Kind() {
 		case reflect.Map:
 			if v, ok := v.(map[string]interface{}); ok {
-				newMap = processingReflectMap(logging, chanOutMispFormat, v, lr, num+1, fbTmp)
+				newMap = reflectMap(logging, chanOutMispFormat, v, lr, num+1, fbTmp, id)
 				nl[k] = newMap
 			}
 
 		case reflect.Slice:
 			if v, ok := v.([]interface{}); ok {
-				newList = processingReflectSlice(logging, chanOutMispFormat, v, lr, num+1, fbTmp)
+				newList = reflectSlice(logging, chanOutMispFormat, v, lr, num+1, fbTmp, id)
 				nl[k] = newList
 			}
 
 		default:
-			nl[k] = processingReflectAnySimpleType(logging, chanOutMispFormat, k, v, lr, num, fbTmp)
+			nl[k] = reflectAnySimpleType(logging, chanOutMispFormat, k, v, lr, num, fbTmp, id)
 		}
 	}
 
 	return nl
 }
 
-func processingReflectSlice(
+func reflectSlice(
 	logging chan<- datamodels.MessageLogging,
 	chanOutMispFormat chan<- datamodels.ChanOutputDecodeJSON,
 	l []interface{},
 	lr *rules.ListRule,
 	num int,
-	fieldBranch string) []interface{} {
+	fieldBranch string,
+	id string) []interface{} {
 
 	var (
 		newMap  map[string]interface{}
@@ -350,20 +355,20 @@ func processingReflectSlice(
 		switch r.Kind() {
 		case reflect.Map:
 			if v, ok := v.(map[string]interface{}); ok {
-				newMap = processingReflectMap(logging, chanOutMispFormat, v, lr, num+1, fieldBranch)
+				newMap = reflectMap(logging, chanOutMispFormat, v, lr, num+1, fieldBranch, id)
 
 				nl = append(nl, newMap)
 			}
 
 		case reflect.Slice:
 			if v, ok := v.([]interface{}); ok {
-				newList = processingReflectSlice(logging, chanOutMispFormat, v, lr, num+1, fieldBranch)
+				newList = reflectSlice(logging, chanOutMispFormat, v, lr, num+1, fieldBranch, id)
 
 				nl = append(nl, newList...)
 			}
 
 		default:
-			nl = append(nl, processingReflectAnySimpleType(logging, chanOutMispFormat, k, v, lr, num, fieldBranch))
+			nl = append(nl, reflectAnySimpleType(logging, chanOutMispFormat, k, v, lr, num, fieldBranch, id))
 		}
 	}
 

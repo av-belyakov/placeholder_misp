@@ -9,7 +9,6 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"placeholder_misp/coremodule"
 	"placeholder_misp/datamodels"
 )
 
@@ -56,7 +55,7 @@ func CheckHash(h []string) map[string]string {
 */
 
 var _ = Describe("Checkstringhase", func() {
-	testList := []coremodule.ChanInputCreateMispFormat{
+	testList := []datamodels.ChanOutputDecodeJSON{
 		{
 			FieldBranch: "observables.attachment.name",
 			FieldName:   "mytextfile.txt",

@@ -10,7 +10,7 @@ import (
 	"placeholder_misp/mispinteractions"
 )
 
-/*type FieldsNameMapping struct {
+type FieldsNameMapping struct {
 	InputFieldName, MispFieldName string
 }
 
@@ -118,17 +118,14 @@ func getObjName(objName string) string {
 	}
 
 	return l[0]
-}*/
+}
 
-func NewMispFormat(
+func NewVerifiedMispFormat(
+	chanDecodeJson <-chan datamodels.ChanOutputDecodeJSON,
+	chanDecodeDone <-chan bool,
 	taskId string,
 	mispmodule *mispinteractions.ModuleMISP,
-	logging chan<- datamodels.MessageLogging) (chan datamodels.ChanOutputDecodeJSON, chan bool) {
-
-	//канал принимающий данные необходимые для заполнения MISP форматов
-	chanInput := make(chan datamodels.ChanOutputDecodeJSON)
-	//останавливает обработчик канала chanInput (при завершении декодировании сообщения)
-	chanDone := make(chan bool)
+	logging chan<- datamodels.MessageLogging) {
 
 	eventsMisp := datamodels.NewEventMisp()
 	listObjectsMisp := datamodels.NewListObjectsMispFormat()
@@ -198,202 +195,194 @@ func NewMispFormat(
 		"observables.attachment.size": {listObjectsMisp.SetValueSizeObjectsMisp},
 	}
 
-	go func() {
-		var (
-			maxCountObservables int
-			seqNumObservable    int
-			userEmail           string
-			caseSource          string
-			caseId              float64
-			patterIsNum         *regexp.Regexp = regexp.MustCompile(`^\d+$`)
-		)
-		defer func() {
-			close(chanInput)
-			close(chanDone)
-		}()
+	var (
+		maxCountObservables int
+		seqNumObservable    int
+		userEmail           string
+		caseSource          string
+		caseId              float64
+		patterIsNum         *regexp.Regexp = regexp.MustCompile(`^\d+$`)
+	)
 
-		svn := NewStorageValueName()
-		leot := datamodels.NewListEventObjectTags()
-		exclusionRules := NewExclusionRules()
+	svn := NewStorageValueName()
+	leot := datamodels.NewListEventObjectTags()
+	exclusionRules := NewExclusionRules()
 
-		for key := range listHandlerMisp {
-			if strings.Contains(key, "observables") {
-				maxCountObservables++
-			}
+	for key := range listHandlerMisp {
+		if strings.Contains(key, "observables") {
+			maxCountObservables++
 		}
+	}
 
-		listTags := make(map[int][2]string)
+	listTags := make(map[int][2]string)
 
-		for {
-			select {
-			case tmf := <-chanInput:
-				//ищем источник события
-				if source, ok := searchEventSource(tmf); ok {
-					caseSource = source
-				}
+	for {
+		select {
+		case tmf := <-chanDecodeJson:
+			//ищем источник события
+			if source, ok := searchEventSource(tmf); ok {
+				caseSource = source
+			}
 
-				//ищем id события
-				if cid, ok := searchCaseId(tmf); ok {
-					caseId = cid
-				}
+			//ищем id события
+			if cid, ok := searchCaseId(tmf); ok {
+				caseId = cid
+			}
 
-				// ищем email владельца события
-				if uemail, ok := searchOwnerEmail(tmf); ok {
-					userEmail = uemail
-				}
+			// ищем email владельца события
+			if uemail, ok := searchOwnerEmail(tmf); ok {
+				userEmail = uemail
+			}
 
-				//для observables которые содержат свойства, являющиеся картами,
-				//такими как свойства 'attachment', 'reports' и т.д. не
-				//осуществлять подсчет свойств
-				isObservables := strings.Contains(tmf.FieldBranch, "observables")
-				countOne := strings.Count(tmf.FieldBranch, ".") <= 1
+			//для observables которые содержат свойства, являющиеся картами,
+			//такими как свойства 'attachment', 'reports' и т.д. не
+			//осуществлять подсчет свойств
+			isObservables := strings.Contains(tmf.FieldBranch, "observables")
+			countOne := strings.Count(tmf.FieldBranch, ".") <= 1
 
-				if isObservables && countOne {
-					var newFieldName = tmf.FieldName
-					//сделал проверку на число что бы исключить повторение
-					//имен для свойств являющихся срезами, так как в данной ситуации
-					//имя содержащееся в tmf.FieldName представляет собой числовой
-					//индекс, соответственное, если будет еще одно свойство являющееся
-					//срезом, то может быть совпадение имен и изменение seqNumObservable, а как
-					//результат будет переход на другой объект 'observables'
-					if patterIsNum.MatchString(tmf.FieldName) {
-						tmp := strings.Split(tmf.FieldBranch, ".")
-						var nameTmp string
-						if len(tmp) > 0 {
-							nameTmp = tmp[len(tmp)-1] + "_"
-						}
-
-						newFieldName = nameTmp + tmf.FieldName
+			if isObservables && countOne {
+				var newFieldName = tmf.FieldName
+				//сделал проверку на число что бы исключить повторение
+				//имен для свойств являющихся срезами, так как в данной ситуации
+				//имя содержащееся в tmf.FieldName представляет собой числовой
+				//индекс, соответственное, если будет еще одно свойство являющееся
+				//срезом, то может быть совпадение имен и изменение seqNumObservable, а как
+				//результат будет переход на другой объект 'observables'
+				if patterIsNum.MatchString(tmf.FieldName) {
+					tmp := strings.Split(tmf.FieldBranch, ".")
+					var nameTmp string
+					if len(tmp) > 0 {
+						nameTmp = tmp[len(tmp)-1] + "_"
 					}
 
-					//подсчет свойств для объектов типа 'observables' выполняется для
-					//того что бы отделить один объект 'observables' от другого
-					if svn.GetValueName(newFieldName) {
-						svn.CleanValueName()
-						seqNumObservable++
-					}
-
-					svn.SetValueName(newFieldName)
-
-					if tmf.ExclusionRuleWorked {
-						exclusionRules.Add(seqNumObservable, tmf.FieldBranch)
-					}
+					newFieldName = nameTmp + tmf.FieldName
 				}
 
-				//обрабатываем свойство observables.attachment
-				if strings.Contains(tmf.FieldBranch, "attachment") {
-					listAttributeTmp.AddAttribute(tmf.FieldBranch, tmf.Value, seqNumObservable)
+				//подсчет свойств для объектов типа 'observables' выполняется для
+				//того что бы отделить один объект 'observables' от другого
+				if svn.GetValueName(newFieldName) {
+					svn.CleanValueName()
+					seqNumObservable++
 				}
 
-				//обрабатываем свойство event.object.tags, оно ответственно за
-				//наполнение поля "Теги" MISP
-				if tmf.FieldBranch == "event.object.tags" {
-					if tag, ok := tmf.Value.(string); ok {
-						leot.SetTag(tag)
+				svn.SetValueName(newFieldName)
 
-						/*
-							ДЛЯ ПОДКЛЮЧЕНИЯ ГАЛАКТИК нужно сформировать, на основе данных из TTP,
-							тег со следующем форматом. Пример ниже
-
-							"misp-galaxy:mitre-attack-pattern=\"Match Legitimate Name or Location - T1036.005\""
-						*/
-
-					}
+				if tmf.ExclusionRuleWorked {
+					exclusionRules.Add(seqNumObservable, tmf.FieldBranch)
 				}
+			}
 
-				//обрабатываем свойство observables.tags
-				if tmf.FieldBranch == "observables.tags" {
-					listTags = handlerObservablesTags(tmf.Value, listTags, listAttributesMisp, seqNumObservable)
+			//обрабатываем свойство observables.attachment
+			if strings.Contains(tmf.FieldBranch, "attachment") {
+				listAttributeTmp.AddAttribute(tmf.FieldBranch, tmf.Value, seqNumObservable)
+			}
+
+			//обрабатываем свойство event.object.tags, оно ответственно за
+			//наполнение поля "Теги" MISP
+			if tmf.FieldBranch == "event.object.tags" {
+				if tag, ok := tmf.Value.(string); ok {
+					leot.SetTag(tag)
+
+					/*
+						ДЛЯ ПОДКЛЮЧЕНИЯ ГАЛАКТИК нужно сформировать, на основе данных из TTP,
+						тег со следующем форматом. Пример ниже
+
+						"misp-galaxy:mitre-attack-pattern=\"Match Legitimate Name or Location - T1036.005\""
+					*/
+
 				}
+			}
 
-				//проверяем есть ли путь до обрабатываемого свойства в списке обработчиков
-				lf, ok := listHandlerMisp[tmf.FieldBranch]
-				if ok {
-					//основной обработчик путей из tmf.FieldBranch
-					for _, f := range lf {
-						f(tmf.Value, seqNumObservable)
-					}
+			//обрабатываем свойство observables.tags
+			if tmf.FieldBranch == "observables.tags" {
+				listTags = handlerObservablesTags(tmf.Value, listTags, listAttributesMisp, seqNumObservable)
+			}
+
+			//проверяем есть ли путь до обрабатываемого свойства в списке обработчиков
+			lf, ok := listHandlerMisp[tmf.FieldBranch]
+			if ok {
+				//основной обработчик путей из tmf.FieldBranch
+				for _, f := range lf {
+					f(tmf.Value, seqNumObservable)
 				}
+			}
 
-			case isAllowed := <-chanDone:
-				//удаляем те объекты Attributes которые соответствуют правилам EXCLUDE
-				delElementAttributes(exclusionRules, listAttributesMisp, logging)
+		case isAllowed := <-chanDecodeDone:
+			//удаляем те объекты Attributes которые соответствуют правилам EXCLUDE
+			delElementAttributes(exclusionRules, listAttributesMisp, logging)
 
-				//fmt.Println("==================== exclusionRules =====================")
-				//for k, v := range exclusionRules.SearchObjectName("observables") {
-				//	fmt.Printf("%d. %d\n", k+1, v.SequenceNumber)
-				//}
+			//fmt.Println("==================== exclusionRules =====================")
+			//for k, v := range exclusionRules.SearchObjectName("observables") {
+			//	fmt.Printf("%d. %d\n", k+1, v.SequenceNumber)
+			//}
 
-				//fmt.Println("____________________ Attributes _______________________")
-				//i := 1
-				//for k, v := range getNewListAttributes(
-				//	listAttributesMisp.GetListAttributesMisp(),
-				//	listTags) {
-				//	fmt.Printf("%d. num: %d, Value: %s\n", i, k, v.Value)
-				//	i++
-				//}
-				//fmt.Println("_______________________________________________________")
+			//fmt.Println("____________________ Attributes _______________________")
+			//i := 1
+			//for k, v := range getNewListAttributes(
+			//	listAttributesMisp.GetListAttributesMisp(),
+			//	listTags) {
+			//	fmt.Printf("%d. num: %d, Value: %s\n", i, k, v.Value)
+			//	i++
+			//}
+			//fmt.Println("_______________________________________________________")
 
-				if !isAllowed {
-					_, f, l, _ := runtime.Caller(0)
+			if !isAllowed {
+				_, f, l, _ := runtime.Caller(0)
 
-					logging <- datamodels.MessageLogging{
-						MsgData: fmt.Sprintf("'the message with case id %d was not sent to MISP because it does not comply with the rules' %s:%d", int(caseId), f, l-1),
-						MsgType: "warning",
-					}
-				} else {
-					//добавляем case id в поле Info
-					eventsMisp.Info += fmt.Sprintf(" :::TheHive case id '%d':::", int(caseId))
-
-					listAttributes := getNewListAttributes(listAttributesMisp.GetListAttributesMisp(), listTags)
-
-					//выполняем некоторые преобразования со свойствами Category,
-					//Type и ObjectRelation
-					alignmentListAttributes(&listAttributes)
-
-					//тут отправляем сформированные по формату MISP пользовательские структуры
-					mispmodule.SendingDataInput(mispinteractions.SettingsChanInputMISP{
-						Command:    "add event",
-						TaskId:     taskId,
-						CaseId:     caseId,
-						CaseSource: caseSource,
-						UserEmail:  userEmail,
-						MajorData: map[string]interface{}{
-							"events": eventsMisp,
-							//getNewListAttributes влияет на поля Category и Type
-							//типа Attributes
-							"attributes": listAttributes,
-							"objects": getNewListObjects(
-								listObjectsMisp.GetListObjectsMisp(),
-								listAttributeTmp.GetListAttribute()),
-							"event.object.tags": leot.GetListTags(),
-						}})
-				}
-
-				//очищаем события, список аттрибутов и текущий email пользователя
-				userEmail, caseSource = "", ""
-				leot.CleanListTags()
-				eventsMisp.CleanEventsMispFormat()
-				//exclusionRules.Clean()
-				listObjectsMisp.CleanListObjectsMisp()
-				listAttributeTmp.CleanAttribute()
-				listAttributesMisp.CleanListAttributesMisp()
-
-				// только для тестов, что бы завершить гроутину вывода информации и логирования
 				logging <- datamodels.MessageLogging{
-					MsgData: "",
-					MsgType: "STOP TEST",
+					MsgData: fmt.Sprintf("'the message with case id %d was not sent to MISP because it does not comply with the rules' %s:%d", int(caseId), f, l-1),
+					MsgType: "warning",
 				}
+			} else {
+				//добавляем case id в поле Info
+				eventsMisp.Info += fmt.Sprintf(" :::TheHive case id '%d':::", int(caseId))
 
-				return
+				listAttributes := getNewListAttributes(listAttributesMisp.GetListAttributesMisp(), listTags)
+
+				//выполняем некоторые преобразования со свойствами Category,
+				//Type и ObjectRelation
+				alignmentListAttributes(&listAttributes)
+
+				//тут отправляем сформированные по формату MISP пользовательские структуры
+				mispmodule.SendingDataInput(mispinteractions.SettingsChanInputMISP{
+					Command:    "add event",
+					TaskId:     taskId,
+					CaseId:     caseId,
+					CaseSource: caseSource,
+					UserEmail:  userEmail,
+					MajorData: map[string]interface{}{
+						"events": eventsMisp,
+						//getNewListAttributes влияет на поля Category и Type
+						//типа Attributes
+						"attributes": listAttributes,
+						"objects": getNewListObjects(
+							listObjectsMisp.GetListObjectsMisp(),
+							listAttributeTmp.GetListAttribute()),
+						"event.object.tags": leot.GetListTags(),
+					}})
 			}
-		}
-	}()
 
-	return chanInput, chanDone
+			//очищаем события, список аттрибутов и текущий email пользователя
+			userEmail, caseSource = "", ""
+			leot.CleanListTags()
+			eventsMisp.CleanEventsMispFormat()
+			//exclusionRules.Clean()
+			listObjectsMisp.CleanListObjectsMisp()
+			listAttributeTmp.CleanAttribute()
+			listAttributesMisp.CleanListAttributesMisp()
+
+			// только для тестов, что бы завершить гроутину вывода информации и логирования
+			logging <- datamodels.MessageLogging{
+				MsgData: "",
+				MsgType: "STOP TEST",
+			}
+
+			return
+		}
+	}
 }
 
-/*func delElementAttributes(er *ExclusionRules, la *datamodels.ListAttributesMispFormat, logging chan<- datamodels.MessageLogging) {
+func delElementAttributes(er *ExclusionRules, la *datamodels.ListAttributesMispFormat, logging chan<- datamodels.MessageLogging) {
 	for _, v := range er.SearchObjectName("observables") {
 		if attr, ok := la.DelElementListAttributesMisp(v.SequenceNumber); ok {
 			logging <- datamodels.MessageLogging{
@@ -551,4 +540,4 @@ func checkHashName(name string) bool {
 	}
 
 	return false
-}*/
+}

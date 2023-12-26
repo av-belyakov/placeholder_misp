@@ -28,7 +28,11 @@ func CoreHandler(
 	natsChanReception := natsModule.GetDataReceptionChannel()
 	mispChanReception := mispModule.GetDataReceptionChannel()
 	redisChanReception := redisModule.GetDataReceptionChannel()
-	hmfh := NewHandlerMessageFromHive(storageApp, listRule, logging, counting)
+
+	//СТАРЫЙ обработчик
+	//hmfh := NewHandlerMessageFromHive(storageApp, listRule, logging, counting)
+	//НОВЫЙ обработчик
+	decodeJson := NewDecodeJsonMessageSettings(listRule, logging, counting)
 
 	for {
 		select {
@@ -42,12 +46,28 @@ func CoreHandler(
 			})
 
 			//формирование итоговых документов в формате MISP
-			chanCreateMispFormat, chanDone := NewMispFormat(data.MsgId, mispModule, logging)
+			//chanOutputDecodeJSON, chanDone := NewMispFormat(data.MsgId, mispModule, logging)
 
-			//обработчик сообщений из TheHive (выполняется разбор сообщения и его разбор на основе правил)
-			go hmfh.HandlerMessageFromHive(chanCreateMispFormat, data.Data, data.MsgId, chanDone)
+			//СТАРЫЙ обработчик сообщений из TheHive (выполняется разбор сообщения и его разбор на основе правил)
+			//go hmfh.HandlerMessageFromHive(chanOutputDecodeJSON, data.Data, data.MsgId, chanDone)
 
-			// отправка сообщения в Elasticshearch
+			//******************** Внимание *******************
+			//Надо проверить декодирование JSON документов и формирование
+			//новых объектов в MISP формате. Внес некоторые изменения в обработчики
+			//JSON сообщения и формирования нового MISP формата. Восновном изменения
+			//касаются зеркальной, по отношению к старым, заменой формирования и
+			//использования каналов. Это сделано из-за того что появился новый обработчик
+			//формирующий верефицированный JSON объект (TheHive JSON) для его отправки
+			//в Elasticsearch
+
+			//НОВЫЙ обработчик сообщений из TheHive (выполняется разбор сообщения и его разбор на основе правил)
+			chanOutputJsonDecode, chanDecodeDone := decodeJson.HandlerJsonMessage(data.Data, data.MsgId)
+			//НОВЫЙ формирование итоговых документов в формате MISP
+			go NewVerifiedMispFormat(chanOutputJsonDecode, chanDecodeDone, data.MsgId, mispModule, logging)
+
+			//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			// отправка СЫРОГО сообщения в Elasticshearch
+			//ПОКА ОСТАВЛЯЮ, ПОТОМ НАДО БУДЕТ УДАЛИТЬ
 			esModule.HandlerData(elasticsearchinteractions.SettingsInputChan{
 				UUID: data.MsgId,
 				Data: data.Data,

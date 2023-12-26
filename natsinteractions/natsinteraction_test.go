@@ -82,7 +82,7 @@ var _ = Describe("Natsinteraction", Ordered, func() {
 				procMsgHive coremodule.FieldsNameMapping
 			)
 
-			chanOutMispFormat := make(chan coremodule.ChanInputCreateMispFormat)
+			chanOutMispFormat := make(chan datamodels.ChanOutputDecodeJSON)
 
 			//инициализация списка правил
 			lr, lw, err := rules.NewListRule("placeholder_misp", "rules", "mispmsgrule.yaml")

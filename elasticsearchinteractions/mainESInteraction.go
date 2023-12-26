@@ -30,9 +30,26 @@ type ModuleElasticSearch struct {
 }
 
 type handlerSendData struct {
+	client     *elasticsearch.Client
 	conf       confighandler.AppConfigElasticSearch
 	storageApp *memorytemporarystorage.CommonStorageTemporary
 	logging    chan<- datamodels.MessageLogging
+}
+
+func (h *handlerSendData) New() error {
+	es, err := elasticsearch.NewClient(elasticsearch.Config{
+		Addresses: []string{fmt.Sprintf("http://%s:%d", h.conf.Host, h.conf.Port)},
+		Username:  h.conf.User,
+		Password:  h.conf.Passwd,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	h.client = es
+
+	return nil
 }
 
 func (hsd handlerSendData) sendingData(uuid string) {
@@ -42,15 +59,10 @@ func (hsd handlerSendData) sendingData(uuid string) {
 		return
 	}
 
-	es, err := elasticsearch.NewClient(elasticsearch.Config{
-		Addresses: []string{fmt.Sprintf("http://%s:%d", hsd.conf.Host, hsd.conf.Port)},
-		Username:  hsd.conf.User,
-		Password:  hsd.conf.Passwd,
-	})
-	if err != nil {
+	if hsd.client == nil {
 		_, f, l, _ := runtime.Caller(0)
 		hsd.logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-6),
+			MsgData: fmt.Sprintf("'the client parameters for connecting to the Elasticsearch database are not set correctly' %s:%d", f, l-2),
 			MsgType: "error",
 		}
 
@@ -70,7 +82,7 @@ func (hsd handlerSendData) sendingData(uuid string) {
 
 	t := time.Now()
 	buf := bytes.NewReader(b)
-	res, err := es.API.Index(fmt.Sprintf("%s%s_%d_%d", hsd.conf.Prefix, hsd.conf.Index, t.Year(), int(t.Month())), buf)
+	res, err := hsd.client.Index(fmt.Sprintf("%s%s_%d_%d", hsd.conf.Prefix, hsd.conf.Index, t.Year(), int(t.Month())), buf)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 		hsd.logging <- datamodels.MessageLogging{
@@ -115,9 +127,18 @@ func init() {
 func HandlerElasticSearch(
 	conf confighandler.AppConfigElasticSearch,
 	storageApp *memorytemporarystorage.CommonStorageTemporary,
-	logging chan<- datamodels.MessageLogging) *ModuleElasticSearch {
+	logging chan<- datamodels.MessageLogging) (*ModuleElasticSearch, error) {
 
-	hsd := handlerSendData{conf, storageApp, logging}
+	hsd := handlerSendData{
+		conf:       conf,
+		storageApp: storageApp,
+		logging:    logging,
+	}
+	if err := hsd.New(); err != nil {
+		if err != nil {
+			return &es, err
+		}
+	}
 
 	go func() {
 		for data := range es.chanInputElasticSearch {
@@ -128,7 +149,7 @@ func HandlerElasticSearch(
 		}
 	}()
 
-	return &es
+	return &es, nil
 }
 
 func (es ModuleElasticSearch) HandlerData(data SettingsInputChan) {

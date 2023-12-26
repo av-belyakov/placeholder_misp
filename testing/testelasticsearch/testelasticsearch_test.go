@@ -79,8 +79,8 @@ var _ = Describe("Testelasticsearch", Ordered, func() {
 		})
 	})
 
-	Context("Тест 2. Создание соединения с БД", func() {
-		It("При инициализации соединения не должно быть ошибок", func() {
+	Context("Тест 2. Создание нового клиента для подключения к БД", func() {
+		It("При инициализации нового клиента не должно быть ошибок", func() {
 			Expect(errConn).ShouldNot(HaveOccurred())
 		})
 	})
@@ -89,12 +89,15 @@ var _ = Describe("Testelasticsearch", Ordered, func() {
 		It("При обработке запроса для получения инфрмации о БД не должно быть ошибок", func() {
 			//res, err := client.API.Index("hive-case*").Raw(exampleByte).Do(context.Background())
 			res, err := es.Info()
-			defer res.Body.Close()
+
+			fmt.Println("ES ERROR:", err)
+
 			Expect(err).ShouldNot(HaveOccurred())
 
 			fmt.Println("Elasticsearch Info: ", res)
 
 			Expect(res.StatusCode).Should(Equal(http.StatusOK))
+			defer res.Body.Close()
 		})
 	})
 
