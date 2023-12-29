@@ -22,14 +22,14 @@ import (
 
 var _ = Describe("Addneweventandattributes", Ordered, func() {
 	var (
-		logging                        chan datamodels.MessageLogging
-		counting                       chan datamodels.DataCounterSettings
-		confApp                        confighandler.ConfigApp
-		listRules                      *rules.ListRule
-		mispModule                     *mispinteractions.ModuleMISP
-		storageApp                     *memorytemporarystorage.CommonStorageTemporary
-		chanCreateMispFormat           chan datamodels.ChanOutputDecodeJSON
-		chanDone                       chan bool
+		logging    chan datamodels.MessageLogging
+		counting   chan datamodels.DataCounterSettings
+		confApp    confighandler.ConfigApp
+		listRules  *rules.ListRule
+		mispModule *mispinteractions.ModuleMISP
+		storageApp *memorytemporarystorage.CommonStorageTemporary
+		//chanCreateMispFormat           chan datamodels.ChanOutputDecodeJSON
+		//chanDone                       chan bool
 		exampleByte                    []byte
 		errReadFile, errMisp, errRules error
 	)
@@ -128,11 +128,16 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		mispModule, errMisp = mispinteractions.HandlerMISP(*confApp.GetAppMISP(), confApp.Organizations, logging)
 
 		//формирование итоговых документов в формате MISP
-		chanCreateMispFormat, chanDone = coremodule.NewMispFormat(taskId, mispModule, logging)
-
+		//chanCreateMispFormat, chanDone = coremodule.NewMispFormat(taskId, mispModule, logging)
 		//обработчик сообщений из TheHive (выполняется разбор сообщения и его разбор на основе правил)
-		hmfh := coremodule.NewHandlerMessageFromHive(storageApp, listRules, logging, counting)
-		go hmfh.HandlerMessageFromHive(chanCreateMispFormat, exampleByte, taskId, chanDone)
+		//hmfh := coremodule.NewHandlerMessageFromHive(storageApp, listRules, logging, counting)
+		//go hmfh.HandlerMessageFromHive(chanCreateMispFormat, exampleByte, taskId, chanDone)
+
+		decodeJson := coremodule.NewDecodeJsonMessageSettings(listRules, logging, counting)
+		//НОВЫЙ обработчик сообщений из TheHive (выполняется разбор сообщения и его разбор на основе правил)
+		chanOutputJsonDecode, chanDecodeDone := decodeJson.HandlerJsonMessage(exampleByte, taskId)
+		//НОВЫЙ формирование итоговых документов в формате MISP
+		go coremodule.NewVerifiedMispFormat(chanOutputJsonDecode, chanDecodeDone, taskId, mispModule, logging)
 	})
 
 	Context("Тест 1. Проверка инициализации модулей", func() {

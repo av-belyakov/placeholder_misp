@@ -263,7 +263,7 @@ func (ed EventDetails) ToStringBeautiful(num int) string {
 	str += fmt.Sprintf("%ssummary: '%s'\n", ws, ed.Summary)
 	str += fmt.Sprintf("%sstatus: '%s'\n", ws, ed.Status)
 	str += fmt.Sprintf("%simpactStatus: '%s'\n", ws, ed.ImpactStatus)
-	str += fmt.Sprintf("%scustomFields: \n%s", ws, CustomFieldsfuncToStringBeautiful(ed.CustomFields, num))
+	str += fmt.Sprintf("%scustomFields: \n%s", ws, CustomFieldsToStringBeautiful(ed.CustomFields, num))
 
 	return str
 }
@@ -297,6 +297,22 @@ func (e *EventObject) SetValueCaseId(v int) {
 func (e *EventObject) SetAnyCaseId(i interface{}) {
 	if v, ok := i.(int); ok {
 		e.CaseId = v
+	}
+}
+
+func (e *EventObject) GetSeverity() int {
+	return e.Severity
+}
+
+// SetValueSeverity устанавливает INT значение для поля Severity
+func (e *EventObject) SetValueSeverity(v int) {
+	e.Severity = v
+}
+
+// SetAnySeverity устанавливает ЛЮБОЕ значение для поля Severity
+func (e *EventObject) SetAnySeverity(i interface{}) {
+	if v, ok := i.(int); ok {
+		e.Severity = v
 	}
 }
 
@@ -622,7 +638,7 @@ func (eo EventObject) ToStringBeautiful(num int) string {
 	str += fmt.Sprintf("%sstatus: '%s'\n", ws, eo.Status)
 	str += fmt.Sprintf("%ssummary: '%s'\n", ws, eo.Summary)
 	str += fmt.Sprintf("%sowner: '%s'\n", ws, eo.Owner)
-	str += fmt.Sprintf("%scustomFields: \n%s", ws, CustomFieldsfuncToStringBeautiful(eo.CustomFields, num))
+	str += fmt.Sprintf("%scustomFields: \n%s", ws, CustomFieldsToStringBeautiful(eo.CustomFields, num))
 	/*str += fmt.Sprintf("%spermissions: \n%s", ws, func(l []string) string {
 		var str string
 		ws := supportingfunctions.GetWhitespace(num + 1)
@@ -636,7 +652,7 @@ func (eo EventObject) ToStringBeautiful(num int) string {
 	return str
 }
 
-func CustomFieldsfuncToStringBeautiful(l map[string]CustomerFields, num int) string {
+func CustomFieldsToStringBeautiful(l map[string]CustomerFields, num int) string {
 	var str string
 	ws := supportingfunctions.GetWhitespace(num + 2)
 
@@ -644,7 +660,7 @@ func CustomFieldsfuncToStringBeautiful(l map[string]CustomerFields, num int) str
 		str += fmt.Sprintf("%s%s:\n", supportingfunctions.GetWhitespace(num+1), k)
 
 		nameOne, dataOne, nameTwo, dataTwo := v.Get()
-		str += fmt.Sprintf("%s%s: %s\n", ws, nameOne, dataOne)
+		str += fmt.Sprintf("%s%s: %d\n", ws, nameOne, dataOne)
 		str += fmt.Sprintf("%s%s: %s\n", ws, nameTwo, dataTwo)
 	}
 	return str

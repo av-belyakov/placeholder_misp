@@ -1,7 +1,7 @@
 package datamodels
 
 type CustomerFields interface {
-	Set(int, interface{})
+	Set(interface{}, interface{})
 	Get() (string, int, string, string)
 }
 
@@ -118,4 +118,9 @@ type CustomFieldStringType struct {
 type CustomFieldDateType struct {
 	Order int    `json:"order"`
 	Date  uint64 `json:"date"`
+}
+
+type CustomFieldIntegerType struct {
+	Order   int `json:"order"`
+	Integer int `json:"integer"`
 }

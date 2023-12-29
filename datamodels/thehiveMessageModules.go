@@ -182,9 +182,12 @@ func (cf *CustomFieldStringType) Get() (string, int, string, string) {
 }
 
 // Set устанавливает значения CustomFieldStringType
-func (cf *CustomFieldStringType) Set(order int, value interface{}) {
-	cf.Order = order
-	cf.String = fmt.Sprint(value)
+func (cf *CustomFieldStringType) Set(order, str interface{}) {
+	if o, ok := order.(int); ok {
+		cf.Order = o
+	}
+
+	cf.String = fmt.Sprint(str)
 }
 
 // Get возвращает значения CustomFieldDateType, где 1 и 3 значение это
@@ -197,10 +200,30 @@ func (cf *CustomFieldDateType) Get() (string, int, string, string) {
 
 // Set устанавливает значения CustomFieldDateType, при этом
 // значение value должно быть типа uint64
-func (cf *CustomFieldDateType) Set(order int, value interface{}) {
-	cf.Order = order
-	if v, ok := value.(uint64); ok {
+func (cf *CustomFieldDateType) Set(order, date interface{}) {
+	if o, ok := order.(int); ok {
+		cf.Order = o
+	}
+
+	if v, ok := date.(uint64); ok {
 		cf.Date = v
+	}
+}
+
+// Get возвращает значения CustomFieldIntegerType, где 1 и 3 значение это
+// наименование поля
+func (cf *CustomFieldIntegerType) Get() (string, int, string, string) {
+	return "order", cf.Order, "integer", fmt.Sprint(cf.Integer)
+}
+
+// Set устанавливает значения CustomFieldIntegerType
+func (cf *CustomFieldIntegerType) Set(order, integer interface{}) {
+	if o, ok := order.(int); ok {
+		cf.Order = o
+	}
+
+	if i, ok := integer.(int); ok {
+		cf.Integer = i
 	}
 }
 
