@@ -12,7 +12,76 @@ var (
 	eventDetailsCustomFields map[string]datamodels.CustomerFields = make(map[string]datamodels.CustomerFields)
 
 	observables datamodels.ObservablesMessageTheHive = datamodels.ObservablesMessageTheHive{}
+
+	so *supportiveObservables = NewSupportiveObservables()
 )
+
+// supportiveObservables вспомогательный тип для формирования объекта типа observables
+// currentNum текущий номер объекта типа observables
+// currentNumReports текущий номер временного объекта для свойства reports
+// listAcceptedFields - список путей
+// reportsTmp - временный объект для свойства reports
+// observableTmp - временный объект типа observables
+// observables - набор объектов типа observables
+type supportiveObservables struct {
+	currentNum         int
+	currentNumReports  int
+	listAcceptedFields []string
+	reportsTmp         map[string]map[string][]datamodels.Taxonomy
+	observableTmp      datamodels.ObservableMessage
+	observables        []datamodels.ObservableMessage
+}
+
+func NewSupportiveObservables() *supportiveObservables {
+	return &supportiveObservables{
+		listAcceptedFields: make([]string, 0),
+		reportsTmp:         make(map[string]map[string][]datamodels.Taxonomy),
+		observableTmp:      datamodels.ObservableMessage{},
+		observables:        make([]datamodels.ObservableMessage, 0, 0)}
+}
+
+func (o *supportiveObservables) GetCurrentNum() int {
+	return o.currentNum
+}
+
+func (o *supportiveObservables) HandlerValue(fieldBranch string, i interface{}, f func(interface{})) {
+	//если поле повторяется то считается что это уже новый объект
+	if o.isExistFieldBranch(fieldBranch) {
+		o.currentNum += o.currentNum
+		o.listAcceptedFields = make([]string, 0)
+		o.observables = append(o.observables, o.observableTmp)
+		o.observableTmp = datamodels.ObservableMessage{}
+	}
+
+	o.listAcceptedFields = append(o.listAcceptedFields, fieldBranch)
+	f(i)
+}
+
+func (o *supportiveObservables) HandlerReportValue(fieldBranch string, i interface{}, f func(interface{})) {
+	/*
+	 */
+}
+
+func (o *supportiveObservables) isExistFieldBranch(value string) bool {
+	for _, v := range o.listAcceptedFields {
+		if v == value {
+			return true
+		}
+	}
+
+	return false
+}
+
+// GetObservables возвращает []datamodels.ObservableMessage, однако, метод
+// выполняет еще очень важное действие, перемещает содержимое из o.observableTmp в
+// список o.observables, так как observables автоматически пополняется только при
+// совпадении значений в listAcceptedFields. Соответственно при завершении
+// JSON объекта, последние добавленные значения остаются observableTmp
+func (o *supportiveObservables) GetObservables() []datamodels.ObservableMessage {
+	o.observables = append(o.observables, o.observableTmp)
+
+	return o.observables
+}
 
 // ------ EVENT ------
 var listHandlerEvent map[string][]func(interface{}) = map[string][]func(interface{}){
@@ -299,13 +368,206 @@ var listHandlerEventObjectCustomFields map[string][]func(interface{}) = map[stri
 
 // ------ OBSERVABLES ------
 var listHandlerObservables map[string][]func(interface{}) = map[string][]func(interface{}){
+	//--- ioc ---
+	"observables.ioc": {func(i interface{}) {
+		so.HandlerValue(
+			"observables.ioc",
+			i,
+			so.observableTmp.SetAnyIoc,
+		)
+	}},
+	//--- sighted ---
+	"observables.sighted": {func(i interface{}) {
+		so.HandlerValue(
+			"observables.sighted",
+			i,
+			so.observableTmp.SetAnySighted,
+		)
+	}},
+	//--- ignoreSimilarity ---
+	"observables.ignoreSimilarity": {func(i interface{}) {
+		so.HandlerValue(
+			"observables.ignoreSimilarity",
+			i,
+			so.observableTmp.SetAnyIgnoreSimilarity,
+		)
+	}},
+	//--- tlp ---
+	"observables.tlp": {func(i interface{}) {
+		so.HandlerValue(
+			"observables.tlp",
+			i,
+			so.observableTmp.SetAnyTlp,
+		)
+	}},
+	//--- _createdAt ---
+	"observables._createdAt": {func(i interface{}) {
+		so.HandlerValue(
+			"observables._createdAt",
+			i,
+			so.observableTmp.SetAnyCreatedAt,
+		)
+	}},
+	//--- _updatedAt ---
+	"observables._updatedAt": {func(i interface{}) {
+		so.HandlerValue(
+			"observables._updatedAt",
+			i,
+			so.observableTmp.SetAnyUpdatedAt,
+		)
+	}},
+	//--- startDate ---
+	"observables.startDate": {func(i interface{}) {
+		so.HandlerValue(
+			"observables.startDate",
+			i,
+			so.observableTmp.SetAnyStartDate,
+		)
+	}},
+	//--- _createdBy ---
+	"observables._createdBy": {func(i interface{}) {
+		so.HandlerValue(
+			"observables._createdBy",
+			i,
+			so.observableTmp.SetAnyCreatedBy,
+		)
+	}},
+	//--- _updatedBy ---
+	"observables._updatedBy": {func(i interface{}) {
+		so.HandlerValue(
+			"observables._updatedBy",
+			i,
+			so.observableTmp.SetAnyUpdatedBy,
+		)
+	}},
+	//--- _id ---
+	"observables._id": {func(i interface{}) {
+		so.HandlerValue(
+			"observables._id",
+			i,
+			so.observableTmp.SetAnyUnderliningId,
+		)
+	}},
+	//--- _type ---
+	"observables._type": {func(i interface{}) {
+		so.HandlerValue(
+			"observables._type",
+			i,
+			so.observableTmp.SetAnyUnderliningType,
+		)
+	}},
+	//--- data ---
+	"observables.data": {func(i interface{}) {
+		so.HandlerValue(
+			"observables.data",
+			i,
+			so.observableTmp.SetAnyData,
+		)
+	}},
+	//--- dataType ---
+	"observables.dataType": {func(i interface{}) {
+		so.HandlerValue(
+			"observables.dataType",
+			i,
+			so.observableTmp.SetAnyDataType,
+		)
+	}},
+	//--- message ---
+	"observables.message": {func(i interface{}) {
+		so.HandlerValue(
+			"observables.message",
+			i,
+			so.observableTmp.SetAnyMessage,
+		)
+	}},
+	//--- tags ---
+	"observables.tags": {func(i interface{}) {
+		so.HandlerValue(
+			"observables.tags",
+			i,
+			so.observableTmp.SetAnyTags,
+		)
+	}},
+
+	//--- attachment.id ---
+	"observables.attachment.id": {func(i interface{}) {
+		so.HandlerValue(
+			"observables.attachment.id",
+			i,
+			so.observableTmp.Attachment.SetAnyId,
+		)
+	}},
+	//--- attachment.size ---
+	"observables.attachment.size": {func(i interface{}) {
+		so.HandlerValue(
+			"observables.attachment.size",
+			i,
+			so.observableTmp.Attachment.SetAnySize,
+		)
+	}},
+	// --- attachment.name ---
+	"observables.attachment.name": {func(i interface{}) {
+		so.HandlerValue(
+			"observables.attachment.name",
+			i,
+			so.observableTmp.Attachment.SetAnyName,
+		)
+	}},
+	// --- attachment.contentType ---
+	"observables.attachment.contentType": {func(i interface{}) {
+		so.HandlerValue(
+			"observables.attachment.contentType",
+			i,
+			so.observableTmp.Attachment.SetAnyContentType,
+		)
+	}},
+	// --- attachment.hashes ---
+	"observables.attachment.hashes": {func(i interface{}) {
+		so.HandlerValue(
+			"observables.attachment.hashes",
+			i,
+			so.observableTmp.Attachment.SetAnyHashes,
+		)
+	}},
 
 	/*
-		Тут надо подумать как обрабатывать пути начинающиеся на observables.* так как
-		datamodels.ObservablesMessageTheHive является списком
+		!!!!!
+			Надо сделать Reports!!!!
+		!!!!!
+
+				so.observableTmp.Reports
 	*/
 
-	"observables.rootId": {observables.UnderliningId},
+	/*
+		+ Ioc              bool                             `json:"ioc"`
+		+ Sighted          bool                             `json:"sighted"`
+		+ IgnoreSimilarity bool                             `json:"ignoreSimilarity"`
+		+ Tlp              int                              `json:"tlp"`
+		+ CreatedAt        uint64                           `json:"_createdAt"`
+		+ UpdatedAt        uint64                           `json:"_updatedAt"`
+		+ StartDate        uint64                           `json:"startDate"`
+		+ CreatedBy        string                           `json:"_createdBy"`
+		+ UpdatedBy        string                           `json:"_updatedBy"`
+		+ UnderliningId    string                           `json:"_id"`
+		+ UnderliningType  string                           `json:"_type"`
+		+ Data             string                           `json:"data"`
+		+ DataType         string                           `json:"dataType"`
+		+ Message          string                           `json:"message"`
+		+ Tags             []string                         `json:"tags"`
+		+ Attachment       AttachmentData                   `json:"attachment"`
+		Reports          map[string]map[string][]Taxonomy `json:"reports"`
+	*/
+
+	/*
+		//---  ---
+		"observables.": {func(i interface{}) {
+			so.HandlerValue(
+				"observables.",
+				i,
+				so.observableTmp.SetAny,
+			)
+		}},
+	*/
 }
 
 func newCustomFieldsElement(elem, objType string, customFields *map[string]datamodels.CustomerFields) {

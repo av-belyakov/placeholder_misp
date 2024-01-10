@@ -321,9 +321,9 @@ func (om ObservableMessage) ToStringBeautiful(num int) string {
 				for i, j := range v {
 					str += fmt.Sprintf("%s%d.\n", supportingfunctions.GetWhitespace(num+3), i+1)
 					str += fmt.Sprintf("%sLevel: %v\n", supportingfunctions.GetWhitespace(num+4), j.Level)
-					str += fmt.Sprintf("%Namespace: %v\n", supportingfunctions.GetWhitespace(num+4), j.Namespace)
-					str += fmt.Sprintf("%Predicate: %v\n", supportingfunctions.GetWhitespace(num+4), j.Predicate)
-					str += fmt.Sprintf("%Value: %v\n", supportingfunctions.GetWhitespace(num+4), j.Value)
+					str += fmt.Sprintf("%sNamespace: %v\n", supportingfunctions.GetWhitespace(num+4), j.Namespace)
+					str += fmt.Sprintf("%sPredicate: %v\n", supportingfunctions.GetWhitespace(num+4), j.Predicate)
+					str += fmt.Sprintf("%sValue: %v\n", supportingfunctions.GetWhitespace(num+4), j.Value)
 				}
 			}
 		}

@@ -9,6 +9,7 @@ import (
 func NewEventMisp() EventsMispFormat {
 	return EventsMispFormat{
 		Timestamp:         "0",
+		Published:         getPublished(),
 		PublishTimestamp:  "0",
 		SightingTimestamp: "0",
 		Uuid:              uuid.New().String(),
@@ -166,12 +167,23 @@ func (emisp *EventsMispFormat) SetValueDisableCorrelationEventsMisp(v interface{
 	}
 }
 
+func getPublished() bool {
+	return true
+}
+
 func getAnalysis() string {
 	return "2"
 }
 
+// getDistributionEvent
+// 0 - Your organization only
+// 1 - This community only
+// 2 - Connected communities
+// 3 - All communities
+// 4 - Sharing group
+// 5 - Inherit Event
 func getDistributionEvent() string {
-	return "2"
+	return "1"
 }
 
 func getThreatLevelId() string {
