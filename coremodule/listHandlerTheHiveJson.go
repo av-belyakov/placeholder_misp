@@ -1,6 +1,10 @@
 package coremodule
 
-import "placeholder_misp/datamodels"
+import (
+	"strings"
+
+	"placeholder_misp/datamodels"
+)
 
 var (
 	source datamodels.SourceMessageTheHive = datamodels.SourceMessageTheHive{}
@@ -25,9 +29,7 @@ var (
 // observables - набор объектов типа observables
 type supportiveObservables struct {
 	currentNum         int
-	currentNumReports  int
 	listAcceptedFields []string
-	reportsTmp         map[string]map[string][]datamodels.Taxonomy
 	observableTmp      datamodels.ObservableMessage
 	observables        []datamodels.ObservableMessage
 }
@@ -35,7 +37,6 @@ type supportiveObservables struct {
 func NewSupportiveObservables() *supportiveObservables {
 	return &supportiveObservables{
 		listAcceptedFields: make([]string, 0),
-		reportsTmp:         make(map[string]map[string][]datamodels.Taxonomy),
 		observableTmp:      datamodels.ObservableMessage{},
 		observables:        make([]datamodels.ObservableMessage, 0, 0)}
 }
@@ -57,11 +58,6 @@ func (o *supportiveObservables) HandlerValue(fieldBranch string, i interface{}, 
 	f(i)
 }
 
-func (o *supportiveObservables) HandlerReportValue(fieldBranch string, i interface{}, f func(interface{})) {
-	/*
-	 */
-}
-
 func (o *supportiveObservables) isExistFieldBranch(value string) bool {
 	for _, v := range o.listAcceptedFields {
 		if v == value {
@@ -81,6 +77,84 @@ func (o *supportiveObservables) GetObservables() []datamodels.ObservableMessage 
 	o.observables = append(o.observables, o.observableTmp)
 
 	return o.observables
+}
+
+// supportiveObservablesReports вспомогательный тип для формирования объекта типа reports
+type supportiveObservablesReports struct {
+	currentNum         int
+	listAcceptedFields []string
+	taxonomyTmp        datamodels.Taxonomy
+	reports            map[string]datamodels.ReportTaxonomies
+}
+
+func NewSupportiveObservablesReports() *supportiveObservablesReports {
+	return &supportiveObservablesReports{
+		listAcceptedFields: make([]string, 0),
+		taxonomyTmp:        datamodels.Taxonomy{},
+		reports:            make(map[string]datamodels.ReportTaxonomies),
+	}
+}
+
+/*func (o *supportiveObservables) HandlerReportValue(fieldBranch string, i interface{}, f func(interface{})) {
+		i := strings.Split("reports.BIZONE_ThreatVision_1_0.taxonomies.level", ".")
+		assert.Equal(t, len(i), 4)
+		assert.Equal(t, i[1], "BIZONE_ThreatVision_1_0")
+
+
+	fields := strings.Split(fieldBranch, ".")
+	if len(fields) != 4 {
+		return
+	}
+
+	o.reportsTmp[fields[1]][fields[2]]
+}*/
+
+func (sor *supportiveObservablesReports) HandlerReportValue(
+	fieldBranch string,
+	i interface{},
+	f func(interface{})) {
+	/*
+	   Reports          map[string]ReportTaxonomys `json:"reports"`
+
+	   	type ReportTaxonomies struct {
+	   		Taxonomies []Taxonomy `json:"taxonomys"`
+	   	}
+
+	   	type Taxonomy struct {
+	   		Level     string `json:"level"`
+	   		Namespace string `json:"namespace"`
+	   		Predicate string `json:"predicate"`
+	   		Value     string `json:"value"`
+	   	}
+	*/
+
+	fields := strings.Split(fieldBranch, ".")
+	if len(fields) != 4 {
+		return
+	}
+
+	//пока обрабатываем только taxonomies
+	if fields[2] != "taxonomies" {
+		return
+	}
+
+	if _, ok := sor.reports[fields[1]]; !ok {
+		sor.reports[fields[1]] = datamodels.ReportTaxonomies{}
+	}
+
+	if sor.isExistFieldBranch(fields[4]) {
+		sor.reports[fields[1]].Taxonomies = append(sor.reports[fields[1]].Taxonomies, sor.taxonomyTmp)
+	}
+}
+
+func (sor *supportiveObservablesReports) isExistFieldBranch(value string) bool {
+	for _, v := range sor.listAcceptedFields {
+		if v == value {
+			return true
+		}
+	}
+
+	return false
 }
 
 // ------ EVENT ------
@@ -530,6 +604,12 @@ var listHandlerObservables map[string][]func(interface{}) = map[string][]func(in
 		)
 	}},
 
+	"reports.BIZONE_ThreatVision_1_0.taxonomies.level": {func(i interface{}) {
+		/*so.HandlerReportValue(
+			"reports.BIZONE_ThreatVision_1_0.taxonomies.level",
+			i,
+		)*/
+	}},
 	/*
 		!!!!!
 			Надо сделать Reports!!!!

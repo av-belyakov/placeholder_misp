@@ -7,7 +7,6 @@ type ConfigApp struct {
 	AppConfigRedis
 	AppConfigTheHive
 	AppConfigElasticSearch
-	AppConfigNKCKI
 	RulesProcMSGMISP
 }
 
@@ -79,11 +78,6 @@ type AppConfigElasticSearch struct {
 	Passwd string `yaml:"passwd"`
 	Host   string `yaml:"host"`
 	Port   int    `yaml:"port"`
-}
-
-type AppConfigNKCKI struct {
-	Host string `yaml:"host"`
-	Port int    `yaml:"port"`
 }
 
 type RulesProcMSGMISP struct {

@@ -20,6 +20,3 @@ ElasticSearch:
   index: "module_placeholder_thehive_case"
   user: writer
   passwd: XxZqesYXuk8C
-NKCKI:
-  host: 127.0.0.1
-  port: 12000

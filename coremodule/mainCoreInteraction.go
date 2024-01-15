@@ -9,7 +9,6 @@ import (
 	"placeholder_misp/memorytemporarystorage"
 	"placeholder_misp/mispinteractions"
 	"placeholder_misp/natsinteractions"
-	"placeholder_misp/nkckiinteractions"
 	"placeholder_misp/redisinteractions"
 	rules "placeholder_misp/rulesinteraction"
 )
@@ -19,7 +18,6 @@ func CoreHandler(
 	mispModule *mispinteractions.ModuleMISP,
 	redisModule *redisinteractions.ModuleRedis,
 	esModule *elasticsearchinteractions.ModuleElasticSearch,
-	nkckiModule *nkckiinteractions.ModuleNKCKI,
 	listRule *rules.ListRule,
 	storageApp *memorytemporarystorage.CommonStorageTemporary,
 	logging chan<- datamodels.MessageLogging,
@@ -40,6 +38,7 @@ func CoreHandler(
 			storageApp.SetRawDataHiveFormatMessage(data.MsgId, data.Data)
 
 			//добавляем raw данные по кейсу из thehive в Redis
+			//В МОДУЛЕ REDIS ЕЩЕ НЕ РЕАЛИЗОВАНО
 			redisModule.SendingDataInput(redisinteractions.SettingsChanInputRedis{
 				Command: "set raw case",
 				RawData: data.Data,

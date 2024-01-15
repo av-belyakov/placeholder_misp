@@ -15,22 +15,34 @@ import (
 func NewConfig() (ConfigApp, error) {
 	conf := ConfigApp{}
 	var envList map[string]string = map[string]string{
-		"GO_PHMISP_MAIN":       "",
-		"GO_PHMISP_MHOST":      "",
-		"GO_PHMISP_MAUTH":      "",
-		"GO_PHMISP_NHOST":      "",
-		"GO_PHMISP_NPORT":      "",
-		"GO_PHMISP_REDISHOST":  "",
-		"GO_PHMISP_REDISPORT":  "",
-		"GO_PHMISP_ESSEND":     "",
-		"GO_PHMISP_ESHOST":     "",
-		"GO_PHMISP_ESPORT":     "",
-		"GO_PHMISP_ESPREFIX":   "",
-		"GO_PHMISP_ESINDEX":    "",
-		"GO_PHMISP_ESUSER":     "",
-		"GO_PHMISP_ESPASSWD":   "",
-		"GO_PHMISP_NKCKIHOST":  "",
-		"GO_PHMISP_NKCKIPORT":  "",
+		"GO_PHMISP_MAIN": "",
+
+		//Подключение к MISP
+		"GO_PHMISP_MHOST": "",
+		"GO_PHMISP_MAUTH": "",
+
+		//Подключение к NATS
+		"GO_PHMISP_NHOST": "",
+		"GO_PHMISP_NPORT": "",
+
+		//Подключение к СУБД Redis
+		"GO_PHMISP_REDISHOST": "",
+		"GO_PHMISP_REDISPORT": "",
+
+		//Подключение к СУБД Elasticsearch
+		"GO_PHMISP_ESSEND":   "",
+		"GO_PHMISP_ESHOST":   "",
+		"GO_PHMISP_ESPORT":   "",
+		"GO_PHMISP_ESPREFIX": "",
+		"GO_PHMISP_ESINDEX":  "",
+		"GO_PHMISP_ESUSER":   "",
+		"GO_PHMISP_ESPASSWD": "",
+
+		//Подключение к НКЦКИ
+		"GO_PHMISP_NKCKIHOST": "",
+		"GO_PHMISP_NKCKIPORT": "",
+
+		//Место нахождение правил
 		"GO_PHMISP_RULES_DIR":  "",
 		"GO_PHMISP_RULES_FILE": "",
 	}
@@ -164,14 +176,6 @@ func NewConfig() (ConfigApp, error) {
 			conf.AppConfigElasticSearch.Passwd = viper.GetString("ElasticSearch.passwd")
 		}
 
-		// ПРЕДВАРИТЕЛЬНЫЕ Настройки для модуля подключения к NKCKI
-		if viper.IsSet("NKCKI.host") {
-			conf.AppConfigNKCKI.Host = viper.GetString("NKCKI.host")
-		}
-		if viper.IsSet("NKCKI.port") {
-			conf.AppConfigNKCKI.Port = viper.GetInt("NKCKI.port")
-		}
-
 		//Настройки для модуля правил обработки сообщений
 		if viper.IsSet("RULES_PROC_MSG_FOR_MISP.directory") {
 			conf.RulesProcMSGMISP.Directory = viper.GetString("RULES_PROC_MSG_FOR_MISP.directory")
@@ -285,16 +289,6 @@ func NewConfig() (ConfigApp, error) {
 	}
 	if envList["GO_PHMISP_ESPASSWD"] != "" {
 		conf.AppConfigElasticSearch.Passwd = envList["GO_PHMISP_ESPASSWD"]
-	}
-
-	// ПРЕДВАРИТЕЛЬНЫЕ Настройки для модуля подключения к NKCKI
-	if envList["GO_PHMISP_NKCKIHOST"] != "" {
-		conf.AppConfigNKCKI.Host = envList["GO_PHMISP_NKCKIHOST"]
-	}
-	if envList["GO_PHMISP_NKCKIPORT"] != "" {
-		if p, err := strconv.Atoi(envList["GO_PHMISP_NKCKIPORT"]); err == nil {
-			conf.AppConfigNKCKI.Port = p
-		}
 	}
 
 	//Настройки для модуля правил обработки сообщений

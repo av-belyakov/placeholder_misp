@@ -237,12 +237,12 @@ func (o *ObservableMessage) SetAnyTags(i interface{}) {
 	o.Tags = append(o.Tags, fmt.Sprint(i))
 }
 
-func (o *ObservableMessage) GetReports() map[string]map[string][]Taxonomy {
+func (o *ObservableMessage) GetReports() map[string]ReportTaxonomies {
 	return o.Reports
 }
 
-// SetValueTags устанавливает СТРОКОВОЕ значение для поля Tags
-func (o *ObservableMessage) SetValueReports(v map[string]map[string][]Taxonomy) {
+// SetValueReports устанавливает значение для поля Reports
+func (o *ObservableMessage) SetValueReports(v map[string]ReportTaxonomies) {
 	o.Reports = v
 }
 
@@ -312,19 +312,17 @@ func (om ObservableMessage) ToStringBeautiful(num int) string {
 		return str
 	}(om.Tags))
 	str += fmt.Sprintf("%stlp: '%d'\n", ws, om.Tlp)
-	str += fmt.Sprintf("%sreports: \n%s", ws, func(l map[string]map[string][]Taxonomy) string {
+	str += fmt.Sprintf("%sreports: \n%s", ws, func(l map[string]ReportTaxonomies) string {
 		var str string
 		for key, value := range l {
 			str += fmt.Sprintf("%s%s:\n", supportingfunctions.GetWhitespace(num+1), key)
-			for k, v := range value {
-				str += fmt.Sprintf("%s%s:\n", supportingfunctions.GetWhitespace(num+2), k)
-				for i, j := range v {
-					str += fmt.Sprintf("%s%d.\n", supportingfunctions.GetWhitespace(num+3), i+1)
-					str += fmt.Sprintf("%sLevel: %v\n", supportingfunctions.GetWhitespace(num+4), j.Level)
-					str += fmt.Sprintf("%sNamespace: %v\n", supportingfunctions.GetWhitespace(num+4), j.Namespace)
-					str += fmt.Sprintf("%sPredicate: %v\n", supportingfunctions.GetWhitespace(num+4), j.Predicate)
-					str += fmt.Sprintf("%sValue: %v\n", supportingfunctions.GetWhitespace(num+4), j.Value)
-				}
+			str += fmt.Sprintf("%staxonomys:\n", supportingfunctions.GetWhitespace(num+2))
+			for k, v := range value.Taxonomies {
+				str += fmt.Sprintf("%s%d.\n", supportingfunctions.GetWhitespace(num+3), k+1)
+				str += fmt.Sprintf("%sLevel: %v\n", supportingfunctions.GetWhitespace(num+4), v.Level)
+				str += fmt.Sprintf("%sNamespace: %v\n", supportingfunctions.GetWhitespace(num+4), v.Namespace)
+				str += fmt.Sprintf("%sPredicate: %v\n", supportingfunctions.GetWhitespace(num+4), v.Predicate)
+				str += fmt.Sprintf("%sValue: %v\n", supportingfunctions.GetWhitespace(num+4), v.Value)
 			}
 		}
 		return str
@@ -404,6 +402,19 @@ func (a *AttachmentData) SetValueHashes(v string) {
 // SetAnyHashes устанавливает ЛЮБОЕ значение для поля Hashes
 func (a *AttachmentData) SetAnyHashes(i interface{}) {
 	a.Hashes = append(a.Hashes, fmt.Sprint(i))
+}
+
+// ********************* ReportTaxonomys *******************
+func (t *ReportTaxonomies) GetTaxonomys() []Taxonomy {
+	return t.Taxonomies
+}
+
+func (t *ReportTaxonomies) GetReportTaxonomys() ReportTaxonomies {
+	return *t
+}
+
+func (t *ReportTaxonomies) AddTaxonomy(taxonomy Taxonomy) {
+	t.Taxonomies = append(t.Taxonomies, taxonomy)
 }
 
 // *********************** Taxonomy ************************
