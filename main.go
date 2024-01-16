@@ -276,5 +276,10 @@ func main() {
 		_ = sl.WriteLoggingData(fmt.Sprintf(" '%s' %s:%d", err, f, l-2), "error")
 	}
 
+	logging <- datamodels.MessageLogging{
+		MsgData: "application '" + appName + "' is started",
+		MsgType: "info",
+	}
+
 	coremodule.CoreHandler(natsModule, mispModule, redisModule, lr, storageApp, logging, counting)
 }
