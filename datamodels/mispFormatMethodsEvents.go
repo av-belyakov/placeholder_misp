@@ -9,6 +9,7 @@ import (
 func NewEventMisp() EventsMispFormat {
 	return EventsMispFormat{
 		Timestamp:         "0",
+		Published:         getPublished(),
 		PublishTimestamp:  "0",
 		SightingTimestamp: "0",
 		Uuid:              uuid.New().String(),
@@ -32,7 +33,7 @@ func (emisp *EventsMispFormat) CleanEventsMispFormat() {
 	emisp.AttributeCount = ""
 	emisp.ExtendsUuid = ""
 	emisp.EventCreatorEmail = ""
-	emisp.Published = false
+	emisp.Published = getPublished()
 	emisp.ProposalEmailLock = false
 	emisp.Locked = false
 	emisp.DisableCorrelation = false
@@ -171,7 +172,7 @@ func getAnalysis() string {
 }
 
 func getDistributionEvent() string {
-	return "2"
+	return "1"
 }
 
 func getThreatLevelId() string {
@@ -180,6 +181,10 @@ func getThreatLevelId() string {
 
 func getSharingGroupId() string {
 	return "1"
+}
+
+func getPublished() bool {
+	return true
 }
 
 /*func getTagTLP(tlp int) datamodels.TagsMispFormat {

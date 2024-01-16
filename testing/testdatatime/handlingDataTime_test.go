@@ -42,8 +42,8 @@ var _ = Describe("Testing/Testdatatime/HandlingDataTime", func() {
 		It("Должны быть успешно получены текущие год и месяц", func() {
 			t := time.Now()
 
-			Expect(t.Year()).Should(Equal(2023))
-			Expect(int(t.Month())).Should(Equal(12))
+			Expect(t.Year()).Should(Equal(2024))
+			Expect(int(t.Month())).Should(Equal(1))
 		})
 	})
 
@@ -54,6 +54,16 @@ var _ = Describe("Testing/Testdatatime/HandlingDataTime", func() {
 
 			v = coremodule.GetTypeNameObservablesTag("example:md5")
 			Expect(v).Should(Equal("md5"))
+		})
+	})
+
+	Context("Test 4", func() {
+		It("date time now", func() {
+			date := float64(time.Now().UnixMilli())
+
+			fmt.Println("UNIX DATE ", date)
+
+			Expect(len(fmt.Sprintf("%13.f", date))).Should(Equal(13))
 		})
 	})
 })

@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"runtime"
 	"strings"
+	"time"
 
 	"placeholder_misp/datamodels"
 	"placeholder_misp/mispinteractions"
@@ -369,6 +370,13 @@ func NewMispFormat(
 				//обрабатываем свойство observables.tags
 				if tmf.FieldBranch == "observables.tags" {
 					listTags = handlerObservablesTags(tmf.Value, listTags, listAttributesMisp, seqNumObservable)
+
+					/*
+						ДЛЯ ПОДКЛЮЧЕНИЯ ГАЛАКТИК нужно сформировать, на основе данных из TTP,
+						тег со следующем форматом. Пример ниже
+
+						"misp-galaxy:mitre-attack-pattern=\"Match Legitimate Name or Location - T1036.005\""
+					*/
 				}
 
 				//проверяем есть ли путь до обрабатываемого свойства в списке обработчиков
@@ -409,6 +417,9 @@ func NewMispFormat(
 				} else {
 					//добавляем case id в поле Info
 					eventsMisp.Info += fmt.Sprintf(" :::TheHive case id '%d':::", int(caseId))
+
+					//добавляем дату публикации
+					eventsMisp.SetValuePublishTimestampEventsMisp(float64(time.Now().UnixMilli()), 0)
 
 					//тут отправляем сформированные по формату MISP пользовательские структуры
 					mispmodule.SendingDataInput(mispinteractions.SettingsChanInputMISP{
