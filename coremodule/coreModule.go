@@ -1,3 +1,8 @@
+// Пакет coremodule является ядром/маршрутизатором приложения
+//
+// Данный пакет обеспечивает связь и взаимодействие между различными
+// специализированными модулями, такими как например, модули взаимодействия
+// с NATS, MISP и т.д.
 package coremodule
 
 import (
@@ -5,11 +10,9 @@ import (
 	"runtime"
 
 	"placeholder_misp/datamodels"
-	"placeholder_misp/elasticsearchinteractions"
 	"placeholder_misp/memorytemporarystorage"
 	"placeholder_misp/mispinteractions"
 	"placeholder_misp/natsinteractions"
-	"placeholder_misp/nkckiinteractions"
 	"placeholder_misp/redisinteractions"
 	rules "placeholder_misp/rulesinteraction"
 )
@@ -18,8 +21,6 @@ func CoreHandler(
 	natsModule *natsinteractions.ModuleNATS,
 	mispModule *mispinteractions.ModuleMISP,
 	redisModule *redisinteractions.ModuleRedis,
-	esModule *elasticsearchinteractions.ModuleElasticSearch,
-	nkckiModule *nkckiinteractions.ModuleNKCKI,
 	listRule *rules.ListRule,
 	storageApp *memorytemporarystorage.CommonStorageTemporary,
 	logging chan<- datamodels.MessageLogging,
@@ -46,15 +47,6 @@ func CoreHandler(
 
 			//обработчик сообщений из TheHive (выполняется разбор сообщения и его разбор на основе правил)
 			go hmfh.HandlerMessageFromHive(chanCreateMispFormat, data.Data, data.MsgId, chanDone)
-
-			// отправка сообщения в Elasticshearch
-			esModule.HandlerData(elasticsearchinteractions.SettingsInputChan{
-				UUID: data.MsgId,
-				Data: data.Data,
-			})
-
-			// отправка сообщения в НКЦКИ (пока заглушка)
-			//nkckiModule.SendingData(procMsg.Message)
 
 		case data := <-mispChanReception:
 			switch data.Command {

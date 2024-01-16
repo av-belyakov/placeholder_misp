@@ -1,3 +1,4 @@
+// Пакет mispinteractions реализует методы для взаимодействия с API MISP
 package mispinteractions
 
 import (
@@ -10,17 +11,8 @@ import (
 	"placeholder_misp/datamodels"
 )
 
-var mmisp ModuleMISP
-
 type RespMISP struct {
 	Event map[string]interface{} `json:"event"`
-}
-
-func init() {
-	mmisp = ModuleMISP{
-		ChanInputMISP:  make(chan SettingsChanInputMISP),
-		ChanOutputMISP: make(chan SettingChanOutputMISP),
-	}
 }
 
 // NewClientMISP возвращает структуру типа ClientMISP с предустановленными значениями
@@ -58,6 +50,12 @@ func HandlerMISP(
 	conf confighandler.AppConfigMISP,
 	organistions []confighandler.Organization,
 	logging chan<- datamodels.MessageLogging) (*ModuleMISP, error) {
+
+	mmisp := ModuleMISP{
+		ChanInputMISP:  make(chan SettingsChanInputMISP),
+		ChanOutputMISP: make(chan SettingChanOutputMISP),
+	}
+
 	client, err := NewClientMISP(conf.Host, conf.Auth, false)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
@@ -155,7 +153,7 @@ func HandlerMISP(
 
 			switch data.Command {
 			case "add event":
-				go addEvent(conf.Host, authKey, data, logging)
+				go addEvent(conf.Host, authKey, data, &mmisp, logging)
 
 			case "del event by id":
 				go delEventById(conf, data.EventId, logging)
@@ -170,6 +168,7 @@ func addEvent(
 	host string,
 	authKey string,
 	data SettingsChanInputMISP,
+	mmisp *ModuleMISP,
 	logging chan<- datamodels.MessageLogging) {
 
 	// ***********************************

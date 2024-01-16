@@ -58,9 +58,6 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 			Expect(conf.GetAppNATS().Host).Should(Equal("nats.cloud.gcm"))
 			Expect(conf.GetAppNATS().Port).Should(Equal(4222))
 			Expect(conf.GetAppMISP().Host).Should(Equal("misp-center.cloud.gcm"))
-			Expect(conf.GetAppES().Host).Should(Equal("datahook.cloud.gcm"))
-			Expect(conf.GetAppES().Port).Should(Equal(9200))
-			Expect(conf.GetAppES().Index).Should(Equal("thehive33"))
 		})
 
 		It("Должно быть получено содержимое файла 'config_dev.yaml' при значении переменной GO_PHMISP_MAIN=development", func() {

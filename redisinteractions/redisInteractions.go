@@ -1,3 +1,4 @@
+// Пакет redisinteractions содержит маршрутизатор для обработки запросов к СУБД Redis
 package redisinteractions
 
 import (
@@ -13,20 +14,17 @@ import (
 	redis "github.com/redis/go-redis/v9"
 )
 
-var mredis ModuleRedis
-
-func init() {
-	mredis = ModuleRedis{
-		chanInputRedis:  make(chan SettingsChanInputRedis),
-		chanOutputRedis: make(chan SettingChanOutputRedis),
-	}
-}
-
 func HandlerRedis(
 	ctx context.Context,
 	conf confighandler.AppConfigRedis,
 	storageApp *memorytemporarystorage.CommonStorageTemporary,
 	logging chan<- datamodels.MessageLogging) *ModuleRedis {
+
+	mredis := ModuleRedis{
+		chanInputRedis:  make(chan SettingsChanInputRedis),
+		chanOutputRedis: make(chan SettingChanOutputRedis),
+	}
+
 	rdb := redis.NewClient(&redis.Options{
 		Addr: fmt.Sprintf("%s:%d", conf.Host, conf.Port),
 	})

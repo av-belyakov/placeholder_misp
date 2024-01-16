@@ -28,10 +28,6 @@ func (conf *ConfigApp) GetAppTheHive() *AppConfigTheHive {
 	return &conf.AppConfigTheHive
 }
 
-func (conf *ConfigApp) GetAppES() *AppConfigElasticSearch {
-	return &conf.AppConfigElasticSearch
-}
-
 func (conf *ConfigApp) Clean() {
 	conf = &ConfigApp{}
 }

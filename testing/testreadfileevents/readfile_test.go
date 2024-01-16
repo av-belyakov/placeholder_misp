@@ -14,7 +14,7 @@ import (
 var _ = Describe("Readfile", func() {
 	Context("Test 1", func() {
 		It("Should by is success", func() {
-			f, err := os.OpenFile("../../natsinteractions/test_json/events_1696583308", os.O_RDONLY, os.ModePerm)
+			f, err := os.OpenFile("../../testing/test_json/events_1696583308", os.O_RDONLY, os.ModePerm)
 
 			Expect(err).ShouldNot(HaveOccurred())
 

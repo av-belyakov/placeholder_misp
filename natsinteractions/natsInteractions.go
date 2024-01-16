@@ -1,3 +1,4 @@
+// Пакет natsinteractions реализует методы для взаимодействия с NATS
 package natsinteractions
 
 import (
@@ -17,9 +18,9 @@ import (
 )
 
 var (
-	ns    *natsStorage
-	once  sync.Once
-	mnats ModuleNATS
+	//ns    *natsStorage
+	once sync.Once
+	//mnats ModuleNATS
 )
 
 type natsStorage struct {
@@ -33,6 +34,7 @@ type messageDescriptors struct {
 }
 
 func NewStorageNATS() *natsStorage {
+	var ns *natsStorage
 	once.Do(func() {
 		ns = &natsStorage{storage: make(map[string]messageDescriptors)}
 
@@ -83,20 +85,20 @@ func (ns *natsStorage) deleteElement(id string) {
 	delete(ns.storage, id)
 }
 
-func init() {
-	mnats.chanOutputNATS = make(chan SettingsOutputChan)
-	mnats.chanInputNATS = make(chan SettingsInputChan)
-
-	//инициируем хранилище для дескрипторов сообщений NATS
-	ns = NewStorageNATS()
-}
-
 func NewClientNATS(
 	conf confighandler.AppConfigNATS,
 	confTheHive confighandler.AppConfigTheHive,
 	storageApp *memorytemporarystorage.CommonStorageTemporary,
 	logging chan<- datamodels.MessageLogging,
 	counting chan<- datamodels.DataCounterSettings) (*ModuleNATS, error) {
+
+	var mnats ModuleNATS = ModuleNATS{
+		chanOutputNATS: make(chan SettingsOutputChan),
+		chanInputNATS:  make(chan SettingsInputChan),
+	}
+
+	//инициируем хранилище для дескрипторов сообщений NATS
+	ns := NewStorageNATS()
 
 	nc, err := nats.Connect(
 		fmt.Sprintf("%s:%d", conf.Host, conf.Port),

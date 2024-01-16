@@ -1,3 +1,4 @@
+// Пакет zabbixinteractions предназначен для взаимодействия с API Zabbix
 package zabbixinteractions
 
 // NewHandlerZabbixConnection создает обработчик соединения с Zabbix

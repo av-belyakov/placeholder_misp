@@ -61,7 +61,7 @@ var _ = Describe("Testelasticsearch", Ordered, func() {
 
 	BeforeAll(func() {
 		//читаем тестовый файл
-		exampleByte, errReadFile = readFileJson("natsinteractions/test_json", "example_caseId_33705_1.json")
+		exampleByte, errReadFile = readFileJson("testing/test_json", "example_caseId_33705_1.json")
 
 		fmt.Println("file length: ", len(exampleByte))
 

@@ -120,7 +120,7 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		//читаем тестовый файл
 		//"example_caseId_33705.json" совпадает с правилами
 		//"example_caseId_33807.json" НЕ совпадает с правилами
-		exampleByte, errReadFile = readFileJson("natsinteractions/test_json", "example_caseId_9663.json")
+		exampleByte, errReadFile = readFileJson("testing/test_json", "example_caseId_9663.json")
 
 		//9663
 

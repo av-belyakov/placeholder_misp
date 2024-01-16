@@ -56,7 +56,7 @@ var _ = Describe("Interactionredisdb", Ordered, func() {
 		// канал для логирования
 		logging := make(chan datamodels.MessageLogging)
 
-		exampleByte, errReadFile = readFileJson("natsinteractions/test_json", "example_caseId_33705_1.json")
+		exampleByte, errReadFile = readFileJson("testing/test_json", "example_caseId_33705_1.json")
 
 		// инициализируем модуль временного хранения информации
 		storageApp := memorytemporarystorage.NewTemporaryStorage()

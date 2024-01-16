@@ -63,7 +63,7 @@ var _ = Describe("Processingrules", Ordered, func() {
 		counting = make(chan datamodels.DataCounterSettings)
 
 		//читаем тестовый файл
-		exampleByte, errReadFile = readFileJson("natsinteractions/test_json", "example_caseId_33705.json")
+		exampleByte, errReadFile = readFileJson("testing/test_json", "example_caseId_33705.json")
 
 		//инициализация списка правил
 		lr, _, errGetRule = rules.NewListRule("placeholder_misp", "rules", "mispmsgrule.yaml")

@@ -14,11 +14,9 @@ import (
 	"placeholder_misp/confighandler"
 	"placeholder_misp/coremodule"
 	"placeholder_misp/datamodels"
-	"placeholder_misp/elasticsearchinteractions"
 	"placeholder_misp/memorytemporarystorage"
 	"placeholder_misp/mispinteractions"
 	"placeholder_misp/natsinteractions"
-	"placeholder_misp/nkckiinteractions"
 	"placeholder_misp/redisinteractions"
 	rules "placeholder_misp/rulesinteraction"
 	"placeholder_misp/supportingfunctions"
@@ -278,20 +276,5 @@ func main() {
 		_ = sl.WriteLoggingData(fmt.Sprintf(" '%s' %s:%d", err, f, l-2), "error")
 	}
 
-	//инициализация модуля для взаимодействия с ElasticSearch
-	esModule := elasticsearchinteractions.HandlerElasticSearch(*confApp.GetAppES(), storageApp, logging)
-
-	// инициализация модуля для взаимодействия с NKCKI
-	nkckiModule, err := nkckiinteractions.NewClientNKCKI(confApp.AppConfigNKCKI, logging)
-	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		_ = sl.WriteLoggingData(fmt.Sprintf(" '%s' %s:%d", err, f, l-2), "error")
-	}
-
-	logging <- datamodels.MessageLogging{
-		MsgData: "application '" + appName + "' is started",
-		MsgType: "info",
-	}
-
-	coremodule.CoreHandler(natsModule, mispModule, redisModule, esModule, nkckiModule, lr, storageApp, logging, counting)
+	coremodule.CoreHandler(natsModule, mispModule, redisModule, lr, storageApp, logging, counting)
 }

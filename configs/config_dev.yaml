@@ -12,14 +12,3 @@ MISP:
   auth: TvHkjH8jVQEIdvAxjxnL4H6wDoKyV7jobDjndvAo
 THEHIVE:
   send: false
-ElasticSearch:
-  send: false
-  host: datahook.cloud.gcm
-  port: 9200
-  prefix:
-  index: "module_placeholder_thehive_case"
-  user: writer
-  passwd: XxZqesYXuk8C
-NKCKI:
-  host: 127.0.0.1
-  port: 12000
