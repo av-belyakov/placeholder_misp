@@ -153,7 +153,7 @@ func HandlerMISP(
 
 			switch data.Command {
 			case "add event":
-				go addEvent(conf.Host, authKey, data, &mmisp, logging)
+				go addEvent(conf.Host, authKey, conf.Auth, data, &mmisp, logging)
 
 			case "del event by id":
 				go delEventById(conf, data.EventId, logging)
@@ -167,6 +167,7 @@ func HandlerMISP(
 func addEvent(
 	host string,
 	authKey string,
+	masterKey string,
 	data SettingsChanInputMISP,
 	mmisp *ModuleMISP,
 	logging chan<- datamodels.MessageLogging) {
@@ -238,8 +239,21 @@ func addEvent(
 	//
 	//
 
+	//публикуем добавленное событие
+	//masterKey нужен для публикации события так как пользователь
+	//должен иметь более расшириные права чем могут иметь некоторые
+	//обычные пользователи
+	if err := sendRequestPublishEvent(host, masterKey, eventId); err != nil {
+		_, f, l, _ := runtime.Caller(0)
+
+		logging <- datamodels.MessageLogging{
+			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
+			MsgType: "error",
+		}
+	}
+
 	// добавляем event_reports
-	if err := sendEventReportsMispFormat(host, authKey, eventId, data.CaseId, logging); err != nil {
+	if err := sendEventReportsMispFormat(host, authKey, eventId, data.CaseId); err != nil {
 		_, f, l, _ := runtime.Caller(0)
 
 		logging <- datamodels.MessageLogging{

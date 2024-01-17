@@ -5,7 +5,6 @@ import (
 	"regexp"
 	"runtime"
 	"strings"
-	"time"
 
 	"placeholder_misp/datamodels"
 	"placeholder_misp/mispinteractions"
@@ -417,9 +416,6 @@ func NewMispFormat(
 				} else {
 					//добавляем case id в поле Info
 					eventsMisp.Info += fmt.Sprintf(" :::TheHive case id '%d':::", int(caseId))
-
-					//добавляем дату публикации
-					eventsMisp.SetValuePublishTimestampEventsMisp(float64(time.Now().UnixMilli()), 0)
 
 					//тут отправляем сформированные по формату MISP пользовательские структуры
 					mispmodule.SendingDataInput(mispinteractions.SettingsChanInputMISP{

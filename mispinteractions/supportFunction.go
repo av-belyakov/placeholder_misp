@@ -227,7 +227,30 @@ func sendObjectsMispFormat(host, authKey, eventId string, d SettingsChanInputMIS
 	return res, resBodyByte
 }
 
-func sendEventReportsMispFormat(host, authKey, eventId string, caseId float64, logging chan<- datamodels.MessageLogging) error {
+func sendRequestPublishEvent(host, authKey, eventId string) error {
+	c, err := NewClientMISP(host, authKey, false)
+	if err != nil {
+		_, f, l, _ := runtime.Caller(0)
+		return fmt.Errorf("'event publish add, %s' %s:%d", err.Error(), f, l-2)
+	}
+
+	res, _, err := c.Post("/events/publish/"+eventId, []byte{})
+	if err != nil {
+		_, f, l, _ := runtime.Caller(0)
+
+		return fmt.Errorf("'event publish add, %s' %s:%d", err.Error(), f, l-2)
+	}
+
+	if res.StatusCode != http.StatusOK {
+		_, f, l, _ := runtime.Caller(0)
+
+		return fmt.Errorf("'event publish add, %s' %s:%d", res.Status, f, l-1)
+	}
+
+	return nil
+}
+
+func sendEventReportsMispFormat(host, authKey, eventId string, caseId float64) error {
 	c, err := NewClientMISP(host, authKey, false)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
@@ -236,7 +259,7 @@ func sendEventReportsMispFormat(host, authKey, eventId string, caseId float64, l
 
 	b, err := json.Marshal(datamodels.EventReports{
 		Name:         fmt.Sprint(caseId),
-		Distribution: "0",
+		Distribution: "1",
 	})
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)

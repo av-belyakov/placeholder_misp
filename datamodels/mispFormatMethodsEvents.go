@@ -184,7 +184,7 @@ func getSharingGroupId() string {
 }
 
 func getPublished() bool {
-	return true
+	return false
 }
 
 /*func getTagTLP(tlp int) datamodels.TagsMispFormat {

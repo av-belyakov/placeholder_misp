@@ -155,7 +155,7 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 
 			var err error
 
-			for count := 0; count < 2; count++ {
+			for count := 0; count < 1; count++ {
 				mop := <-mispOutput
 
 				fmt.Println(count, ". TEST , mispOutput = ", mop)
