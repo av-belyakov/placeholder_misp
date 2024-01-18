@@ -371,7 +371,7 @@ func sendEventTagsMispFormat(host, authKey, eventId string, d SettingsChanInputM
 		}
 
 		resData := decodeResponseMIspMessage(b)
-		resultMsg := fmt.Sprintf("result published event with id '%s' - %s '%s' %s", eventId, resData.name, resData.message, resData.success)
+		resultMsg := fmt.Sprintf("tag: '%s' %s '%s' %s errors:'%s'", v, resData.name, resData.message, resData.success, resData.errors)
 		// ***********************************
 		// Это логирование только для теста!!!
 		// ***********************************
@@ -413,11 +413,13 @@ func delEventsMispFormat(host, authKey, eventId string) (*http.Response, error) 
 
 func decodeResponseMIspMessage(b []byte) struct {
 	name    string
+	errors  string
 	message string
 	success string
 } {
 	msg := struct {
 		name    string
+		errors  string
 		message string
 		success string
 	}{}
@@ -427,6 +429,9 @@ func decodeResponseMIspMessage(b []byte) struct {
 			switch k {
 			case "name":
 				msg.name = fmt.Sprint(v)
+
+			case "errors":
+				msg.errors = fmt.Sprint(v)
 
 			case "message":
 				msg.message = fmt.Sprint(v)
