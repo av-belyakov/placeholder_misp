@@ -372,15 +372,10 @@ func sendEventTagsMispFormat(host, authKey, eventId string, d SettingsChanInputM
 
 		resData := decodeResponseMIspMessage(b)
 		resultMsg := fmt.Sprintf("tag: '%s' %s '%s' %s errors:'%s'", v, resData.name, resData.message, resData.success, resData.errors)
-		// ***********************************
-		// Это логирование только для теста!!!
-		// ***********************************
 		logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("TEST_INFO func 'sendEventTagsMispFormat', результат выполнения POST запроса - '%s'", resultMsg),
-			MsgType: "testing",
+			MsgData: fmt.Sprintf("event tags №%s the result of executing the POST query - '%s'", eventId, resultMsg),
+			MsgType: "warning",
 		}
-		//
-		//
 
 		if res.StatusCode != http.StatusOK {
 			_, f, l, _ := runtime.Caller(0)
