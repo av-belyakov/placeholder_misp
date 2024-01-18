@@ -23,11 +23,9 @@ func NewListEventObjectTags() *ListEventObjectTags {
 }
 
 func (leot *ListEventObjectTags) SetTag(v string) {
-	if !strings.Contains(v, "ATs:") {
-		return
+	if strings.Contains(v, "ATs:") || strings.Contains(v, "misp-galaxy:") {
+		*leot = append(*leot, v)
 	}
-
-	*leot = append(*leot, v)
 }
 
 func (leot *ListEventObjectTags) GetListTags() ListEventObjectTags {

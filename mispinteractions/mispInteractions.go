@@ -239,19 +239,6 @@ func addEvent(
 	//
 	//
 
-	//публикуем добавленное событие
-	//masterKey нужен для публикации события так как пользователь
-	//должен иметь более расшириные права чем могут иметь некоторые
-	//обычные пользователи
-	if err := sendRequestPublishEvent(host, masterKey, eventId); err != nil {
-		_, f, l, _ := runtime.Caller(0)
-
-		logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
-			MsgType: "error",
-		}
-	}
-
 	// добавляем event_reports
 	if err := sendEventReportsMispFormat(host, authKey, eventId, data.CaseId); err != nil {
 		_, f, l, _ := runtime.Caller(0)
@@ -282,6 +269,26 @@ func addEvent(
 		logging <- datamodels.MessageLogging{
 			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
 			MsgType: "error",
+		}
+	}
+
+	//публикуем добавленное событие
+	//masterKey нужен для публикации события так как пользователь
+	//должен иметь более расшириные права чем могут иметь некоторые
+	//обычные пользователи
+	resMsg, err := sendRequestPublishEvent(host, masterKey, eventId)
+	if err != nil {
+		_, f, l, _ := runtime.Caller(0)
+
+		logging <- datamodels.MessageLogging{
+			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
+			MsgType: "error",
+		}
+	}
+	if resMsg != "" {
+		logging <- datamodels.MessageLogging{
+			MsgData: resMsg,
+			MsgType: "warning",
 		}
 	}
 

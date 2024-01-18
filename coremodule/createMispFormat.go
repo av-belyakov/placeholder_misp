@@ -10,189 +10,6 @@ import (
 	"placeholder_misp/mispinteractions"
 )
 
-// ChanInputCreateMispFormat
-// ExclusionRuleWorked - информирует что сработало правило исключения значения из списка
-// передаваемых данных
-// UUID - уникальный идентификатор в формате UUID
-// FieldName - наименование поля
-// ValueType - тип передаваемого значения (string, int и т.д.)
-// Value - любые передаваемые данные
-// FieldBranch - 'путь' до значения в как в JSON формате, например 'event.details.customFields.class'
-type ChanInputCreateMispFormat struct {
-	ExclusionRuleWorked bool
-	UUID                string
-	FieldName           string
-	ValueType           string
-	Value               interface{}
-	FieldBranch         string
-}
-
-type FieldsNameMapping struct {
-	InputFieldName, MispFieldName string
-}
-
-// storageValueName временное хранилище свойств элементов observables
-type storageValueName []string
-
-func NewStorageValueName() *storageValueName {
-	return &storageValueName{}
-}
-
-func (svn *storageValueName) SetValueName(value string) {
-	*svn = append(*svn, value)
-}
-
-func (svn *storageValueName) GetValueName(value string) bool {
-	for _, v := range *svn {
-		if v == value {
-			return true
-		}
-	}
-
-	return false
-}
-
-func (svn *storageValueName) CleanValueName() {
-	*svn = storageValueName{}
-}
-
-// ExclusionRules содержит информацию об объектах которые нужно исключить из
-// передачи в MISP
-type ExclusionRules []ExclusionRule
-
-// ExclusionRule
-// SequenceNumber - порядковый номер в списке объектов
-// NameList - наименование объекта
-type ExclusionRule struct {
-	SequenceNumber int
-	NameList       string
-}
-
-// Add добавляет информацию об объекте подлежащего исключению из списка передаваемых в MISP
-func (er *ExclusionRules) Add(sn int, n string) {
-	var isExist bool
-	n = getObjName(n)
-
-	for _, v := range *er {
-		if v.SequenceNumber == sn && v.NameList == n {
-			isExist = true
-
-			break
-		}
-	}
-
-	if !isExist {
-		*er = append(*er, ExclusionRule{SequenceNumber: sn, NameList: n})
-	}
-}
-
-// SearchObjectName ищет, и возвращает список с информацией об объектах которые нужно
-// исключить из передачи в MISP
-func (er *ExclusionRules) SearchObjectName(objName string) []ExclusionRule {
-	list := []ExclusionRule{}
-
-	for _, v := range *er {
-		if v.NameList != getObjName(objName) {
-			continue
-		}
-
-		list = append(list, v)
-	}
-
-	return list
-}
-
-// SearchSeqNum ищет, и возвращает список с информацией об объектах которые нужно
-// исключить из передачи в MISP
-func (er *ExclusionRules) SearchSeqNum(sn int) []ExclusionRule {
-	list := []ExclusionRule{}
-
-	for _, v := range *er {
-		if v.SequenceNumber != sn {
-			continue
-		}
-
-		list = append(list, v)
-	}
-
-	return list
-}
-
-// Clean выполняет очистку списка
-func (er *ExclusionRules) Clean() {
-	er = &ExclusionRules{}
-}
-
-func NewExclusionRules() *ExclusionRules {
-	return &ExclusionRules{}
-}
-
-func getObjName(objName string) string {
-	l := strings.Split(objName, ".")
-
-	if len(l) == 0 {
-		return ""
-	}
-
-	return l[0]
-}
-
-func init() {
-	/*galaxyClustersMisp = datamodels.GalaxyClustersMispFormat{
-		Description:   "3",
-		GalaxyElement: []datamodels.GalaxyElementMispFormat{},
-	}
-	usersMisp = datamodels.UsersMispFormat{
-		Newsread:     "0",
-		ChangePw:     "0",
-		CurrentLogin: "0",
-		LastLogin:    "0",
-		DateCreated:  "0",
-		DateModified: "0",
-	}
-	organizationsMisp = datamodels.OrganisationsMispFormat{
-		DateCreated:  "0",
-		DateModified: "0",
-	}
-	serversMisp = datamodels.ServersMispFormat{}
-	feedsMisp = datamodels.FeedsMispFormat{
-		Distribution: "3",
-		SourceFormat: "misp",
-		InputSource:  "network",
-	}
-	tagsMisp = datamodels.TagsMispFormat{
-		Exportable:     true,
-		IsGalaxy:       true,
-		IsCustomGalaxy: true,
-		Inherited:      1,
-	}
-
-	listHandlerMisp = map[string][]func(interface{}, int){
-		//event -> events
-		"event.object.title":     {eventsMisp.SetValueInfoEventsMisp},
-		"event.object.startDate": {eventsMisp.SetValueTimestampEventsMisp},
-		"event.details.endDate":  {eventsMisp.SetValueDateEventsMisp},
-		"event.object.tlp":       {eventsMisp.SetValueDistributionEventsMisp},
-		"event.object.severity":  {eventsMisp.SetValueThreatLevelIdEventsMisp},
-		"event.organisationId":   {eventsMisp.SetValueOrgIdEventsMisp},
-		"event.object.updatedAt": {eventsMisp.SetValueSightingTimestampEventsMisp},
-		"event.object.owner":     {eventsMisp.SetValueEventCreatorEmailEventsMisp},
-		//observables -> attributes
-		"observables._id":        {listAttributesMisp.SetValueObjectIdAttributesMisp},
-		"observables.data":       {listAttributesMisp.SetValueValueAttributesMisp},
-		"observables.dataType":   {listObjectsMisp.SetValueNameObjectsMisp},
-		"observables._createdAt": {listAttributesMisp.SetValueTimestampAttributesMisp},
-		"observables.message":    {listAttributesMisp.SetValueCommentAttributesMisp},
-		"observables.startDate": {
-			listAttributesMisp.SetValueFirstSeenAttributesMisp,
-			listObjectsMisp.SetValueFirstSeenObjectsMisp,
-			listObjectsMisp.SetValueTimestampObjectsMisp,
-		},
-		//observables.attachment -> objects
-		"observables.attachment.size": {listObjectsMisp.SetValueSizeObjectsMisp},
-	}*/
-}
-
 func NewMispFormat(
 	taskId string,
 	mispmodule *mispinteractions.ModuleMISP,
@@ -288,6 +105,8 @@ func NewMispFormat(
 		svn := NewStorageValueName()
 		leot := datamodels.NewListEventObjectTags()
 		exclusionRules := NewExclusionRules()
+		listGalaxyTags := NewMispGalaxyTags()
+		addFuncGalaxyTags := addListGalaxyTags(listGalaxyTags)
 
 		for key := range listHandlerMisp {
 			if strings.Contains(key, "observables") {
@@ -361,21 +180,31 @@ func NewMispFormat(
 				//обрабатываем свойство event.object.tags, оно ответственно за
 				//наполнение поля "Теги" MISP
 				if tmf.FieldBranch == "event.object.tags" {
-					if tag, ok := tmf.Value.(string); ok {
-						leot.SetTag(tag)
-					}
-				}
-
-				//обрабатываем свойство observables.tags
-				if tmf.FieldBranch == "observables.tags" {
-					listTags = handlerObservablesTags(tmf.Value, listTags, listAttributesMisp, seqNumObservable)
 
 					/*
 						ДЛЯ ПОДКЛЮЧЕНИЯ ГАЛАКТИК нужно сформировать, на основе данных из TTP,
 						тег со следующем форматом. Пример ниже
 
 						"misp-galaxy:mitre-attack-pattern=\"Match Legitimate Name or Location - T1036.005\""
+
+						ttp.extraData.pattern.patternId - содержит что то похожее на T1036.005
+						ttp.extraData.pattern.patternType - содержит что то похожее на attack-pattern
+						ttp.extraData.pattern.name - вроде описание
 					*/
+
+					if tag, ok := tmf.Value.(string); ok {
+						leot.SetTag(tag)
+					}
+				}
+
+				//заполняем временный объект listGalaxyTags данными, предназначенными
+				//для формирования специализированных тегов на основе которых в MISP
+				//будут формироватся галактики
+				addFuncGalaxyTags(tmf.FieldBranch, tmf.Value)
+
+				//обрабатываем свойство observables.tags
+				if tmf.FieldBranch == "observables.tags" {
+					listTags = handlerObservablesTags(tmf.Value, listTags, listAttributesMisp, seqNumObservable)
 				}
 
 				//проверяем есть ли путь до обрабатываемого свойства в списке обработчиков
@@ -416,6 +245,16 @@ func NewMispFormat(
 				} else {
 					//добавляем case id в поле Info
 					eventsMisp.Info += fmt.Sprintf(" :::TheHive case id '%d':::", int(caseId))
+
+					//добавляем в datemodels.ListObjectEventTags дополнительные теги
+					//ответственные за формирование галактик в MISP
+					joinEventTags(leot, createGalaxyTags(listGalaxyTags))
+
+					//fmt.Println("==================== The Galaxise =======================")
+					//fmt.Println(listGalaxyTags.Get())
+					//fmt.Println(leot.GetListTags())
+					//fmt.Println(createGalaxyTags(listGalaxyTags))
+					//fmt.Println("===========================================")
 
 					//тут отправляем сформированные по формату MISP пользовательские структуры
 					mispmodule.SendingDataInput(mispinteractions.SettingsChanInputMISP{
@@ -459,153 +298,4 @@ func NewMispFormat(
 	}()
 
 	return chanInput, chanDone
-}
-
-func delElementAttributes(er *ExclusionRules, la *datamodels.ListAttributesMispFormat, logging chan<- datamodels.MessageLogging) {
-	for _, v := range er.SearchObjectName("observables") {
-		if attr, ok := la.DelElementListAttributesMisp(v.SequenceNumber); ok {
-			logging <- datamodels.MessageLogging{
-				MsgData: fmt.Sprintf("'an attribute with a value of '%s' has been removed'", attr.Value),
-				MsgType: "warning",
-			}
-		}
-	}
-}
-
-// обрабатывает значение свойства observables.tags
-func handlerObservablesTags(v interface{},
-	listTags map[int][2]string,
-	listAttributesMisp *datamodels.ListAttributesMispFormat,
-	seqNumObservable int) map[int][2]string {
-	tag, ok := v.(string)
-	if !ok {
-		return listTags
-	}
-
-	//проверка значения на соответствию определенному шаблону
-	//начинающемуся на misp: при этом значения целиком берутся из
-	//этого шаблона
-	result, err := CheckMISPObservablesTag(tag)
-	if err == nil {
-		listTags[seqNumObservable] = result
-	} else {
-		result := GetTypeNameObservablesTag(tag)
-		if result == "" {
-			return listTags
-		}
-		//добавляем значение из tags в поле object_relation
-		listAttributesMisp.SetValueObjectRelationAttributesMisp(result, seqNumObservable)
-
-		//Добавляем в свойство Category соответствующее значение
-		//если наименование похоже на наименование типа хеширования
-		if checkHashName(result) {
-			listAttributesMisp.AutoSetValueCategoryAttributesMisp(result, seqNumObservable)
-		}
-	}
-
-	return listTags
-}
-
-// searchEventSource выполняет поиск источника события
-func searchEventSource(tmf ChanInputCreateMispFormat) (string, bool) {
-	var (
-		source string
-		ok     bool
-	)
-
-	if tmf.FieldBranch == "source" {
-		source, ok = tmf.Value.(string)
-	}
-
-	return source, ok
-}
-
-// searchCaseId выполняет поиск id кейса
-func searchCaseId(tmf ChanInputCreateMispFormat) (float64, bool) {
-	var (
-		cid float64
-		ok  bool
-	)
-
-	if tmf.FieldBranch == "event.object.caseId" {
-		cid, ok = tmf.Value.(float64)
-	}
-
-	return cid, ok
-}
-
-// searchOwnerEmail выполняет поиск email владельца события
-func searchOwnerEmail(tmf ChanInputCreateMispFormat) (string, bool) {
-	var (
-		email string
-		ok    bool
-	)
-
-	if tmf.FieldBranch == "event.object.owner" {
-		email, ok = tmf.Value.(string)
-	}
-
-	return email, ok
-}
-
-// getNewListAttributes устанавливает значения в свойствах Category и Type и в том
-// числе изменяет состояние свойства DisableCorrelation (которое по умолчанию ВЫКЛЮЧЕНО)
-// на значение информирующее MISP нужно ли выполнять корреляцию или нет
-func getNewListAttributes(al map[int]datamodels.AttributesMispFormat, lat map[int][2]string) []datamodels.AttributesMispFormat {
-	nal := make([]datamodels.AttributesMispFormat, 0, len(al))
-
-	for k, v := range al {
-		if elem, ok := lat[k]; ok {
-			v.Category = elem[0]
-			v.Type = elem[1]
-
-			//очищаем данное свойство, являющееся вспомогательным, так как оно может
-			//быть заполненно ранее, а приоритетным являются значения в Category и Type
-			v.ObjectRelation = ""
-		}
-
-		//выключаем автоматическую коореляцию с другими событиями для MISP
-		if (v.Type == "other" || v.Type == "snort") && (v.ObjectRelation == "" || v.ObjectRelation == "snort") {
-			v.DisableCorrelation = true
-		}
-
-		nal = append(nal, v)
-	}
-
-	return nal
-}
-
-func getNewListObjects(
-	listObjects map[int]datamodels.ObjectsMispFormat,
-	attachment map[int][]datamodels.AttributeMispFormat,
-) map[int]datamodels.ObjectsMispFormat {
-	nlo := make(map[int]datamodels.ObjectsMispFormat, len(attachment))
-	for k, v := range attachment {
-		if obj, ok := listObjects[k]; ok {
-			obj.Attribute = v
-			nlo[k] = obj
-		}
-	}
-
-	return nlo
-}
-
-func checkHashName(name string) bool {
-	list := []string{
-		"md5",
-		"sha1",
-		"sha224",
-		"sha256",
-		"sha384",
-		"sha512",
-		"ja3",
-	}
-
-	for _, v := range list {
-		if name == v {
-			return true
-		}
-	}
-
-	return false
 }

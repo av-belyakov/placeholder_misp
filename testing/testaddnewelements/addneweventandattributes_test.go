@@ -120,9 +120,7 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		//читаем тестовый файл
 		//"example_caseId_33705.json" совпадает с правилами
 		//"example_caseId_33807.json" НЕ совпадает с правилами
-		exampleByte, errReadFile = readFileJson("testing/test_json", "example_caseId_9663.json")
-
-		//9663
+		exampleByte, errReadFile = readFileJson("testing/test_json", "example_caseId_33705.json")
 
 		//инициалиация модуля для взаимодействия с MISP
 		mispModule, errMisp = mispinteractions.HandlerMISP(*confApp.GetAppMISP(), confApp.Organizations, logging)
@@ -155,7 +153,7 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 
 			var err error
 
-			for count := 0; count < 1; count++ {
+			for count := 0; count < 2; count++ {
 				mop := <-mispOutput
 
 				fmt.Println(count, ". TEST , mispOutput = ", mop)
