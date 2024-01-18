@@ -180,18 +180,6 @@ func NewMispFormat(
 				//обрабатываем свойство event.object.tags, оно ответственно за
 				//наполнение поля "Теги" MISP
 				if tmf.FieldBranch == "event.object.tags" {
-
-					/*
-						ДЛЯ ПОДКЛЮЧЕНИЯ ГАЛАКТИК нужно сформировать, на основе данных из TTP,
-						тег со следующем форматом. Пример ниже
-
-						"misp-galaxy:mitre-attack-pattern=\"Match Legitimate Name or Location - T1036.005\""
-
-						ttp.extraData.pattern.patternId - содержит что то похожее на T1036.005
-						ttp.extraData.pattern.patternType - содержит что то похожее на attack-pattern
-						ttp.extraData.pattern.name - вроде описание
-					*/
-
 					if tag, ok := tmf.Value.(string); ok {
 						leot.SetTag(tag)
 					}

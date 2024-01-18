@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/url"
 	"runtime"
+	"time"
 
 	"placeholder_misp/confighandler"
 	"placeholder_misp/datamodels"
@@ -262,8 +263,11 @@ func addEvent(
 	// добавляем объекты
 	_, _ = sendObjectsMispFormat(host, authKey, eventId, data, logging)
 
+	//берем небольшой таймаут
+	time.Sleep(2 * time.Second)
+
 	// добавляем event_tags
-	if err := sendEventTagsMispFormat(host, authKey, eventId, data, logging); err != nil {
+	if err := sendEventTagsMispFormat(host, masterKey, eventId, data, logging); err != nil {
 		_, f, l, _ := runtime.Caller(0)
 
 		logging <- datamodels.MessageLogging{

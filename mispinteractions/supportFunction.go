@@ -237,28 +237,15 @@ func sendRequestPublishEvent(host, authKey, eventId string) (string, error) {
 		return resultMsg, fmt.Errorf("'event publish add, %s' %s:%d", err.Error(), f, l-2)
 	}
 
-	res, resByte, err := c.Post("/events/publish/"+eventId, []byte{})
+	res, b, err := c.Post("/events/publish/"+eventId, []byte{})
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 
 		return resultMsg, fmt.Errorf("'event publish add, %s' %s:%d", err.Error(), f, l-2)
 	}
 
-	resTmp := map[string]interface{}{}
-	if err := json.Unmarshal(resByte, &resTmp); err == nil {
-		var resName, resMsg string
-		for k, v := range resTmp {
-			if k == "name" {
-				resName = fmt.Sprint(v)
-			}
-
-			if k == "message" {
-				resMsg = fmt.Sprint(v)
-			}
-		}
-
-		resultMsg = fmt.Sprintf("result published event with id '%s' - %s '%s'", eventId, resName, resMsg)
-	}
+	resData := decodeResponseMIspMessage(b)
+	resultMsg = fmt.Sprintf("result published event with id '%s' - %s '%s' %s", eventId, resData.name, resData.message, resData.success)
 
 	if res.StatusCode != http.StatusOK {
 		_, f, l, _ := runtime.Caller(0)
@@ -335,6 +322,16 @@ func sendEventTagsMispFormat(host, authKey, eventId string, d SettingsChanInputM
 
 	eotmf := datamodels.EventObjectTagsMispFormat{}
 
+	// ***********************************
+	// Это логирование только для теста!!!
+	// ***********************************
+	logging <- datamodels.MessageLogging{
+		MsgData: fmt.Sprintf("TEST_INFO func 'sendEventTagsMispFormat', готовимся добавлять event tags - %v", leot.GetListTags()),
+		MsgType: "testing",
+	}
+	//
+	//
+
 	for _, v := range leot {
 		eotmf.Event = eventId
 		eotmf.Tag = v
@@ -351,7 +348,17 @@ func sendEventTagsMispFormat(host, authKey, eventId string, d SettingsChanInputM
 			continue
 		}
 
-		res, _, err := c.Post("/events/addTag", b)
+		// ***********************************
+		// Это логирование только для теста!!!
+		// ***********************************
+		logging <- datamodels.MessageLogging{
+			MsgData: fmt.Sprintf("TEST_INFO func 'sendEventTagsMispFormat', готовимся отправить POST запрос для добавления тега %s", v),
+			MsgType: "testing",
+		}
+		//
+		//
+
+		res, b, err := c.Post("/events/addTag", b)
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
 
@@ -362,6 +369,18 @@ func sendEventTagsMispFormat(host, authKey, eventId string, d SettingsChanInputM
 
 			continue
 		}
+
+		resData := decodeResponseMIspMessage(b)
+		resultMsg := fmt.Sprintf("result published event with id '%s' - %s '%s' %s", eventId, resData.name, resData.message, resData.success)
+		// ***********************************
+		// Это логирование только для теста!!!
+		// ***********************************
+		logging <- datamodels.MessageLogging{
+			MsgData: fmt.Sprintf("TEST_INFO func 'sendEventTagsMispFormat', результат выполнения POST запроса - '%s'", resultMsg),
+			MsgType: "testing",
+		}
+		//
+		//
 
 		if res.StatusCode != http.StatusOK {
 			_, f, l, _ := runtime.Caller(0)
@@ -390,4 +409,34 @@ func delEventsMispFormat(host, authKey, eventId string) (*http.Response, error) 
 	}
 
 	return res, nil
+}
+
+func decodeResponseMIspMessage(b []byte) struct {
+	name    string
+	message string
+	success string
+} {
+	msg := struct {
+		name    string
+		message string
+		success string
+	}{}
+	resTmp := map[string]interface{}{}
+	if err := json.Unmarshal(b, &resTmp); err == nil {
+		for k, v := range resTmp {
+			switch k {
+			case "name":
+				msg.name = fmt.Sprint(v)
+
+			case "message":
+				msg.message = fmt.Sprint(v)
+
+			case "success":
+				msg.success = fmt.Sprint(v)
+
+			}
+		}
+	}
+
+	return msg
 }

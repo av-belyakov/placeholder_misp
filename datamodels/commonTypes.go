@@ -23,7 +23,7 @@ func NewListEventObjectTags() *ListEventObjectTags {
 }
 
 func (leot *ListEventObjectTags) SetTag(v string) {
-	if strings.Contains(v, "ATs:") || strings.Contains(v, "misp-galaxy:") {
+	if strings.Contains(v, "ATs") || strings.Contains(v, "misp-galaxy:") {
 		*leot = append(*leot, v)
 	}
 }

@@ -143,10 +143,6 @@ func addListGalaxyTags(lgt *MispGalaxyTags) func(string, any) {
 	}
 
 	return func(fieldBranch string, value any) {
-		//if strings.Contains(fieldBranch, "ttp.extraData.") {
-		//	fmt.Println("fieldBranch =", fieldBranch, " value =", value)
-		//}
-
 		v := fmt.Sprint(value)
 		if searchValue(fieldBranchList, fieldBranch) {
 			num++
@@ -155,21 +151,14 @@ func addListGalaxyTags(lgt *MispGalaxyTags) func(string, any) {
 
 		switch fieldBranch {
 		case "ttp.extraData.pattern.patternId":
-			//fmt.Println("fieldBranch =", fieldBranch, " value =", value, "NUM:", num)
-			//fmt.Println("fieldBranchList:", fieldBranchList)
-
 			lgt.SetPatternId(num, v)
 			fieldBranchList = append(fieldBranchList, fieldBranch)
-		case "ttp.extraData.pattern.patternType":
-			//fmt.Println("fieldBranch =", fieldBranch, " value =", value, "NUM:", num)
-			//fmt.Println("fieldBranchList:", fieldBranchList)
 
+		case "ttp.extraData.pattern.patternType":
 			lgt.SetPatternType(num, v)
 			fieldBranchList = append(fieldBranchList, fieldBranch)
-		case "ttp.extraData.pattern.name":
-			//fmt.Println("fieldBranch =", fieldBranch, " value =", value, "NUM:", num)
-			//fmt.Println("fieldBranchList:", fieldBranchList)
 
+		case "ttp.extraData.pattern.name":
 			lgt.SetName(num, v)
 			fieldBranchList = append(fieldBranchList, fieldBranch)
 		}
@@ -205,18 +194,9 @@ func getNewListObjects(
 }
 
 func joinEventTags(listTags *datamodels.ListEventObjectTags, galaxyTags []string) {
-	//newListTags := make(datamodels.ListEventObjectTags, 0, len(listTags)+len(galaxyTags))
-
 	for _, v := range galaxyTags {
-
-		//		fmt.Println("func 'joinEventTags', galaxyTags VALUE =", v)
-
 		listTags.SetTag(v)
 	}
-
-	//fmt.Println("------******************------")
-	//fmt.Println("func 'joinEventTags', newListTags =", listTags)
-	//fmt.Println("------******************------")
 }
 
 func checkHashName(name string) bool {
