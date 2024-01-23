@@ -75,7 +75,7 @@ LOGGING:
     }
 ZABBIX:
   isTransmit: true
-  networkHost: "zabbix.cloud.gcm"
+  networkHost: "192.168.9.45"
   networkPort: 10051
   zabbixHost: "sib-server"
   zabbixKey: "test_bav"

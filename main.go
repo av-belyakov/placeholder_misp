@@ -127,8 +127,8 @@ func counterHandler(
 func interactionZabbix(
 	confApp confighandler.ConfigApp,
 	hz *zabbixinteractions.HandlerZabbixConnection,
-	iz <-chan string,
-	logging chan<- datamodels.MessageLogging) {
+	sl simplelogger.SimpleLoggerSettings,
+	iz <-chan string) {
 	co := confApp.GetCommonApp()
 	t := time.Tick(time.Duration(co.Zabbix.TimeInterval) * time.Minute)
 
@@ -141,10 +141,7 @@ func interactionZabbix(
 
 			if _, err := hz.SendData([]string{co.Zabbix.Handshake}); err != nil {
 				_, f, l, _ := runtime.Caller(0)
-				logging <- datamodels.MessageLogging{
-					MsgData: fmt.Sprintf("'%v' %s:%d", err, f, l-1),
-					MsgType: "error",
-				}
+				_ = sl.WriteLoggingData(fmt.Sprintf(" '%v' %s:%d", err, f, l-1), "error")
 			}
 
 		case msg := <-iz:
@@ -154,10 +151,7 @@ func interactionZabbix(
 
 			if _, err := hz.SendData([]string{msg}); err != nil {
 				_, f, l, _ := runtime.Caller(0)
-				logging <- datamodels.MessageLogging{
-					MsgData: fmt.Sprintf("'%v' %s:%d", err, f, l-1),
-					MsgType: "error",
-				}
+				_ = sl.WriteLoggingData(fmt.Sprintf(" '%v' %s:%d", err, f, l-1), "error")
 			}
 		}
 	}
@@ -247,14 +241,14 @@ func main() {
 	appVersion := supportingfunctions.GetAppVersion(appName)
 	log.Printf("Placeholder_misp application, version %s is running. Application status is '%s'\n", appVersion, appStatus)
 
-	// логирование данных
-	go loggingHandler(iz, sl, logging)
+	//взаимодействие с Zabbix
+	go interactionZabbix(confApp, hz, sl, iz)
 
 	//вывод данных счетчика
 	go counterHandler(iz, storageApp, counting)
 
-	//взаимодействие с Zabbix
-	go interactionZabbix(confApp, hz, iz, logging)
+	// логирование данных
+	go loggingHandler(iz, sl, logging)
 
 	//инициализация модуля для взаимодействия с NATS (Данный модуль обязателен для взаимодействия)
 	natsModule, err := natsinteractions.NewClientNATS(confApp.AppConfigNATS, confApp.AppConfigTheHive, storageApp, logging, counting)
