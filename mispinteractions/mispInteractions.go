@@ -264,7 +264,7 @@ func addEvent(
 	_, _ = sendObjectsMispFormat(host, authKey, eventId, data, logging)
 
 	//берем небольшой таймаут
-	time.Sleep(2 * time.Second)
+	time.Sleep(4 * time.Second)
 
 	// добавляем event_tags
 	if err := sendEventTagsMispFormat(host, masterKey, eventId, data, logging); err != nil {

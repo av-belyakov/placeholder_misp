@@ -27,15 +27,16 @@ const ROOT_DIR = "placeholder_misp"
 
 var (
 	err        error
-	sl         simplelogger.SimpleLoggerSettings
+	warnings   []string
 	confApp    confighandler.ConfigApp
+	sl         simplelogger.SimpleLoggerSettings
 	lr         *rules.ListRule
 	hz         *zabbixinteractions.HandlerZabbixConnection
-	warnings   []string
 	storageApp *memorytemporarystorage.CommonStorageTemporary
-	iz         chan string
-	logging    chan datamodels.MessageLogging
-	counting   chan datamodels.DataCounterSettings
+
+	iz       chan string
+	logging  chan datamodels.MessageLogging
+	counting chan datamodels.DataCounterSettings
 )
 
 func getAppName(pf string, nl int) (string, error) {

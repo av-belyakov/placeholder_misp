@@ -274,7 +274,8 @@ func NewMispFormat(
 				listAttributeTmp.CleanAttribute()
 				listAttributesMisp.CleanListAttributesMisp()
 
-				// только для тестов, что бы завершить гроутину вывода информации и логирования
+				// ТОЛЬКО ДЛЯ ТЕСТОВ, что бы завершить гроутину вывода информации и логирования
+				//при выполнения тестирования
 				logging <- datamodels.MessageLogging{
 					MsgData: "",
 					MsgType: "STOP TEST",
