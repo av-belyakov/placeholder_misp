@@ -18,6 +18,7 @@ import (
 	"placeholder_misp/natsinteractions"
 	"placeholder_misp/redisinteractions"
 	rules "placeholder_misp/rulesinteraction"
+	"placeholder_misp/supportingfunctions"
 )
 
 func CoreHandler(
@@ -32,7 +33,7 @@ func CoreHandler(
 	natsChanReception := natsModule.GetDataReceptionChannel()
 	mispChanReception := mispModule.GetDataReceptionChannel()
 	redisChanReception := redisModule.GetDataReceptionChannel()
-	hmfh := NewHandlerMessageFromHive(storageApp, listRule, logging, counting)
+	hjm := NewHandlerJsonMessage(storageApp, logging, counting)
 
 	for {
 		select {
@@ -45,11 +46,19 @@ func CoreHandler(
 				RawData: data.Data,
 			})
 
-			//формирование итоговых документов в формате MISP
-			chanCreateMispFormat, chanDone := NewMispFormat(data.MsgId, mispModule, logging)
+			//для записи необработанных событий в лог-файл events
+			if str, err := supportingfunctions.NewReadReflectJSONSprint(data.Data); err != nil {
+				logging <- datamodels.MessageLogging{
+					MsgData: fmt.Sprintf("\t---------------\n\tEVENTS:\n%s\n", str),
+					MsgType: "events",
+				}
+			}
 
-			//обработчик сообщений из TheHive (выполняется разбор сообщения и его разбор на основе правил)
-			go hmfh.HandlerMessageFromHive(chanCreateMispFormat, data.Data, data.MsgId, chanDone)
+			// обработчик JSON документа
+			chanOutputDecodeJson := hjm.HandlerJsonMessage(data.Data, data.MsgId)
+
+			//формирование итоговых документов в формате MISP
+			go NewMispFormat(chanOutputDecodeJson, data.MsgId, mispModule, listRule, logging, counting)
 
 		case data := <-mispChanReception:
 			switch data.Command {

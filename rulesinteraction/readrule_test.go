@@ -35,15 +35,19 @@ var _ = Describe("Readrule", Ordered, func() {
 				resultPrint += fmt.Sprintln("    ", k+1, ".")
 				resultPrint += fmt.Sprintf("      searchField: '%s'\n", v.SearchField)
 				resultPrint += fmt.Sprintf("      searchValue: '%s'\n", v.SearchValue)
+				resultPrint += fmt.Sprintf("      statementExpression: '%v'\n", v.StatementExpression)
 			}
 		}
 
 		resultPrint += fmt.Sprintln("  EXCLUDE:")
-		for k, v := range r.Rules.Exclude {
-			resultPrint += fmt.Sprintln("    ", k+1, ".")
-			resultPrint += fmt.Sprintf("      searchField: '%s'\n", v.SearchField)
-			resultPrint += fmt.Sprintf("      searchValue: '%s'\n", v.SearchValue)
-			resultPrint += fmt.Sprintf("      accurateComparison: '%v'\n", v.AccurateComparison)
+		for key, value := range r.Rules.Exclude {
+			resultPrint += fmt.Sprintln("  ", key+1, ".")
+			for k, v := range value.ListAnd {
+				resultPrint += fmt.Sprintln("    ", k+1, ".")
+				resultPrint += fmt.Sprintf("      searchField: '%s'\n", v.SearchField)
+				resultPrint += fmt.Sprintf("      searchValue: '%s'\n", v.SearchValue)
+				resultPrint += fmt.Sprintf("      accurateComparison: '%v'\n", v.AccurateComparison)
+			}
 		}
 
 		resultPrint += fmt.Sprintf("  PASSANY: '%v'\n", r.Rules.Passany)

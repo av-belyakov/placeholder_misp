@@ -69,16 +69,24 @@ func (lr *ListRule) PassRuleHandler(fieldName string, currentValue interface{}) 
 				continue
 			}
 
+			fmt.Printf("func 'PassRuleHandler' fieldName: '%s', v.SearchField: '%s'\n", fieldName, v.SearchField)
+
 			if strings.Contains(v.SearchValue, "not:") && v.SearchValue[:4] == "not:" {
 				if cvstr == v.SearchValue[4:] {
 					continue
 				}
 
+				fmt.Printf("func 'PassRuleHandler' 111 cvstr: '%s', v.SearchValue: '%s'\n", cvstr, v.SearchValue)
+
 				lr.Rules.Pass[key].ListAnd[k].StatementExpression = true
 			} else {
+				fmt.Printf("func 'PassRuleHandler' 222 cvstr: '%s', v.SearchValue: '%s'\n", cvstr, v.SearchValue)
+
 				if cvstr != v.SearchValue {
 					continue
 				}
+
+				fmt.Printf("func 'PassRuleHandler' 333 cvstr: '%s', v.SearchValue: '%s'\n", cvstr, v.SearchValue)
 
 				lr.Rules.Pass[key].ListAnd[k].StatementExpression = true
 			}
@@ -105,6 +113,8 @@ func (lr *ListRule) SomePassRuleIsTrue() bool {
 	for k, v := range lr.Rules.Pass {
 		skipMsg := true
 		for _, value := range v.ListAnd {
+			fmt.Printf("func 'SomePassRuleIsTrue', value:%v\n", value)
+
 			if !value.StatementExpression {
 				skipMsg = false
 
@@ -115,6 +125,8 @@ func (lr *ListRule) SomePassRuleIsTrue() bool {
 		// действует правило 'И'
 		list[k] = skipMsg
 	}
+
+	fmt.Println("func 'SomePassRuleIsTrue', list:", list)
 
 	for _, v := range list {
 		if v {
@@ -137,20 +149,19 @@ func (lr *ListRule) SomePassRuleIsTrue() bool {
 func (lr *ListRule) ExcludeRuleHandler(fieldName string, currentValue interface{}) bool {
 	cvstr := fmt.Sprint(currentValue)
 
-	for _, v := range lr.Rules.Exclude {
-		if fieldName != v.SearchField {
-			continue
-		}
+	for _, value := range lr.Rules.Exclude {
+		for _, v := range value.ListAnd {
+			if v.SearchField != fieldName {
+				continue
+			}
 
-		//fmt.Println("func 'ExcludeRuleHandler'")
-		//fmt.Println("fieldName: ", fieldName, " currentValue:", cvstr)
+			if v.AccurateComparison && cvstr == v.SearchValue {
+				return true
+			}
 
-		if v.AccurateComparison && cvstr == v.SearchValue {
-			return true
-		}
-
-		if !v.AccurateComparison && strings.Contains(cvstr, v.SearchValue) {
-			return true
+			if !v.AccurateComparison && strings.Contains(cvstr, v.SearchValue) {
+				return true
+			}
 		}
 	}
 
@@ -168,7 +179,7 @@ func (lr *ListRule) GetRulePassany() bool {
 }
 
 // GetRuleExclude  возвращает список правил типа Exclude
-func (lr *ListRule) GetRuleExclude() []RuleExclude {
+func (lr *ListRule) GetRuleExclude() []ExcludeListAnd {
 	return lr.Rules.Exclude
 }
 
@@ -197,8 +208,8 @@ func getRootPath(rootDir string) (string, error) {
 }
 
 func (lr *ListRule) verification() []string {
-	rr, rp, re := []RuleReplace{}, []PassListAnd{}, []RuleExclude{}
-	warning := []string{}
+	rr, rp, re := []RuleReplace(nil), []PassListAnd(nil), []ExcludeListAnd(nil)
+	warning := []string(nil)
 
 	//проверяем правила типа 'Pass'
 	for _, value := range lr.Rules.Pass {
@@ -206,7 +217,7 @@ func (lr *ListRule) verification() []string {
 			continue
 		}
 
-		listAnd := []RulePass{}
+		listAnd := []RulePass(nil)
 		for k, v := range value.ListAnd {
 			k += 1
 			if v.SearchField == "" {
@@ -251,21 +262,36 @@ func (lr *ListRule) verification() []string {
 	}
 
 	//проверяем правила типа 'Exclude'
-	for k, v := range lr.Rules.Exclude {
-		k += 1
-		if v.SearchField == "" {
-			warning = append(warning, fmt.Sprintf("warning: rule type 'EXCLUDE', number rule '%d', the 'searchField' property should not be empty", k))
-
+	for _, value := range lr.Rules.Exclude {
+		if len(value.ListAnd) == 0 {
 			continue
 		}
 
-		re = append(re, RuleExclude{
-			CommonRuleFields: CommonRuleFields{
-				SearchField: v.SearchField,
-				SearchValue: v.SearchValue,
-			},
-			AccurateComparison: v.AccurateComparison,
-		})
+		listAnd := []RuleExclude(nil)
+		for k, v := range value.ListAnd {
+			k += 1
+			if v.SearchField == "" {
+				warning = append(warning, fmt.Sprintf("warning: rule type 'EXCLUDE', number rule '%d', the 'searchField' property should not be empty", k))
+
+				continue
+			}
+
+			if v.SearchValue == "" {
+				warning = append(warning, fmt.Sprintf("warning: rule type 'EXCLUDE', number rule '%d', the 'searchValue' property should not be empty", k))
+
+				continue
+			}
+
+			listAnd = append(listAnd, RuleExclude{
+				CommonRuleFields: CommonRuleFields{
+					SearchField: v.SearchField,
+					SearchValue: v.SearchValue,
+				},
+				AccurateComparison: v.AccurateComparison,
+			})
+		}
+
+		re = append(re, ExcludeListAnd{ListAnd: listAnd})
 	}
 
 	if len(rp) == 0 && !lr.Rules.Passany {

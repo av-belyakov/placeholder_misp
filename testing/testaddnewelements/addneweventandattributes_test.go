@@ -28,8 +28,6 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		listRules                      *rules.ListRule
 		mispModule                     *mispinteractions.ModuleMISP
 		storageApp                     *memorytemporarystorage.CommonStorageTemporary
-		chanCreateMispFormat           chan coremodule.ChanInputCreateMispFormat
-		chanDone                       chan bool
 		exampleByte                    []byte
 		errReadFile, errMisp, errRules error
 	)
@@ -125,12 +123,11 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		//инициалиация модуля для взаимодействия с MISP
 		mispModule, errMisp = mispinteractions.HandlerMISP(*confApp.GetAppMISP(), confApp.Organizations, logging)
 
+		hjm := coremodule.NewHandlerJsonMessage(storageApp, logging, counting)
+		// обработчик JSON документа
+		chanOutputDecodeJson := hjm.HandlerJsonMessage(exampleByte, taskId)
 		//формирование итоговых документов в формате MISP
-		chanCreateMispFormat, chanDone = coremodule.NewMispFormat(taskId, mispModule, logging)
-
-		//обработчик сообщений из TheHive (выполняется разбор сообщения и его разбор на основе правил)
-		hmfh := coremodule.NewHandlerMessageFromHive(storageApp, listRules, logging, counting)
-		go hmfh.HandlerMessageFromHive(chanCreateMispFormat, exampleByte, taskId, chanDone)
+		go coremodule.NewMispFormat(chanOutputDecodeJson, taskId, mispModule, listRules, logging, counting)
 	})
 
 	Context("Тест 1. Проверка инициализации модулей", func() {

@@ -1,19 +1,19 @@
 #     Общее описание правил.
 #
 #   Все используемые правила делятся на три типа: REPLACE, PASSANY и PASS. Правила
-# типа REPLACE и PASS реализованы в виде списка объектов с параметрами. 
+# типа REPLACE и PASS реализованы в виде списка объектов с параметрами.
 #
 #   Правило типа PASSANY имеет только один единственный параметр 'true' или 'false'.
 #
 #   Правила из раздела REPLACE должны содержать список объектов состоящих из определенных
 # свойств и отвечают за замену значений определенных полей, либо просто совпадающих полей,
-# если наименование искомого поле не заполняется. 
+# если наименование искомого поле не заполняется.
 # Правило данного типа выполняется ВСЕГДА. Для данного типа правил обязательными являются
 # поля 'searchValue' и 'replaceValue'. Свойство 'searchField' может быть пустым или
 # отсутствовать, тогда поиск будет осуществлятся только по значению из свойства 'searchValue'.
 # Одно из свойств 'searchField' или 'searchValue' должно быть заполнено. Если свойство
 # 'searchValue' пустое, а свойство 'searchField' заполнено то выполняется поиск поля с
-# именем из 'searchField' и пустым значением. Если свойство 'replaceValue' пустое, то 
+# именем из 'searchField' и пустым значением. Если свойство 'replaceValue' пустое, то
 # найденное значение будет заменено пустым.
 # ЛОГИКА обработки списка объектов данного правила "ИЛИ".
 #
@@ -27,9 +27,9 @@
 # символом в стоке может содержать конструкцию 'not:', что для обработчика будет означать
 # логическое отрицание. Кроме того, данное поле может содержать только конструкцию 'not:'
 # что будет означать - поле не должно быть пустым.
-# ЛОГИКА обработки списка объектов "ИЛИ" для первого уровня вложения и логика "И" для 
-# второго уровня вложения. 
-# 
+# ЛОГИКА обработки списка объектов "ИЛИ" для первого уровня вложения и логика "И" для
+# второго уровня вложения.
+#
 #   Правила из раздела EXCLUDE должны содержать список из вложенных объектов, состоящих
 # из определенных свойств. Они отвечают за исключение сообщения из списка передаваемых
 # в MISP. Эти правила применяются только для свойств содержащих массив объектов.
@@ -40,14 +40,14 @@
 # в которых нужно найти определенное значение. Поле searchValue может быть пустым,
 # тогда будет выполнен поиск пустого свойства из поля searchField. Поле accurateComparison
 # содержит тригер, определяющий тип поиска значения из поля searchValue.
-# При значении поля accurateComparison 'false' поиск осуществляется 
+# При значении поля accurateComparison 'false' поиск осуществляется
 # по наличию содержимого. Например, если searchValue содержит значение
 # 'example', то в указанном из поля searchField свойстве будет выполнятся поиск
 # наличия значения 'example' в любом тексте, если оно есть то правило применяется.
 # В противоположность, значение 'true' поля accurateComparison требует осуществлять
 # 'строгое' сравнение, то есть содержимое в искомом свойстве должно содержать
 # только значение 'example' и ничего больше.
-# ЛОГИКА обработки списка объектов "ИЛИ". 
+# ЛОГИКА обработки списка объектов "ИЛИ".
 #
 #   Список параметров правил:
 # - searchField - поле поиска (обязательно для правил PASS)
@@ -103,21 +103,31 @@ RULES:
   REPLACE:
   PASS:
     - listAnd:
-      - searchField: "event.object.impactStatus"
-        searchValue: "WithImpact"
-      - searchField: "event.object.resolutionStatus"
-        searchValue: "TruePositive"
-      - searchField: "event.object.tlp"
-        searchValue: "not:3"
+        - searchField: "event.object.impactStatus"
+          searchValue: "WithImpact"
+        - searchField: "event.object.resolutionStatus"
+          searchValue: "TruePositive"
+        - searchField: "event.object.tlp"
+          searchValue: "not:3"
     - listAnd:
   EXCLUDE:
-    - searchField: "observables.tlp"
-      searchValue: "3"
-      accurateComparison: true
-    - searchField: "observables.dataType"
-      searchValue: "url_pcap"
-      accurateComparison: false
-    - searchField: "observables.data"
-      searchValue: "anisimova.cloud.gcm"
-      accurateComparison: false
+    - listAnd:
+        - searchField: "observables.tlp"
+          searchValue: "3"
+          accurateComparison: true
+    - listAnd:
+        - searchField: "observables.dataType"
+          searchValue: "url_pcap"
+          accurateComparison: false
+    - listAnd:
+        - searchField: "observables.data"
+          searchValue: "anisimova.cloud.gcm"
+          accurateComparison: false
+    - listAnd:
+        - searchField: "observables.ioc"
+          searchValue: "true"
+          accurateComparison: true
+        - searchField: "observables.tlp"
+          searchValue: "2"
+          accurateComparison: true
   PASSANY: false

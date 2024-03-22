@@ -6,26 +6,25 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"placeholder_misp/coremodule"
-	"placeholder_misp/datamodels"
-	"placeholder_misp/memorytemporarystorage"
-	"placeholder_misp/mispinteractions"
-	rules "placeholder_misp/rulesinteraction"
-	"placeholder_misp/supportingfunctions"
 	"sync"
 	"time"
 
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+
+	"placeholder_misp/coremodule"
+	"placeholder_misp/datamodels"
+	"placeholder_misp/memorytemporarystorage"
+	"placeholder_misp/mispinteractions"
+	rules "placeholder_misp/rulesinteraction"
+	"placeholder_misp/supportingfunctions"
 )
 
 var _ = Describe("Processingrules", Ordered, func() {
 	var (
-		lr *rules.ListRule
-		//storageApp                        *memorytemporarystorage.CommonStorageTemporary
-		logging chan datamodels.MessageLogging
-		//mispOutput                        <-chan mispinteractions.SettingChanOutputMISP
+		lr          *rules.ListRule
+		logging     chan datamodels.MessageLogging
 		moduleMisp  *mispinteractions.ModuleMISP
 		exampleByte []byte
 		counting    chan datamodels.DataCounterSettings
@@ -97,7 +96,7 @@ var _ = Describe("Processingrules", Ordered, func() {
 			var count int
 			for _, v := range lr.GetRulePass() {
 				for _, value := range v.ListAnd {
-					//		fmt.Printf("field '%s' is exist '%v'\n", value.SearchField, value.StatementExpression)
+					//fmt.Printf("\tfield '%s' is exist '%v'\n", value.SearchField, value.StatementExpression)
 
 					if value.StatementExpression {
 						count++
@@ -224,6 +223,29 @@ var _ = Describe("Processingrules", Ordered, func() {
 							if l, ok := d.([]datamodels.AttributesMispFormat); ok {
 								fmt.Println("___________ MISP type: ATTRIBUTES ___________")
 								fmt.Println("+++++++++++++++ Length: ", len(l))
+								/*
+									!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+									После изменения функций
+
+									hjm := coremodule.NewHandlerJsonMessage(storageApp, logging, counting)
+									// обработчик JSON документа
+									chanOutputDecodeJson := hjm.HandlerJsonMessage(exampleByte, msgId)
+									//формирование итоговых документов в формате MISP
+									go coremodule.NewMispFormat(chanOutputDecodeJson, msgId, moduleMisp, lr, logging, counting)
+
+									протестировал их. Все работает также как и раньше,
+									в том числе и обработка правил REPLACE и PASS
+
+									!!!! но правило EXCLUDE в настоящее время не обрабатывается,
+									НАДО СДЕЛАТЬ обработчик !!!!
+
+									!!! для успешного прохождения данных тестов
+									нужно закоментировать listRule.CleanStatementExpressionRulePass()
+									в файле createMispFormat.go
+
+									!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+								*/
 								fmt.Println("_____________________________________________")
 							}
 						}
@@ -270,17 +292,15 @@ var _ = Describe("Processingrules", Ordered, func() {
 				}
 			}()
 
+			msgId := uuid.New().String()
 			// инициализируем модуль временного хранения информации
 			storageApp := memorytemporarystorage.NewTemporaryStorage()
 
-			hmfh := coremodule.NewHandlerMessageFromHive(storageApp, lr, logging, counting)
-
-			msgId := uuid.New().String()
-
-			// формирование итоговых документов в формате MISP
-			chanCreateMispFormat, chanDone := coremodule.NewMispFormat(msgId, moduleMisp, logging)
-			// обработчик сообщений из TheHive (выполняется разбор сообщения и его разбор на основе правил)
-			go hmfh.HandlerMessageFromHive(chanCreateMispFormat, exampleByte, msgId, chanDone)
+			hjm := coremodule.NewHandlerJsonMessage(storageApp, logging, counting)
+			// обработчик JSON документа
+			chanOutputDecodeJson := hjm.HandlerJsonMessage(exampleByte, msgId)
+			//формирование итоговых документов в формате MISP
+			go coremodule.NewMispFormat(chanOutputDecodeJson, msgId, moduleMisp, lr, logging, counting)
 
 			wg.Wait()
 

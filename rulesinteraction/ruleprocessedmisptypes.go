@@ -7,15 +7,19 @@ type ListRule struct {
 
 // RuleOptions содержит опции правил
 type RuleOptions struct {
-	Passany bool          `yaml:"PASSANY"`
-	Pass    []PassListAnd `yaml:"PASS"`
-	Replace []RuleReplace `yaml:"REPLACE"`
-	Exclude []RuleExclude `yaml:"EXCLUDE"`
+	Passany bool             `yaml:"PASSANY"`
+	Pass    []PassListAnd    `yaml:"PASS"`
+	Replace []RuleReplace    `yaml:"REPLACE"`
+	Exclude []ExcludeListAnd `yaml:"EXCLUDE"`
 }
 
 // PassListAnd список правил с логикой 'И'
 type PassListAnd struct {
 	ListAnd []RulePass `yaml:"listAnd"`
+}
+
+type ExcludeListAnd struct {
+	ListAnd []RuleExclude `yaml:"listAnd"`
 }
 
 // CommonRuleFields общие поля которые могут использоватся для описания большинства типов правил
@@ -33,7 +37,8 @@ type RulePassany struct {
 }
 
 // RulePass содержит тип правила для пропуска сообщений подходящих под определенные критерии
-// StatementExpression утверждение выражения
+// StatementExpression утверждение выражения (индикатор соответствия правила переданному
+// выражению)
 type RulePass struct {
 	CommonRuleFields    `mapstructure:",squash"`
 	StatementExpression bool
