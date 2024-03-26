@@ -145,27 +145,33 @@ func (lr *ListRule) SomePassRuleIsTrue() bool {
 // сравнение, то есть содержимое currentValue должно в точности соответствовать содержимому
 // поля searchValue. А если состояние поля AccurateComparison 'false', то тогда currentValue
 // должно содержать в себе значение из поля searchValue вместе с любыми другими значениями.
-// При совпадения значений, функция возвращает 'true'.
-func (lr *ListRule) ExcludeRuleHandler(fieldName string, currentValue interface{}) bool {
+func (lr *ListRule) ExcludeRuleHandler(fieldName string, currentValue interface{}) ([2]int, bool) {
 	cvstr := fmt.Sprint(currentValue)
+	var address [2]int
 
-	for _, value := range lr.Rules.Exclude {
-		for _, v := range value.ListAnd {
+	for key, value := range lr.Rules.Exclude {
+		for k, v := range value.ListAnd {
 			if v.SearchField != fieldName {
 				continue
 			}
 
-			if v.AccurateComparison && cvstr == v.SearchValue {
-				return true
-			}
+			if v.AccurateComparison {
+				if cvstr == v.SearchValue {
+					address := [2]int{key, k}
 
-			if !v.AccurateComparison && strings.Contains(cvstr, v.SearchValue) {
-				return true
+					return address, true
+				}
+			} else {
+				if strings.Contains(cvstr, v.SearchValue) {
+					address := [2]int{key, k}
+
+					return address, true
+				}
 			}
 		}
 	}
 
-	return false
+	return address, false
 }
 
 // GetRulePass возвращает список правил типа Pass

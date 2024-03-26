@@ -124,8 +124,16 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
 
+			attrObject, errMarshal := json.MarshalIndent(lamf[k], "", "  ")
+			if errMarshal != nil {
+				logging <- datamodels.MessageLogging{
+					MsgData: fmt.Sprintf("'the received data does not match the type \"attributes\"' %s:%d", f, l-2),
+					MsgType: "error",
+				}
+			}
+
 			logging <- datamodels.MessageLogging{
-				MsgData: fmt.Sprintf("'attributes №%s add, %s' %s:%d", eventId, err.Error(), f, l-2),
+				MsgData: fmt.Sprintf("'attributes №%s add, object:\n%s\n%s' %s:%d", eventId, string(attrObject), err.Error(), f, l-2),
 				MsgType: "warning",
 			}
 
@@ -319,6 +327,8 @@ func sendEventTagsMispFormat(host, authKey, eventId string, d SettingsChanInputM
 
 		return nil
 	}
+
+	fmt.Println("__________ func 'sendEventTagsMispFormat', ListEventObjectTags:", leot, "___________________")
 
 	eotmf := datamodels.EventObjectTagsMispFormat{}
 

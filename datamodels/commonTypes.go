@@ -23,7 +23,24 @@ func NewListEventObjectTags() *ListEventObjectTags {
 }
 
 func (leot *ListEventObjectTags) SetTag(v string) {
-	if strings.Contains(v, "ATs") || strings.Contains(v, "misp-galaxy:") {
+	listPattern := []string{
+		"ats",
+		"sensor",
+		"misp-galaxy",
+		"class-attack",
+	}
+
+	searchName := func(str string) bool {
+		for _, value := range listPattern {
+			if strings.Contains(str, value) {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	if searchName(strings.ToLower(v)) {
 		*leot = append(*leot, v)
 	}
 }

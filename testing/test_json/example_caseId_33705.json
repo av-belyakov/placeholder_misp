@@ -474,7 +474,7 @@
             "data": "192.168.23.44",
             "reports": "",
             "sighted": false,
-            "ioc": false,
+            "ioc": true,
             "tlp": 2
         },
         {
@@ -507,7 +507,7 @@
             "_createdAt": 1699603435587,
             "data": "ftp://ftp.cloud.gcm/traffic/8030009/1699603033_2023_11_10____10_57_13_995420.pcap",
             "extraData": "",
-            "ioc": true,
+            "ioc": false,
             "ignoreSimilarity": true,
             "message": "Download a piece of traffic",
             "tlp": 2,

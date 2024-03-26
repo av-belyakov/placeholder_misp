@@ -1,6 +1,7 @@
 package coremodule
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"runtime"
@@ -23,6 +24,9 @@ func NewMispFormat(
 	listObjectsMisp := datamodels.NewListObjectsMispFormat()
 	listAttributeTmp := datamodels.NewListAttributeTmp()
 	listAttributesMisp := datamodels.NewListAttributesMispFormat()
+	leot := datamodels.NewListEventObjectTags()
+
+	supportiveListExcludeRule := NewSupportiveListExcludeRuleTmp(listRule.GetRuleExclude())
 
 	listHandlerMisp := map[string][]func(interface{}, int){
 		//event -> events
@@ -34,6 +38,9 @@ func NewMispFormat(
 		"event.organisationId":   {eventsMisp.SetValueOrgIdEventsMisp},
 		"event.object.updatedAt": {eventsMisp.SetValueSightingTimestampEventsMisp},
 		"event.object.owner":     {eventsMisp.SetValueEventCreatorEmailEventsMisp},
+		"event.object.customFields.class-attack.string": {func(i interface{}, num int) {
+			leot.SetTag(fmt.Sprintf("class-attack=\"%v\"", i))
+		}},
 		//observables -> attributes
 		"observables._id":  {listAttributesMisp.SetValueObjectIdAttributesMisp},
 		"observables.data": {listAttributesMisp.SetValueValueAttributesMisp},
@@ -61,14 +68,13 @@ func NewMispFormat(
 	var (
 		maxCountObservables int
 		seqNumObservable    int
+		caseId              float64
 		userEmail           string
 		caseSource          string
-		caseId              float64
 		patterIsNum         *regexp.Regexp = regexp.MustCompile(`^\d+$`)
 	)
 
 	svn := NewStorageValueName()
-	leot := datamodels.NewListEventObjectTags()
 	exclusionRules := NewExclusionRules()
 	listGalaxyTags := NewMispGalaxyTags()
 	addFuncGalaxyTags := addListGalaxyTags(listGalaxyTags)
@@ -97,8 +103,8 @@ func NewMispFormat(
 			userEmail = uemail
 		}
 
-		//************* Обработка правил ***************
-		//обработка правил Replacement
+		//*************** Обработка правил ***************
+		//обработка правил REPLACEMENT (замена)
 		newValue, _, err := listRule.ReplacementRuleHandler(tmf.ValueType, tmf.FieldBranch, tmf.Value)
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
@@ -108,20 +114,8 @@ func NewMispFormat(
 				MsgType: "warning",
 			}
 		}
-		//обработка правил Pass
+		//обработка правил PASS (пропуск)
 		listRule.PassRuleHandler(tmf.FieldBranch, newValue)
-
-		//fmt.Printf("func 'NewMispFormat', FieldBranch: '%s', Value: '%v' (newValue: '%v')\n", tmf.FieldBranch, tmf.Value, newValue)
-
-		/*
-			!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-				здесь и далее в других типах надо подумать как
-				обрабатывать группу условий тип "И"
-
-			!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		*/
-		//обработка правил EXCLUSION (исключения)
-		//ExclusionRuleWorked: lr.ExcludeRuleHandler(fieldBranch, ncv),
 		//**********************************************
 
 		//для observables которые содержат свойства, являющиеся картами,
@@ -157,15 +151,9 @@ func NewMispFormat(
 
 			svn.SetValueName(newFieldName)
 
-			/*
-				!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-					здесь и далее в других типах надо подумать как
-					обрабатывать группу условий тип "И"
-
-				!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			*/
-			if tmf.ExclusionRuleWorked {
-				exclusionRules.Add(seqNumObservable, tmf.FieldBranch)
+			// ************* обработка правил EXCLUSION (исключения) *************
+			if addrRule, isEqual := listRule.ExcludeRuleHandler(tmf.FieldBranch, newValue); isEqual {
+				supportiveListExcludeRule.Add(seqNumObservable, tmf.FieldBranch, newValue, addrRule, isEqual)
 			}
 		}
 
@@ -240,6 +228,39 @@ func NewMispFormat(
 		//ответственные за формирование галактик в MISP
 		joinEventTags(leot, createGalaxyTags(listGalaxyTags))
 
+		fmt.Println("*-*-*-*-*-*-*-*-*-*-*-*-*-*--*--*-*-*-*-*-")
+		for k, v := range supportiveListExcludeRule.Get() {
+			fmt.Printf("num:%d\n", k)
+			for key, value := range v {
+				fmt.Printf("  %d.\n    %v\n", key, value)
+			}
+		}
+		fmt.Println("*-*-*-*-*-*-*-*-*-*-*-*-*-*--*--*-*-*-*-*-")
+
+		fmt.Println("******** BEFORE COUNT listAttributesMisp =", len(listAttributesMisp.GetListAttributesMisp()))
+		//	Здесь надо доделать!!!!!!!!!!!!
+		for k, v := range listAttributesMisp.GetListAttributesMisp() {
+			if supportiveListExcludeRule.CheckRuleTrue(k) {
+				//*************************
+				//ЭТО ТО ЧТО НУЖНО УДАЛИТЬ
+				//*************************
+				fmt.Println("_____ listObjectsTmp key:", k, " data:")
+				jsonObj, _ := json.MarshalIndent(v, "", "  ")
+				fmt.Println(string(jsonObj))
+
+				/*
+					!!!!!!!!!!!!!!!!!!!!!!!
+						Вроде сделал, успешно удаляет, но наверное надо еще
+						потестировать, возможно уже в продакшине
+					!!!!!!!!!!!!!!!!!!!!!!!
+				*/
+
+				//удаляем элементы подходящие под правила
+				listAttributesMisp.DelElementListAttributesMisp(k)
+			}
+		}
+		fmt.Println("******** AFTER COUNT listAttributesMisp =", len(listAttributesMisp.GetListAttributesMisp()))
+
 		//тут отправляем сформированные по формату MISP пользовательские структуры
 		mispmodule.SendingDataInput(mispinteractions.SettingsChanInputMISP{
 			Command:    "add event",
@@ -249,8 +270,7 @@ func NewMispFormat(
 			UserEmail:  userEmail,
 			MajorData: map[string]interface{}{
 				"events": eventsMisp,
-				//getNewListAttributes влияет на поля Category и Type
-				//типа Attributes
+				//getNewListAttributes влияет на поля Category и Type типа Attributes
 				"attributes": getNewListAttributes(
 					listAttributesMisp.GetListAttributesMisp(),
 					listTags),
@@ -265,7 +285,6 @@ func NewMispFormat(
 	userEmail, caseSource = "", ""
 	leot.CleanListTags()
 	eventsMisp.CleanEventsMispFormat()
-	//exclusionRules.Clean()
 	listObjectsMisp.CleanListObjectsMisp()
 	listAttributeTmp.CleanAttribute()
 	listAttributesMisp.CleanListAttributesMisp()

@@ -220,7 +220,7 @@ func (lamisp *ListAttributesMispFormat) SetValueValueAttributesMisp(v interface{
 	//повторную блокировку Mutex
 	lamisp.Unlock()
 
-	//дополнительно, если значение подподает под рег. вырожение типа "8030073:193.29.19.55"
+	//дополнительно, если значение подподает под рег. выражение типа "8030073:193.29.19.55"
 	//то устанавливаем дополнительное значение типа в поле "object_relation"
 	patter := regexp.MustCompile(`^[\d]+:((25[0-5]|2[0-4]\d|[01]?\d\d?)[.]){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$`)
 	if patter.MatchString(value) {

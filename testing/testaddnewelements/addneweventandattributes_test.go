@@ -65,12 +65,12 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		confApp.AppConfigNATS.Port = 4222
 
 		//misp-world
-		confApp.AppConfigMISP.Host = "misp-world.cloud.gcm"
-		confApp.AppConfigMISP.Auth = "TvHkjH8jVQEIdvAxjxnL4H6wDoKyV7jobDjndvAo"
+		//confApp.AppConfigMISP.Host = "misp-world.cloud.gcm"
+		//confApp.AppConfigMISP.Auth = "TvHkjH8jVQEIdvAxjxnL4H6wDoKyV7jobDjndvAo"
 
 		//misp-center
-		//confApp.AppConfigMISP.Host = "misp-center.cloud.gcm"
-		//confApp.AppConfigMISP.Auth = "Z2PwRBdP5lFP7rdDJBzxmSahaLEwIvJoeOuwhRYQ"
+		confApp.AppConfigMISP.Host = "misp-center.cloud.gcm"
+		confApp.AppConfigMISP.Auth = "Z2PwRBdP5lFP7rdDJBzxmSahaLEwIvJoeOuwhRYQ"
 
 		go func() {
 			fmt.Println("___ Logging START")

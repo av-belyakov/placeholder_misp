@@ -127,7 +127,7 @@ RULES:
         - searchField: "observables.ioc"
           searchValue: "true"
           accurateComparison: true
-        - searchField: "observables.tlp"
-          searchValue: "2"
+        - searchField: "observables.data"
+          searchValue: "192.168.23.44"
           accurateComparison: true
   PASSANY: false
