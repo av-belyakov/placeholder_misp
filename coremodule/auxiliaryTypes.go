@@ -5,20 +5,17 @@ import (
 )
 
 // ChanInputCreateMispFormat
-// ExclusionRuleWorked - информирует что сработало правило исключения значения из списка
-// передаваемых данных
 // UUID - уникальный идентификатор в формате UUID
 // FieldName - наименование поля
 // ValueType - тип передаваемого значения (string, int и т.д.)
 // Value - любые передаваемые данные
 // FieldBranch - 'путь' до значения в как в JSON формате, например 'event.details.customFields.class'
 type ChanInputCreateMispFormat struct {
-	ExclusionRuleWorked bool
-	UUID                string
-	FieldName           string
-	ValueType           string
-	Value               interface{}
-	FieldBranch         string
+	UUID        string
+	FieldName   string
+	ValueType   string
+	Value       interface{}
+	FieldBranch string
 }
 
 type FieldsNameMapping struct {

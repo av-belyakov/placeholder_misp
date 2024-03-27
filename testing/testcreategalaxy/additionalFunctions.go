@@ -3,14 +3,14 @@ package testcreategalaxy_test
 import (
 	"encoding/json"
 	"fmt"
-	"placeholder_misp/datamodels"
-	rules "placeholder_misp/rulesinteraction"
 	"reflect"
 	"runtime"
+
+	"placeholder_misp/datamodels"
+	rules "placeholder_misp/rulesinteraction"
 )
 
 // ChanInputCreateMispFormat
-// ExclusionRuleWorked - информирует что сработало правило исключения значения из списка
 // передаваемых данных
 // UUID - уникальный идентификатор в формате UUID
 // FieldName - наименование поля
@@ -18,12 +18,11 @@ import (
 // Value - любые передаваемые данные
 // FieldBranch - 'путь' до значения в как в JSON формате, например 'event.details.customFields.class'
 type ChanInputCreateMispFormat struct {
-	ExclusionRuleWorked bool
-	UUID                string
-	FieldName           string
-	ValueType           string
-	Value               interface{}
-	FieldBranch         string
+	UUID        string
+	FieldName   string
+	ValueType   string
+	Value       interface{}
+	FieldBranch string
 }
 
 func DecodeJsonObject(
@@ -35,7 +34,7 @@ func DecodeJsonObject(
 ) {
 	listMap := map[string]interface{}{}
 	if err := json.Unmarshal(b, &listMap); err == nil {
-		_ = processingReflectMap(logging, cmispf, listMap, listRule, 0, "")
+		_ = processingReflectMap(logging, cmispf, listMap, listRule, "")
 	}
 
 	cmispfDone <- true
@@ -47,7 +46,6 @@ func processingReflectAnySimpleType(
 	name interface{},
 	anyType interface{},
 	lr *rules.ListRule,
-	num int,
 	fieldBranch string) interface{} {
 
 	var nameStr string
@@ -80,11 +78,10 @@ func processingReflectAnySimpleType(
 		lr.PassRuleHandler(fieldBranch, ncv)
 
 		chanOutMispFormat <- ChanInputCreateMispFormat{
-			FieldName:           nameStr,
-			ValueType:           "string",
-			Value:               ncv,
-			FieldBranch:         fieldBranch,
-			ExclusionRuleWorked: lr.ExcludeRuleHandler(fieldBranch, ncv),
+			FieldName:   nameStr,
+			ValueType:   "string",
+			Value:       ncv,
+			FieldBranch: fieldBranch,
 		}
 
 		return ncv
@@ -104,11 +101,10 @@ func processingReflectAnySimpleType(
 		lr.PassRuleHandler(fieldBranch, ncv)
 
 		chanOutMispFormat <- ChanInputCreateMispFormat{
-			FieldName:           nameStr,
-			ValueType:           "int",
-			Value:               ncv,
-			FieldBranch:         fieldBranch,
-			ExclusionRuleWorked: lr.ExcludeRuleHandler(fieldBranch, ncv),
+			FieldName:   nameStr,
+			ValueType:   "int",
+			Value:       ncv,
+			FieldBranch: fieldBranch,
 		}
 
 		return ncv
@@ -128,11 +124,10 @@ func processingReflectAnySimpleType(
 		lr.PassRuleHandler(fieldBranch, ncv)
 
 		chanOutMispFormat <- ChanInputCreateMispFormat{
-			FieldName:           nameStr,
-			ValueType:           "uint",
-			Value:               ncv,
-			FieldBranch:         fieldBranch,
-			ExclusionRuleWorked: lr.ExcludeRuleHandler(fieldBranch, ncv),
+			FieldName:   nameStr,
+			ValueType:   "uint",
+			Value:       ncv,
+			FieldBranch: fieldBranch,
 		}
 
 		return ncv
@@ -152,11 +147,10 @@ func processingReflectAnySimpleType(
 		lr.PassRuleHandler(fieldBranch, ncv)
 
 		chanOutMispFormat <- ChanInputCreateMispFormat{
-			FieldName:           nameStr,
-			ValueType:           "float",
-			Value:               ncv,
-			FieldBranch:         fieldBranch,
-			ExclusionRuleWorked: lr.ExcludeRuleHandler(fieldBranch, ncv),
+			FieldName:   nameStr,
+			ValueType:   "float",
+			Value:       ncv,
+			FieldBranch: fieldBranch,
 		}
 
 		return ncv
@@ -176,11 +170,10 @@ func processingReflectAnySimpleType(
 		lr.PassRuleHandler(fieldBranch, ncv)
 
 		chanOutMispFormat <- ChanInputCreateMispFormat{
-			FieldName:           nameStr,
-			ValueType:           "bool",
-			Value:               ncv,
-			FieldBranch:         fieldBranch,
-			ExclusionRuleWorked: lr.ExcludeRuleHandler(fieldBranch, ncv),
+			FieldName:   nameStr,
+			ValueType:   "bool",
+			Value:       ncv,
+			FieldBranch: fieldBranch,
 		}
 
 		return ncv
@@ -194,7 +187,6 @@ func processingReflectMap(
 	chanOutMispFormat chan<- ChanInputCreateMispFormat,
 	l map[string]interface{},
 	lr *rules.ListRule,
-	num int,
 	fieldBranch string) map[string]interface{} {
 
 	var (
@@ -221,18 +213,18 @@ func processingReflectMap(
 		switch r.Kind() {
 		case reflect.Map:
 			if v, ok := v.(map[string]interface{}); ok {
-				newMap = processingReflectMap(logging, chanOutMispFormat, v, lr, num+1, fbTmp)
+				newMap = processingReflectMap(logging, chanOutMispFormat, v, lr, fbTmp)
 				nl[k] = newMap
 			}
 
 		case reflect.Slice:
 			if v, ok := v.([]interface{}); ok {
-				newList = processingReflectSlice(logging, chanOutMispFormat, v, lr, num+1, fbTmp)
+				newList = processingReflectSlice(logging, chanOutMispFormat, v, lr, fbTmp)
 				nl[k] = newList
 			}
 
 		default:
-			nl[k] = processingReflectAnySimpleType(logging, chanOutMispFormat, k, v, lr, num, fbTmp)
+			nl[k] = processingReflectAnySimpleType(logging, chanOutMispFormat, k, v, lr, fbTmp)
 		}
 	}
 
@@ -244,7 +236,6 @@ func processingReflectSlice(
 	chanOutMispFormat chan<- ChanInputCreateMispFormat,
 	l []interface{},
 	lr *rules.ListRule,
-	num int,
 	fieldBranch string) []interface{} {
 
 	var (
@@ -263,20 +254,20 @@ func processingReflectSlice(
 		switch r.Kind() {
 		case reflect.Map:
 			if v, ok := v.(map[string]interface{}); ok {
-				newMap = processingReflectMap(logging, chanOutMispFormat, v, lr, num+1, fieldBranch)
+				newMap = processingReflectMap(logging, chanOutMispFormat, v, lr, fieldBranch)
 
 				nl = append(nl, newMap)
 			}
 
 		case reflect.Slice:
 			if v, ok := v.([]interface{}); ok {
-				newList = processingReflectSlice(logging, chanOutMispFormat, v, lr, num+1, fieldBranch)
+				newList = processingReflectSlice(logging, chanOutMispFormat, v, lr, fieldBranch)
 
 				nl = append(nl, newList...)
 			}
 
 		default:
-			nl = append(nl, processingReflectAnySimpleType(logging, chanOutMispFormat, k, v, lr, num, fieldBranch))
+			nl = append(nl, processingReflectAnySimpleType(logging, chanOutMispFormat, k, v, lr, fieldBranch))
 		}
 	}
 

@@ -130,4 +130,14 @@ RULES:
         - searchField: "observables.data"
           searchValue: "192.168.23.44"
           accurateComparison: true
+    - listAnd:
+        - searchField: "observables.sighted"
+          searchValue: "false"
+          accurateComparison: true
+        - searchField: "observables._createdBy"
+          searchValue: "zablotsky"
+          accurateComparison: false
+        - searchField: "observables.data"
+          searchValue: "letin@mail"
+          accurateComparison: false
   PASSANY: false

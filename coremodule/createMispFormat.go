@@ -1,7 +1,6 @@
 package coremodule
 
 import (
-	"encoding/json"
 	"fmt"
 	"regexp"
 	"runtime"
@@ -209,8 +208,9 @@ func NewMispFormat(
 
 	//выполняет очистку значения StatementExpression что равно отсутствию совпадений в правилах Pass
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// ВРЕМЕННО ЗАКОМЕНТИРОВАЛ
-	// не забыть снять коментарий
+	// ВРЕМЕННО КОМЕНТИРУЕТСЯ для проведения тестов
+	//
+	// в production не забывать убирать коментарий
 	//
 	listRule.CleanStatementExpressionRulePass()
 
@@ -228,38 +228,12 @@ func NewMispFormat(
 		//ответственные за формирование галактик в MISP
 		joinEventTags(leot, createGalaxyTags(listGalaxyTags))
 
-		fmt.Println("*-*-*-*-*-*-*-*-*-*-*-*-*-*--*--*-*-*-*-*-")
-		for k, v := range supportiveListExcludeRule.Get() {
-			fmt.Printf("num:%d\n", k)
-			for key, value := range v {
-				fmt.Printf("  %d.\n    %v\n", key, value)
-			}
-		}
-		fmt.Println("*-*-*-*-*-*-*-*-*-*-*-*-*-*--*--*-*-*-*-*-")
-
-		fmt.Println("******** BEFORE COUNT listAttributesMisp =", len(listAttributesMisp.GetListAttributesMisp()))
-		//	Здесь надо доделать!!!!!!!!!!!!
-		for k, v := range listAttributesMisp.GetListAttributesMisp() {
+		for k := range listAttributesMisp.GetListAttributesMisp() {
 			if supportiveListExcludeRule.CheckRuleTrue(k) {
-				//*************************
-				//ЭТО ТО ЧТО НУЖНО УДАЛИТЬ
-				//*************************
-				fmt.Println("_____ listObjectsTmp key:", k, " data:")
-				jsonObj, _ := json.MarshalIndent(v, "", "  ")
-				fmt.Println(string(jsonObj))
-
-				/*
-					!!!!!!!!!!!!!!!!!!!!!!!
-						Вроде сделал, успешно удаляет, но наверное надо еще
-						потестировать, возможно уже в продакшине
-					!!!!!!!!!!!!!!!!!!!!!!!
-				*/
-
-				//удаляем элементы подходящие под правила
+				//удаляем элементы подходящие под правила группы EXCLUDE
 				listAttributesMisp.DelElementListAttributesMisp(k)
 			}
 		}
-		fmt.Println("******** AFTER COUNT listAttributesMisp =", len(listAttributesMisp.GetListAttributesMisp()))
 
 		//тут отправляем сформированные по формату MISP пользовательские структуры
 		mispmodule.SendingDataInput(mispinteractions.SettingsChanInputMISP{
