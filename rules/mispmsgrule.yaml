@@ -103,10 +103,10 @@ RULES:
   REPLACE:
   PASS:
     - listAnd:
-        - searchField: "event.object.impactStatus"
-          searchValue: "WithImpact"
-        - searchField: "event.object.resolutionStatus"
-          searchValue: "TruePositive"
+        #        - searchField: "event.object.impactStatus"
+        #          searchValue: "WithImpact"
+        #        - searchField: "event.object.resolutionStatus"
+        #          searchValue: "TruePositive"
         - searchField: "event.object.tlp"
           searchValue: "not:3"
     - listAnd:
@@ -135,7 +135,7 @@ RULES:
           searchValue: "false"
           accurateComparison: true
         - searchField: "observables._createdBy"
-          searchValue: "zablotsky"
+          searchValue: "belyakov"
           accurateComparison: false
         - searchField: "observables.data"
           searchValue: "letin@mail"
