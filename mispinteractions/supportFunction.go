@@ -328,8 +328,6 @@ func sendEventTagsMispFormat(host, authKey, eventId string, d SettingsChanInputM
 		return nil
 	}
 
-	fmt.Println("__________ func 'sendEventTagsMispFormat', ListEventObjectTags:", leot, "___________________")
-
 	eotmf := datamodels.EventObjectTagsMispFormat{}
 
 	// ***********************************

@@ -113,8 +113,6 @@ func (lr *ListRule) SomePassRuleIsTrue() bool {
 	for k, v := range lr.Rules.Pass {
 		skipMsg := true
 		for _, value := range v.ListAnd {
-			fmt.Printf("func 'SomePassRuleIsTrue', value:%v\n", value)
-
 			if !value.StatementExpression {
 				skipMsg = false
 
@@ -125,8 +123,6 @@ func (lr *ListRule) SomePassRuleIsTrue() bool {
 		// действует правило 'И'
 		list[k] = skipMsg
 	}
-
-	fmt.Println("func 'SomePassRuleIsTrue', list:", list)
 
 	for _, v := range list {
 		if v {

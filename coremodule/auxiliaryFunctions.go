@@ -97,8 +97,6 @@ func (ser *SupportiveExcludeRuleTmp) Add(num int, fieldName string, searchValue 
 				continue
 			}
 
-			fmt.Println("func 'Add', fieldName:", fieldName, " search value:", searchValue)
-
 			ser.rules[num][k][key].isEqual = true
 		}
 	}
