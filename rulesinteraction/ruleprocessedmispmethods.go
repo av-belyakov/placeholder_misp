@@ -69,24 +69,16 @@ func (lr *ListRule) PassRuleHandler(fieldName string, currentValue interface{}) 
 				continue
 			}
 
-			fmt.Printf("func 'PassRuleHandler' fieldName: '%s', v.SearchField: '%s'\n", fieldName, v.SearchField)
-
 			if strings.Contains(v.SearchValue, "not:") && v.SearchValue[:4] == "not:" {
 				if cvstr == v.SearchValue[4:] {
 					continue
 				}
 
-				fmt.Printf("func 'PassRuleHandler' 111 cvstr: '%s', v.SearchValue: '%s'\n", cvstr, v.SearchValue)
-
 				lr.Rules.Pass[key].ListAnd[k].StatementExpression = true
 			} else {
-				fmt.Printf("func 'PassRuleHandler' 222 cvstr: '%s', v.SearchValue: '%s'\n", cvstr, v.SearchValue)
-
 				if cvstr != v.SearchValue {
 					continue
 				}
-
-				fmt.Printf("func 'PassRuleHandler' 333 cvstr: '%s', v.SearchValue: '%s'\n", cvstr, v.SearchValue)
 
 				lr.Rules.Pass[key].ListAnd[k].StatementExpression = true
 			}
