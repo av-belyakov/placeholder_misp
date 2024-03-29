@@ -16,13 +16,19 @@
 #
 #    ZABBIX настройки подключения к серверу Zabbix
 #
-# isTransmit - триггер включения/отключения передачи
-# networkHost - хост в формате ip или domainname для подклчения к серверу
-# networkPort - сетевой порт
-# zabbixHost - приемник сообщений
-# zabbixKey - ключ приемника
-# timeInterval - временной интервал в минутах, нужен для подтверждения активности модуля
-# handshake - сообщение которое будет отправлятся для подтверждения активности
+# networkHost: хост в формате ip или domainname для подклчения к серверу
+#  networkPort: сетевой порт
+#  zabbixHosts: группа хостов zabbix
+#    - zabbixHost: имя хоста (приемник сообщений)
+#      eventTypes: группы типов событий (например error, info или handshake)
+#        - eventType: тип события (на какое событие отправлять данные)
+#          zabbixKey: ключ приемника
+#          isTransmit: триггер включения/отключения передачи
+#          handshake:
+#            timeInterval: временной интервал в минутах, нужен для
+#             подтверждения активности модуля (если 0 НЕ ПЕРЕДАЮТСЯ)
+#            message: сообщение которое будет отправлятся для подтверждения
+#             активности (если пустое. то не передается)
 #
 ORGANIZATIONS:
   - { orgName: "GCM", sourceName: "gcm" }
@@ -74,10 +80,29 @@ LOGGING:
       maxFileSize: 10000,
     }
 ZABBIX:
-  isTransmit: true
   networkHost: "192.168.9.45"
   networkPort: 10051
-  zabbixHost: "sib-server"
-  zabbixKey: "test_bav"
-  timeInterval: 10
-  handshake: "I'm still alive"
+  zabbixHosts:
+    - zabbixHost: "test-uchet-db.cloud.gcm"
+      eventTypes:
+        # для отслеживания ошибок
+        - eventType: "error"
+          zabbixKey: "error_bav"
+          isTransmit: true
+          handshake:
+            timeInterval: 0
+            message: ""
+        # для информационных сообщений о выполненной работе
+        - eventType: "info"
+          zabbixKey: "info_bav"
+          isTransmit: true
+          handshake:
+            timeInterval: 0
+            message: "I'm still alive"
+        # для регулярного отстукивания что модуль еще работает
+        - eventType: "handshake"
+          zabbixKey: "handshake_bav"
+          isTransmit: true
+          handshake:
+            timeInterval: 1
+            message: "0"

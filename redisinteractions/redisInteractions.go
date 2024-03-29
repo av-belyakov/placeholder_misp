@@ -5,13 +5,14 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"placeholder_misp/confighandler"
-	"placeholder_misp/datamodels"
-	"placeholder_misp/memorytemporarystorage"
 	"runtime"
 	"strings"
 
 	redis "github.com/redis/go-redis/v9"
+
+	"placeholder_misp/confighandler"
+	"placeholder_misp/datamodels"
+	"placeholder_misp/memorytemporarystorage"
 )
 
 func HandlerRedis(

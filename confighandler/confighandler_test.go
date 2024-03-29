@@ -26,20 +26,28 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 		It("Должно быть получено содержимое общего файла 'config.yaml'", func() {
 			conf, err := confighandler.NewConfig()
 
-			fmt.Println("conf = ", conf)
+			//fmt.Println("conf = ", conf)
 
-			for k, v := range conf.GetListOrganization() {
-				fmt.Printf("%d. OrgName: %s, SourceName: %s\n", k, v.OrgName, v.SourceName)
-			}
+			//for k, v := range conf.GetListOrganization() {
+			//	fmt.Printf("%d. OrgName: %s, SourceName: %s\n", k, v.OrgName, v.SourceName)
+			//}
 
-			fmt.Println("------------------------ ZABBIX -------------------------")
-			fmt.Println("IsTransmit:", conf.GetCommonApp().Zabbix.IsTransmit)
-			fmt.Println("TimeInterval:", conf.GetCommonApp().Zabbix.TimeInterval)
-			fmt.Println("Handshake:", conf.GetCommonApp().Zabbix.Handshake)
-			fmt.Println("NetworkHost:", conf.GetCommonApp().Zabbix.NetworkHost)
-			fmt.Println("NetworkPort:", conf.GetCommonApp().Zabbix.NetworkPort)
-			fmt.Println("ZabbixHost:", conf.GetCommonApp().Zabbix.ZabbixHost)
-			fmt.Println("ZabbixKey:", conf.GetCommonApp().Zabbix.ZabbixKey)
+			commonApp := conf.GetCommonApp()
+
+			//fmt.Println("------------------------ ZABBIX -------------------------")
+			//fmt.Println("NetworkHost:", conf.GetCommonApp().Zabbix.NetworkHost)
+			//fmt.Println("NetworkPort:", conf.GetCommonApp().Zabbix.NetworkPort)
+
+			Expect(commonApp.Zabbix.NetworkHost).Should(Equal("192.168.9.45"))
+			Expect(commonApp.Zabbix.NetworkPort).Should(Equal(10051))
+			Expect(len(commonApp.Zabbix.ZabbixHosts)).Should(Equal(1))
+			Expect(commonApp.Zabbix.ZabbixHosts[0].ZabbixHost).Should(Equal("sib-server"))
+			Expect(len(commonApp.Zabbix.ZabbixHosts[0].EventTypes)).Should(Equal(3))
+			Expect(commonApp.Zabbix.ZabbixHosts[0].EventTypes[0].EventType).Should(Equal("error"))
+			Expect(commonApp.Zabbix.ZabbixHosts[0].EventTypes[0].ZabbixKey).Should(Equal("test_bav_1"))
+			Expect(commonApp.Zabbix.ZabbixHosts[0].EventTypes[0].IsTransmit).Should(BeTrue())
+			Expect(commonApp.Zabbix.ZabbixHosts[0].EventTypes[0].Handshake.TimeInterval).Should(Equal(1))
+			Expect(commonApp.Zabbix.ZabbixHosts[0].EventTypes[0].Handshake.Message).Should(Equal("0"))
 
 			Expect(err).ShouldNot(HaveOccurred())
 			Expect(len(conf.GetListLogs())).Should(Equal(5))
@@ -120,11 +128,7 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 
 	Context("Тест 3. Проверка выполнения анмаршалинга конфигурационного файла", func() {
 		It("Должен быть выполнен анмаршалинг части основного конфигурационного файла", func() {
-			type Logs struct {
-				Log []confighandler.LogSet
-			}
-
-			ls := Logs{}
+			ls := confighandler.Logs{}
 
 			viper.SetConfigFile("../configs/config.yaml")
 			viper.SetConfigType("yaml")
@@ -135,6 +139,7 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 			ok := viper.IsSet("LOGGING")
 			err := viper.GetViper().Unmarshal(&ls)
 
+			Expect(len(ls.Logging)).ShouldNot(Equal(0))
 			fmt.Println("result unmarshal config file LOG: ", ls)
 
 			Expect(ok).Should(BeTrue())
