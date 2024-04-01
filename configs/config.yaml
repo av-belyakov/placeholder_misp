@@ -82,27 +82,26 @@ LOGGING:
 ZABBIX:
   networkHost: "192.168.9.45"
   networkPort: 10051
-  zabbixHosts:
-    - zabbixHost: "test-uchet-db.cloud.gcm"
-      eventTypes:
-        # для отслеживания ошибок
-        - eventType: "error"
-          zabbixKey: "error_bav"
-          isTransmit: true
-          handshake:
-            timeInterval: 0
-            message: ""
-        # для информационных сообщений о выполненной работе
-        - eventType: "info"
-          zabbixKey: "info_bav"
-          isTransmit: true
-          handshake:
-            timeInterval: 0
-            message: "I'm still alive"
-        # для регулярного отстукивания что модуль еще работает
-        - eventType: "handshake"
-          zabbixKey: "handshake_bav"
-          isTransmit: true
-          handshake:
-            timeInterval: 1
-            message: "0"
+  zabbixHost: "test-uchet-db.cloud.gcm"
+  eventTypes:
+    # для отслеживания ошибок
+    - eventType: "error"
+      zabbixKey: "placeholder_misp.error"
+      isTransmit: true
+      handshake:
+        timeInterval: 0
+        message: ""
+    # для информационных сообщений о выполненной работе
+    - eventType: "info"
+      zabbixKey: "placeholder_misp.info"
+      isTransmit: true
+      handshake:
+        timeInterval: 0
+        message: "I'm still alive"
+    # для регулярного отстукивания что модуль еще работает
+    - eventType: "handshake"
+      zabbixKey: "placeholder_misp.handshake"
+      isTransmit: true
+      handshake:
+        timeInterval: 1
+        message: "0"

@@ -26,7 +26,7 @@ type HandlerZabbixConnection struct {
 	netProto    string
 	zabbixHost  string
 	connTimeout *time.Duration
-	chanErr     chan<- error
+	chanErr     chan error
 }
 
 type ZabbixOptions struct {

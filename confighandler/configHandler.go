@@ -101,7 +101,8 @@ func NewConfig() (ConfigApp, error) {
 			conf.CommonAppConfig.Zabbix = ZabbixOptions{
 				NetworkPort: np,
 				NetworkHost: z.Zabbix.NetworkHost,
-				ZabbixHosts: z.Zabbix.ZabbixHosts,
+				ZabbixHost:  z.Zabbix.ZabbixHost,
+				EventTypes:  z.Zabbix.EventTypes,
 			}
 		}
 

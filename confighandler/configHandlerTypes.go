@@ -41,9 +41,10 @@ type ZabbixSet struct {
 }
 
 type ZabbixOptions struct {
-	NetworkPort int                 `yaml:"networkPort"`
-	NetworkHost string              `yaml:"networkHost"`
-	ZabbixHosts []ZabbixHostOptions `yaml:"zabbixHosts"`
+	NetworkPort int         `yaml:"networkPort"`
+	NetworkHost string      `yaml:"networkHost"`
+	ZabbixHost  string      `yaml:"zabbixHost"`
+	EventTypes  []EventType `yaml:"eventType"`
 }
 
 type ZabbixHostOptions struct {

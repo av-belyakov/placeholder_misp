@@ -23,17 +23,17 @@ var _ = Describe("Senderzabbix", Ordered, func() {
 			{
 				IsTransmit: true,
 				EventType:  "error",
-				ZabbixKey:  "error_bav",
+				ZabbixKey:  "placeholder_misp.error",
 			},
 			{
 				IsTransmit: true,
 				EventType:  "info",
-				ZabbixKey:  "info_bav",
+				ZabbixKey:  "placeholder_misp.info",
 			},
 			{
 				IsTransmit: true,
 				EventType:  "handshake",
-				ZabbixKey:  "handshake_bav",
+				ZabbixKey:  "placeholder_misp.handshake",
 				Handshake: zabbixinteractions.Handshake{
 					TimeInterval: 1,
 					Message:      "I'm still alive",
@@ -54,33 +54,29 @@ var _ = Describe("Senderzabbix", Ordered, func() {
 				MsgData: "test message with information about app",
 			},
 		}
-
-		chanErr chan error
 	)
 
 	BeforeAll(func() {
-		chanErr = make(chan error)
-		connTimeout := time.Duration(7 * time.Second)
-
-		go func() {
-			for err := range chanErr {
-				fmt.Println("------------- ERROR -------------")
-				fmt.Println(err)
-			}
-		}()
+		connTimeout := time.Duration(3 * time.Second)
 
 		ctx, ctxCancel = context.WithCancel(context.Background())
 		testuchetdb, zcErr = zabbixinteractions.NewZabbixConnection(
 			ctx,
 			zabbixinteractions.SettingsZabbixConnection{
 				Port: 10051,
-				//Host:              "192.168.9.45", //правильный
-				Host:              "192.168.9.145", //не правильный
+				Host: "192.168.9.45", //правильный
+				//Host:              "192.168.9.145", //не правильный
 				NetProto:          "tcp",
 				ZabbixHost:        "test-uchet-db.cloud.gcm",
 				ConnectionTimeout: &connTimeout,
-			},
-			chanErr)
+			})
+
+		go func() {
+			for err := range testuchetdb.GetChanErr() {
+				fmt.Println("------------- ERROR -------------")
+				fmt.Println(err)
+			}
+		}()
 	})
 
 	Context("Тест 0. Проверяем на наличие ошибок при выполнении NewZabbixConnection", func() {
@@ -113,10 +109,10 @@ var _ = Describe("Senderzabbix", Ordered, func() {
 					time.Sleep(time.Duration(1 * time.Second))
 				}
 
-				time.Sleep(time.Duration(2 * time.Second))
+				time.Sleep(time.Duration(10 * time.Second))
 
 				ctxCancel()
-				close(chanErr)
+				//close(chanErr)
 
 				chanDone <- struct{}{}
 			}()

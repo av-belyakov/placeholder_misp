@@ -9,6 +9,7 @@
 package coremodule
 
 import (
+	"context"
 	"fmt"
 	"runtime"
 
@@ -21,24 +22,42 @@ import (
 	"placeholder_misp/supportingfunctions"
 )
 
-func CoreHandler(
+type CoreHandlerSettings struct {
+	storageApp *memorytemporarystorage.CommonStorageTemporary
+	logging    chan<- datamodels.MessageLogging
+	counting   chan<- datamodels.DataCounterSettings
+}
+
+func NewCoreHandler(
+	storage *memorytemporarystorage.CommonStorageTemporary,
+	log chan<- datamodels.MessageLogging,
+	count chan<- datamodels.DataCounterSettings) *CoreHandlerSettings {
+	return &CoreHandlerSettings{
+		storageApp: storage,
+		logging:    log,
+		counting:   count,
+	}
+}
+
+func (settings *CoreHandlerSettings) CoreHandler(
+	ctx context.Context,
 	natsModule *natsinteractions.ModuleNATS,
 	mispModule *mispinteractions.ModuleMISP,
 	redisModule *redisinteractions.ModuleRedis,
-	listRule *rules.ListRule,
-	storageApp *memorytemporarystorage.CommonStorageTemporary,
-	logging chan<- datamodels.MessageLogging,
-	counting chan<- datamodels.DataCounterSettings) {
+	listRule *rules.ListRule) {
 
 	natsChanReception := natsModule.GetDataReceptionChannel()
 	mispChanReception := mispModule.GetDataReceptionChannel()
 	redisChanReception := redisModule.GetDataReceptionChannel()
-	hjm := NewHandlerJsonMessage(storageApp, logging, counting)
+	hjm := NewHandlerJsonMessage(settings.storageApp, settings.logging, settings.counting)
 
 	for {
 		select {
+		case <-ctx.Done():
+			return
+
 		case data := <-natsChanReception:
-			storageApp.SetRawDataHiveFormatMessage(data.MsgId, data.Data)
+			settings.storageApp.SetRawDataHiveFormatMessage(data.MsgId, data.Data)
 
 			//добавляем raw данные по кейсу из thehive в Redis
 			redisModule.SendingDataInput(redisinteractions.SettingsChanInputRedis{
@@ -48,7 +67,7 @@ func CoreHandler(
 
 			//для записи необработанных событий в лог-файл events
 			if str, err := supportingfunctions.NewReadReflectJSONSprint(data.Data); err != nil {
-				logging <- datamodels.MessageLogging{
+				settings.logging <- datamodels.MessageLogging{
 					MsgData: fmt.Sprintf("\t---------------\n\tEVENTS:\n%s\n", str),
 					MsgType: "events",
 				}
@@ -58,7 +77,7 @@ func CoreHandler(
 			chanOutputDecodeJson := hjm.HandlerJsonMessage(data.Data, data.MsgId)
 
 			//формирование итоговых документов в формате MISP
-			go NewMispFormat(chanOutputDecodeJson, data.MsgId, mispModule, listRule, logging, counting)
+			go NewMispFormat(chanOutputDecodeJson, data.MsgId, mispModule, listRule, settings.logging, settings.counting)
 
 		case data := <-mispChanReception:
 			switch data.Command {
@@ -86,8 +105,7 @@ func CoreHandler(
 				eventId, ok := data.Result.(string)
 				if !ok {
 					_, f, l, _ := runtime.Caller(0)
-
-					logging <- datamodels.MessageLogging{
+					settings.logging <- datamodels.MessageLogging{
 						MsgData: fmt.Sprintf("'it is not possible to convert a value to a string' %s:%d", f, l-1),
 						MsgType: "error",
 					}

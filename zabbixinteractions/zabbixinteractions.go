@@ -15,8 +15,7 @@ import (
 // NewZabbixConnection создает обработчик соединения с Zabbix
 // ctx - должен быть context.WithCancel()
 // settings - настройки
-// chErr - канал для отправки ошибок
-func NewZabbixConnection(ctx context.Context, settings SettingsZabbixConnection, chErr chan<- error) (*HandlerZabbixConnection, error) {
+func NewZabbixConnection(ctx context.Context, settings SettingsZabbixConnection) (*HandlerZabbixConnection, error) {
 	var hzc HandlerZabbixConnection
 
 	if settings.Host == "" {
@@ -47,14 +46,19 @@ func NewZabbixConnection(ctx context.Context, settings SettingsZabbixConnection,
 		netProto:    settings.NetProto,
 		zabbixHost:  settings.ZabbixHost,
 		connTimeout: settings.ConnectionTimeout,
-		chanErr:     chErr,
+		chanErr:     make(chan error),
 	}
 
 	return &hzc, nil
 }
 
-func (hzc *HandlerZabbixConnection) Handler(listet []EventType, msgChan <-chan MessageSettings) error {
-	countEvents := len(listet)
+// GetChanErr возвращает канал в который отправляются ошибки возникающие при соединении с Zabbix
+func (hzc *HandlerZabbixConnection) GetChanErr() chan error {
+	return hzc.chanErr
+}
+
+func (hzc *HandlerZabbixConnection) Handler(events []EventType, msgChan <-chan MessageSettings) error {
+	countEvents := len(events)
 	if countEvents == 0 {
 		_, f, l, _ := runtime.Caller(0)
 		return fmt.Errorf("'invalid configuration file for Zabbix, the number of event types (ZABBIX.zabbixHosts.eventTypes) is 0' %s:%d", f, l-1)
@@ -63,20 +67,17 @@ func (hzc *HandlerZabbixConnection) Handler(listet []EventType, msgChan <-chan M
 	listChans := make(map[string]chan<- string, countEvents)
 
 	go func() {
-		fmt.Println("func 'Handler', goroutin 1111 START")
-
 		<-hzc.ctx.Done()
 
 		for _, channel := range listChans {
 			close(channel)
 		}
-
 		listChans = nil
 
-		fmt.Println("func 'Handler', goroutin 1111 END")
+		close(hzc.chanErr)
 	}()
 
-	for _, v := range listet {
+	for _, v := range events {
 		if !v.IsTransmit {
 			continue
 		}
@@ -95,7 +96,6 @@ func (hzc *HandlerZabbixConnection) Handler(listet []EventType, msgChan <-chan M
 				for msg := range cm {
 					if _, err := hzc.SendData(zkey, []string{msg}); err != nil {
 						hzc.chanErr <- err
-
 					}
 				}
 			} else {
@@ -123,13 +123,8 @@ func (hzc *HandlerZabbixConnection) Handler(listet []EventType, msgChan <-chan M
 	}
 
 	go func() {
-		fmt.Println("func 'Handler', goroutin 3333")
-
 		for data := range msgChan {
-			fmt.Println("func 'Handler', goroutin 3333_1")
-
 			if c, ok := listChans[data.EventType]; ok {
-				fmt.Println("func 'Handler', goroutin 3333_2")
 				c <- data.Message
 			}
 		}
@@ -142,8 +137,6 @@ func (hzc *HandlerZabbixConnection) SendData(zkey string, data []string) (int, e
 	if len(data) == 0 {
 		return 0, fmt.Errorf("the list of transmitted data should not be empty")
 	}
-
-	fmt.Println("func 'SendData', START...")
 
 	ldz := make([]DataZabbix, 0, len(data))
 	for _, v := range data {
@@ -172,17 +165,11 @@ func (hzc *HandlerZabbixConnection) SendData(zkey string, data []string) (int, e
 	pkg = append(pkg, dataLen...)
 	pkg = append(pkg, jsonReg...)
 
-	var d net.Dialer
+	var d net.Dialer = net.Dialer{}
 	ctx, cancel := context.WithTimeout(context.Background(), *hzc.connTimeout)
 	defer cancel()
 
-	fmt.Println("func 'SendData', SENDING DATA...")
-
 	conn, err := d.DialContext(ctx, hzc.netProto, fmt.Sprintf("%s:%d", hzc.host, hzc.port))
-	//conn, err := d.Dial(hzc.netProto, fmt.Sprintf("%s:%d", hzc.host, hzc.port))
-
-	fmt.Println("func 'SendData', SENDING ERROR:", err)
-
 	if err != nil {
 		return 0, err
 	}
