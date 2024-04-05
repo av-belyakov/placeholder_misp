@@ -144,4 +144,4 @@ RULES:
         - searchField: "observables.data"
           searchValue: "letin@mail"
           accurateComparison: false
-  PASSANY: false
+  PASSANY: true

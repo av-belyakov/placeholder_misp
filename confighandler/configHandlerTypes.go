@@ -47,11 +47,6 @@ type ZabbixOptions struct {
 	EventTypes  []EventType `yaml:"eventType"`
 }
 
-type ZabbixHostOptions struct {
-	ZabbixHost string      `yaml:"zabbixHost"`
-	EventTypes []EventType `yaml:"eventType"`
-}
-
 type EventType struct {
 	IsTransmit bool      `yaml:"isTransmit"`
 	EventType  string    `yaml:"eventType"`

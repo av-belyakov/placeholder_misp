@@ -162,7 +162,7 @@ func main() {
 	}
 
 	//инициализируем модуль логирования
-	sl, err := simplelogger.NewSimpleLogger("placeholder_misp", getLoggerSettings(confApp.GetListLogs()))
+	sl, err := simplelogger.NewSimpleLogger(ROOT_DIR, getLoggerSettings(confApp.GetListLogs()))
 	if err != nil {
 		log.Fatalf("error module 'simplelogger': %v", err)
 	}

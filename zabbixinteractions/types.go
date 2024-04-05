@@ -50,7 +50,6 @@ type MessageSettings struct {
 	Message, EventType string
 }
 
-// -----------------------------------------------
 type PatternZabbix struct {
 	Request string       `json:"request"`
 	Data    []DataZabbix `json:"data"`
