@@ -57,6 +57,16 @@ func (settings *CoreHandlerSettings) CoreHandler(
 			return
 
 		case data := <-natsChanReception:
+			// ***********************************
+			// Это логирование только для теста!!!
+			// ***********************************
+			settings.logging <- datamodels.MessageLogging{
+				MsgData: "TEST_INFO func 'CoreHandler', reseived new object",
+				MsgType: "testing",
+			}
+			//
+			//
+
 			settings.storageApp.SetRawDataHiveFormatMessage(data.MsgId, data.Data)
 
 			//добавляем raw данные по кейсу из thehive в Redis
@@ -66,12 +76,27 @@ func (settings *CoreHandlerSettings) CoreHandler(
 			})
 
 			//для записи необработанных событий в лог-файл events
-			if str, err := supportingfunctions.NewReadReflectJSONSprint(data.Data); err == nil {
-				settings.logging <- datamodels.MessageLogging{
-					MsgData: fmt.Sprintf("\t---------------\n\tEVENTS:\n%s\n", str),
-					MsgType: "events",
+			go func() {
+				str, err := supportingfunctions.NewReadReflectJSONSprint(data.Data)
+				if err != nil {
+					// ***********************************
+					// Это логирование только для теста!!!
+					// ***********************************
+					settings.logging <- datamodels.MessageLogging{
+						MsgData: "TEST_INFO func 'CoreHandler', reseived new data",
+						MsgType: "testing",
+					}
+					//
+					//
 				}
-			}
+
+				if err == nil {
+					settings.logging <- datamodels.MessageLogging{
+						MsgData: fmt.Sprintf("\t---------------\n\tEVENTS:\n%s\n", str),
+						MsgType: "events",
+					}
+				}
+			}()
 
 			// обработчик JSON документа
 			chanOutputDecodeJson := hjm.HandlerJsonMessage(data.Data, data.MsgId)
@@ -83,6 +108,17 @@ func (settings *CoreHandlerSettings) CoreHandler(
 			switch data.Command {
 			//отправка eventId в NATS
 			case "send event id":
+
+				// ***********************************
+				// Это логирование только для теста!!!
+				// ***********************************
+				settings.logging <- datamodels.MessageLogging{
+					MsgData: "TEST_INFO func 'CoreHandler', send EventId to ----> NATS",
+					MsgType: "testing",
+				}
+				//
+				//
+
 				natsModule.SendingDataInput(natsinteractions.SettingsInputChan{
 					Command: data.Command,
 					EventId: data.EventId,

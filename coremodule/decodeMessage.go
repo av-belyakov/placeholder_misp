@@ -78,6 +78,16 @@ func (s *HandlerJsonMessageSettings) HandlerJsonMessage(b []byte, taskId string)
 			Count:    1,
 		}
 
+		// ***********************************
+		// Это логирование только для теста!!!
+		// ***********************************
+		s.Logging <- datamodels.MessageLogging{
+			MsgData: "TEST_INFO func 'HandlerJsonMessage', handling json message",
+			MsgType: "testing",
+		}
+		//
+		//
+
 		close(chanInput)
 	}()
 

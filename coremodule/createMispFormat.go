@@ -213,6 +213,16 @@ func NewMispFormat(
 	listRule.CleanStatementExpressionRulePass()
 
 	if !isAllowed {
+		// ***********************************
+		// Это логирование только для теста!!!
+		// ***********************************
+		logging <- datamodels.MessageLogging{
+			MsgData: fmt.Sprintf("TEST_INFO func 'NewMispFormat', case with id '%d' does not comply with the rules", int(caseId)),
+			MsgType: "testing",
+		}
+		//
+		//
+
 		_, f, l, _ := runtime.Caller(0)
 		logging <- datamodels.MessageLogging{
 			MsgData: fmt.Sprintf("'the message with case id %d was not sent to MISP because it does not comply with the rules' %s:%d", int(caseId), f, l-1),
@@ -232,6 +242,16 @@ func NewMispFormat(
 				listAttributesMisp.DelElementListAttributesMisp(k)
 			}
 		}
+
+		// ***********************************
+		// Это логирование только для теста!!!
+		// ***********************************
+		logging <- datamodels.MessageLogging{
+			MsgData: fmt.Sprintf("TEST_INFO func 'NewMispFormat', case with id '%d' equal rules, send data to MISP module", int(caseId)),
+			MsgType: "testing",
+		}
+		//
+		//
 
 		//тут отправляем сформированные по формату MISP пользовательские структуры
 		mispmodule.SendingDataInput(mispinteractions.SettingsChanInputMISP{

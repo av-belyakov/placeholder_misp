@@ -132,26 +132,6 @@ func HandlerMISP(
 				}
 			}
 
-			//
-			// --------------------- ТОЛЬКО ДЛЯ ОТЛАДКИ ----------------------
-			//
-			//if data.CaseId == 0 || data.UserEmail == "" {
-			//	if ed, ok := data.MajorData["events"]; !ok {
-			//		logging <- datamodels.MessageLogging{
-			//			MsgData: fmt.Sprintf("TEST_ERROR func 'HandlerMISP', reseived command '%s', the properties of \"events\" were not found in the received data. DATA: %v", data.Command, data.MajorData),
-			//			MsgType: "error",
-			//		}
-			//	} else {
-			//		logging <- datamodels.MessageLogging{
-			//			MsgData: fmt.Sprintf("TEST_ERROR func 'HandlerMISP', reseived command '%s', data object '%v'", data.Command, ed),
-			//			MsgType: "error",
-			//		}
-			//	}
-			//}
-			//
-			// ----------------------------------------------------------------
-			//
-
 			switch data.Command {
 			case "add event":
 				go addEvent(conf.Host, authKey, conf.Auth, data, &mmisp, logging)
@@ -177,7 +157,7 @@ func addEvent(
 	// Это логирование только для теста!!!
 	// ***********************************
 	logging <- datamodels.MessageLogging{
-		MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', --=== RESEIVED DATA ===--	USER EMAIL: %s, ObjectId: %v", data.UserEmail, data.CaseId),
+		MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', send EVENTS to ----> MISP	USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId),
 		MsgType: "testing",
 	}
 	//
@@ -234,7 +214,7 @@ func addEvent(
 	// Это логирование только для теста!!!
 	// ***********************************
 	logging <- datamodels.MessageLogging{
-		MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', отправляем запрос для добавления в БД Redis, id кейса и нового события, где case id: %v, event id: %s", data.CaseId, eventId),
+		MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', send EVENTS REPORTS to ----> MISP	USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId),
 		MsgType: "testing",
 	}
 	//
@@ -250,6 +230,16 @@ func addEvent(
 		}
 	}
 
+	// ***********************************
+	// Это логирование только для теста!!!
+	// ***********************************
+	logging <- datamodels.MessageLogging{
+		MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', send data to ----> RedisDB USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId),
+		MsgType: "testing",
+	}
+	//
+	//
+
 	//отправляем запрос для добавления в БД Redis, id кейса и нового события
 	mmisp.SendingDataOutput(SettingChanOutputMISP{
 		Command: "set new event id",
@@ -257,14 +247,44 @@ func addEvent(
 		EventId: eventId,
 	})
 
+	// ***********************************
+	// Это логирование только для теста!!!
+	// ***********************************
+	logging <- datamodels.MessageLogging{
+		MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', send ATTRIBYTES to ----> MISP	USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId),
+		MsgType: "testing",
+	}
+	//
+	//
+
 	//добавляем атрибуты
 	_, _ = sendAttribytesMispFormat(host, authKey, eventId, data, logging)
+
+	// ***********************************
+	// Это логирование только для теста!!!
+	// ***********************************
+	logging <- datamodels.MessageLogging{
+		MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', send OBJECTS to ----> MISP	USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId),
+		MsgType: "testing",
+	}
+	//
+	//
 
 	// добавляем объекты
 	_, _ = sendObjectsMispFormat(host, authKey, eventId, data, logging)
 
 	//берем небольшой таймаут
 	time.Sleep(4 * time.Second)
+
+	// ***********************************
+	// Это логирование только для теста!!!
+	// ***********************************
+	logging <- datamodels.MessageLogging{
+		MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', send EVENT_TAGS to ----> MISP	USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId),
+		MsgType: "testing",
+	}
+	//
+	//
 
 	// добавляем event_tags
 	if err := sendEventTagsMispFormat(host, masterKey, eventId, data, logging); err != nil {
@@ -275,6 +295,16 @@ func addEvent(
 			MsgType: "error",
 		}
 	}
+
+	// ***********************************
+	// Это логирование только для теста!!!
+	// ***********************************
+	logging <- datamodels.MessageLogging{
+		MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', send PUBLISH to ----> MISP	USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId),
+		MsgType: "testing",
+	}
+	//
+	//
 
 	//публикуем добавленное событие
 	//masterKey нужен для публикации события так как пользователь
@@ -295,6 +325,16 @@ func addEvent(
 			MsgType: "warning",
 		}
 	}
+
+	// ***********************************
+	// Это логирование только для теста!!!
+	// ***********************************
+	logging <- datamodels.MessageLogging{
+		MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', send EventId to ----> CORE	USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId),
+		MsgType: "testing",
+	}
+	//
+	//
 
 	//отправляем в ядро информацию по event Id
 	mmisp.SendingDataOutput(SettingChanOutputMISP{

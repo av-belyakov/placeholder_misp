@@ -124,6 +124,16 @@ func NewClientNATS(
 	})
 
 	nc.Subscribe("main_caseupdate", func(m *nats.Msg) {
+		// ***********************************
+		// Это логирование только для теста!!!
+		// ***********************************
+		logging <- datamodels.MessageLogging{
+			MsgData: "------------|||||| TEST_INFO func 'NewClientNATS', reseived new object ||||||------------",
+			MsgType: "testing",
+		}
+		//
+		//
+
 		mnats.chanOutputNATS <- SettingsOutputChan{
 			MsgId: ns.setElement(m),
 			Data:  m.Data,
