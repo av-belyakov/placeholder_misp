@@ -66,7 +66,7 @@ func (settings *CoreHandlerSettings) CoreHandler(
 			})
 
 			//для записи необработанных событий в лог-файл events
-			if str, err := supportingfunctions.NewReadReflectJSONSprint(data.Data); err != nil {
+			if str, err := supportingfunctions.NewReadReflectJSONSprint(data.Data); err == nil {
 				settings.logging <- datamodels.MessageLogging{
 					MsgData: fmt.Sprintf("\t---------------\n\tEVENTS:\n%s\n", str),
 					MsgType: "events",
