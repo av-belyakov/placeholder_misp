@@ -190,17 +190,15 @@ func NewMispFormat(
 	}
 
 	var isAllowed bool
-	dt := "events do not meet rules"
 	//проверяем что бы хотя бы одно правило разрешало пропуск кейса
 	if listRule.GetRulePassany() || listRule.SomePassRuleIsTrue() {
 		isAllowed = true
-		dt = "update events meet rules"
-	}
 
-	//сетчик кейсов соответствующих или не соответствующих правилам
-	counting <- datamodels.DataCounterSettings{
-		DataType: dt,
-		Count:    1,
+		//сетчик кейсов соответствующих или не соответствующих правилам
+		counting <- datamodels.DataCounterSettings{
+			DataType: "update events meet rules",
+			Count:    1,
+		}
 	}
 
 	//удаляем те объекты Attributes которые соответствуют правилам EXCLUDE

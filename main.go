@@ -71,34 +71,45 @@ func counterHandler(
 	channelZabbix chan<- zabbixinteractions.MessageSettings,
 	storageApp *memorytemporarystorage.CommonStorageTemporary,
 	counting <-chan datamodels.DataCounterSettings) {
-	var ae, emr int
+	//var ae, emr int
 
-	for d := range counting {
-		switch d.DataType {
+	for data := range counting {
+		d, h, m, s := supportingfunctions.GetDifference(storageApp.GetStartTimeDataCounter(), time.Now())
+		patternTime := fmt.Sprintf("со старта приложения: дней %d, часов %d, минут %d, секунд %d", d, h, m, s)
+		var msg string
+
+		switch data.DataType {
 		case "update accepted events":
-			storageApp.SetAcceptedEventsDataCounter(d.Count)
+			storageApp.SetAcceptedEventsDataCounter(data.Count)
+			msg = fmt.Sprintf("принято: %d, %s", storageApp.GetAcceptedEventsDataCounter(), patternTime)
 		case "update processed events":
-			storageApp.SetProcessedEventsDataCounter(d.Count)
+			storageApp.SetProcessedEventsDataCounter(data.Count)
+			msg = fmt.Sprintf("обработано: %d, %s", storageApp.GetProcessedEventsDataCounter(), patternTime)
 		case "update events meet rules":
-			storageApp.SetEventsMeetRulesDataCounter(d.Count)
-		case "events do not meet rules":
-			storageApp.SetEventsDoNotMeetRulesDataCounter(d.Count)
+			storageApp.SetEventsMeetRulesDataCounter(data.Count)
+			msg = fmt.Sprintf("соответствует правилам: %d, %s", storageApp.GetEventsMeetRulesDataCounter(), patternTime)
 		}
 
-		dc := storageApp.GetDataCounter()
-		d, h, m, s := supportingfunctions.GetDifference(dc.StartTime, time.Now())
+		log.Printf("\t%s\n", msg)
+		channelZabbix <- zabbixinteractions.MessageSettings{
+			EventType: "info",
+			Message:   msg,
+		}
 
-		log.Printf("\tсобытий принятых/обработанных: %d/%d, соответствие/не соответствие правилам: %d/%d, время со старта приложения: дней %d, часов %d, минут %d, секунд %d\n", dc.AcceptedEvents, dc.ProcessedEvents, dc.EventsMeetRules, dc.EventsDoNotMeetRules, d, h, m, s)
+		/*
+			dc := storageApp.GetDataCounter()
+			d, h, m, s := supportingfunctions.GetDifference(dc.StartTime, time.Now())
+			log.Printf("\tсобытий принятых/обработанных: %d/%d, соответствие/не соответствие правилам: %d/%d, время со старта приложения: дней %d, часов %d, минут %d, секунд %d\n", dc.AcceptedEvents, dc.ProcessedEvents, dc.EventsMeetRules, dc.EventsDoNotMeetRules, d, h, m, s)
+			if ae != dc.AcceptedEvents || emr != dc.EventsMeetRules {
+				channelZabbix <- zabbixinteractions.MessageSettings{
+					EventType: "info",
+					Message:   fmt.Sprintf("событий принятых: %d, соответствие правилам: %d, время со старта приложения: дней %d, часов %d, минут %d, секунд %d\n", dc.AcceptedEvents, dc.EventsMeetRules, d, h, m, s),
+				}
 
-		if ae != dc.AcceptedEvents || emr != dc.EventsMeetRules {
-			channelZabbix <- zabbixinteractions.MessageSettings{
-				EventType: "info",
-				Message:   fmt.Sprintf("событий принятых: %d, соответствие правилам: %d, время со старта приложения: дней %d, часов %d, минут %d, секунд %d\n", dc.AcceptedEvents, dc.EventsMeetRules, d, h, m, s),
+				ae = dc.AcceptedEvents
+				emr = dc.EventsMeetRules
 			}
-
-			ae = dc.AcceptedEvents
-			emr = dc.EventsMeetRules
-		}
+		*/
 	}
 }
 

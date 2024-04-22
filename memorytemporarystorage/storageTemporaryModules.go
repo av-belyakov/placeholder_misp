@@ -15,12 +15,22 @@ func (cst *CommonStorageTemporary) GetDataCounter() DataCounter {
 	}
 }
 
+// GetStartTimeDataCounter возвращает время начала сетчика
+func (cst *CommonStorageTemporary) GetStartTimeDataCounter() time.Time {
+	return cst.dataCounter.startTime
+}
+
 // SetStartTimeDataCounter добавляет время начала сетчика
 func (cst *CommonStorageTemporary) SetStartTimeDataCounter(t time.Time) {
 	cst.dataCounter.Lock()
 	defer cst.dataCounter.Unlock()
 
 	cst.dataCounter.startTime = t
+}
+
+// GetAcceptedEventsDataCounter сетчик принятых событий
+func (cst *CommonStorageTemporary) GetAcceptedEventsDataCounter() int {
+	return cst.dataCounter.acceptedEvents
 }
 
 // SetAcceptedEventsDataCounter увеличивает сетчик принятых событий
@@ -31,12 +41,22 @@ func (cst *CommonStorageTemporary) SetAcceptedEventsDataCounter(num int) {
 	cst.dataCounter.acceptedEvents += num
 }
 
+// GetProcessedEventsDataCounter сетчик обработанных событий
+func (cst *CommonStorageTemporary) GetProcessedEventsDataCounter() int {
+	return cst.dataCounter.processedEvents
+}
+
 // SetProcessedEventsDataCounter увеличивает сетчик обработанных событий
 func (cst *CommonStorageTemporary) SetProcessedEventsDataCounter(num int) {
 	cst.dataCounter.Lock()
 	defer cst.dataCounter.Unlock()
 
 	cst.dataCounter.processedEvents += num
+}
+
+// GetEventsMeetRulesDataCounter сетчик событий соответствующих правилу
+func (cst *CommonStorageTemporary) GetEventsMeetRulesDataCounter() int {
+	return cst.dataCounter.eventsMeetRules
 }
 
 // SetEventsMeetRulesDataCounter увеличивает сетчик событий соответствующих правилу
