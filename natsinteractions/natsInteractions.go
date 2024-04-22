@@ -18,9 +18,8 @@ import (
 )
 
 var (
-	//ns    *natsStorage
+	ns   *natsStorage
 	once sync.Once
-	//mnats ModuleNATS
 )
 
 type natsStorage struct {
@@ -34,7 +33,6 @@ type messageDescriptors struct {
 }
 
 func NewStorageNATS() *natsStorage {
-	var ns *natsStorage
 	once.Do(func() {
 		ns = &natsStorage{storage: make(map[string]messageDescriptors)}
 

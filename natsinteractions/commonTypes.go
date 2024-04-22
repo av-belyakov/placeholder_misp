@@ -17,7 +17,7 @@ type SettingsInputChan struct {
 	Command, EventId, TaskId string
 }
 
-func (mnats ModuleNATS) GetDataReceptionChannel() <-chan SettingsOutputChan /*[]byte*/ {
+func (mnats ModuleNATS) GetDataReceptionChannel() <-chan SettingsOutputChan {
 	return mnats.chanOutputNATS
 }
 

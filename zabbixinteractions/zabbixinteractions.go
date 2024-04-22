@@ -72,8 +72,8 @@ func (hzc *HandlerZabbixConnection) Handler(events []EventType, msgChan <-chan M
 		for _, channel := range listChans {
 			close(channel)
 		}
-		listChans = nil
 
+		listChans = nil
 		close(hzc.chanErr)
 	}()
 

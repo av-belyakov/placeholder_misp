@@ -167,6 +167,12 @@ func main() {
 		log.Fatalf("error module 'simplelogger': %v", err)
 	}
 
+	defer func() {
+		if r := recover(); r != nil {
+			_ = sl.WriteLoggingData(fmt.Sprint(r), "error")
+		}
+	}()
+
 	//инициализируем модуль чтения правил обработки MISP сообщений
 	lr, warnings, err := rules.NewListRule(ROOT_DIR, confApp.RulesProcMSGMISP.Directory, confApp.RulesProcMSGMISP.File)
 	if err != nil {
@@ -234,7 +240,7 @@ func main() {
 	counting := make(chan datamodels.DataCounterSettings)
 	go counterHandler(channelZabbix, storageApp, counting)
 
-	// логирование данных
+	//логирование данных
 	logging := make(chan datamodels.MessageLogging)
 	go loggingHandler(channelZabbix, sl, logging)
 
@@ -247,7 +253,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// инициализация модуля для взаимодействия с СУБД Redis
+	//инициализация модуля для взаимодействия с СУБД Redis
 	ctxRedis := context.Background()
 	redisModule := redisinteractions.HandlerRedis(ctxRedis, *confApp.GetAppRedis(), storageApp, logging)
 
