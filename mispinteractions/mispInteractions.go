@@ -91,54 +91,56 @@ func HandlerMISP(
 
 	//здесь обрабатываем данные из входного канала модуля MISP
 	go func() {
-		for data := range mmisp.GetInputChannel() {
+		for msg := range mmisp.GetInputChannel() {
 			authKey := conf.Auth
 
 			// ***********************************
 			// Это логирование только для теста!!!
 			// ***********************************
 			logging <- datamodels.MessageLogging{
-				MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', reseived command '%s', data object '%v'", data.Command, data),
+				MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', reseived command '%s', case Id '%d'", msg.Command, int(msg.CaseId)),
 				MsgType: "testing",
 			}
 			//
 			//
 
-			// получаем авторизационный ключ пользователя по его email
-			if data.UserEmail != "" {
-				if us, err := connHandler.GetUserData(data.UserEmail); err == nil {
-					authKey = us.AuthKey
-				} else {
-					_, f, l, _ := runtime.Caller(0)
-					logging <- datamodels.MessageLogging{
-						MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-3),
-						MsgType: "error",
-					}
-
-					if us, err = connHandler.CreateNewUser(data.UserEmail, data.CaseSource); err != nil {
-						_, f, l, _ = runtime.Caller(0)
+			go func(data SettingsChanInputMISP) {
+				// получаем авторизационный ключ пользователя по его email
+				if data.UserEmail != "" {
+					if us, err := connHandler.GetUserData(data.UserEmail); err == nil {
+						authKey = us.AuthKey
+					} else {
+						_, f, l, _ := runtime.Caller(0)
 						logging <- datamodels.MessageLogging{
-							MsgData: fmt.Sprintf("'%s, case id %d' %s:%d", err.Error(), int(data.CaseId), f, l-3),
+							MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-3),
 							MsgType: "error",
 						}
-					} else {
-						authKey = us.AuthKey
 
-						logging <- datamodels.MessageLogging{
-							MsgData: fmt.Sprintf("a new user %s has been successfully created", data.UserEmail),
-							MsgType: "info",
+						if us, err = connHandler.CreateNewUser(data.UserEmail, data.CaseSource); err != nil {
+							_, f, l, _ = runtime.Caller(0)
+							logging <- datamodels.MessageLogging{
+								MsgData: fmt.Sprintf("'%s, case id %d' %s:%d", err.Error(), int(data.CaseId), f, l-3),
+								MsgType: "error",
+							}
+						} else {
+							authKey = us.AuthKey
+
+							logging <- datamodels.MessageLogging{
+								MsgData: fmt.Sprintf("a new user %s has been successfully created", data.UserEmail),
+								MsgType: "info",
+							}
 						}
 					}
 				}
-			}
 
-			switch data.Command {
-			case "add event":
-				go addEvent(conf.Host, authKey, conf.Auth, data, &mmisp, logging)
+				switch data.Command {
+				case "add event":
+					addEvent(conf.Host, authKey, conf.Auth, data, &mmisp, logging)
 
-			case "del event by id":
-				go delEventById(conf, data.EventId, logging)
-			}
+				case "del event by id":
+					delEventById(conf, data.EventId, logging)
+				}
+			}(msg)
 		}
 	}()
 
