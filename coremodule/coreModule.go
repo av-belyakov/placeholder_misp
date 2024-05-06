@@ -54,6 +54,11 @@ func (settings *CoreHandlerSettings) CoreHandler(
 	for {
 		select {
 		case <-ctx.Done():
+			settings.logging <- datamodels.MessageLogging{
+				MsgData: "TEST_INFO func 'CoreHandler', reseived ctx.Done()!!!!",
+				MsgType: "testing",
+			}
+
 			return
 
 		case data := <-natsChanReception:

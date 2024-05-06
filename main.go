@@ -286,6 +286,9 @@ func main() {
 	go func() {
 		osCall := <-sigChan
 		msg := fmt.Sprintf("stop 'main' function, %s", osCall.String())
+
+		log.Println(msg)
+
 		_ = sl.WriteLoggingData(msg, "info")
 
 		close(counting)
