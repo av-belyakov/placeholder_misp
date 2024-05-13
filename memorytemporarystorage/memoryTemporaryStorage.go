@@ -34,7 +34,7 @@ func checkTimeDelete(cst *CommonStorageTemporary) {
 
 	for range c {
 		go func() {
-			for k, v := range copyMap(cst.HiveFormatMessage.Storages) {
+			for k, v := range cst.HiveFormatMessage.Storages {
 				if v.isProcessedMisp && v.isProcessedElasticsearsh && v.isProcessedNKCKI {
 					deleteHiveFormatMessageElement(k, cst)
 				}
@@ -42,20 +42,11 @@ func checkTimeDelete(cst *CommonStorageTemporary) {
 		}()
 
 		go func() {
-			for k, v := range copyMap(cst.temporaryInputCase.Cases) {
+			for k, v := range cst.temporaryInputCase.Cases {
 				if time.Now().Unix() > (v.TimeCreate + 54000) {
 					deleteTemporaryCase(k, cst)
 				}
 			}
 		}()
 	}
-}
-
-func copyMap[K comparable, T any](oldMap map[K]T) map[K]T {
-	newMap := make(map[K]T, len(oldMap))
-	for key, value := range oldMap {
-		newMap[key] = value
-	}
-
-	return newMap
 }
