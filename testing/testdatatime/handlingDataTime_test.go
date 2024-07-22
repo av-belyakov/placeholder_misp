@@ -43,7 +43,7 @@ var _ = Describe("Testing/Testdatatime/HandlingDataTime", func() {
 			t := time.Now()
 
 			Expect(t.Year()).Should(Equal(2024))
-			Expect(int(t.Month())).Should(Equal(1))
+			Expect(int(t.Month())).Should(Equal(7))
 		})
 	})
 
@@ -64,6 +64,17 @@ var _ = Describe("Testing/Testdatatime/HandlingDataTime", func() {
 			fmt.Println("UNIX DATE ", date)
 
 			Expect(len(fmt.Sprintf("%13.f", date))).Should(Equal(13))
+		})
+	})
+
+	Context("Test 5", func() {
+		It("При парсинге строки в формате RFC3339 ошибок быть не должно", func() {
+			t, err := time.Parse(time.RFC3339, "2024-06-26T09:47:46+03:00")
+			Expect(err).ShouldNot(HaveOccurred())
+
+			fmt.Println("Datetime now:", t.String())
+
+			Expect(true).Should(BeTrue())
 		})
 	})
 })

@@ -84,8 +84,8 @@ func (cst *CommonStorageTemporary) GetTemporaryCase(id int) (SettingsInputCase, 
 
 // SetTemporaryCase добавляет информацию о кейсах во временное хранилище
 func (cst *CommonStorageTemporary) SetTemporaryCase(id int, s SettingsInputCase) {
-	cst.temporaryInputCase.Lock()
-	defer cst.temporaryInputCase.Unlock()
+	cst.temporaryInputCase.mu.Lock()
+	defer cst.temporaryInputCase.mu.Unlock()
 
 	s.TimeCreate = time.Now().Unix()
 	cst.temporaryInputCase.Cases[id] = s
@@ -103,8 +103,8 @@ func (cst *CommonStorageTemporary) GetCountHiveFormatMessage() int {
 
 // SetOriginalHaveFormatMessage добавляет сырые данные полученные от TheHive
 func (cst *CommonStorageTemporary) SetRawDataHiveFormatMessage(uuid string, data []byte) {
-	cst.HiveFormatMessage.Lock()
-	defer cst.HiveFormatMessage.Unlock()
+	cst.HiveFormatMessage.mu.Lock()
+	defer cst.HiveFormatMessage.mu.Unlock()
 
 	if _, ok := cst.HiveFormatMessage.Storages[uuid]; !ok {
 		cst.HiveFormatMessage.Storages[uuid] = StorageHiveFormatMessages{}
@@ -132,8 +132,8 @@ func (cst *CommonStorageTemporary) GetRawDataHiveFormatMessage(uuid string) ([]b
 
 // SetProcessedDataHiveFormatMessage добавляет данные частично разобранные Unmarshal JSON
 func (cst *CommonStorageTemporary) SetProcessedDataHiveFormatMessage(uuid string, data map[string]interface{}) {
-	cst.HiveFormatMessage.Lock()
-	defer cst.HiveFormatMessage.Unlock()
+	cst.HiveFormatMessage.mu.Lock()
+	defer cst.HiveFormatMessage.mu.Unlock()
 
 	if _, ok := cst.HiveFormatMessage.Storages[uuid]; !ok {
 		cst.HiveFormatMessage.Storages[uuid] = StorageHiveFormatMessages{}
@@ -161,8 +161,8 @@ func (cst *CommonStorageTemporary) GetProcessedDataHiveFormatMessage(uuid string
 
 // SetAllowedTransferTrueHiveFormatMessage устанавливает поле информирующее о разрешении пропуска события в TRUE
 func (cst *CommonStorageTemporary) SetAllowedTransferTrueHiveFormatMessage(uuid string) {
-	cst.HiveFormatMessage.Lock()
-	defer cst.HiveFormatMessage.Unlock()
+	cst.HiveFormatMessage.mu.Lock()
+	defer cst.HiveFormatMessage.mu.Unlock()
 
 	if _, ok := cst.HiveFormatMessage.Storages[uuid]; !ok {
 		cst.HiveFormatMessage.Storages[uuid] = StorageHiveFormatMessages{}
@@ -280,16 +280,18 @@ func (cst *CommonStorageTemporary) GetListUserSettingsMISP() *CommonStorageTempo
 	return cst
 }
 
-func deleteHiveFormatMessageElement(uuid string, cst *CommonStorageTemporary) {
-	cst.HiveFormatMessage.Lock()
-	defer cst.HiveFormatMessage.Unlock()
+// Delete удаляет элемент из списка сообщений, полученных от TheHive
+func (e *HiveFormatMessages) Delete(uuid string) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
 
-	delete(cst.HiveFormatMessage.Storages, uuid)
+	delete(e.Storages, uuid)
 }
 
-func deleteTemporaryCase(id int, cst *CommonStorageTemporary) {
-	cst.temporaryInputCase.Lock()
-	defer cst.temporaryInputCase.Unlock()
+// Delete удаляет элемент из списка кейсов
+func (e *TemporaryInputCases) Delete(id int) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
 
-	delete(cst.temporaryInputCase.Cases, id)
+	delete(e.Cases, id)
 }

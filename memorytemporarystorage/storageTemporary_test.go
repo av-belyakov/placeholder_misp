@@ -21,7 +21,7 @@ var _ = Describe("StorageTemporary", Ordered, func() {
 		cst = memorytemporarystorage.NewTemporaryStorage()
 	})
 
-	Context("Тест 1. Тестируем добавление и редактирование информации в HiveFormatMessage", func() {
+	Context("Тест 1. Тестируем добавление, редактирование и удаление информации в HiveFormatMessage", func() {
 		It("Должны быть успешно добавлены RAW данные", func() {
 			b1 := []byte("test message 1")
 			cst.SetRawDataHiveFormatMessage(uuidMsg1, b1)
@@ -57,6 +57,17 @@ var _ = Describe("StorageTemporary", Ordered, func() {
 
 			Expect(at).ShouldNot(Equal(BeFalse()))
 			Expect(ok).ShouldNot(Equal(BeFalse()))
+		})
+
+		It("Должен быть успешно удален элемент", func() {
+			testDelUuid := uuid.NewString()
+			cst.SetProcessedDataHiveFormatMessage(uuid.NewString(), map[string]interface{}{"test message delete_23": 23})
+			cst.SetProcessedDataHiveFormatMessage(testDelUuid, map[string]interface{}{"test message delete_4": 4})
+
+			Expect(len(cst.HiveFormatMessage.Storages)).Should(Equal(5))
+
+			cst.HiveFormatMessage.Delete(testDelUuid)
+			Expect(len(cst.HiveFormatMessage.Storages)).Should(Equal(4))
 		})
 	})
 
