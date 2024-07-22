@@ -30,55 +30,33 @@ func NewTemporaryStorage() *CommonStorageTemporary {
 
 // checkTimeDeleteTemporaryStorageSearchQueries очистка информации о задаче по истечении определенного времени или неактуальности данных
 func checkTimeDelete(cst *CommonStorageTemporary) {
-	c := time.Tick(3 * time.Second)
+	c := time.Tick(5 * time.Second)
+
+	var wg sync.WaitGroup
 
 	for range c {
-		go func() {
-			listDel := []string(nil)
+		wg.Add(2)
 
-			//так как чтение Map тоже вызывает конкурентный доступ
-			//cst.HiveFormatMessage.mu.RLock()
+		go func() {
 			for k, v := range cst.HiveFormatMessage.Storages {
 				if v.isProcessedMisp && v.isProcessedElasticsearsh && v.isProcessedNKCKI {
-					listDel = append(listDel, k)
+					delete(cst.HiveFormatMessage.Storages, k)
 				}
 			}
-			//cst.HiveFormatMessage.mu.RUnlock()
 
-			if len(listDel) == 0 {
-				return
-			}
-
-			cst.HiveFormatMessage.mu.Lock()
-			defer cst.HiveFormatMessage.mu.Unlock()
-
-			for _, v := range listDel {
-				delete(cst.HiveFormatMessage.Storages, v)
-			}
+			wg.Done()
 		}()
 
 		go func() {
-			listDel := []int(nil)
-
-			// так как чтение Map тоже вызывает конкурентный доступ
-			//cst.temporaryInputCase.mu.RLock()
 			for k, v := range cst.temporaryInputCase.Cases {
 				if time.Now().Unix() > (v.TimeCreate + 54000) {
-					listDel = append(listDel, k)
+					delete(cst.temporaryInputCase.Cases, k)
 				}
 			}
-			//cst.temporaryInputCase.mu.Unlock()
 
-			if len(listDel) == 0 {
-				return
-			}
-
-			cst.temporaryInputCase.mu.Lock()
-			defer cst.temporaryInputCase.mu.Unlock()
-
-			for _, v := range listDel {
-				delete(cst.temporaryInputCase.Cases, v)
-			}
+			wg.Done()
 		}()
+
+		wg.Wait()
 	}
 }
