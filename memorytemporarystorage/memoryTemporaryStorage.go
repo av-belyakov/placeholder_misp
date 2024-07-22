@@ -37,13 +37,13 @@ func checkTimeDelete(cst *CommonStorageTemporary) {
 			listDel := []string(nil)
 
 			//так как чтение Map тоже вызывает конкурентный доступ
-			cst.HiveFormatMessage.mu.RLock()
+			//cst.HiveFormatMessage.mu.RLock()
 			for k, v := range cst.HiveFormatMessage.Storages {
 				if v.isProcessedMisp && v.isProcessedElasticsearsh && v.isProcessedNKCKI {
 					listDel = append(listDel, k)
 				}
 			}
-			cst.HiveFormatMessage.mu.RUnlock()
+			//cst.HiveFormatMessage.mu.RUnlock()
 
 			if len(listDel) == 0 {
 				return
@@ -61,13 +61,13 @@ func checkTimeDelete(cst *CommonStorageTemporary) {
 			listDel := []int(nil)
 
 			// так как чтение Map тоже вызывает конкурентный доступ
-			cst.temporaryInputCase.mu.RLock()
+			//cst.temporaryInputCase.mu.RLock()
 			for k, v := range cst.temporaryInputCase.Cases {
 				if time.Now().Unix() > (v.TimeCreate + 54000) {
 					listDel = append(listDel, k)
 				}
 			}
-			cst.temporaryInputCase.mu.Unlock()
+			//cst.temporaryInputCase.mu.Unlock()
 
 			if len(listDel) == 0 {
 				return
