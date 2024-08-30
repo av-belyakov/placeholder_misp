@@ -37,21 +37,25 @@ func checkTimeDelete(cst *CommonStorageTemporary) {
 		wg.Add(2)
 
 		go func() {
+			cst.HiveFormatMessage.mu.Lock()
 			for k, v := range cst.HiveFormatMessage.Storages {
 				if v.isProcessedMisp && v.isProcessedElasticsearsh && v.isProcessedNKCKI {
 					delete(cst.HiveFormatMessage.Storages, k)
 				}
 			}
+			cst.HiveFormatMessage.mu.Unlock()
 
 			wg.Done()
 		}()
 
 		go func() {
+			cst.temporaryInputCase.mu.Lock()
 			for k, v := range cst.temporaryInputCase.Cases {
 				if time.Now().Unix() > (v.TimeCreate + 54000) {
 					delete(cst.temporaryInputCase.Cases, k)
 				}
 			}
+			cst.temporaryInputCase.mu.Unlock()
 
 			wg.Done()
 		}()
