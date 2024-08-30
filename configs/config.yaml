@@ -66,6 +66,13 @@ LOGGING:
       maxFileSize: 10000,
     }
   - {
+      msgTypeName: "debug",
+      writingFile: false,
+      pathDirectory: "logs",
+      writingStdout: true,
+      maxFileSize: 10000,
+    }
+  - {
       msgTypeName: "events",
       writingFile: true,
       pathDirectory: "logs",

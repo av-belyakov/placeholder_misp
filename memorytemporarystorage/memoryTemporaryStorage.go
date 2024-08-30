@@ -30,9 +30,8 @@ func NewTemporaryStorage() *CommonStorageTemporary {
 
 // checkTimeDeleteTemporaryStorageSearchQueries очистка информации о задаче по истечении определенного времени или неактуальности данных
 func checkTimeDelete(cst *CommonStorageTemporary) {
-	c := time.Tick(5 * time.Second)
-
 	var wg sync.WaitGroup
+	c := time.Tick(5 * time.Second)
 
 	for range c {
 		wg.Add(2)
