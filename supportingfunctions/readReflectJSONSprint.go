@@ -2,8 +2,10 @@ package supportingfunctions
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"reflect"
+	"strings"
 )
 
 // NewReadReflectJSONSprint функция выполняет вывод JSON сообщения в виде текста
@@ -16,7 +18,7 @@ func NewReadReflectJSONSprint(b []byte) (string, error) {
 	listMap := map[string]interface{}{}
 	if err := json.Unmarshal(b, &listMap); err == nil {
 		if len(listMap) == 0 {
-			return str, fmt.Errorf(errSrc)
+			return str, errors.New(errSrc)
 		}
 
 		return readReflectMapSprint(listMap, 0), err
@@ -25,7 +27,7 @@ func NewReadReflectJSONSprint(b []byte) (string, error) {
 	listSlice := []interface{}{}
 	if err := json.Unmarshal(b, &listSlice); err == nil {
 		if len(listSlice) == 0 {
-			return str, fmt.Errorf(errSrc)
+			return str, errors.New(errSrc)
 		}
 
 		return readReflectSliceSprint(listSlice, 0), err
@@ -35,7 +37,13 @@ func NewReadReflectJSONSprint(b []byte) (string, error) {
 }
 
 func readReflectAnyTypeSprint(name interface{}, anyType interface{}, num int) string {
-	var str, nameStr string
+	var (
+		nameStr string
+		str     strings.Builder = strings.Builder{}
+
+		isCleanLine bool
+	)
+
 	r := reflect.TypeOf(anyType)
 	ws := GetWhitespace(num)
 
@@ -43,30 +51,41 @@ func readReflectAnyTypeSprint(name interface{}, anyType interface{}, num int) st
 		nameStr = fmt.Sprintf("%s%v.", ws, n+1)
 	} else if n, ok := name.(string); ok {
 		nameStr = fmt.Sprintf("%s\"%s\":", ws, n)
+
+		if n == "description" {
+			isCleanLine = true
+		}
 	}
 
 	if r == nil {
-		return str
+		return str.String()
 	}
 
 	switch r.Kind() {
 	case reflect.String:
-		str += fmt.Sprintf("%s \"%s\"\n", nameStr, reflect.ValueOf(anyType).String())
+		dataStr := reflect.ValueOf(anyType).String()
+
+		if isCleanLine {
+			dataStr = strings.ReplaceAll(dataStr, "\t", "")
+			dataStr = strings.ReplaceAll(dataStr, "\n", "")
+		}
+
+		str.WriteString(fmt.Sprintf("%s \"%s\"\n", nameStr, dataStr))
 
 	case reflect.Int, reflect.Int16, reflect.Int32, reflect.Int64:
-		str += fmt.Sprintf("%s %d\n", nameStr, reflect.ValueOf(anyType).Int())
+		str.WriteString(fmt.Sprintf("%s %d\n", nameStr, reflect.ValueOf(anyType).Int()))
 
 	case reflect.Uint, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		str += fmt.Sprintf("%s %d\n", nameStr, reflect.ValueOf(anyType).Uint())
+		str.WriteString(fmt.Sprintf("%s %d\n", nameStr, reflect.ValueOf(anyType).Uint()))
 
 	case reflect.Float32, reflect.Float64:
-		str += fmt.Sprintf("%s %v\n", nameStr, int(reflect.ValueOf(anyType).Float()))
+		str.WriteString(fmt.Sprintf("%s %v\n", nameStr, int(reflect.ValueOf(anyType).Float())))
 
 	case reflect.Bool:
-		str += fmt.Sprintf("%s %v\n", nameStr, reflect.ValueOf(anyType).Bool())
+		str.WriteString(fmt.Sprintf("%s %v\n", nameStr, reflect.ValueOf(anyType).Bool()))
 	}
 
-	return str
+	return str.String()
 }
 
 func readReflectMapSprint(list map[string]interface{}, num int) string {
@@ -114,8 +133,6 @@ func readReflectSliceSprint(list []interface{}, num int) string {
 		if r == nil {
 			return str
 		}
-
-		//str += readReflectAnyTypeSprint(k, v, num)
 
 		switch r.Kind() {
 		case reflect.Map:
