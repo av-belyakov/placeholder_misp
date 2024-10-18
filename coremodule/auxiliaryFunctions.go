@@ -378,6 +378,7 @@ func checkHashName(name string) bool {
 	list := []string{
 		"md5",
 		"sha1",
+		"sha128",
 		"sha224",
 		"sha256",
 		"sha384",

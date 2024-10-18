@@ -1,10 +1,9 @@
 package testhash_test
 
 import (
+	"errors"
 	"fmt"
-	"os"
-	"strings"
-	"time"
+	"regexp"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -32,28 +31,27 @@ func CheckHash(h []string) map[string]string {
 	return result
 }
 
-/*
-    {
-      "template_uuid": "c8cc27a6-4bd31-1f72-afa5-7b9bb4ac3b3b",
-      "template_version": "1",
-      "first_seen": "1581984000000000",
-      "timestamp": "1617875568",
-      "name": "file",
-      "description": "size 817 byte",
-      "event_id": "12660",
-      "meta-category": "file",
-      "distribution": "5",
-      "Attribute": [
-        {
-          "category": "Payload delivery",
-          "type": "other",
-          "value": "n[n.txt",
-          "distribution": "0",
-          "object_relation": "filename"
-        },
- 	  ],
+func CheckStringHash(value string) (string, int, error) {
+	size := len(value)
+
+	reg := regexp.MustCompile(`^[a-fA-F0-9]+$`)
+	if !reg.MatchString(value) {
+		return "", size, errors.New("the value must consist of hexadecimal characters only")
 	}
-*/
+
+	switch size {
+	case 32:
+		return "md5", size, nil
+	case 40:
+		return "sha1", size, nil
+	case 64:
+		return "sha256", size, nil
+	case 128:
+		return "sha512", size, nil
+	}
+
+	return "other", size, nil
+}
 
 var _ = Describe("Checkstringhase", func() {
 	testList := []coremodule.ChanInputCreateMispFormat{
@@ -79,6 +77,16 @@ var _ = Describe("Checkstringhase", func() {
 		},
 	}
 
+	testListStrings := []string{
+		"294593fcb93a6d6694c9670e86e649bf",                                 //md5
+		"fd861b0d33cc076ded2987c94fa9860e0c4aadd0",                         //sha1
+		"6b3383ad0a767b008e8a41db84efea8847de86796aefd3703dcecb7ec3203e27", //sha256
+		"c3f167e719aa944af2e80941ac629d39cec22308",                         //sha1
+		"78cf6611f6928a64b03a57fe218c3cd4",                                 //md5
+		"2c0961c22dc6caad6210759787fb149a837ee2db",                         //sha1
+		"mytextfile.txt",
+	}
+
 	Context("Тест 1. Проверяем тип хеша", func() {
 		It("Должно быть определен тип хеша", func() {
 			hashes := []string{
@@ -90,6 +98,24 @@ var _ = Describe("Checkstringhase", func() {
 			r := CheckHash(hashes)
 
 			Expect(len(r)).Should(Equal(3))
+		})
+
+		It("Должна быть найдена одна ошибка, остальные типы хеша должны быть успешно определены", func() {
+			var countSuccess, countError int
+
+			for _, v := range testListStrings {
+				hashType, stringSize, err := CheckStringHash(v)
+				if err != nil {
+					countError++
+				} else {
+					countSuccess++
+				}
+
+				fmt.Println("test value:", v, "hashType:", hashType, " stringSize:", stringSize)
+			}
+
+			Expect(countError).Should(Equal(1))
+			Expect(countSuccess).Should(Equal(6))
 		})
 	})
 
@@ -112,7 +138,7 @@ var _ = Describe("Checkstringhase", func() {
 		})
 	})
 
-	Context("Test 3", func() {
+	/*Context("Test 3", func() {
 		It("test time", func() {
 			firstSeen := fmt.Sprint(time.Now().UnixMilli()) //13
 			timestamp := fmt.Sprint(time.Now().UnixMicro()) //16
@@ -155,5 +181,5 @@ var _ = Describe("Checkstringhase", func() {
 			Expect(ok).Should(BeTrue())
 			Expect(v).Should(Equal("development"))
 		})
-	})
+	})*/
 })

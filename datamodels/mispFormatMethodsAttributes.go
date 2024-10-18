@@ -2,6 +2,7 @@ package datamodels
 
 import (
 	"fmt"
+	"placeholder_misp/supportingfunctions"
 	"regexp"
 	"time"
 
@@ -196,6 +197,13 @@ func (lamisp *ListAttributesMispFormat) AutoSetValueTypeAttributesMisp(v string,
 
 	if f, ok := collection[v]; ok {
 		f(lamisp, num)
+	}
+
+	//это для определения типа хеша
+	if v == "hash" {
+		if hashName, _, err := supportingfunctions.CheckStringHash(v); err == nil {
+			lamisp.SetValueTypeAttributesMisp(hashName, num)
+		}
 	}
 }
 

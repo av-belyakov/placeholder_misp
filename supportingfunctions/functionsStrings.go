@@ -2,10 +2,12 @@ package supportingfunctions
 
 import (
 	"bufio"
+	"errors"
 	"os"
 	"regexp"
 )
 
+// GetWhitespace возвращает пробел
 func GetWhitespace(num int) string {
 	var str string
 
@@ -20,6 +22,7 @@ func GetWhitespace(num int) string {
 	return str
 }
 
+// GetAppName имя из файла
 func GetAppName(pf string, nl int) (string, error) {
 	var line string
 
@@ -42,6 +45,7 @@ func GetAppName(pf string, nl int) (string, error) {
 	return line, nil
 }
 
+// GetAppVersion версия из файла
 func GetAppVersion(str string) string {
 	version := "версия не определена"
 	patter := regexp.MustCompile(`v(\d)+\.(\d)+.(\d)+`)
@@ -52,6 +56,29 @@ func GetAppVersion(str string) string {
 	}
 
 	return version
+}
+
+// CheckStringHash определеяет тип хеш суммы по ее длинне
+func CheckStringHash(value string) (string, int, error) {
+	size := len(value)
+
+	reg := regexp.MustCompile(`^[a-fA-F0-9]+$`)
+	if !reg.MatchString(value) {
+		return "", size, errors.New("the value must consist of hexadecimal characters only")
+	}
+
+	switch size {
+	case 32:
+		return "md5", size, nil
+	case 40:
+		return "sha1", size, nil
+	case 64:
+		return "sha256", size, nil
+	case 128:
+		return "sha512", size, nil
+	}
+
+	return "other", size, nil
 }
 
 func CheckHashSum(hsum string) string {

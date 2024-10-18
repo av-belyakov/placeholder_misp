@@ -144,13 +144,6 @@ func interactionZabbix(
 }
 
 func main() {
-	/*sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan,
-		syscall.SIGHUP,
-		syscall.SIGINT,
-		syscall.SIGTERM,
-		syscall.SIGQUIT)*/
-
 	ctx, ctxCancel := signal.NotifyContext(context.Background(),
 		syscall.SIGHUP,
 		syscall.SIGINT,

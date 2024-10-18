@@ -27,6 +27,7 @@ func NewMispFormat(
 
 	supportiveListExcludeRule := NewSupportiveListExcludeRuleTmp(listRule.GetRuleExclude())
 
+	//это основной обработчик параметров входящего объекта
 	listHandlerMisp := map[string][]func(interface{}, int){
 		//event -> events
 		"event.object.title":     {eventsMisp.SetValueInfoEventsMisp},
@@ -180,6 +181,9 @@ func NewMispFormat(
 		}
 
 		//проверяем есть ли путь до обрабатываемого свойства в списке обработчиков
+		//это главный обработчик который выполняет всю работу, особенно если выше идущие
+		//обработчики не выполнялись так как принимаемые значения не соответствовали
+		//параметрам для их вызова
 		lf, ok := listHandlerMisp[tmf.FieldBranch]
 		if ok {
 			//основной обработчик путей из tmf.FieldBranch

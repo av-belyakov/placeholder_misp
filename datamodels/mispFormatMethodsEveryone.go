@@ -7,17 +7,20 @@ import (
 	"placeholder_misp/supportingfunctions"
 )
 
+// ListAttributeTmp временный список атрибутов
 type ListAttributeTmp struct {
 	attributes map[int][]AttributeMispFormat
 	sync.Mutex
 }
 
+// NewListAttributeTmp генерирует временный список атрибутов
 func NewListAttributeTmp() *ListAttributeTmp {
 	return &ListAttributeTmp{
 		attributes: map[int][]AttributeMispFormat{},
 	}
 }
 
+// AddAttribute добавляет атрибуты в список атрибутов
 func (la *ListAttributeTmp) AddAttribute(branch string, value interface{}, num int) {
 	t := "other"
 	objr := "other"
@@ -62,10 +65,12 @@ func (la *ListAttributeTmp) AddAttribute(branch string, value interface{}, num i
 	la.attributes[num] = tmp
 }
 
+// GetListAttribute возвращает список атрибутов
 func (la *ListAttributeTmp) GetListAttribute() map[int][]AttributeMispFormat {
 	return la.attributes
 }
 
+// CleanAttribute очищает временный список атрибутов
 func (la *ListAttributeTmp) CleanAttribute() {
 	la.Lock()
 	defer la.Unlock()
