@@ -2,6 +2,10 @@ package supportingfunctions
 
 import (
 	"bufio"
+	"crypto/md5"
+	"crypto/sha1"
+	"crypto/sha256"
+	"crypto/sha512"
 	"errors"
 	"os"
 	"regexp"
@@ -60,7 +64,7 @@ func GetAppVersion(str string) string {
 
 // CheckStringHash определеяет тип хеш суммы по ее длинне
 func CheckStringHash(value string) (string, int, error) {
-	size := len(value)
+	size := len([]byte(value))
 
 	reg := regexp.MustCompile(`^[a-fA-F0-9]+$`)
 	if !reg.MatchString(value) {
@@ -68,19 +72,20 @@ func CheckStringHash(value string) (string, int, error) {
 	}
 
 	switch size {
-	case 32:
+	case md5.Size:
 		return "md5", size, nil
-	case 40:
+	case sha1.Size:
 		return "sha1", size, nil
-	case 64:
+	case sha256.Size:
 		return "sha256", size, nil
-	case 128:
+	case sha512.Size:
 		return "sha512", size, nil
 	}
 
 	return "other", size, nil
 }
 
+/*
 func CheckHashSum(hsum string) string {
 	switch len(hsum) {
 	case 32:
@@ -93,3 +98,4 @@ func CheckHashSum(hsum string) string {
 
 	return "other"
 }
+*/

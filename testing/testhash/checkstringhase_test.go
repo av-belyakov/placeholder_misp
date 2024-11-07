@@ -1,57 +1,15 @@
 package testhash_test
 
 import (
-	"errors"
 	"fmt"
-	"regexp"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	"placeholder_misp/coremodule"
 	"placeholder_misp/datamodels"
+	"placeholder_misp/supportingfunctions"
 )
-
-func CheckHash(h []string) map[string]string {
-	result := make(map[string]string, len(h))
-
-	for _, v := range h {
-		switch len(v) {
-		case 32:
-			result[v] = "md5"
-		case 40:
-			result[v] = "sha1"
-		case 64:
-			result[v] = "sha256"
-		default:
-			result[v] = "other"
-		}
-	}
-
-	return result
-}
-
-func CheckStringHash(value string) (string, int, error) {
-	size := len(value)
-
-	reg := regexp.MustCompile(`^[a-fA-F0-9]+$`)
-	if !reg.MatchString(value) {
-		return "", size, errors.New("the value must consist of hexadecimal characters only")
-	}
-
-	switch size {
-	case 32:
-		return "md5", size, nil
-	case 40:
-		return "sha1", size, nil
-	case 64:
-		return "sha256", size, nil
-	case 128:
-		return "sha512", size, nil
-	}
-
-	return "other", size, nil
-}
 
 var _ = Describe("Checkstringhase", func() {
 	testList := []coremodule.ChanInputCreateMispFormat{
@@ -88,23 +46,11 @@ var _ = Describe("Checkstringhase", func() {
 	}
 
 	Context("Тест 1. Проверяем тип хеша", func() {
-		It("Должно быть определен тип хеша", func() {
-			hashes := []string{
-				"c29438b04791184d3eba39bdb7cf99560ab62068fee9509d50cf59723c398ac1",
-				"58861ef4c118cc3270b9871734ee54852a1374e5",
-				"7c531394dc2f483bc6c6c628c02e0788",
-			}
-
-			r := CheckHash(hashes)
-
-			Expect(len(r)).Should(Equal(3))
-		})
-
 		It("Должна быть найдена одна ошибка, остальные типы хеша должны быть успешно определены", func() {
 			var countSuccess, countError int
 
 			for _, v := range testListStrings {
-				hashType, stringSize, err := CheckStringHash(v)
+				hashType, stringSize, err := supportingfunctions.CheckStringHash(v)
 				if err != nil {
 					countError++
 				} else {

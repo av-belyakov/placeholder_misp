@@ -1,5 +1,7 @@
 github.com/av-belyakov/simplelogger v0.0.0-20240829144636-e8b606b7e069 h1:uAVF/bS8X+hHm8hvy1voWBHonfdbrcAEFw58mvHPYsw=
 github.com/av-belyakov/simplelogger v0.0.0-20240829144636-e8b606b7e069/go.mod h1:NGvAPMeVHkAPNroGgrQzNvQBbXVmhj0g25+9y7ZUjsg=
+github.com/av-belyakov/simplelogger v0.0.0-20241025122435-67bb4d6f6ae4 h1:sIT6BPdH12iQoIDZKqrfP0g5rjIffJnpNuCxmG/QZvA=
+github.com/av-belyakov/simplelogger v0.0.0-20241025122435-67bb4d6f6ae4/go.mod h1:NGvAPMeVHkAPNroGgrQzNvQBbXVmhj0g25+9y7ZUjsg=
 github.com/bsm/ginkgo/v2 v2.12.0 h1:Ny8MWAHyOepLGlLKYmXG4IEkioBysk6GpaRTLC8zwWs=
 github.com/bsm/ginkgo/v2 v2.12.0/go.mod h1:SwYbGRRDovPVboqFv0tPTcG1sN61LM1Z4ARdbAV9g4c=
 github.com/bsm/gomega v1.27.10 h1:yeMWxP2pV2fG3FgAODIY8EiRE3dy0aeFYt4l7wh6yKA=

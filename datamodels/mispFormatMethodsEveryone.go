@@ -22,8 +22,12 @@ func NewListAttributeTmp() *ListAttributeTmp {
 
 // AddAttribute добавляет атрибуты в список атрибутов
 func (la *ListAttributeTmp) AddAttribute(branch string, value interface{}, num int) {
-	t := "other"
-	objr := "other"
+	var (
+		t    string = "other"
+		objr string = "other"
+
+		err error
+	)
 
 	nameIsExist := strings.Contains(branch, "attachment.name")
 	hashesIsExist := strings.Contains(branch, "attachment.hashes")
@@ -49,8 +53,9 @@ func (la *ListAttributeTmp) AddAttribute(branch string, value interface{}, num i
 
 	if str, ok := value.(string); ok {
 		if hashesIsExist {
-			t = supportingfunctions.CheckHashSum(str)
-			objr = t
+			if t, _, err = supportingfunctions.CheckStringHash(str); err == nil {
+				objr = t
+			}
 		}
 
 		tmp = append(tmp, AttributeMispFormat{
