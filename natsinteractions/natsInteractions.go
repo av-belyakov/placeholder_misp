@@ -17,6 +17,11 @@ import (
 	"placeholder_misp/memorytemporarystorage"
 )
 
+const (
+	ansiReset    = "\033[0m"
+	ansiDarkGray = "\033[90m"
+)
+
 var (
 	ns   *natsStorage
 	once sync.Once
@@ -146,7 +151,7 @@ func NewClientNATS(
 		}
 	})
 
-	log.Printf("Connect to NATS with address %s:%d\n", conf.Host, conf.Port)
+	log.Printf("%vConnect to NATS with address %s:%d%v\n", ansiDarkGray, conf.Host, conf.Port, ansiReset)
 
 	// обработка данных приходящих в модуль от ядра приложения
 	go func() {

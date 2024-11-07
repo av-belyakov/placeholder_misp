@@ -15,6 +15,11 @@ import (
 	"placeholder_misp/memorytemporarystorage"
 )
 
+const (
+	ansiReset    = "\033[0m"
+	ansiDarkGray = "\033[90m"
+)
+
 func HandlerRedis(
 	ctx context.Context,
 	conf confighandler.AppConfigRedis,
@@ -30,7 +35,7 @@ func HandlerRedis(
 		Addr: fmt.Sprintf("%s:%d", conf.Host, conf.Port),
 	})
 
-	log.Printf("Connect to Redis DB with address %s:%d", conf.Host, conf.Port)
+	log.Printf("%vConnect to Redis DB with address %s:%d%v", ansiDarkGray, conf.Host, conf.Port, ansiReset)
 
 	go func() {
 		for data := range mredis.chanInputRedis {

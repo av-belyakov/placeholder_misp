@@ -24,7 +24,11 @@ import (
 	"placeholder_misp/zabbixinteractions"
 )
 
-const ROOT_DIR = "placeholder_misp"
+const (
+	ROOT_DIR    = "placeholder_misp"
+	ansiReset   = "\033[0m"
+	ansiDarkRed = "\033[31m"
+)
 
 func getLoggerSettings(cls []confighandler.LogSet) []simplelogger.Options {
 	loggerConf := make([]simplelogger.Options, 0, len(cls))
@@ -222,7 +226,7 @@ func main() {
 	}
 
 	appVersion := supportingfunctions.GetAppVersion(appName)
-	log.Printf("Placeholder_misp application, version %s is running. Application status is '%s'\n", appVersion, appStatus)
+	log.Printf("%vPlaceholder_misp application, version %s is running. Application status is '%s'%v\n", appVersion, appStatus, ansiDarkRed, ansiReset)
 
 	//инициализируем модуль временного хранения информации
 	storageApp := memorytemporarystorage.NewTemporaryStorage()
@@ -275,24 +279,6 @@ func main() {
 
 		ctxCancel()
 	}()
-
-	/*ctxCore, ctxCancelCore := context.WithCancel(context.Background())
-
-	go func() {
-		osCall := <-sigChan
-		msg := fmt.Sprintf("stop 'main' function, %s", osCall.String())
-
-		log.Println(msg)
-
-		_ = sl.WriteLoggingData(msg, "info")
-
-		close(counting)
-		close(logging)
-		close(channelZabbix)
-
-		ctxCancelZ()
-		ctxCancelCore()
-	}()*/
 
 	core := coremodule.NewCoreHandler(storageApp, logging, counting)
 	core.CoreHandler(ctx, natsModule, mispModule, redisModule, lr)
