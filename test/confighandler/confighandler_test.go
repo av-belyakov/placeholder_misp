@@ -1,4 +1,4 @@
-package confighandler_test
+package confighandler
 
 import (
 	"fmt"
@@ -14,17 +14,22 @@ import (
 )
 
 var _ = Describe("MainConfigHandler", Ordered, func() {
+	const ROOT_DIR = "placeholder_misp"
+
 	BeforeAll(func() {
-		os.Setenv("GO_PHMISP_MAIN", "")
-		os.Setenv("GO_PHMISP_MHOST", "")
-		os.Setenv("GO_PHMISP_MPORT", "")
-		os.Setenv("GO_PHMISP_NHOST", "")
-		os.Setenv("GO_PHMISP_NPORT", "")
+		os.Unsetenv("GO_PHMISP_MAIN")
+		os.Unsetenv("GO_PHMISP_MHOST")
+		os.Unsetenv("GO_PHMISP_MPORT")
+		os.Unsetenv("GO_PHMISP_NHOST")
+		os.Unsetenv("GO_PHMISP_NPORT")
+		os.Unsetenv("GO_PHMISP_NCACHETTL")
+		os.Unsetenv("GO_PHMISP_NSUBSENDERCASE")
+		os.Unsetenv("GO_PHMISP_NSUBLISTENERCOMMAND")
 	})
 
 	Context("Тест 1. Проверяем работу функции NewConfig с разными значениями переменной окружения GO_PHMISP_MAIN", func() {
 		It("Должно быть получено содержимое общего файла 'config.yaml'", func() {
-			conf, err := confighandler.NewConfig()
+			conf, err := confighandler.NewConfig(ROOT_DIR)
 
 			//fmt.Println("conf = ", conf)
 
@@ -34,9 +39,8 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 
 			commonApp := conf.GetCommonApp()
 
-			//fmt.Println("------------------------ ZABBIX -------------------------")
-			//fmt.Println("NetworkHost:", conf.GetCommonApp().Zabbix.NetworkHost)
-			//fmt.Println("NetworkPort:", conf.GetCommonApp().Zabbix.NetworkPort)
+			fmt.Println("------------------------ application config NATS -------------------------")
+			fmt.Printf("%+v\n", conf.AppConfigNATS)
 
 			Expect(commonApp.Zabbix.NetworkHost).Should(Equal("192.168.9.45"))
 			Expect(commonApp.Zabbix.NetworkPort).Should(Equal(10051))
@@ -49,7 +53,7 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 			Expect(commonApp.Zabbix.EventTypes[0].Handshake.Message).Should(Equal(""))
 
 			Expect(err).ShouldNot(HaveOccurred())
-			Expect(len(conf.GetListLogs())).Should(Equal(5))
+			Expect(len(conf.GetListLogs())).Should(Equal(6))
 			Expect(len(conf.GetListOrganization())).Should(Equal(12))
 			Expect(conf.LogList[0].PathDirectory).Should(Equal("logs"))
 			Expect(conf.LogList[0].MsgTypeName).Should(Equal("error"))
@@ -59,36 +63,53 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 		It("Должно быть получено содержимое файла 'config_prod.yaml' при пустом значении переменной GO_PHMISP_MAIN", func() {
 			os.Setenv("GO_PHMISP_MAIN", "")
 
-			conf, err := confighandler.NewConfig()
-
+			conf, err := confighandler.NewConfig(ROOT_DIR)
 			Expect(err).ShouldNot(HaveOccurred())
-			Expect(conf.GetAppNATS().Host).Should(Equal("nats.cloud.gcm"))
-			Expect(conf.GetAppNATS().Port).Should(Equal(4222))
+
+			confNats := conf.GetAppNATS()
+			Expect(confNats.Host).Should(Equal("nats.cloud.gcm"))
+			Expect(confNats.Port).Should(Equal(4222))
+			Expect(confNats.CacheTTL).Should(Equal(3600))
+			Expect(confNats.Subscriptions.SenderCase).Should(Equal("object.casetype"))
+			Expect(confNats.Subscriptions.ListenerCommand).Should(Equal("object.commandstype"))
+
 			Expect(conf.GetAppMISP().Host).Should(Equal("misp-center.cloud.gcm"))
 		})
 
 		It("Должно быть получено содержимое файла 'config_dev.yaml' при значении переменной GO_PHMISP_MAIN=development", func() {
 			os.Setenv("GO_PHMISP_MAIN", "development")
 
-			conf, err := confighandler.NewConfig()
-
+			conf, err := confighandler.NewConfig(ROOT_DIR)
 			Expect(err).ShouldNot(HaveOccurred())
-			Expect(conf.GetAppNATS().Host).Should(Equal("nats.cloud.gcm"))
-			Expect(conf.GetAppNATS().Port).Should(Equal(4222))
-			Expect(conf.GetAppMISP().Host).Should(Equal("misp-world.cloud.gcm"))
 
+			confNats := conf.GetAppNATS()
+			Expect(confNats.Host).Should(Equal("nats.cloud.gcm"))
+			Expect(confNats.Port).Should(Equal(4222))
+			Expect(confNats.CacheTTL).Should(Equal(3600))
+			Expect(confNats.Subscriptions.SenderCase).Should(Equal("object.casetype"))
+			Expect(confNats.Subscriptions.ListenerCommand).Should(Equal("object.commandstype"))
+
+			Expect(conf.GetAppMISP().Host).Should(Equal("misp-world.cloud.gcm"))
 		})
 
 		It("Должно быть перезаписанно содержимое некоторых полей полученных с переменных окружения GO_PHMISP_*", func() {
 			os.Setenv("GO_PHMISP_MAIN", "development")
-			os.Setenv("GO_PHMISP_MHOST", "78.87.78.87")
+
+			os.Setenv("GO_PHMISP_NHOST", "78.87.78.87")
 			os.Setenv("GO_PHMISP_NPORT", "11111")
+			os.Setenv("GO_PHMISP_NCACHETTL", "4500")
+			os.Setenv("GO_PHMISP_NSUBSENDERCASE", "object.casetype.test")
+			os.Setenv("GO_PHMISP_NSUBLISTENERCOMMAND", "object.commandstype.test")
 
-			conf, err := confighandler.NewConfig()
-
+			conf, err := confighandler.NewConfig(ROOT_DIR)
 			Expect(err).ShouldNot(HaveOccurred())
-			Expect(conf.GetAppMISP().Host).Should(Equal("78.87.78.87"))
-			Expect(conf.GetAppNATS().Port).Should(Equal(11111))
+
+			confNats := conf.GetAppNATS()
+			Expect(confNats.Host).Should(Equal("78.87.78.87"))
+			Expect(confNats.Port).Should(Equal(11111))
+			Expect(confNats.CacheTTL).Should(Equal(4500))
+			Expect(confNats.Subscriptions.SenderCase).Should(Equal("object.casetype.test"))
+			Expect(confNats.Subscriptions.ListenerCommand).Should(Equal("object.commandstype.test"))
 		})
 	})
 
@@ -129,17 +150,15 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 		It("Должен быть выполнен анмаршалинг части основного конфигурационного файла", func() {
 			ls := confighandler.Logs{}
 
-			viper.SetConfigFile("../configs/config.yaml")
+			viper.SetConfigFile("../../configs//config.yaml")
 			viper.SetConfigType("yaml")
-			errRC := viper.ReadInConfig()
 
+			errRC := viper.ReadInConfig()
 			Expect(errRC).ShouldNot(HaveOccurred())
 
 			ok := viper.IsSet("LOGGING")
 			err := viper.GetViper().Unmarshal(&ls)
-
 			Expect(len(ls.Logging)).ShouldNot(Equal(0))
-			fmt.Println("result unmarshal config file LOG: ", ls)
 
 			Expect(ok).Should(BeTrue())
 			Expect(err).ShouldNot(HaveOccurred())

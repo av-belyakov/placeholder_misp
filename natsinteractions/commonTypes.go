@@ -14,7 +14,7 @@ type SettingsOutputChan struct {
 }
 
 type SettingsInputChan struct {
-	Command, EventId, TaskId string
+	Command, EventId, TaskId, RootId, CaseId string
 }
 
 func (mnats ModuleNATS) GetDataReceptionChannel() <-chan SettingsOutputChan {
@@ -27,4 +27,12 @@ func (mnats ModuleNATS) SendingDataInput(data SettingsInputChan) {
 
 func (mnats ModuleNATS) SendingDataOutput(data SettingsOutputChan) {
 	mnats.chanOutputNATS <- data
+}
+
+type ResponseToCommand struct {
+	StatusCode int         `json:"status_code"`
+	ID         string      `json:"id"`
+	Error      string      `json:"error"`
+	Command    string      `json:"command"`
+	Data       interface{} `json:"data"`
 }

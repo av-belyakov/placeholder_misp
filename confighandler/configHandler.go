@@ -1,29 +1,4 @@
 // Пакет confighandler формирует конфигурационные настройки приложения
-//
-// Данный пакет формирует конфигурационные настройки приложения получая
-// данные о конфигурации из нескольких источников:
-// 1. чтение конфигурационных файлов 'config.yaml', 'config_dev.yaml' и
-// 'config_prod.yaml' которые должны находится в директории 'configs';
-// 2. получение настроек конфигурации через переменные окружения GO_PHMISP,
-// при этом значения переданные через переменные окружения являются
-// приоритетными.
-//
-// Для передачи настроек используются следующие переменные окружения:
-// 1. для переключения между 'config_dev.yaml' и 'config_prod.yaml'
-// GO_PHMISP_MAIN
-// При GO_PHMISP_MAIN=development будет использоваться 'config_dev.yaml'
-// 2. для подключения к MISP:
-// GO_PHMISP_MHOST
-// GO_PHMISP_MAUTH
-// 3. для подключения к к NATS:
-// GO_PHMISP_NHOST
-// GO_PHMISP_NPORT
-// 4. для подключения к к СУБД Redis:
-// GO_PHMISP_REDISHOST
-// GO_PHMISP_REDISPORT
-// 5. для указания места расположения и наименования файла правил:
-// GO_PHMISP_RULES_DIR
-// GO_PHMISP_RULES_FILE
 package confighandler
 
 import (
@@ -33,24 +8,40 @@ import (
 	"path"
 	"strconv"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/spf13/viper"
 
 	"placeholder_misp/supportingfunctions"
 )
 
-func NewConfig() (ConfigApp, error) {
-	conf := ConfigApp{}
-	var envList map[string]string = map[string]string{
-		"GO_PHMISP_MAIN":       "",
-		"GO_PHMISP_MHOST":      "",
-		"GO_PHMISP_MAUTH":      "",
-		"GO_PHMISP_NHOST":      "",
-		"GO_PHMISP_NPORT":      "",
-		"GO_PHMISP_REDISHOST":  "",
-		"GO_PHMISP_REDISPORT":  "",
-		"GO_PHMISP_RULES_DIR":  "",
-		"GO_PHMISP_RULES_FILE": "",
-	}
+func NewConfig(rootDir string) (*ConfigApp, error) {
+	conf := &ConfigApp{}
+
+	var (
+		validate *validator.Validate
+		envList  map[string]string = map[string]string{
+			"GO_PHMISP_MAIN": "",
+
+			//Подключение к MISP
+			"GO_PHMISP_MHOST": "",
+			"GO_PHMISP_MAUTH": "",
+
+			//Подключение к NATS
+			"GO_PHMISP_NHOST":               "",
+			"GO_PHMISP_NPORT":               "",
+			"GO_PHMISP_NCACHETTL":           "",
+			"GO_PHMISP_NSUBSENDERCASE":      "",
+			"GO_PHMISP_NSUBLISTENERCOMMAND": "",
+
+			//Подключение к Redis DB
+			"GO_PHMISP_REDISHOST": "",
+			"GO_PHMISP_REDISPORT": "",
+
+			//Правила обработки событий
+			"GO_PHMISP_RULES_DIR":  "",
+			"GO_PHMISP_RULES_FILE": "",
+		}
+	)
 
 	getFileName := func(sf, confPath string, lfs []fs.DirEntry) (string, error) {
 		for _, v := range lfs {
@@ -123,6 +114,16 @@ func NewConfig() (ConfigApp, error) {
 		if viper.IsSet("NATS.port") {
 			conf.AppConfigNATS.Port = viper.GetInt("NATS.port")
 		}
+		if viper.IsSet("NATS.cacheTtl") {
+			conf.AppConfigNATS.CacheTTL = viper.GetInt("NATS.cacheTtl")
+		}
+
+		if viper.IsSet("NATS.subscriptions.sender_case") {
+			conf.AppConfigNATS.Subscriptions.SenderCase = viper.GetString("NATS.subscriptions.sender_case")
+		}
+		if viper.IsSet("NATS.subscriptions.listener_command") {
+			conf.AppConfigNATS.Subscriptions.ListenerCommand = viper.GetString("NATS.subscriptions.listener_command")
+		}
 
 		//Настройки для модуля подключения к MISP
 		if viper.IsSet("MISP.host") {
@@ -156,13 +157,15 @@ func NewConfig() (ConfigApp, error) {
 		return nil
 	}
 
+	validate = validator.New(validator.WithRequiredStructEnabled())
+
 	for v := range envList {
 		if env, ok := os.LookupEnv(v); ok {
 			envList[v] = env
 		}
 	}
 
-	rootPath, err := supportingfunctions.GetRootPath("placeholder_misp")
+	rootPath, err := supportingfunctions.GetRootPath(rootDir)
 	if err != nil {
 		return conf, err
 	}
@@ -210,6 +213,17 @@ func NewConfig() (ConfigApp, error) {
 			conf.AppConfigNATS.Port = p
 		}
 	}
+	if envList["GO_PHMISP_NCACHETTL"] != "" {
+		if v, err := strconv.Atoi(envList["GO_PHMISP_NCACHETTL"]); err == nil {
+			conf.AppConfigNATS.CacheTTL = v
+		}
+	}
+	if envList["GO_PHMISP_NSUBSENDERCASE"] != "" {
+		conf.AppConfigNATS.Subscriptions.SenderCase = envList["GO_PHMISP_NSUBSENDERCASE"]
+	}
+	if envList["GO_PHMISP_NSUBLISTENERCOMMAND"] != "" {
+		conf.AppConfigNATS.Subscriptions.ListenerCommand = envList["GO_PHMISP_NSUBLISTENERCOMMAND"]
+	}
 
 	//Настройки для модуля подключения к MISP
 	if envList["GO_PHMISP_MHOST"] != "" {
@@ -235,6 +249,11 @@ func NewConfig() (ConfigApp, error) {
 	}
 	if envList["GO_PHMISP_RULES_FILE"] != "" {
 		conf.RulesProcMSGMISP.File = envList["GO_PHMISP_RULES_FILE"]
+	}
+
+	//выполняем проверку заполненой структуры
+	if err = validate.Struct(conf); err != nil {
+		return conf, err
 	}
 
 	return conf, nil

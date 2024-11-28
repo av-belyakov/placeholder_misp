@@ -2,6 +2,7 @@
 package natsinteractions
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -128,7 +129,7 @@ func NewClientNATS(
 		}
 	})
 
-	nc.Subscribe("main_caseupdate", func(m *nats.Msg) {
+	nc.Subscribe(conf.Subscriptions.SenderCase, func(m *nats.Msg) {
 		// ***********************************
 		// Это логирование только для теста!!!
 		// ***********************************
@@ -154,15 +155,81 @@ func NewClientNATS(
 	log.Printf("%vConnect to NATS with address %s:%d%v\n", ansiDarkGray, conf.Host, conf.Port, ansiReset)
 
 	// обработка данных приходящих в модуль от ядра приложения
-	go func() {
-		for data := range mnats.chanInputNATS {
+	go func(chInput <-chan SettingsInputChan, toSend bool, log chan<- datamodels.MessageLogging) {
+		for incomingData := range chInput {
 			//не отправляем eventId в TheHive
-			if !confTheHive.Send {
+			if !toSend {
 				continue
 			}
 
+			//
+			//Здесь нужно сделать обработку отправки тега и custom field
+			//по новому
+			//КРОМЕ ТО нужно предотвратить повторную отправку команд на добавление тегов!!!
+			//
+
+			//отправляем команды на установку тега и значения поля customFields
+			go func(data SettingsInputChan, log chan<- datamodels.MessageLogging) {
+				requests := map[string][]byte{
+					"add_case_tag": []byte(
+						fmt.Sprintf(`{
+							"service": "MISP",
+							"command": "add_case_tag",
+							"root_id": "%s",
+							"case_id": "%s",
+							"value": "Webhook: send=\"MISP\""}`,
+							data.RootId,
+							data.CaseId)),
+					"set_case_custom_field": []byte(
+						fmt.Sprintf(`{
+							"service": "MISP",
+							"command": "set_case_custom_field",
+							"root_id": "%s",
+	  						"field_name": "misp-event-id.string",
+							"value": "%s"}`,
+							data.RootId,
+							data.EventId)),
+				}
+
+				reqHandler := func(command string, req []byte) (string, error) {
+					ctx, ctxCancel := context.WithTimeout(context.Background(), 300*time.Second)
+					defer ctxCancel()
+
+					res, err := nc.RequestWithContext(ctx, conf.Subscriptions.ListenerCommand, req)
+					if err != nil {
+						_, f, l, _ := runtime.Caller(0)
+						return "", fmt.Errorf("error processing command '%s' for caseId '%s' (rootId '%s') '%s' %s:%d", command, data.CaseId, data.RootId, err.Error(), f, l-2)
+					}
+
+					resToComm := ResponseToCommand{}
+					if err = json.Unmarshal(res.Data, &resToComm); err != nil {
+						_, f, l, _ := runtime.Caller(0)
+						return "", fmt.Errorf("%s %s:%d", err.Error(), f, l-2)
+					}
+
+					if resToComm.Error != "" {
+						return "", fmt.Errorf("command '%s' for caseId '%s' (rootId '%s') return status code '%d' with error message '%s'", command, data.CaseId, data.RootId, resToComm.StatusCode, resToComm.Error)
+					}
+
+					return fmt.Sprintf("command '%s' for caseId '%s' (rootId '%s') return status code '%d'", command, data.CaseId, data.RootId, resToComm.StatusCode), nil
+				}
+
+				for command, req := range requests {
+					info, err := reqHandler(command, req)
+					if err != nil {
+						log <- datamodels.MessageLogging{MsgType: "error", MsgData: err.Error()}
+
+						continue
+					}
+
+					log <- datamodels.MessageLogging{MsgType: "info", MsgData: info}
+				}
+			}(incomingData, log)
+
+			//*****************************************************
+			//все что ниже не подходит для новой реализации
 			//получаем дескриптор соединения с NATS для отправки eventId
-			ncd, ok := ns.getElement(data.TaskId)
+			/*ncd, ok := ns.getElement(data.TaskId)
 			if !ok {
 				_, f, l, _ := runtime.Caller(0)
 
@@ -204,9 +271,9 @@ func NewClientNATS(
 					MsgData: fmt.Sprintf("%s %s:%d", err.Error(), f, l-2),
 					MsgType: "error",
 				}
-			}
+			}*/
 		}
-	}()
+	}(mnats.chanInputNATS, confTheHive.Send, logging)
 
 	return &mnats, nil
 }

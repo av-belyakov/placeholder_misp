@@ -69,6 +69,7 @@ func NewMispFormat(
 		maxCountObservables int
 		seqNumObservable    int
 		caseId              float64
+		rootId              string
 		userEmail           string
 		caseSource          string
 		patterIsNum         *regexp.Regexp = regexp.MustCompile(`^\d+$`)
@@ -160,6 +161,13 @@ func NewMispFormat(
 		//обрабатываем свойство observables.attachment
 		if strings.Contains(tmf.FieldBranch, "attachment") {
 			listAttributeTmp.AddAttribute(tmf.FieldBranch, newValue, seqNumObservable)
+		}
+
+		//получаем rootId
+		if tmf.FieldBranch == "event.object.rootId" {
+			if rid, ok := newValue.(string); ok {
+				rootId = rid
+			}
 		}
 
 		//обрабатываем свойство event.object.tags, оно ответственно за
@@ -262,6 +270,7 @@ func NewMispFormat(
 			Command:    "add event",
 			TaskId:     taskId,
 			CaseId:     caseId,
+			RootId:     rootId,
 			CaseSource: caseSource,
 			UserEmail:  userEmail,
 			MajorData: map[string]interface{}{

@@ -51,7 +51,7 @@ var _ = Describe("Interactionredisdb", Ordered, func() {
 
 	BeforeAll(func() {
 		// инициализация модуля конфига
-		ca, _ := confighandler.NewConfig()
+		ca, _ := confighandler.NewConfig("placeholder_misp")
 
 		// канал для логирования
 		logging := make(chan datamodels.MessageLogging)

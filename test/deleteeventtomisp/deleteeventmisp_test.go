@@ -14,7 +14,7 @@ import (
 
 var _ = Describe("Deleteeventmisp", Ordered, func() {
 	var (
-		confApp confighandler.ConfigApp
+		confApp *confighandler.ConfigApp
 		//redismodule               *redisinteractions.ModuleRedis
 		mispmodule                *mispinteractions.ModuleMISP
 		errConfApp, errMispModule error
@@ -23,7 +23,7 @@ var _ = Describe("Deleteeventmisp", Ordered, func() {
 	logging := make(chan datamodels.MessageLogging)
 
 	BeforeAll(func() {
-		confApp, errConfApp = confighandler.NewConfig()
+		confApp, errConfApp = confighandler.NewConfig("placeholder_misp")
 		confApp.AppConfigRedis = confighandler.AppConfigRedis{
 			Host: "192.168.9.208",
 			Port: 16379,

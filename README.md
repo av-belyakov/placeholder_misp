@@ -1,4 +1,4 @@
-Placeholder_MISP v1.3.4
+Placeholder_MISP v1.4.1
 
 Конфигурационные параметры для сервиса могут быть заданы как через конфигурационный файл так и методом установки переменных окружения.
 
@@ -14,23 +14,28 @@ Placeholder_MISP v1.3.4
 
 1. Подключение к MISP:
 
-- GO_PHMISP_MHOST
-- GO_PHMISP_MAUTH
+GO_PHMISP_MHOST
+GO_PHMISP_MAUTH
 
 2. Подключение к NATS:
 
-- GO_PHMISP_NHOST
-- GO_PHMISP_NPORT
+GO_PHMISP_NHOST
+GO_PHMISP_NPORT
+GO_PHMISP_NCACHETTL - данный параметр должен содержать время жизни записи
+кэша, по истечение которого запись автоматически удаляется, значение задается
+в секундах в диапазоне от 10 до 86400 секунд
+GO_PHMISP_NSUBSENDERCASE - канал для приема из него информации по case
+GO_PHMISP_NSUBLISTENERCOMMAND - канал для передачи команд которые нужно выполнить на TheHive
 
 3. Подключение к СУБД Redis:
 
-- GO_PHMISP_REDISHOST
-- GO_PHMISP_REDISPORT
+GO_PHMISP_REDISHOST
+GO_PHMISP_REDISPORT
 
 4. Место расположения и наименования файла правил:
 
-- GO_PHMISP_RULES_DIR
-- GO_PHMISP_RULES_FILE
+GO_PHMISP_RULES_DIR
+GO_PHMISP_RULES_FILE
 
 Приоритет значений заданных через переменные окружения выше чем значений полученных из конфигурационных файлов. Таким образом можно осуществлять гибкую временную настройку приложения.
 

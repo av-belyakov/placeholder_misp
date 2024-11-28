@@ -25,9 +25,12 @@ import (
 )
 
 const (
-	ROOT_DIR    = "placeholder_misp"
-	ansiReset   = "\033[0m"
-	ansiDarkRed = "\033[31m"
+	ROOT_DIR = "placeholder_misp"
+
+	ansiWhite               = "\033[97m"
+	ansiDarkGreenBackground = "\033[42m"
+	boldFont                = "\033[1m"
+	ansiReset               = "\033[0m"
 )
 
 func getLoggerSettings(cls []confighandler.LogSet) []simplelogger.Options {
@@ -105,7 +108,7 @@ func counterHandler(
 // interactionZabbix осуществляет взаимодействие с Zabbix
 func interactionZabbix(
 	ctx context.Context,
-	confApp confighandler.ConfigApp,
+	confApp *confighandler.ConfigApp,
 	sl *simplelogger.SimpleLoggerSettings,
 	channelZabbix <-chan zabbixinteractions.MessageSettings) error {
 
@@ -155,7 +158,7 @@ func main() {
 		syscall.SIGQUIT)
 
 	//инициализируем модуль чтения конфигурационного файла
-	confApp, err := confighandler.NewConfig()
+	confApp, err := confighandler.NewConfig(ROOT_DIR)
 	if err != nil {
 		log.Fatalf("error module 'confighandler': %v", err)
 	}
@@ -226,7 +229,9 @@ func main() {
 	}
 
 	appVersion := supportingfunctions.GetAppVersion(appName)
-	log.Printf("%vPlaceholder_misp application, version %s is running. Application status is '%s'%v\n", appVersion, appStatus, ansiDarkRed, ansiReset)
+
+	msg := fmt.Sprintf("Placeholder_misp application, version %s is running. Application status is '%s'", appVersion, appStatus)
+	log.Printf("%v%v%v%s%v\n", ansiDarkGreenBackground, boldFont, ansiWhite, msg, ansiReset)
 
 	//инициализируем модуль временного хранения информации
 	storageApp := memorytemporarystorage.NewTemporaryStorage()

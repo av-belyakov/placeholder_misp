@@ -1,4 +1,4 @@
-package confighandler_test
+package confighandler
 
 import (
 	"testing"

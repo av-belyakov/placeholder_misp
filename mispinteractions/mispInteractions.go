@@ -342,6 +342,8 @@ func addEvent(
 	mmisp.SendingDataOutput(SettingChanOutputMISP{
 		Command: "send event id",
 		EventId: eventId,
+		CaseId:  fmt.Sprint(data.CaseId),
+		RootId:  data.RootId,
 		TaskId:  data.TaskId,
 	})
 }

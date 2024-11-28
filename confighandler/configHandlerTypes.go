@@ -20,11 +20,11 @@ type Logs struct {
 }
 
 type LogSet struct {
-	WritingStdout bool   `yaml:"writingStdout"`
-	WritingFile   bool   `yaml:"writingFile"`
-	MaxFileSize   int    `yaml:"maxFileSize"`
-	MsgTypeName   string `yaml:"msgTypeName"`
-	PathDirectory string `yaml:"pathDirectory"`
+	WritingStdout bool   `validate:"required" yaml:"writingStdout"`
+	WritingFile   bool   `validate:"required" yaml:"writingFile"`
+	MaxFileSize   int    `validate:"min=1000" yaml:"maxFileSize"`
+	MsgTypeName   string `validate:"oneof=error info warning" yaml:"msgTypeName"`
+	PathDirectory string `validate:"required" yaml:"pathDirectory"`
 }
 
 type Orgs struct {
@@ -41,27 +41,34 @@ type ZabbixSet struct {
 }
 
 type ZabbixOptions struct {
-	NetworkPort int         `yaml:"networkPort"`
-	NetworkHost string      `yaml:"networkHost"`
-	ZabbixHost  string      `yaml:"zabbixHost"`
+	NetworkPort int         `validate:"gt=0,lte=65535" yaml:"networkPort"`
+	NetworkHost string      `validate:"required" yaml:"networkHost"`
+	ZabbixHost  string      `validate:"required" yaml:"zabbixHost"`
 	EventTypes  []EventType `yaml:"eventType"`
 }
 
 type EventType struct {
 	IsTransmit bool      `yaml:"isTransmit"`
-	EventType  string    `yaml:"eventType"`
-	ZabbixKey  string    `yaml:"zabbixKey"`
+	EventType  string    `validate:"required" yaml:"eventType"`
+	ZabbixKey  string    `validate:"required" yaml:"zabbixKey"`
 	Handshake  Handshake `yaml:"handshake"`
 }
 
 type Handshake struct {
 	TimeInterval int    `yaml:"timeInterval"`
-	Message      string `yaml:"message"`
+	Message      string `validate:"required" yaml:"message"`
 }
 
 type AppConfigNATS struct {
-	Host string `yaml:"host"`
-	Port int    `yaml:"port"`
+	Port          int               `validate:"gt=0,lte=65535" yaml:"port"`
+	CacheTTL      int               `validate:"gt=10,lte=86400" yaml:"cacheTtl"`
+	Host          string            `validate:"required" yaml:"host"`
+	Subscriptions SubscriptionsNATS `yaml:"subscriptions"`
+}
+
+type SubscriptionsNATS struct {
+	SenderCase      string `validate:"required" yaml:"sender_case"`
+	ListenerCommand string `validate:"required" yaml:"listener_command"`
 }
 
 type AppConfigMISP struct {
@@ -70,8 +77,8 @@ type AppConfigMISP struct {
 }
 
 type AppConfigRedis struct {
+	Port int    `validate:"gt=0,lte=65535" yaml:"port"`
 	Host string `yaml:"host"`
-	Port int    `yaml:"port"`
 }
 
 type AppConfigTheHive struct {

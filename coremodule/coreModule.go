@@ -130,6 +130,8 @@ func (settings *CoreHandlerSettings) CoreHandler(
 					Command: data.Command,
 					EventId: data.EventId,
 					TaskId:  data.TaskId,
+					RootId:  data.RootId,
+					CaseId:  data.CaseId,
 				})
 
 			//отправка данных в Redis
