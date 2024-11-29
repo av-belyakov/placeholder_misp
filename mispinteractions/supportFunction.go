@@ -73,7 +73,6 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 	ad, ok := d.MajorData["attributes"]
 	if !ok {
 		_, f, l, _ := runtime.Caller(0)
-
 		logging <- datamodels.MessageLogging{
 			MsgData: fmt.Sprintf("'the properties of \"attributes\" were not found in the received data' %s:%d", f, l-2),
 			MsgType: "error",
@@ -85,7 +84,6 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 	lamf, ok := ad.([]datamodels.AttributesMispFormat)
 	if !ok {
 		_, f, l, _ := runtime.Caller(0)
-
 		logging <- datamodels.MessageLogging{
 			MsgData: fmt.Sprintf("'the received data does not match the type \"attributes\"' %s:%d", f, l-2),
 			MsgType: "error",
@@ -99,7 +97,6 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 
 		if lamf[k].Value == "" {
 			_, f, l, _ := runtime.Caller(0)
-
 			logging <- datamodels.MessageLogging{
 				MsgData: fmt.Sprintf("'attributes for event id №%s is not added, the \"Value\" type property should not be empty' %s:%d", eventId, f, l-1),
 				MsgType: "warning",
@@ -111,7 +108,6 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 		b, err := json.Marshal(lamf[k])
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
-
 			logging <- datamodels.MessageLogging{
 				MsgData: fmt.Sprintf("'attributes №%s add, %s' %s:%d", eventId, err.Error(), f, l-2),
 				MsgType: "warning",
@@ -123,7 +119,6 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 		res, resBodyByte, err = c.Post("/attributes/add/"+eventId, b)
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
-
 			attrObject, errMarshal := json.MarshalIndent(lamf[k], "", "  ")
 			if errMarshal != nil {
 				logging <- datamodels.MessageLogging{
@@ -142,7 +137,6 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 
 		if res.StatusCode != http.StatusOK {
 			_, f, l, _ := runtime.Caller(0)
-
 			logging <- datamodels.MessageLogging{
 				MsgData: fmt.Sprintf("'attributes №%s add, %s' %s:%d", eventId, res.Status, f, l-1),
 				MsgType: "warning",
@@ -174,7 +168,6 @@ func sendObjectsMispFormat(host, authKey, eventId string, d SettingsChanInputMIS
 	od, ok := d.MajorData["objects"]
 	if !ok {
 		_, f, l, _ := runtime.Caller(0)
-
 		logging <- datamodels.MessageLogging{
 			MsgData: fmt.Sprintf("'the properties of \"objects\" were not found in the received data' %s:%d", f, l-2),
 			MsgType: "error",
@@ -186,7 +179,6 @@ func sendObjectsMispFormat(host, authKey, eventId string, d SettingsChanInputMIS
 	lomf, ok := od.(map[int]datamodels.ObjectsMispFormat)
 	if !ok {
 		_, f, l, _ := runtime.Caller(0)
-
 		logging <- datamodels.MessageLogging{
 			MsgData: fmt.Sprintf("'the received data does not match the type \"objects\"' %s:%d", f, l-2),
 			MsgType: "error",
@@ -201,7 +193,6 @@ func sendObjectsMispFormat(host, authKey, eventId string, d SettingsChanInputMIS
 		b, err := json.Marshal(v)
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
-
 			logging <- datamodels.MessageLogging{
 				MsgData: fmt.Sprintf("'objects №%s add, %s' %s:%d", eventId, err.Error(), f, l-2),
 				MsgType: "warning",
@@ -213,7 +204,6 @@ func sendObjectsMispFormat(host, authKey, eventId string, d SettingsChanInputMIS
 		res, resBodyByte, err = c.Post("/objects/add/"+eventId, b)
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
-
 			logging <- datamodels.MessageLogging{
 				MsgData: fmt.Sprintf("'objects №%s add, %s' %s:%d", eventId, err.Error(), f, l-2),
 				MsgType: "warning",
@@ -224,7 +214,6 @@ func sendObjectsMispFormat(host, authKey, eventId string, d SettingsChanInputMIS
 
 		if res.StatusCode != http.StatusOK {
 			_, f, l, _ := runtime.Caller(0)
-
 			logging <- datamodels.MessageLogging{
 				MsgData: fmt.Sprintf("'objects №%s add, %s' %s:%d", eventId, res.Status, f, l-1),
 				MsgType: "warning",
@@ -277,20 +266,17 @@ func sendEventReportsMispFormat(host, authKey, eventId string, caseId float64) e
 	})
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
-
 		return fmt.Errorf("'event report add, %s' %s:%d", err.Error(), f, l-2)
 	}
 
 	res, _, err := c.Post("/event_reports/add/"+eventId, b)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
-
 		return fmt.Errorf("'event report add, %s' %s:%d", err.Error(), f, l-2)
 	}
 
 	if res.StatusCode != http.StatusOK {
 		_, f, l, _ := runtime.Caller(0)
-
 		return fmt.Errorf("'event report add, %s' %s:%d", res.Status, f, l-1)
 	}
 

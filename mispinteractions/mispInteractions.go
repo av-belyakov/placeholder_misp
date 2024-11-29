@@ -169,7 +169,6 @@ func addEvent(
 	_, resBodyByte, err := sendEventsMispFormat(host, authKey, data)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
-
 		logging <- datamodels.MessageLogging{
 			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
 			MsgType: "error",
@@ -181,7 +180,6 @@ func addEvent(
 	resMisp := RespMISP{}
 	if err := json.Unmarshal(resBodyByte, &resMisp); err != nil {
 		_, f, l, _ := runtime.Caller(0)
-
 		logging <- datamodels.MessageLogging{
 			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
 			MsgType: "error",
@@ -203,7 +201,6 @@ func addEvent(
 
 	if eventId == "" {
 		_, f, l, _ := runtime.Caller(0)
-
 		logging <- datamodels.MessageLogging{
 			MsgData: fmt.Sprintf("'the formation of events of the 'Attributes' type was not performed because the EventID is empty' %s:%d", f, l-1),
 			MsgType: "error",
@@ -225,7 +222,6 @@ func addEvent(
 	// добавляем event_reports
 	if err := sendEventReportsMispFormat(host, authKey, eventId, data.CaseId); err != nil {
 		_, f, l, _ := runtime.Caller(0)
-
 		logging <- datamodels.MessageLogging{
 			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
 			MsgType: "error",
@@ -291,7 +287,6 @@ func addEvent(
 	// добавляем event_tags
 	if err := sendEventTagsMispFormat(host, masterKey, eventId, data, logging); err != nil {
 		_, f, l, _ := runtime.Caller(0)
-
 		logging <- datamodels.MessageLogging{
 			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
 			MsgType: "error",
@@ -315,7 +310,6 @@ func addEvent(
 	resMsg, err := sendRequestPublishEvent(host, masterKey, eventId)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
-
 		logging <- datamodels.MessageLogging{
 			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
 			MsgType: "error",
@@ -337,6 +331,32 @@ func addEvent(
 	}
 	//
 	//
+
+	/*
+	   типы команд для передачи в NATS
+
+	   requests := map[string][]byte{
+	   					"add_case_tag": []byte(
+	   						fmt.Sprintf(`{
+	   							"service": "MISP",
+	   							"command": "add_case_tag",
+	   							"root_id": "%s",
+	   							"case_id": "%s",
+	   							"value": "Webhook: send=\"MISP\""}`,
+	   							data.RootId,
+	   							data.CaseId)),
+	   					"set_case_custom_field": []byte(
+	   						fmt.Sprintf(`{
+	   							"service": "MISP",
+	   							"command": "set_case_custom_field",
+	   							"root_id": "%s",
+	   	  						"field_name": "misp-event-id.string",
+	   							"value": "%s"}`,
+	   							data.RootId,
+	   							data.EventId)),
+	   				}
+
+	*/
 
 	//отправляем в ядро информацию по event Id
 	mmisp.SendingDataOutput(SettingChanOutputMISP{
@@ -367,7 +387,6 @@ func delEventById(
 	_, err := delEventsMispFormat(conf.Host, conf.Auth, eventId)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
-
 		logging <- datamodels.MessageLogging{
 			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
 			MsgType: "error",

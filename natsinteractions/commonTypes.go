@@ -14,7 +14,12 @@ type SettingsOutputChan struct {
 }
 
 type SettingsInputChan struct {
-	Command, EventId, TaskId, RootId, CaseId string
+	Command string //команда
+	TaskId  string //внутренний id задачи
+	EventId string //id события
+	CaseId  string //id кейса
+	RootId  string //rootId
+	Data    []byte //данные
 }
 
 func (mnats ModuleNATS) GetDataReceptionChannel() <-chan SettingsOutputChan {
