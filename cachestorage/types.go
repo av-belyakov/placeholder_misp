@@ -1,34 +1,47 @@
 package cachestorage
 
 import (
-	"placeholder_misp/datamodels"
 	"sync"
 	"time"
+
+	"placeholder_misp/datamodels"
 )
 
-// CacheRunningFunctions хранилище функций
-type CacheRunningFunctions struct {
-	ttl          time.Duration
-	cacheStorage cacheStorageParameters
-	stackObjects stackObjectsParameters
+type CacheExecutedObjects struct {
+	ttl           time.Duration    //время хранения
+	stackObjects  listStackObjects //очередь объектов предназначенных для выполнения
+	cacheStorages cacheStorages    //кеш хранилища
 }
 
-type cacheStorageParameters struct {
+type listStackObjects struct {
+	mutex    sync.Mutex
+	storages []listFormatsMISP
+}
+
+type cacheStorages struct {
+	size     int
 	mutex    sync.RWMutex
 	storages map[string]storageParameters
 }
 
 type storageParameters struct {
-	isFunctionExecution     bool
-	isCompletedSuccessfully bool
-	numberAttempts          int
-	timeExpiry              time.Time
-	cacheFunc               func(int) bool
+	isExecution             bool           //статус выполнения
+	isCompletedSuccessfully bool           //результат выполнения
+	numberAttempts          int            //количество попыток (НАВЕРНОЕ В ДАННОМ СЛУЧАЕ НЕ НУЖНО)
+	timeExpiry              time.Time      //время истечения жизни
+	cacheFunc               func(int) bool //фунция-обертка выполнения
 }
 
-type stackObjectsParameters struct {
-	mutex    sync.Mutex
-	storages []listFormatsMISP
+// CacheRunningFunctions хранилище функций
+type CacheRunningFunctions struct {
+	ttl          time.Duration
+	cacheStorage cacheStorageParameters
+	stackObjects storageParameters
+}
+
+type cacheStorageParameters struct {
+	mutex    sync.RWMutex
+	storages map[string]storageParameters
 }
 
 //1. Положить в очередь.
