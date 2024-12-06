@@ -293,7 +293,6 @@ func sendEventTagsMispFormat(host, authKey, eventId string, d SettingsChanInputM
 	eot, ok := d.MajorData["event.object.tags"]
 	if !ok {
 		_, f, l, _ := runtime.Caller(0)
-
 		logging <- datamodels.MessageLogging{
 			MsgData: fmt.Sprintf("'the properties of \"objects\" were not found in the received data' %s:%d", f, l-2),
 			MsgType: "error",
@@ -305,7 +304,6 @@ func sendEventTagsMispFormat(host, authKey, eventId string, d SettingsChanInputM
 	leot, ok := eot.(datamodels.ListEventObjectTags)
 	if !ok {
 		_, f, l, _ := runtime.Caller(0)
-
 		logging <- datamodels.MessageLogging{
 			MsgData: fmt.Sprintf("'the received data does not match the type \"objects\"' %s:%d", f, l-2),
 			MsgType: "error",
@@ -333,7 +331,6 @@ func sendEventTagsMispFormat(host, authKey, eventId string, d SettingsChanInputM
 		b, err := json.Marshal(eotmf)
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
-
 			logging <- datamodels.MessageLogging{
 				MsgData: fmt.Sprintf("'event tags №%s add, %s' %s:%d", eventId, err.Error(), f, l-2),
 				MsgType: "warning",
@@ -355,7 +352,6 @@ func sendEventTagsMispFormat(host, authKey, eventId string, d SettingsChanInputM
 		res, b, err := c.Post("/events/addTag", b)
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
-
 			logging <- datamodels.MessageLogging{
 				MsgData: fmt.Sprintf("'event tags №%s add, %s' %s:%d", eventId, err.Error(), f, l-2),
 				MsgType: "warning",
@@ -373,7 +369,6 @@ func sendEventTagsMispFormat(host, authKey, eventId string, d SettingsChanInputM
 
 		if res.StatusCode != http.StatusOK {
 			_, f, l, _ := runtime.Caller(0)
-
 			logging <- datamodels.MessageLogging{
 				MsgData: fmt.Sprintf("'event tags №%s add, %s' %s:%d", eventId, res.Status, f, l-1),
 				MsgType: "warning",
