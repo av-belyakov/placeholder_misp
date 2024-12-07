@@ -1,7 +1,35 @@
 package cachestorage
 
-import "time"
+// AddObjectToQueue добавляет в очередь объектов новый объект
+func (cache *CacheExecutedObjects) AddObjectToQueue(v listFormatsMISP) {
+	cache.queueObjects.mutex.Lock()
+	defer cache.queueObjects.mutex.Unlock()
 
+	cache.queueObjects.storages = append(cache.queueObjects.storages, v)
+}
+
+// GetObjectToQueue забирает с начала очереди новый объект или возвращает
+// FALSE если очередь пуста
+func (cache *CacheExecutedObjects) GetObjectToQueue() (listFormatsMISP, bool) {
+	cache.queueObjects.mutex.Lock()
+	defer cache.queueObjects.mutex.Unlock()
+
+	size := len(cache.queueObjects.storages)
+	if size == 0 {
+		return listFormatsMISP{}, false
+	}
+
+	obj := cache.queueObjects.storages[0]
+	if size == 1 {
+		cache.queueObjects.storages = make([]listFormatsMISP, 0, 0)
+	}
+
+	cache.queueObjects.storages = cache.queueObjects.storages[1:]
+
+	return obj, true
+}
+
+/*
 // SetMethod создает новую запись, принимает значение которое нужно сохранить
 // и id по которому данное значение можно будет найти
 func (crm *CacheRunningFunctions) SetMethod(id string, f func(v int) bool) string {
@@ -101,3 +129,4 @@ func (crm *CacheRunningFunctions) setIsFunctionNotExecution(id string) {
 	storage.isFunctionExecution = false
 	crm.cacheStorage.storages[id] = storage
 }
+*/
