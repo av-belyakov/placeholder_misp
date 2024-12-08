@@ -1,30 +1,30 @@
 package cachestorage
 
 // AddObjectToQueue добавляет в очередь объектов новый объект
-func (cache *CacheExecutedObjects) AddObjectToQueue(v listFormatsMISP) {
-	cache.queueObjects.mutex.Lock()
-	defer cache.queueObjects.mutex.Unlock()
+func (cache *CacheExecutedObjects) AddObjectToQueue(v FormatImplementer) {
+	cache.queue.mutex.Lock()
+	defer cache.queue.mutex.Unlock()
 
-	cache.queueObjects.storages = append(cache.queueObjects.storages, v)
+	cache.queue.storages = append(cache.queue.storages, v)
 }
 
 // GetObjectToQueue забирает с начала очереди новый объект или возвращает
 // FALSE если очередь пуста
-func (cache *CacheExecutedObjects) GetObjectToQueue() (listFormatsMISP, bool) {
-	cache.queueObjects.mutex.Lock()
-	defer cache.queueObjects.mutex.Unlock()
+func (cache *CacheExecutedObjects) GetObjectToQueue() (FormatImplementer, bool) {
+	cache.queue.mutex.Lock()
+	defer cache.queue.mutex.Unlock()
 
-	size := len(cache.queueObjects.storages)
+	size := len(cache.queue.storages)
 	if size == 0 {
-		return listFormatsMISP{}, false
+		return nil, false
 	}
 
-	obj := cache.queueObjects.storages[0]
+	obj := cache.queue.storages[0]
 	if size == 1 {
-		cache.queueObjects.storages = make([]listFormatsMISP, 0, 0)
+		cache.queue.storages = make([]FormatImplementer, 0, 0)
 	}
 
-	cache.queueObjects.storages = cache.queueObjects.storages[1:]
+	cache.queue.storages = cache.queue.storages[1:]
 
 	return obj, true
 }

@@ -15,7 +15,7 @@ type CacheExecutedObjects struct {
 
 type listQueueObjects struct {
 	mutex    sync.Mutex
-	storages []listFormatsMISP
+	storages []FormatImplementer //listFormatsMISP
 }
 
 // listFormatsMISP содержит описание типов добавляемых в MISP и их порядок добавления.
@@ -25,7 +25,7 @@ type listQueueObjects struct {
 // некоторые из них подлежат дополнительной обработке, см. обработчик для каждого из объектов.
 // После добавления всех объектов, событие MISP необходимо опобликовать, как это сделать
 // см. обработчик публикации.
-type listFormatsMISP struct {
+type ListFormatsMISP struct {
 	Event      datamodels.EventsMispFormat
 	Reports    datamodels.EventReports
 	Attributes []datamodels.AttributesMispFormat
@@ -49,6 +49,6 @@ type storageParameters struct {
 	timeExpiry time.Time
 	//общее время истечения жизни, время по истечению которого объект удаляется в любом
 	//случае в независимости от того, был ли он выполнен или нет
-	cacheFunc func(int) bool
+	cacheFunc CacheStorageFuncHandler //func(int) bool
 	//фунция-обертка выполнения
 }

@@ -30,14 +30,14 @@ func NewMispFormat(
 	//это основной обработчик параметров входящего объекта
 	listHandlerMisp := map[string][]func(interface{}, int){
 		//event -> events
-		"event.object.title":     {eventsMisp.SetValueInfoEventsMisp},
-		"event.object.startDate": {eventsMisp.SetValueTimestampEventsMisp},
-		"event.details.endDate":  {eventsMisp.SetValueDateEventsMisp},
-		"event.object.tlp":       {eventsMisp.SetValueDistributionEventsMisp},
-		"event.object.severity":  {eventsMisp.SetValueThreatLevelIdEventsMisp},
-		"event.organisationId":   {eventsMisp.SetValueOrgIdEventsMisp},
-		"event.object.updatedAt": {eventsMisp.SetValueSightingTimestampEventsMisp},
-		"event.object.owner":     {eventsMisp.SetValueEventCreatorEmailEventsMisp},
+		"event.object.title":     {eventsMisp.SetInfo},
+		"event.object.startDate": {eventsMisp.SetTimestamp},
+		"event.details.endDate":  {eventsMisp.SetDate},
+		"event.object.tlp":       {eventsMisp.SetDistribution},
+		"event.object.severity":  {eventsMisp.SetThreatLevelId},
+		"event.organisationId":   {eventsMisp.SetOrgId},
+		"event.object.updatedAt": {eventsMisp.SetSightingTimestamp},
+		"event.object.owner":     {eventsMisp.SetEventCreatorEmail},
 		"event.object.customFields.class-attack.string": {func(i interface{}, num int) {
 			leot.SetTag(fmt.Sprintf("class-attack=\"%v\"", i))
 		}},

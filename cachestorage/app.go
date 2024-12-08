@@ -26,7 +26,7 @@ func NewCacheStorage(ctx context.Context, ttl int) (*CacheExecutedObjects, error
 	cacheExObj := &CacheExecutedObjects{
 		maxTTL: time.Duration(30 * time.Second),
 		queue: listQueueObjects{
-			storages: []listFormatsMISP(nil),
+			storages: []FormatImplementer(nil), //listFormatsMISP(nil),
 		},
 		cache: cacheStorages{
 			storages: map[string]storageParameters{},
