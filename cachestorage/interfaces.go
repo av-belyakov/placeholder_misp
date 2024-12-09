@@ -9,30 +9,10 @@ type CacheStorageFuncHandler interface {
 type FormatImplementer interface {
 	//здесь надо написать все геттеры для объектов
 	//MISP перечисленных в listFormatsMISP
-	EventSetter
 	EventGetter
-}
-
-type EventSetter interface {
-	SetOrgId(v interface{}, num int)
-	SetOrgcId(v interface{}, num int)
-	SetDistribution(v interface{}, num int)
-	SetInfo(v interface{}, num int)
-	SetUUID(v interface{}, num int)
-	SetDate(v interface{}, num int)
-	SetAnalysis(v interface{}, num int)
-	SetAttributeCount(v interface{}, num int)
-	SetTimestamp(v interface{}, num int)
-	SetSharingGroupId(v interface{}, num int)
-	SetThreatLevelId(v interface{}, num int)
-	SetPublishTimestamp(v interface{}, num int)
-	SetSightingTimestamp(v interface{}, num int)
-	SetExtendsUUID(v interface{}, num int)
-	SetEventCreatorEmail(v interface{}, num int)
-	SetPublished(v interface{}, num int)
-	SetProposalEmailLock(v interface{}, num int)
-	SetLocked(v interface{}, num int)
-	SetDisableCorrelation(v interface{}, num int)
+	EventSetter
+	EventReportsGetter
+	EventReportsSetter
 }
 
 type EventGetter interface {
@@ -55,4 +35,38 @@ type EventGetter interface {
 	GetProposalEmailLock() bool
 	GetLocked() bool
 	GetDisableCorrelation() bool
+}
+
+type EventSetter interface {
+	SetOrgId(string)
+	SetOrgcId(string)
+	SetDistribution(string)
+	SetInfo(string)
+	SetUUID(string)
+	SetDate(string)
+	SetAnalysis(string)
+	SetAttributeCount(string)
+	SetTimestamp(string)
+	SetSharingGroupId(string)
+	SetThreatLevelId(string)
+	SetPublishTimestamp(string)
+	SetSightingTimestamp(string)
+	SetExtendsUUID(string)
+	SetEventCreatorEmail(string)
+	SetPublished(bool)
+	SetProposalEmailLock(bool)
+	SetLocked(bool)
+	SetDisableCorrelation(bool)
+}
+
+type EventReportsGetter interface {
+	GetEventReportsName() string
+	GetEventReportsContent() string
+	GetEventReportsDistribution() string
+}
+
+type EventReportsSetter interface {
+	SetEventReportsName(v string)
+	SetEventReportsContent(v string)
+	SetEventReportsDistribution(v string)
 }

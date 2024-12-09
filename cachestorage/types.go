@@ -3,8 +3,6 @@ package cachestorage
 import (
 	"sync"
 	"time"
-
-	"placeholder_misp/datamodels"
 )
 
 type CacheExecutedObjects struct {
@@ -16,21 +14,6 @@ type CacheExecutedObjects struct {
 type listQueueObjects struct {
 	mutex    sync.Mutex
 	storages []FormatImplementer //listFormatsMISP
-}
-
-// listFormatsMISP содержит описание типов добавляемых в MISP и их порядок добавления.
-// По результатам добавления Event, MISP возвращает id котрый необходим как для добавления
-// следующих типов объектов MISP, так и для добавления этого значения в поле
-// 'customFields' TheHive. Не все из этих объектов могут сразу добавлятся в MISP 'как есть',
-// некоторые из них подлежат дополнительной обработке, см. обработчик для каждого из объектов.
-// После добавления всех объектов, событие MISP необходимо опобликовать, как это сделать
-// см. обработчик публикации.
-type ListFormatsMISP struct {
-	Event      datamodels.EventsMispFormat
-	Reports    datamodels.EventReports
-	Attributes []datamodels.AttributesMispFormat
-	Objects    map[int]datamodels.ObjectsMispFormat
-	ObjectTags datamodels.ListEventObjectTags
 }
 
 type cacheStorages struct {

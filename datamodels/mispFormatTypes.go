@@ -27,8 +27,8 @@ type EventsMispFormat struct {
 
 type EventReports struct {
 	Name         string `json:"name"`
-	Distribution string `json:"distribution"`
 	Content      string `json:"content"`
+	Distribution string `json:"distribution"`
 }
 
 type ListAttributesMispFormat struct {
