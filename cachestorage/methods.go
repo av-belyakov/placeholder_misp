@@ -3,9 +3,9 @@ package cachestorage
 // SizeObjectToQueue размер очереди
 func (c *CacheExecutedObjects[T]) SizeObjectToQueue() int {
 	return len(c.queue.storages)
-}
 
-// PushObjectToQueue добавляет в очередь объектов новый объект
+	// PushObjectToQueue добавляет в очередь объектов новый объект
+}
 func (c *CacheExecutedObjects[T]) PushObjectToQueue(v T) {
 	c.queue.mutex.Lock()
 	defer c.queue.mutex.Unlock()
@@ -52,14 +52,16 @@ func (c *CacheExecutedObjects[T]) AddObjectToCache(v CacheStorageFuncHandler[T])
 }
 
 // получить объект из хранилища
-func (c *CacheExecutedObjects[T]) GetObjectToCache() CacheStorageFuncHandler[T] {
-	// вот здесь возвращает объект или только исполняемую функцию?
-	// какой объект возвращать, по старее или по новее?
-}
+//func (c *CacheExecutedObjects[T]) GetObjectToCache(v string) CacheStorageFuncHandler[T] {
+// вот здесь возвращает объект или только исполняемую функцию?
+// какой объект возвращать, по старее или по новее?
+//}
 
 // deleteOldObjectFromCache удаляет самый старый объект по timeMain
 func (c *CacheExecutedObjects[T]) deleteOldObjectFromCache() error {
 	//как то наод еще удалять объекты у которых истекло timeExpiry
+
+	return nil
 }
 
 //isExecution установить в TRUE
