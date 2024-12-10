@@ -22,14 +22,15 @@ import (
 // NewCacheStorage создает новое кэширующее хранилище. Время по истечение которого
 // данные из кэша будут удалены, задается в секундах в диапазоне от 10 до 86400
 // секунд, где 86400 секунд равны одним суткам.
-func NewCacheStorage(ctx context.Context, ttl int) (*CacheExecutedObjects, error) {
-	cacheExObj := &CacheExecutedObjects{
+func NewCacheStorage[T any](ctx context.Context, ttl, maxSize int) (*CacheExecutedObjects[T], error) {
+	cacheExObj := &CacheExecutedObjects[T]{
 		maxTTL: time.Duration(30 * time.Second),
-		queue: listQueueObjects{
-			storages: []FormatImplementer(nil), //listFormatsMISP(nil),
+		queue: listQueueObjects[T]{
+			storages: []T(nil),
 		},
-		cache: cacheStorages{
-			storages: map[string]storageParameters{},
+		cache: cacheStorages[T]{
+			maxSize:  maxSize,
+			storages: map[string]storageParameters[T]{},
 		},
 	}
 
@@ -77,7 +78,7 @@ func NewCacheStorage(ctx context.Context, ttl int) (*CacheExecutedObjects, error
 // под заданные условия из которых удаляется объект с самым старым timeMain. После
 // удаления объекта с самым старым timeMain, обращение к очереди за новым объектом
 // предназначенным для обработки.
-func (cache *CacheExecutedObjects) automaticExecution(ctx context.Context, maxSize int) {
+func (cache *CacheExecutedObjects[Q]) automaticExecution(ctx context.Context, maxSize int) {
 
 }
 

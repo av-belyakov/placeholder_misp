@@ -5,24 +5,26 @@ import (
 	"time"
 )
 
-type CacheExecutedObjects struct {
-	maxTTL time.Duration    //максимальное время, через которое запись в cacheStorages будет удалена
-	queue  listQueueObjects //очередь объектов предназначенных для выполнения
-	cache  cacheStorages    //кеш хранилища
+type CacheExecutedObjects[T any] struct {
+	maxTTL time.Duration       //максимальное время, через которое запись в cacheStorages будет удалена
+	queue  listQueueObjects[T] //очередь объектов предназначенных для выполнения
+	cache  cacheStorages[T]    //кеш хранилища
 }
 
-type listQueueObjects struct {
+type listQueueObjects[T any] struct {
 	mutex    sync.Mutex
-	storages []FormatImplementer //listFormatsMISP
+	storages []T
 }
 
-type cacheStorages struct {
-	size     int
-	mutex    sync.RWMutex
-	storages map[string]storageParameters
+type cacheStorages[T any] struct {
+	mutex   sync.RWMutex
+	maxSize int
+	//максимальный размер кеша при привышении которого выполняется удаление
+	//самой старой записи
+	storages map[string]storageParameters[T]
 }
 
-type storageParameters struct {
+type storageParameters[T any] struct {
 	isExecution bool
 	//статус выполнения
 	isCompletedSuccessfully bool
@@ -32,6 +34,6 @@ type storageParameters struct {
 	timeExpiry time.Time
 	//общее время истечения жизни, время по истечению которого объект удаляется в любом
 	//случае в независимости от того, был ли он выполнен или нет
-	cacheFunc CacheStorageFuncHandler //func(int) bool
+	cacheFunc CacheStorageFuncHandler[T] //func(int) bool
 	//фунция-обертка выполнения
 }

@@ -263,8 +263,8 @@ type OrganisationSettingsMispFormat struct {
 // формируется на основе содержимого поля observables получаемого от TheHive
 // которое дополнительно содержит поле attachment
 type ListObjectsMispFormat struct {
-	objects map[int]ObjectsMispFormat
 	sync.Mutex
+	objects map[int]ObjectsMispFormat
 }
 
 type ObjectsMispFormat struct {

@@ -1,33 +1,88 @@
 package cachestorage
 
-// AddObjectToQueue добавляет в очередь объектов новый объект
-func (cache *CacheExecutedObjects) AddObjectToQueue(v FormatImplementer) {
-	cache.queue.mutex.Lock()
-	defer cache.queue.mutex.Unlock()
-
-	cache.queue.storages = append(cache.queue.storages, v)
+// SizeObjectToQueue размер очереди
+func (c *CacheExecutedObjects[T]) SizeObjectToQueue() int {
+	return len(c.queue.storages)
 }
 
-// GetObjectToQueue забирает с начала очереди новый объект или возвращает
+// PushObjectToQueue добавляет в очередь объектов новый объект
+func (c *CacheExecutedObjects[T]) PushObjectToQueue(v T) {
+	c.queue.mutex.Lock()
+	defer c.queue.mutex.Unlock()
+
+	c.queue.storages = append(c.queue.storages, v)
+}
+
+// PullObjectToQueue забирает с начала очереди новый объект или возвращает
 // FALSE если очередь пуста
-func (cache *CacheExecutedObjects) GetObjectToQueue() (FormatImplementer, bool) {
-	cache.queue.mutex.Lock()
-	defer cache.queue.mutex.Unlock()
+func (c *CacheExecutedObjects[T]) PullObjectToQueue() (T, bool) {
+	c.queue.mutex.Lock()
+	defer c.queue.mutex.Unlock()
 
-	size := len(cache.queue.storages)
+	var obj T
+	size := len(c.queue.storages)
 	if size == 0 {
-		return nil, false
+		return obj, false
 	}
 
-	obj := cache.queue.storages[0]
+	obj = c.queue.storages[0]
 	if size == 1 {
-		cache.queue.storages = make([]FormatImplementer, 0, 0)
+		c.queue.storages = make([]T, 0)
+
+		return obj, true
 	}
 
-	cache.queue.storages = cache.queue.storages[1:]
+	c.queue.storages = c.queue.storages[1:]
 
 	return obj, true
 }
+
+// AddObjectToCache добавляет новый объект в хранилище
+func (c *CacheExecutedObjects[T]) AddObjectToCache(v CacheStorageFuncHandler[T]) error {
+	c.cache.mutex.Lock()
+	defer c.cache.mutex.Unlock()
+
+	if len(c.cache.storages) == c.cache.maxSize {
+		//запустить удаление самого старого объекта
+		//при успешном удалении не должно быть ошибки
+		//если есть ошибка то добавление не выполняется
+	}
+
+	return nil
+}
+
+// получить объект из хранилища
+func (c *CacheExecutedObjects[T]) GetObjectToCache() CacheStorageFuncHandler[T] {
+	// вот здесь возвращает объект или только исполняемую функцию?
+	// какой объект возвращать, по старее или по новее?
+}
+
+// deleteOldObjectFromCache удаляет самый старый объект по timeMain
+func (c *CacheExecutedObjects[T]) deleteOldObjectFromCache() error {
+	//как то наод еще удалять объекты у которых истекло timeExpiry
+}
+
+//isExecution установить в TRUE
+//isExecution установить в FALSE
+
+//isCompletedSuccessfully установить в TRUE
+//isCompletedSuccessfully установить в FALSE
+
+/*
+type storageParameters[T any] struct {
+	isExecution bool
+	//статус выполнения
+	isCompletedSuccessfully bool
+	//результат выполнения
+	timeMain time.Time
+	//основное время, по данному времени можно найти самый старый объект в кеше
+	timeExpiry time.Time
+	//общее время истечения жизни, время по истечению которого объект удаляется в любом
+	//случае в независимости от того, был ли он выполнен или нет
+	cacheFunc CacheStorageFuncHandler[T] //func(int) bool
+	//фунция-обертка выполнения
+}
+*/
 
 /*
 // SetMethod создает новую запись, принимает значение которое нужно сохранить
