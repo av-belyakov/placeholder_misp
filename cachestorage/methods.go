@@ -1,11 +1,13 @@
 package cachestorage
 
+import "time"
+
 // SizeObjectToQueue размер очереди
 func (c *CacheExecutedObjects[T]) SizeObjectToQueue() int {
 	return len(c.queue.storages)
-
-	// PushObjectToQueue добавляет в очередь объектов новый объект
 }
+
+// PushObjectToQueue добавляет в очередь объектов новый объект
 func (c *CacheExecutedObjects[T]) PushObjectToQueue(v T) {
 	c.queue.mutex.Lock()
 	defer c.queue.mutex.Unlock()
@@ -38,15 +40,20 @@ func (c *CacheExecutedObjects[T]) PullObjectToQueue() (T, bool) {
 }
 
 // AddObjectToCache добавляет новый объект в хранилище
-func (c *CacheExecutedObjects[T]) AddObjectToCache(v CacheStorageFuncHandler[T]) error {
+func (c *CacheExecutedObjects[T]) AddObjectToCache(k string, v CacheStorageFuncHandler[T]) error {
 	c.cache.mutex.Lock()
 	defer c.cache.mutex.Unlock()
 
-	if len(c.cache.storages) == c.cache.maxSize {
-		//запустить удаление самого старого объекта
-		//при успешном удалении не должно быть ошибки
-		//если есть ошибка то добавление не выполняется
+	if len(c.cache.storages) >= c.cache.maxSize {
+		//удаление самого старого объекта
+		c.deleteOldObjectFromCache()
 	}
+
+	//1. проверить наличие уже имеющегося объекта по его key
+	//2. если key совпадают то запустить процесс сравнения двух объектов
+	// но только если объект в настоящее время не выполняется, если объект
+	// выполняется то не сравнивать и новый не добавлять
+	//3. заменить только если объекты разные и выстовить тригер isCompletedSuccessfully = FALSE
 
 	return nil
 }
@@ -58,10 +65,39 @@ func (c *CacheExecutedObjects[T]) AddObjectToCache(v CacheStorageFuncHandler[T])
 //}
 
 // deleteOldObjectFromCache удаляет самый старый объект по timeMain
-func (c *CacheExecutedObjects[T]) deleteOldObjectFromCache() error {
-	//как то наод еще удалять объекты у которых истекло timeExpiry
+func (c *CacheExecutedObjects[T]) deleteOldObjectFromCache() {
+	var (
+		index      string
+		timeExpiry time.Time
+	)
 
-	return nil
+	for k, v := range c.cache.storages {
+		if index == "" {
+			index = k
+			timeExpiry = v.timeExpiry
+
+			continue
+		}
+
+		if v.timeExpiry.Before(timeExpiry) {
+			index = k
+			timeExpiry = v.timeExpiry
+		}
+	}
+
+	delete(c.cache.storages, index)
+}
+
+// DeleteForTimeExpiryObjectFromCache удаляет все объекты у которых истекло время жизни
+func (c *CacheExecutedObjects[T]) DeleteForTimeExpiryObjectFromCache() {
+	c.cache.mutex.Lock()
+	defer c.cache.mutex.Unlock()
+
+	for key, storage := range c.cache.storages {
+		if storage.timeExpiry.Before(time.Now()) {
+			delete(c.cache.storages, key)
+		}
+	}
 }
 
 //isExecution установить в TRUE
