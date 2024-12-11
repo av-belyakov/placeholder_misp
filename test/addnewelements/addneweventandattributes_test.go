@@ -118,7 +118,7 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		//читаем тестовый файл
 		//"example_caseId_33705.json" совпадает с правилами
 		//"example_caseId_33807.json" НЕ совпадает с правилами
-		exampleByte, errReadFile = readFileJson("testing/test_json", "example_caseId_33705.json")
+		exampleByte, errReadFile = readFileJson("test/test_json", "examplenew.json")
 
 		//инициалиация модуля для взаимодействия с MISP
 		mispModule, errMisp = mispinteractions.HandlerMISP(*confApp.GetAppMISP(), confApp.Organizations, logging)

@@ -265,6 +265,11 @@ func NewMispFormat(
 		//
 		//
 
+		fmt.Println("===== PRINT listAttributeTmp =====", listAttributeTmp)
+		fmt.Printf("========= PRINT: %+v\n", getNewListObjects(
+			listObjectsMisp.GetListObjectsMisp(),
+			listAttributeTmp.GetListAttribute()))
+
 		//тут отправляем сформированные по формату MISP пользовательские структуры
 		mispmodule.SendingDataInput(mispinteractions.SettingsChanInputMISP{
 			Command:    "add event",

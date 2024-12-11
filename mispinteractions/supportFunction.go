@@ -7,6 +7,7 @@ import (
 	"runtime"
 
 	"placeholder_misp/datamodels"
+	"placeholder_misp/supportingfunctions"
 )
 
 // sendEventsMispFormat отправляет в API MISP событие в виде типа Event и возвращает полученный ответ
@@ -200,6 +201,15 @@ func sendObjectsMispFormat(host, authKey, eventId string, d SettingsChanInputMIS
 
 			continue
 		}
+
+		str, err := supportingfunctions.NewReadReflectJSONSprint(b)
+		if err != nil {
+			fmt.Println("__________ ERROR ___________")
+			fmt.Println(err)
+		}
+
+		fmt.Println("________________ objects _________________")
+		fmt.Println(str)
 
 		res, resBodyByte, err = c.Post("/objects/add/"+eventId, b)
 		if err != nil {
