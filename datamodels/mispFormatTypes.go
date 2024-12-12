@@ -283,9 +283,10 @@ type ObjectsMispFormat struct {
 type ListAttribute []AttributeMispFormat
 
 type AttributeMispFormat struct {
-	Category       string `json:"category"`
-	Type           string `json:"type"`
-	Value          string `json:"value"`
-	Distribution   string `json:"distribution"`
-	ObjectRelation string `json:"object_relation"`
+	DisableCorrelation bool   `json:"disable_correlation"`
+	Category           string `json:"category"`
+	Type               string `json:"type"`
+	Value              string `json:"value"`
+	Distribution       string `json:"distribution"`
+	ObjectRelation     string `json:"object_relation"`
 }

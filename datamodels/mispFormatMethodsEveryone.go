@@ -23,8 +23,9 @@ func NewListAttributeTmp() *ListAttributeTmp {
 // AddAttribute добавляет атрибуты в список атрибутов
 func (la *ListAttributeTmp) AddAttribute(branch string, value interface{}, num int) {
 	var (
-		t    string = "other"
-		objr string = "other"
+		t                  string = "other"
+		objr               string = "other"
+		disableCorrelation bool
 
 		err error
 	)
@@ -58,12 +59,17 @@ func (la *ListAttributeTmp) AddAttribute(branch string, value interface{}, num i
 			}
 		}
 
+		if objr == "filename" || objr == "other" {
+			disableCorrelation = true
+		}
+
 		tmp = append(tmp, AttributeMispFormat{
-			Category:       "Payload delivery",
-			Distribution:   "0",
-			Value:          str,
-			Type:           t,
-			ObjectRelation: objr,
+			Category:           "Payload delivery",
+			Distribution:       "0",
+			DisableCorrelation: disableCorrelation,
+			Value:              str,
+			Type:               t,
+			ObjectRelation:     objr,
 		})
 	}
 
