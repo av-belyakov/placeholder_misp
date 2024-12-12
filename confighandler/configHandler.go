@@ -29,7 +29,6 @@ func NewConfig(rootDir string) (*ConfigApp, error) {
 			//Подключение к NATS
 			"GO_PHMISP_NHOST":               "",
 			"GO_PHMISP_NPORT":               "",
-			"GO_PHMISP_NCACHETTL":           "",
 			"GO_PHMISP_NSUBSENDERCASE":      "",
 			"GO_PHMISP_NSUBLISTENERCOMMAND": "",
 
@@ -113,9 +112,6 @@ func NewConfig(rootDir string) (*ConfigApp, error) {
 		}
 		if viper.IsSet("NATS.port") {
 			conf.AppConfigNATS.Port = viper.GetInt("NATS.port")
-		}
-		if viper.IsSet("NATS.cacheTtl") {
-			conf.AppConfigNATS.CacheTTL = viper.GetInt("NATS.cacheTtl")
 		}
 
 		if viper.IsSet("NATS.subscriptions.sender_case") {
@@ -211,11 +207,6 @@ func NewConfig(rootDir string) (*ConfigApp, error) {
 	if envList["GO_PHMISP_NPORT"] != "" {
 		if p, err := strconv.Atoi(envList["GO_PHMISP_NPORT"]); err == nil {
 			conf.AppConfigNATS.Port = p
-		}
-	}
-	if envList["GO_PHMISP_NCACHETTL"] != "" {
-		if v, err := strconv.Atoi(envList["GO_PHMISP_NCACHETTL"]); err == nil {
-			conf.AppConfigNATS.CacheTTL = v
 		}
 	}
 	if envList["GO_PHMISP_NSUBSENDERCASE"] != "" {
