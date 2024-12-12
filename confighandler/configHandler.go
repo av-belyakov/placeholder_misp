@@ -113,7 +113,9 @@ func NewConfig(rootDir string) (*ConfigApp, error) {
 		if viper.IsSet("NATS.port") {
 			conf.AppConfigNATS.Port = viper.GetInt("NATS.port")
 		}
-
+		if viper.IsSet("NATS.cacheTtl") {
+			conf.AppConfigNATS.CacheTTL = viper.GetInt("NATS.cacheTtl")
+		}
 		if viper.IsSet("NATS.subscriptions.sender_case") {
 			conf.AppConfigNATS.Subscriptions.SenderCase = viper.GetString("NATS.subscriptions.sender_case")
 		}
