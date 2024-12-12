@@ -2,6 +2,7 @@
 package natsinteractions
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"runtime"
@@ -14,11 +15,6 @@ import (
 	"placeholder_misp/confighandler"
 	"placeholder_misp/datamodels"
 	"placeholder_misp/memorytemporarystorage"
-)
-
-const (
-	ansiReset    = "\033[0m"
-	ansiDarkGray = "\033[90m"
 )
 
 var (
@@ -127,7 +123,7 @@ func NewClientNATS(
 		}
 	})
 
-	nc.Subscribe(conf.Subscriptions.SenderCase, func(m *nats.Msg) {
+	nc.Subscribe("main_caseupdate", func(m *nats.Msg) {
 		// ***********************************
 		// Это логирование только для теста!!!
 		// ***********************************
@@ -150,32 +146,60 @@ func NewClientNATS(
 		}
 	})
 
-	log.Printf("%vConnect to NATS with address %s:%d%v\n", ansiDarkGray, conf.Host, conf.Port, ansiReset)
+	log.Printf("Connect to NATS with address %s:%d\n", conf.Host, conf.Port)
 
-	// обработка данных приходящих в модуль от ядра приложения фактически это команды на добавления
-	//тега - 'add_case_tag' и команда на добавление MISP id в поле customField
+	// обработка данных приходящих в модуль от ядра приложения
 	go func() {
-		for incomingData := range mnats.chanInputNATS {
+		for data := range mnats.chanInputNATS {
 			//не отправляем eventId в TheHive
 			if !confTheHive.Send {
 				continue
 			}
 
-			//отправляем команды на установку тега и значения поля customFields
-			go func() {
+			//получаем дескриптор соединения с NATS для отправки eventId
+			ncd, ok := ns.getElement(data.TaskId)
+			if !ok {
+				_, f, l, _ := runtime.Caller(0)
 
-				//***********************************************************************
-				//*** эту функцию надо протестировать протестировать
-				//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-				info, err := SendRequestCommandExecute(nc, conf.Subscriptions.ListenerCommand, incomingData)
-				if err != nil {
-					logging <- datamodels.MessageLogging{MsgType: "error", MsgData: err.Error()}
-
-					return
+				logging <- datamodels.MessageLogging{
+					MsgData: fmt.Sprintf("connection descriptor for task id '%s' not found %s:%d", data.TaskId, f, l-2),
+					MsgType: "error",
 				}
 
-				logging <- datamodels.MessageLogging{MsgType: "info", MsgData: info}
-			}()
+				continue
+			}
+
+			nrm := datamodels.NewResponseMessage()
+
+			if data.Command == "send event id" {
+				nrm.ResponseMessageAddNewCommand(datamodels.ResponseCommandForTheHive{
+					Command: "setcustomfield",
+					Name:    "misp-event-id.string",
+					String:  data.EventId,
+				})
+			}
+
+			res, err := json.Marshal(nrm.GetResponseMessageFromMispToTheHave())
+			if err != nil {
+				_, f, l, _ := runtime.Caller(0)
+
+				logging <- datamodels.MessageLogging{
+					MsgData: fmt.Sprintf("%s %s:%d", err.Error(), f, l-2),
+					MsgType: "error",
+				}
+
+				continue
+			}
+
+			//отправляем в NATS пакет с eventId для добавления его в TheHive
+			if err := ncd.Respond(res); err != nil {
+				_, f, l, _ := runtime.Caller(0)
+
+				logging <- datamodels.MessageLogging{
+					MsgData: fmt.Sprintf("%s %s:%d", err.Error(), f, l-2),
+					MsgType: "error",
+				}
+			}
 		}
 	}()
 
