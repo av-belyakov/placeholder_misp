@@ -1,10 +1,21 @@
 package cachestorage
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 // SizeObjectToQueue размер очереди
 func (c *CacheExecutedObjects[T]) SizeObjectToQueue() int {
 	return len(c.queue.storages)
+}
+
+// CleanQueue очистка очереди
+func (c *CacheExecutedObjects[T]) CleanQueue() {
+	c.queue.mutex.Lock()
+	defer c.queue.mutex.Unlock()
+
+	c.queue.storages = []T(nil)
 }
 
 // PushObjectToQueue добавляет в очередь объектов новый объект
@@ -40,29 +51,167 @@ func (c *CacheExecutedObjects[T]) PullObjectToQueue() (T, bool) {
 }
 
 // AddObjectToCache добавляет новый объект в хранилище
-func (c *CacheExecutedObjects[T]) AddObjectToCache(k string, v CacheStorageFuncHandler[T]) error {
+func (c *CacheExecutedObjects[T]) AddObjectToCache(key string, value CacheStorageFuncHandler[T]) error {
 	c.cache.mutex.Lock()
 	defer c.cache.mutex.Unlock()
 
 	if len(c.cache.storages) >= c.cache.maxSize {
-		//удаление самого старого объекта
+		//удаление самого старого объекта, осуществляется по параметру timeMain
 		c.deleteOldObjectFromCache()
 	}
 
-	//1. проверить наличие уже имеющегося объекта по его key
-	//2. если key совпадают то запустить процесс сравнения двух объектов
-	// но только если объект в настоящее время не выполняется, если объект
-	// выполняется то не сравнивать и новый не добавлять
-	//3. заменить только если объекты разные и выстовить тригер isCompletedSuccessfully = FALSE
+	storage, ok := c.cache.storages[key]
+	if !ok {
+		c.cache.storages[key] = storageParameters[T]{
+			timeMain:   time.Now(),
+			timeExpiry: time.Now().Add(c.maxTTL),
+		}
+		c.cache.storages[key].cacheFunc.SetFunc(value.GetFunc())
+
+		return nil
+	}
+
+	//найден объект у которого ключ совпадает с объектом принятом в обработку
+
+	//объект в настоящее время выполняется
+	if storage.isExecution {
+		return fmt.Errorf("an object has been received whose key ID '%s' matches the already running object, ignore it", key)
+	}
+
+	//сравнение объектов из кеша и полученного из очереди
+	if storage.cacheFunc.Comparison(value) {
+		return fmt.Errorf("objects with key ID '%s' are completely identical, adding an object to the cache is not performed", key)
+	}
+
+	storage.timeMain = time.Now()
+	storage.timeExpiry = time.Now().Add(c.maxTTL)
+	storage.isExecution = false
+	storage.isCompletedSuccessfully = false
+	storage.cacheFunc.SetFunc(value.GetFunc())
+
+	c.cache.storages[key] = storage
 
 	return nil
 }
 
-// получить объект из хранилища
-//func (c *CacheExecutedObjects[T]) GetObjectToCache(v string) CacheStorageFuncHandler[T] {
-// вот здесь возвращает объект или только исполняемую функцию?
-// какой объект возвращать, по старее или по новее?
-//}
+// GetObjectFromCacheByKey возвращает исполняемую функцию из кэша по ключу
+func (c *CacheExecutedObjects[T]) GetObjectFromCacheByKey(key string) (CacheStorageFuncHandler[T], bool) {
+	c.cache.mutex.RLock()
+	defer c.cache.mutex.RUnlock()
+
+	storage, ok := c.cache.storages[key]
+
+	return storage.cacheFunc, ok
+}
+
+// GetObjectFromCacheMinTimeExpiry возвращает из кэша исполняемую функцию которая в настоящее время не
+// выполняется, не была успешно выполнена и время истечения жизни объекта которой самое меньшее
+func (c *CacheExecutedObjects[T]) GetObjectFromCacheMinTimeExpiry() (key string, f CacheStorageFuncHandler[T]) {
+	c.cache.mutex.RLock()
+	defer c.cache.mutex.RUnlock()
+
+	var early time.Time
+	for k, v := range c.cache.storages {
+		if key == "" {
+			key = k
+			early = v.timeExpiry
+			f = v.cacheFunc
+
+			continue
+		}
+
+		if v.timeExpiry.Before(early) {
+			key = k
+			early = v.timeExpiry
+			f = v.cacheFunc
+		}
+	}
+
+	return key, f
+}
+
+// SetTimeExpiry устанавливает или обновляет значение параметра timeExpiry
+func (c *CacheExecutedObjects[T]) SetTimeExpiry(key string) {
+	c.cache.mutex.Lock()
+	defer c.cache.mutex.Unlock()
+
+	if storage, ok := c.cache.storages[key]; ok {
+		storage.timeExpiry = time.Now().Add(c.maxTTL)
+		c.cache.storages[key] = storage
+	}
+}
+
+// SetIsExecutionTrue устанавливает значение параметра isExecution
+func (c *CacheExecutedObjects[T]) SetIsExecutionTrue(key string) {
+	c.cache.mutex.Lock()
+	defer c.cache.mutex.Unlock()
+
+	if storage, ok := c.cache.storages[key]; ok {
+		storage.isExecution = true
+		c.cache.storages[key] = storage
+	}
+}
+
+// SetIsExecutionFalse устанавливает значение параметра isExecution
+func (c *CacheExecutedObjects[T]) SetIsExecutionFalse(key string) {
+	c.cache.mutex.Lock()
+	defer c.cache.mutex.Unlock()
+
+	if storage, ok := c.cache.storages[key]; ok {
+		storage.isExecution = false
+		c.cache.storages[key] = storage
+	}
+}
+
+// SetIsCompletedSuccessfullyTrue устанавливает значение параметра isCompletedSuccessfully
+func (c *CacheExecutedObjects[T]) SetIsCompletedSuccessfullyTrue(key string) {
+	c.cache.mutex.Lock()
+	defer c.cache.mutex.Unlock()
+
+	if storage, ok := c.cache.storages[key]; ok {
+		storage.isCompletedSuccessfully = true
+		c.cache.storages[key] = storage
+	}
+}
+
+// SetIsCompletedSuccessfullyFalse устанавливает значение параметра isCompletedSuccessfully
+func (c *CacheExecutedObjects[T]) SetIsCompletedSuccessfullyFalse(key string) {
+	c.cache.mutex.Lock()
+	defer c.cache.mutex.Unlock()
+
+	if storage, ok := c.cache.storages[key]; ok {
+		storage.isCompletedSuccessfully = false
+		c.cache.storages[key] = storage
+	}
+}
+
+/*
+type storageParameters[T any] struct {
+	isExecution bool
+	//статус выполнения
+	isCompletedSuccessfully bool
+	//результат выполнения
+	timeMain time.Time
+	//основное время, по данному времени можно найти самый старый объект в кеше
+	timeExpiry time.Time
+	//общее время истечения жизни, время по истечению которого объект удаляется в любом
+	//случае в независимости от того, был ли он выполнен или нет
+	cacheFunc CacheStorageFuncHandler[T] //func(int) bool
+	//фунция-обертка выполнения
+}
+*/
+
+// DeleteForTimeExpiryObjectFromCache удаляет все объекты у которых истекло время жизни
+func (c *CacheExecutedObjects[T]) DeleteForTimeExpiryObjectFromCache() {
+	c.cache.mutex.Lock()
+	defer c.cache.mutex.Unlock()
+
+	for key, storage := range c.cache.storages {
+		if storage.timeExpiry.Before(time.Now()) {
+			delete(c.cache.storages, key)
+		}
+	}
+}
 
 // deleteOldObjectFromCache удаляет самый старый объект по timeMain
 func (c *CacheExecutedObjects[T]) deleteOldObjectFromCache() {
@@ -87,40 +236,6 @@ func (c *CacheExecutedObjects[T]) deleteOldObjectFromCache() {
 
 	delete(c.cache.storages, index)
 }
-
-// DeleteForTimeExpiryObjectFromCache удаляет все объекты у которых истекло время жизни
-func (c *CacheExecutedObjects[T]) DeleteForTimeExpiryObjectFromCache() {
-	c.cache.mutex.Lock()
-	defer c.cache.mutex.Unlock()
-
-	for key, storage := range c.cache.storages {
-		if storage.timeExpiry.Before(time.Now()) {
-			delete(c.cache.storages, key)
-		}
-	}
-}
-
-//isExecution установить в TRUE
-//isExecution установить в FALSE
-
-//isCompletedSuccessfully установить в TRUE
-//isCompletedSuccessfully установить в FALSE
-
-/*
-type storageParameters[T any] struct {
-	isExecution bool
-	//статус выполнения
-	isCompletedSuccessfully bool
-	//результат выполнения
-	timeMain time.Time
-	//основное время, по данному времени можно найти самый старый объект в кеше
-	timeExpiry time.Time
-	//общее время истечения жизни, время по истечению которого объект удаляется в любом
-	//случае в независимости от того, был ли он выполнен или нет
-	cacheFunc CacheStorageFuncHandler[T] //func(int) bool
-	//фунция-обертка выполнения
-}
-*/
 
 /*
 // SetMethod создает новую запись, принимает значение которое нужно сохранить

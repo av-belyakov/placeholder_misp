@@ -8,6 +8,7 @@ package datamodels
 // После добавления всех объектов, событие MISP необходимо опобликовать, как это сделать
 // см. обработчик публикации.
 type ListFormatsMISP struct {
+	ID         string
 	Event      *EventsMispFormat
 	Reports    *EventReports
 	Attributes []*AttributesMispFormat

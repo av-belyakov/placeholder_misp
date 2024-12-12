@@ -19,8 +19,8 @@ type listQueueObjects[T any] struct {
 type cacheStorages[T any] struct {
 	mutex   sync.RWMutex
 	maxSize int
-	//максимальный размер кеша при привышении которого выполняется удаление
-	//самой старой записи
+	//максимальный размер кеша при привышении которого выполняется
+	//удаление самой старой записи
 	storages map[string]storageParameters[T]
 }
 
@@ -33,7 +33,7 @@ type storageParameters[T any] struct {
 	//основное время, по данному времени можно найти самый старый объект в кеше
 	timeExpiry time.Time
 	//общее время истечения жизни, время по истечению которого объект удаляется в любом
-	//случае в независимости от того, был ли он выполнен или нет
+	//случае в независимости от того, был ли он выполнен или нет, формируется time.Now().Add(c.maxTTL)
 	cacheFunc CacheStorageFuncHandler[T] //func(int) bool
 	//фунция-обертка выполнения
 }

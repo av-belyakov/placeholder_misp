@@ -7,5 +7,5 @@ func NewListFormatsMISP() *ListFormatsMISP {
 		Attributes: []*AttributesMispFormat(nil),
 		Objects:    map[int]*ObjectsMispFormat(nil),
 		ObjectTags: &ListEventObjectTags{},
-	} 
-} 
+	}
+}

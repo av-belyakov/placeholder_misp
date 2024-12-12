@@ -48,7 +48,46 @@ func TestQueueHandler(t *testing.T) {
 		assert.False(t, ok)
 	})
 
-	t.Run("Тест 2. Найти и удалить самую старую запись", func(t *testing.T) {
+	t.Run("Тест 1.1. Добавить в очередь некоторое количество объектов", func(t *testing.T) {
+		cache.CleanQueue()
+
+		objectTemplate := datamodels.NewListFormatsMISP()
+
+		objectTemplate.ID = "3255-46673"
+		cache.PushObjectToQueue(objectTemplate)
+		cache.PushObjectToQueue(objectTemplate) //дублирующийся объект
+		objectTemplate.ID = "8483-78578"
+		cache.PushObjectToQueue(objectTemplate)
+		objectTemplate.ID = "3132-11223"
+		cache.PushObjectToQueue(objectTemplate)
+		objectTemplate.ID = "6553-13323"
+		cache.PushObjectToQueue(objectTemplate)
+		objectTemplate.ID = "8474-37722"
+		cache.PushObjectToQueue(objectTemplate)
+		objectTemplate.ID = "9123-84885"
+		cache.PushObjectToQueue(objectTemplate)
+		objectTemplate.ID = "1200-04993"
+		cache.PushObjectToQueue(objectTemplate)
+		objectTemplate.ID = "4323-29909"
+		cache.PushObjectToQueue(objectTemplate)
+		objectTemplate.ID = "7605-89493"
+		cache.PushObjectToQueue(objectTemplate)
+
+		assert.Equal(t, cache.SizeObjectToQueue(), 10)
+	})
+
+	t.Run("Тест 2. Добавить в кэш хранилищя некоторое количество объектов находящихся в очереди", func(t *testing.T) {
+		obj, isEmpty := cache.PullObjectToQueue()
+		assert.False(t, isEmpty)
+
+		//похоже здесь obj надо преобразовать в такую структуру
+		//которая соответствовала бы интерфейсу CacheStorageFuncHandler[T any]
+
+		err := cache.AddObjectToCache(obj.ID, obj)
+		assert.NoError(t, err)
+	})
+
+	t.Run("Тест 3. Найти и удалить самую старую запись", func(t *testing.T) {
 		var (
 			index      string
 			timeExpiry time.Time
