@@ -1,7 +1,17 @@
 package cachestorage
 
 type CacheStorageFuncHandler[T any] interface {
-	SetFunc(func(int) bool)
+	CacheStorageGetter[T]
+	CacheStorageSetter[T]
+	Comparison(T) bool
+}
+
+type CacheStorageGetter[T any] interface {
 	GetFunc() func(int) bool
-	Comparison(CacheStorageFuncHandler[T]) bool
+	GetObject() T
+}
+
+type CacheStorageSetter[T any] interface {
+	SetFunc(func(int) bool)
+	SetObject(T)
 }

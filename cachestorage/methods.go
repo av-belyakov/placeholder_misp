@@ -63,8 +63,9 @@ func (c *CacheExecutedObjects[T]) AddObjectToCache(key string, value CacheStorag
 	storage, ok := c.cache.storages[key]
 	if !ok {
 		c.cache.storages[key] = storageParameters[T]{
-			timeMain:   time.Now(),
-			timeExpiry: time.Now().Add(c.maxTTL),
+			timeMain:       time.Now(),
+			timeExpiry:     time.Now().Add(c.maxTTL),
+			originalObject: value.GetObject(),
 		}
 		c.cache.storages[key].cacheFunc.SetFunc(value.GetFunc())
 
@@ -79,7 +80,7 @@ func (c *CacheExecutedObjects[T]) AddObjectToCache(key string, value CacheStorag
 	}
 
 	//сравнение объектов из кеша и полученного из очереди
-	if storage.cacheFunc.Comparison(value) {
+	if value.Comparison(storage.originalObject) {
 		return fmt.Errorf("objects with key ID '%s' are completely identical, adding an object to the cache is not performed", key)
 	}
 
@@ -87,6 +88,7 @@ func (c *CacheExecutedObjects[T]) AddObjectToCache(key string, value CacheStorag
 	storage.timeExpiry = time.Now().Add(c.maxTTL)
 	storage.isExecution = false
 	storage.isCompletedSuccessfully = false
+	storage.originalObject = value.GetObject()
 	storage.cacheFunc.SetFunc(value.GetFunc())
 
 	c.cache.storages[key] = storage

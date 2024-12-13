@@ -19,6 +19,74 @@ var (
 	err error
 )
 
+type SpecialObjectComparator interface {
+	ComparisonID(string) bool
+	ComparisonEvent(*datamodels.EventsMispFormat) bool
+	ComparisonReports(*datamodels.EventReports) bool
+	ComparisonAttributes(*datamodels.AttributesMispFormat) bool
+	ComparisonObjects(map[int]*datamodels.ObjectsMispFormat) bool
+	ComparisonObjectTags(*datamodels.ListEventObjectTags) bool
+	SpecialObjectGetter
+}
+
+type SpecialObjectGetter interface {
+	GetID() string
+	GetEvent() *datamodels.EventsMispFormat
+	GetReports() *datamodels.EventReports
+	GetAttributes() []*datamodels.AttributesMispFormat
+	GetObjects() map[int]*datamodels.ObjectsMispFormat
+	GetObjectTags() *datamodels.ListEventObjectTags
+}
+
+type SpecialObjectForCache[T SpecialObjectComparator] struct {
+	object      T
+	handlerFunc func(int) bool
+}
+
+func NewSpecialObjectForCache[T SpecialObjectComparator]() *SpecialObjectForCache[T] {
+	return &SpecialObjectForCache[T]{}
+}
+
+func (o *SpecialObjectForCache[T]) SetObject(v T) {
+	o.object = v
+}
+
+func (o *SpecialObjectForCache[T]) GetObject() T {
+	return o.object
+}
+
+func (o *SpecialObjectForCache[T]) SetFunc(f func(int) bool) {
+	o.handlerFunc = f
+}
+
+func (o *SpecialObjectForCache[T]) GetFunc() func(int) bool {
+	return o.handlerFunc
+}
+
+func (o *SpecialObjectForCache[T]) Comparison(objFromCache T) bool {
+	//выполнить сравнение
+	//o.object и objFromCache
+
+	if !o.object.ComparisonID(objFromCache.GetID()) {
+		return false
+	}
+
+	if !o.object.ComparisonEvent(objFromCache.GetEvent()) {
+		return false
+	}
+
+	if !o.object.ComparisonReports(objFromCache.GetReports()) {
+		return false
+	}
+
+	if !o.object.ComparisonAttributes(objFromCache.GetAttributes()) {
+		return false
+
+	}
+
+	return true
+}
+
 func TestMain(m *testing.M) {
 	cache, err = cachestorage.NewCacheStorage[*datamodels.ListFormatsMISP](context.Background(), 30, 10)
 	if err != nil {
@@ -80,10 +148,17 @@ func TestQueueHandler(t *testing.T) {
 		obj, isEmpty := cache.PullObjectToQueue()
 		assert.False(t, isEmpty)
 
-		//похоже здесь obj надо преобразовать в такую структуру
-		//которая соответствовала бы интерфейсу CacheStorageFuncHandler[T any]
+		specialObject := NewSpecialObjectForCache[*datamodels.ListFormatsMISP]()
+		specialObject.SetObject(obj)
+		specialObject.SetFunc(func(int) bool {
+			//здесь некий обработчик...
+			//в контексе работы с MISP здесь должен быть код отвечающий
+			//за REST запросы к серверу MISP
 
-		err := cache.AddObjectToCache(obj.ID, obj)
+			return true
+		})
+
+		err := cache.AddObjectToCache(specialObject.object.ID, specialObject)
 		assert.NoError(t, err)
 	})
 

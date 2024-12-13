@@ -34,6 +34,7 @@ type storageParameters[T any] struct {
 	timeExpiry time.Time
 	//общее время истечения жизни, время по истечению которого объект удаляется в любом
 	//случае в независимости от того, был ли он выполнен или нет, формируется time.Now().Add(c.maxTTL)
-	cacheFunc CacheStorageFuncHandler[T] //func(int) bool
+	originalObject T
+	cacheFunc      CacheStorageFuncHandler[T] //func(int) bool
 	//фунция-обертка выполнения
 }
