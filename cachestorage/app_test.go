@@ -23,7 +23,7 @@ type SpecialObjectComparator interface {
 	ComparisonID(string) bool
 	ComparisonEvent(*datamodels.EventsMispFormat) bool
 	ComparisonReports(*datamodels.EventReports) bool
-	ComparisonAttributes(*datamodels.AttributesMispFormat) bool
+	ComparisonAttributes([]*datamodels.AttributesMispFormat) bool
 	ComparisonObjects(map[int]*datamodels.ObjectsMispFormat) bool
 	ComparisonObjectTags(*datamodels.ListEventObjectTags) bool
 	SpecialObjectGetter
@@ -82,6 +82,14 @@ func (o *SpecialObjectForCache[T]) Comparison(objFromCache T) bool {
 	if !o.object.ComparisonAttributes(objFromCache.GetAttributes()) {
 		return false
 
+	}
+
+	if !o.object.ComparisonObjects(objFromCache.GetObjects()) {
+		return false
+	}
+
+	if !o.object.ComparisonObjectTags(o.object.GetObjectTags()) {
+		return false
 	}
 
 	return true

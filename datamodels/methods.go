@@ -10,35 +10,47 @@ func NewListFormatsMISP() *ListFormatsMISP {
 	}
 }
 
+// GetID возвращает уникальный идентификатор
 func (o *ListFormatsMISP) GetID() string {
 	return o.ID
 }
 
+// GetEvent возвращает объект Event
 func (o *ListFormatsMISP) GetEvent() *EventsMispFormat {
 	return o.Event
 }
 
+// GetReports возвращает объект Reports
 func (o *ListFormatsMISP) GetReports() *EventReports {
 	return o.Reports
 }
 
+// GetAttributes возвращает объект Attributes
 func (o *ListFormatsMISP) GetAttributes() []*AttributesMispFormat {
 	return o.Attributes
 }
 
+// GetObjects возвращает объект Objects
 func (o *ListFormatsMISP) GetObjects() map[int]*ObjectsMispFormat {
 	return o.Objects
 }
 
+// GetObjectTags возвращает объект ObjectTags
 func (o *ListFormatsMISP) GetObjectTags() *ListEventObjectTags {
 	return o.ObjectTags
 }
 
+// ComparisonID выполняет сравнение уникальных идентификаторов
 func (o *ListFormatsMISP) ComparisonID(v string) bool {
 	return o.ID == v
 }
 
+// ComparisonEvent выполняет сравнение свойств объекта Event
 func (o *ListFormatsMISP) ComparisonEvent(v *EventsMispFormat) bool {
+	if o.Event.Analysis != v.Analysis {
+		return false
+	}
+
 	if o.Event.Analysis != v.Analysis {
 		return false
 	}
@@ -47,48 +59,92 @@ func (o *ListFormatsMISP) ComparisonEvent(v *EventsMispFormat) bool {
 		return false
 	}
 
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	//и т.д. для всех свойств
-	/*
-		Published          bool   `json:"published"`
-		ProposalEmailLock  bool   `json:"proposal_email_lock"`
-		Locked             bool   `json:"locked"`
-		DisableCorrelation bool   `json:"disable_correlation"`
-		OrgId              string `json:"org_id"`
-		OrgcId             string `json:"orgc_id"`
-		Distribution       string `json:"distribution"` //цифры в виде строки из списка
-		Info               string `json:"info"`
-		Uuid               string `json:"uuid"`
-		Date               string `json:"date"`
-		Analysis           string `json:"analysis"` //цифры в виде строки из списка
-		AttributeCount     string `json:"attribute_count"`
-		Timestamp          string `json:"timestamp"`
-		SharingGroupId     string `json:"sharing_group_id"`
-		ThreatLevelId      string `json:"threat_level_id"`    //цифры в виде строки из списка
-		PublishTimestamp   string `json:"publish_timestamp"`  //по умолчанию "0"
-		SightingTimestamp  string `json:"sighting_timestamp"` //по умолчанию "0"
-		ExtendsUuid        string `json:"extends_uuid"`
-		EventCreatorEmail  string `json:"event_creator_email"`
-	*/
-
-	return true
-}
-
-func (o *ListFormatsMISP) ComparisonReports(v *EventReports) bool {
-	/*
-		type EventReports struct {
-		Name         string `json:"name"`
-		Content      string `json:"content"`
-		Distribution string `json:"distribution"`
+	if o.Event.OrgId != v.OrgId {
+		return false
 	}
-	*/
+
+	if o.Event.OrgcId != v.OrgcId {
+		return false
+	}
+
+	if o.Event.Distribution != v.Distribution {
+		return false
+	}
+
+	if o.Event.Info != v.Info {
+		return false
+	}
+
+	if o.Event.Uuid != v.Uuid {
+		return false
+	}
+
+	if o.Event.Date != v.Date {
+		return false
+	}
+
+	if o.Event.SharingGroupId != v.SharingGroupId {
+		return false
+	}
+
+	if o.Event.ThreatLevelId != v.ThreatLevelId {
+		return false
+	}
+
+	if o.Event.ExtendsUuid != v.ExtendsUuid {
+		return false
+	}
+
+	if o.Event.EventCreatorEmail != v.EventCreatorEmail {
+		return false
+	}
+
+	if o.Event.Published != v.Published {
+		return false
+	}
+
+	if o.Event.ProposalEmailLock != v.ProposalEmailLock {
+		return false
+	}
+
+	if o.Event.Locked != v.Locked {
+		return false
+	}
+
+	if o.Event.DisableCorrelation != v.DisableCorrelation {
+		return false
+	}
+
+	// думаю время сравнивать не стоит, потому что большая вероятность получить идентичный
+	//во всех параметрах объект у которого будет отличатся только время, что в данном случае не очень важно
+	//Timestamp
+	//PublishTimestamp
+	//SightingTimestamp
 
 	return true
 }
 
+// ComparisonReports выполняет сравнение свойств объекта Reports
+func (o *ListFormatsMISP) ComparisonReports(v *EventReports) bool {
+	if o.Reports.Name != v.Name {
+		return false
+	}
+
+	if o.Reports.Content != v.Content {
+		return false
+	}
+
+	if o.Reports.Distribution != v.Distribution {
+		return false
+	}
+
+	return true
+}
+
+// ComparisonAttributes выполняет сравнение свойств объекта Attributes
 func (o *ListFormatsMISP) ComparisonAttributes(v []*AttributesMispFormat) bool {
+
 	/*
-		type AttributesMispFormat struct {
 		ToIds              bool   `json:"to_ids"`
 		Deleted            bool   `json:"deleted"`
 		DisableCorrelation bool   `json:"disable_correlation"`
@@ -99,39 +155,53 @@ func (o *ListFormatsMISP) ComparisonAttributes(v []*AttributesMispFormat) bool {
 		Type               string `json:"type"`     //содержит одно из значений предустановленного списка
 		Value              string `json:"value"`
 		Uuid               string `json:"uuid"`
-		Timestamp          string `json:"timestamp"`    //по умолчанию "0"
 		Distribution       string `json:"distribution"` //цифры в виде строки из списка
 		SharingGroupId     string `json:"sharing_group_id"`
 		Comment            string `json:"comment"`
-		FirstSeen          string `json:"first_seen"`
-		LastSeen           string `json:"last_seen"`
-	}
+		FirstSeen          string `json:"first_seen"` //время
+		LastSeen           string `json:"last_seen"` //время
+		Timestamp          string `json:"timestamp"`    //по умолчанию "0"
 	*/
 
 	return true
 }
 
+// ComparisonObjects выполняет сравнение свойств объекта Objects
 func (o *ListFormatsMISP) ComparisonObjects(v map[int]*ObjectsMispFormat) bool {
 	/*
-		type ObjectsMispFormat struct {
-		TemplateUUID    string        `json:"template_uuid"`
-		TemplateVersion string        `json:"template_version"`
-		FirstSeen       string        `json:"first_seen"`
-		Timestamp       string        `json:"timestamp"`
-		Name            string        `json:"name"`
-		Description     string        `json:"description"`
-		EventId         string        `json:"event_id"`
-		MetaCategory    string        `json:"meta-category"`
-		Distribution    string        `json:"distribution"`
-		Attribute       ListAttribute `json:"Attribute"`
-	}
+			type ObjectsMispFormat struct {
+			TemplateUUID    string        `json:"template_uuid"`
+			TemplateVersion string        `json:"template_version"`
+			FirstSeen       string        `json:"first_seen"`
+			Timestamp       string        `json:"timestamp"`
+			Name            string        `json:"name"`
+			Description     string        `json:"description"`
+			EventId         string        `json:"event_id"`
+			MetaCategory    string        `json:"meta-category"`
+			Distribution    string        `json:"distribution"`
+			Attribute       ListAttribute `json:"Attribute"`
+		}
 	*/
 
 	return true
 }
 
+// ComparisonObjectTags выполняет сравнение свойств объекта ObjectTags
 func (o *ListFormatsMISP) ComparisonObjectTags(v *ListEventObjectTags) bool {
-	//type ListEventObjectTags []string
+	for _, currentObject := range *o.ObjectTags {
+		var isEqual bool
+		for _, objectAdded := range v.GetListTags() {
+			if currentObject == objectAdded {
+				isEqual = true
+
+				break
+			}
+		}
+
+		if !isEqual {
+			return false
+		}
+	}
 
 	return true
 }
