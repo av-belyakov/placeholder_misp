@@ -10,7 +10,7 @@ import (
 )
 
 // sendEventsMispFormat отправляет в API MISP событие в виде типа Event и возвращает полученный ответ
-func sendEventsMispFormat(host, authKey string, d SettingsChanInputMISP) (*http.Response, []byte, error) {
+func sendEventsMispFormat(host, authKey string, d InputSettings) (*http.Response, []byte, error) {
 	var (
 		res         *http.Response
 		resBodyByte = make([]byte, 0)
@@ -53,7 +53,7 @@ func sendEventsMispFormat(host, authKey string, d SettingsChanInputMISP) (*http.
 }
 
 // sendAttribytesMispFormat отправляет в API MISP список атрибутов в виде среза типов Attribytes и возвращает полученный ответ
-func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInputMISP, logging chan<- datamodels.MessageLogging) (*http.Response, []byte) {
+func sendAttribytesMispFormat(host, authKey, eventId string, d InputSettings, logging chan<- datamodels.MessageLogging) (*http.Response, []byte) {
 	var (
 		res         *http.Response
 		resBodyByte = make([]byte, 0)
@@ -148,7 +148,7 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d SettingsChanInput
 }
 
 // sendObjectsMispFormat отправляет в API MISP список объектов содержащихся в свойстве observables.attachment (как правило это описание вложеного файла)
-func sendObjectsMispFormat(host, authKey, eventId string, d SettingsChanInputMISP, logging chan<- datamodels.MessageLogging) (*http.Response, []byte) {
+func sendObjectsMispFormat(host, authKey, eventId string, d InputSettings, logging chan<- datamodels.MessageLogging) (*http.Response, []byte) {
 	var (
 		res         *http.Response
 		resBodyByte = make([]byte, 0)
@@ -283,7 +283,7 @@ func sendEventReportsMispFormat(host, authKey, eventId string, caseId float64) e
 	return nil
 }
 
-func sendEventTagsMispFormat(host, authKey, eventId string, d SettingsChanInputMISP, logging chan<- datamodels.MessageLogging) error {
+func sendEventTagsMispFormat(host, authKey, eventId string, d InputSettings, logging chan<- datamodels.MessageLogging) error {
 	c, err := NewClientMISP(host, authKey, false)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)

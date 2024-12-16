@@ -268,6 +268,7 @@ type ListObjectsMispFormat struct {
 }
 
 type ObjectsMispFormat struct {
+	ID              string        `json:"id"`
 	TemplateUUID    string        `json:"template_uuid"`
 	TemplateVersion string        `json:"template_version"`
 	FirstSeen       string        `json:"first_seen"`

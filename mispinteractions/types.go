@@ -5,14 +5,13 @@ import (
 )
 
 // ModuleMISP инициализированный модуль
-// chanInputMISP - канал для отправки данных в модуль
-// chanOutputMISP - канал для отправки данных из модуля
 type ModuleMISP struct {
-	ChanInputMISP  chan SettingsChanInputMISP
-	ChanOutputMISP chan SettingChanOutputMISP
+	ChanInput  chan InputSettings //канал для отправки данных В модуль
+	ChanOutput chan OutputSetting //канал для отправки данных ИЗ модуля
 }
 
-type SettingsChanInputMISP struct {
+// ChanInputSettings параметры канала для приема данных в модуль
+type InputSettings struct {
 	CaseId     float64
 	Command    string
 	TaskId     string
@@ -23,24 +22,9 @@ type SettingsChanInputMISP struct {
 	MajorData  map[string]interface{}
 }
 
-type SettingChanOutputMISP struct {
+// SettingChanOutputMISP параметры канала для передачи данных из модуля
+type OutputSetting struct {
 	Command, CaseId, EventId, TaskId, RootId string
-}
-
-func (mmisp ModuleMISP) GetDataReceptionChannel() <-chan SettingChanOutputMISP {
-	return mmisp.ChanOutputMISP
-}
-
-func (mmisp ModuleMISP) SendingDataOutput(data SettingChanOutputMISP) {
-	mmisp.ChanOutputMISP <- data
-}
-
-func (mmisp ModuleMISP) GetInputChannel() <-chan SettingsChanInputMISP {
-	return mmisp.ChanInputMISP
-}
-
-func (mmisp ModuleMISP) SendingDataInput(data SettingsChanInputMISP) {
-	mmisp.ChanInputMISP <- data
 }
 
 type StorageAuthorizationData struct {

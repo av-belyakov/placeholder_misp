@@ -14,6 +14,7 @@ import (
 	"runtime"
 
 	"placeholder_misp/datamodels"
+	"placeholder_misp/interfaces"
 	"placeholder_misp/memorytemporarystorage"
 	"placeholder_misp/mispinteractions"
 	"placeholder_misp/natsinteractions"
@@ -41,14 +42,14 @@ func NewCoreHandler(
 
 func (settings *CoreHandlerSettings) CoreHandler(
 	ctx context.Context,
-	natsModule *natsinteractions.ModuleNATS,
-	mispModule *mispinteractions.ModuleMISP,
+	natsModule interfaces.ModuleNatsHandler,
+	mispModule interfaces.ModuleMispHandler,
 	redisModule *redisinteractions.ModuleRedis,
 	listRule *rules.ListRule) {
 
-	natsChanReception := natsModule.GetDataReceptionChannel()
-	mispChanReception := mispModule.GetDataReceptionChannel()
-	redisChanReception := redisModule.GetDataReceptionChannel()
+	chanNatsReception := natsModule.GetDataReceptionChannel()
+	chanMispReception := mispModule.GetDataReceptionChannel()
+	chanRedisReception := redisModule.GetDataReceptionChannel()
 	hjm := NewHandlerJsonMessage(settings.storageApp, settings.logging, settings.counting)
 
 	for {
@@ -61,7 +62,7 @@ func (settings *CoreHandlerSettings) CoreHandler(
 
 			return
 
-		case data := <-natsChanReception:
+		case data := <-chanNatsReception:
 			// ***********************************
 			// Это логирование только для теста!!!
 			// ***********************************
@@ -111,7 +112,7 @@ func (settings *CoreHandlerSettings) CoreHandler(
 			//формирование итоговых документов в формате MISP
 			go NewMispFormat(chanOutputDecodeJson, data.MsgId, mispModule, listRule, settings.logging, settings.counting)
 
-		case data := <-mispChanReception:
+		case data := <-chanMispReception:
 			switch data.Command {
 			//отправка eventId в NATS
 			case "send event id":
@@ -126,7 +127,7 @@ func (settings *CoreHandlerSettings) CoreHandler(
 				//
 				//
 
-				natsModule.SendingDataInput(natsinteractions.SettingsInputChan{
+				natsModule.SendingDataInput(natsinteractions.InputSettings{
 					Command: data.Command,
 					EventId: data.EventId,
 					TaskId:  data.TaskId,
@@ -143,7 +144,7 @@ func (settings *CoreHandlerSettings) CoreHandler(
 				})
 			}
 
-		case data := <-redisChanReception:
+		case data := <-chanRedisReception:
 			switch data.CommandResult {
 			//получаем eventId из Redis для удаления события в MISP
 			case "found event id":
@@ -158,7 +159,7 @@ func (settings *CoreHandlerSettings) CoreHandler(
 					break
 				}
 
-				mispModule.SendingDataInput(mispinteractions.SettingsChanInputMISP{
+				mispModule.SendingDataInput(mispinteractions.InputSettings{
 					Command: "del event by id",
 					EventId: eventId,
 				})

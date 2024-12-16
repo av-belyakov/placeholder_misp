@@ -92,6 +92,10 @@ func (o *SpecialObjectForCache[T]) Comparison(objFromCache T) bool {
 		return false
 	}
 
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	// доделать метод ComparisonObjects в файле datamodels/methods.go
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 	return true
 }
 

@@ -63,7 +63,7 @@ var _ = Describe("Deleteeventmisp", Ordered, func() {
 				}
 			}()
 
-			mispmodule.SendingDataInput(mispinteractions.SettingsChanInputMISP{
+			mispmodule.SendingDataInput(mispinteractions.InputSettings{
 				Command: "del event by id",
 				EventId: "7418",
 			})

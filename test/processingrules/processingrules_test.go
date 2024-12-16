@@ -69,8 +69,8 @@ var _ = Describe("Processingrules", Ordered, func() {
 
 		//эмулируем результат инициализации модуля MISP
 		moduleMisp = &mispinteractions.ModuleMISP{
-			ChanInputMISP:  make(chan mispinteractions.SettingsChanInputMISP),
-			ChanOutputMISP: make(chan mispinteractions.SettingChanOutputMISP),
+			ChanInput:  make(chan mispinteractions.InputSettings),
+			ChanOutput: make(chan mispinteractions.OutputSetting),
 		}
 	})
 

@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"placeholder_misp/datamodels"
+	"placeholder_misp/interfaces"
 	"placeholder_misp/mispinteractions"
 	rules "placeholder_misp/rulesinteraction"
 )
@@ -14,7 +15,7 @@ import (
 func NewMispFormat(
 	chanOutputDecodeJson <-chan ChanInputCreateMispFormat,
 	taskId string,
-	mispmodule *mispinteractions.ModuleMISP,
+	mispModule interfaces.ModuleMispHandler,
 	listRule *rules.ListRule,
 	logging chan<- datamodels.MessageLogging,
 	counting chan<- datamodels.DataCounterSettings) {
@@ -42,7 +43,10 @@ func NewMispFormat(
 			leot.SetTag(fmt.Sprintf("class-attack=\"%v\"", i))
 		}},
 		//observables -> attributes
-		"observables._id":  {listAttributesMisp.SetValueObjectIdAttributesMisp},
+		"observables._id": {
+			listAttributesMisp.SetValueObjectIdAttributesMisp,
+			listObjectsMisp.SetValueIdObjectsMisp,
+		},
 		"observables.data": {listAttributesMisp.SetValueValueAttributesMisp},
 		"observables.dataType": {
 			listObjectsMisp.SetValueNameObjectsMisp,
@@ -266,7 +270,7 @@ func NewMispFormat(
 		//
 
 		//тут отправляем сформированные по формату MISP пользовательские структуры
-		mispmodule.SendingDataInput(mispinteractions.SettingsChanInputMISP{
+		mispModule.SendingDataInput(mispinteractions.InputSettings{
 			Command:    "add event",
 			TaskId:     taskId,
 			CaseId:     caseId,

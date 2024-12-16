@@ -143,51 +143,139 @@ func (o *ListFormatsMISP) ComparisonReports(v *EventReports) bool {
 
 // ComparisonAttributes выполняет сравнение свойств объекта Attributes
 func (o *ListFormatsMISP) ComparisonAttributes(v []*AttributesMispFormat) bool {
+	performComparison := func(current, added AttributesMispFormat) bool {
+		if current.ToIds != added.ToIds {
+			return false
+		}
 
-	/*
-		ToIds              bool   `json:"to_ids"`
-		Deleted            bool   `json:"deleted"`
-		DisableCorrelation bool   `json:"disable_correlation"`
-		EventId            string `json:"event_id"`
-		ObjectId           string `json:"object_id"`
-		ObjectRelation     string `json:"object_relation"`
-		Category           string `json:"category"` //содержит одно из значений предустановленного списка
-		Type               string `json:"type"`     //содержит одно из значений предустановленного списка
-		Value              string `json:"value"`
-		Uuid               string `json:"uuid"`
-		Distribution       string `json:"distribution"` //цифры в виде строки из списка
-		SharingGroupId     string `json:"sharing_group_id"`
-		Comment            string `json:"comment"`
-		FirstSeen          string `json:"first_seen"` //время
-		LastSeen           string `json:"last_seen"` //время
-		Timestamp          string `json:"timestamp"`    //по умолчанию "0"
-	*/
+		if current.Deleted != added.Deleted {
+			return false
+		}
+
+		if current.DisableCorrelation != added.DisableCorrelation {
+			return false
+		}
+
+		if current.EventId != added.EventId {
+			return false
+		}
+
+		if current.ObjectRelation != added.ObjectRelation {
+			return false
+		}
+
+		if current.Category != added.Category {
+			return false
+		}
+
+		if current.Type != added.Type {
+			return false
+		}
+
+		if current.Value != added.Value {
+			return false
+		}
+
+		if current.Distribution != added.Distribution {
+			return false
+		}
+		if current.SharingGroupId != added.SharingGroupId {
+			return false
+		}
+		if current.Comment != added.Comment {
+			return false
+		}
+
+		//Uuid `json:"uuid"` не стал так как для каждого объекта через конструктор
+		//автоматически формируется свой идентификатор
+		//
+		//Timestamp `json:"timestamp"`
+		//FirstSeen `json:"first_seen"`
+		//LastSeen `json:"last_seen"`
+		//а с временем вообще не ясно что и когда может поменять TheHive
+
+		return true
+	}
+
+	if len(o.Attributes) != len(v) {
+		return false
+	}
+
+	for _, currentAttribute := range o.GetAttributes() {
+		var isExist bool
+		for _, addedAttribute := range v {
+			if currentAttribute.ObjectId == addedAttribute.ObjectId {
+				isExist = true
+
+				if !performComparison(*currentAttribute, *addedAttribute) {
+					return false
+				}
+			}
+		}
+
+		if !isExist {
+			return false
+		}
+	}
 
 	return true
 }
 
 // ComparisonObjects выполняет сравнение свойств объекта Objects
 func (o *ListFormatsMISP) ComparisonObjects(v map[int]*ObjectsMispFormat) bool {
-	/*
-			type ObjectsMispFormat struct {
-			TemplateUUID    string        `json:"template_uuid"`
-			TemplateVersion string        `json:"template_version"`
-			FirstSeen       string        `json:"first_seen"`
-			Timestamp       string        `json:"timestamp"`
-			Name            string        `json:"name"`
-			Description     string        `json:"description"`
-			EventId         string        `json:"event_id"`
-			MetaCategory    string        `json:"meta-category"`
-			Distribution    string        `json:"distribution"`
-			Attribute       ListAttribute `json:"Attribute"`
+	performComparison := func(current, added ObjectsMispFormat) bool {
+		/*
+				type ObjectsMispFormat struct {
+				TemplateUUID    string        `json:"template_uuid"`
+				TemplateVersion string        `json:"template_version"`
+				FirstSeen       string        `json:"first_seen"`
+				Timestamp       string        `json:"timestamp"`
+				Name            string        `json:"name"`
+				Description     string        `json:"description"`
+				EventId         string        `json:"event_id"`
+				MetaCategory    string        `json:"meta-category"`
+				Distribution    string        `json:"distribution"`
+				Attribute       ListAttribute `json:"Attribute"`
+			}
+		*/
+
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		// зесь надо дописать сравнение для каждого свойства
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+		return true
+	}
+
+	if len(o.Objects) != len(v) {
+		return false
+	}
+
+	for _, currentObject := range o.GetObjects() {
+		var isExist bool
+		for _, addedObject := range v {
+			if currentObject.ID == addedObject.ID {
+				isExist = true
+
+				if !performComparison(*currentObject, *addedObject) {
+					return false
+				}
+			}
 		}
-	*/
+
+		if !isExist {
+			return false
+		}
+	}
 
 	return true
 }
 
 // ComparisonObjectTags выполняет сравнение свойств объекта ObjectTags
 func (o *ListFormatsMISP) ComparisonObjectTags(v *ListEventObjectTags) bool {
+	if len(*o.ObjectTags) != len(v.GetListTags()) {
+		return false
+	}
+
 	for _, currentObject := range *o.ObjectTags {
 		var isEqual bool
 		for _, objectAdded := range v.GetListTags() {

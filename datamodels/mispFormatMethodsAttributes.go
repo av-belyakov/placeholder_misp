@@ -60,46 +60,28 @@ func (lamisp *ListAttributesMispFormat) GetListAttributesMisp() map[int]Attribut
 }
 
 func (lamisp *ListAttributesMispFormat) SetValueObjectIdAttributesMisp(v interface{}, num int) {
-	var tmp AttributesMispFormat
 	lamisp.Lock()
 	defer lamisp.Unlock()
 
-	if attr, ok := lamisp.attributes[num]; ok {
-		tmp = attr
-	} else {
-		tmp = createNewAttributesMisp()
-	}
-
+	tmp := lamisp.getAttributesMisp(num)
 	tmp.ObjectId = fmt.Sprint(v)
 	lamisp.attributes[num] = tmp
 }
 
 func (lamisp *ListAttributesMispFormat) SetValueObjectRelationAttributesMisp(v interface{}, num int) {
-	var tmp AttributesMispFormat
 	lamisp.Lock()
 	defer lamisp.Unlock()
 
-	if attr, ok := lamisp.attributes[num]; ok {
-		tmp = attr
-	} else {
-		tmp = createNewAttributesMisp()
-	}
-
+	tmp := lamisp.getAttributesMisp(num)
 	tmp.ObjectRelation = fmt.Sprint(v)
 	lamisp.attributes[num] = tmp
 }
 
 func (lamisp *ListAttributesMispFormat) SetValueCategoryAttributesMisp(v interface{}, num int) {
-	var tmp AttributesMispFormat
 	lamisp.Lock()
 	defer lamisp.Unlock()
 
-	if attr, ok := lamisp.attributes[num]; ok {
-		tmp = attr
-	} else {
-		tmp = createNewAttributesMisp()
-	}
-
+	tmp := lamisp.getAttributesMisp(num)
 	tmp.Category = fmt.Sprint(v)
 	lamisp.attributes[num] = tmp
 }
@@ -132,16 +114,10 @@ func (lamisp *ListAttributesMispFormat) AutoSetValueCategoryAttributesMisp(v str
 }
 
 func (lamisp *ListAttributesMispFormat) SetValueTypeAttributesMisp(v interface{}, num int) {
-	var tmp AttributesMispFormat
 	lamisp.Lock()
 	defer lamisp.Unlock()
 
-	if attr, ok := lamisp.attributes[num]; ok {
-		tmp = attr
-	} else {
-		tmp = createNewAttributesMisp()
-	}
-
+	tmp := lamisp.getAttributesMisp(num)
 	tmp.Type = fmt.Sprint(v)
 	lamisp.attributes[num] = tmp
 }
@@ -208,18 +184,11 @@ func (lamisp *ListAttributesMispFormat) AutoSetValueTypeAttributesMisp(v string,
 }
 
 func (lamisp *ListAttributesMispFormat) SetValueValueAttributesMisp(v interface{}, num int) {
-	var tmp AttributesMispFormat
 	lamisp.Lock()
 
-	if attr, ok := lamisp.attributes[num]; ok {
-		tmp = attr
-	} else {
-		tmp = createNewAttributesMisp()
-	}
-
 	value := fmt.Sprint(v)
-
-	tmp.Value = value
+	tmp := lamisp.getAttributesMisp(num)
+	tmp.Value = fmt.Sprint(v)
 	lamisp.attributes[num] = tmp
 
 	//надо разблокировать Mutex до того как использовать lamisp.AutoSetValueCategoryAttributesMisp и
@@ -247,31 +216,19 @@ func (lamisp *ListAttributesMispFormat) SetValueValueAttributesMisp(v interface{
 }
 
 func (lamisp *ListAttributesMispFormat) SetValueUuidAttributesMisp(v interface{}, num int) {
-	var tmp AttributesMispFormat
 	lamisp.Lock()
 	defer lamisp.Unlock()
 
-	if attr, ok := lamisp.attributes[num]; ok {
-		tmp = attr
-	} else {
-		tmp = createNewAttributesMisp()
-	}
-
+	tmp := lamisp.getAttributesMisp(num)
 	tmp.Uuid = fmt.Sprint(v)
 	lamisp.attributes[num] = tmp
 }
 
 func (lamisp *ListAttributesMispFormat) SetValueTimestampAttributesMisp(v interface{}, num int) {
-	var tmp AttributesMispFormat
 	lamisp.Lock()
 	defer lamisp.Unlock()
 
-	if attr, ok := lamisp.attributes[num]; ok {
-		tmp = attr
-	} else {
-		tmp = createNewAttributesMisp()
-	}
-
+	tmp := lamisp.getAttributesMisp(num)
 	if dt, ok := v.(float64); ok {
 		tmp.Timestamp = fmt.Sprintf("%10.f", dt)[:10]
 	}
@@ -280,61 +237,37 @@ func (lamisp *ListAttributesMispFormat) SetValueTimestampAttributesMisp(v interf
 }
 
 func (lamisp *ListAttributesMispFormat) SetValueDistributionAttributesMisp(v interface{}, num int) {
-	var tmp AttributesMispFormat
 	lamisp.Lock()
 	defer lamisp.Unlock()
 
-	if attr, ok := lamisp.attributes[num]; ok {
-		tmp = attr
-	} else {
-		tmp = createNewAttributesMisp()
-	}
-
+	tmp := lamisp.getAttributesMisp(num)
 	tmp.Distribution = fmt.Sprint(v)
 	lamisp.attributes[num] = tmp
 }
 
 func (lamisp *ListAttributesMispFormat) SetValueSharingGroupIdAttributesMisp(v interface{}, num int) {
-	var tmp AttributesMispFormat
 	lamisp.Lock()
 	defer lamisp.Unlock()
 
-	if attr, ok := lamisp.attributes[num]; ok {
-		tmp = attr
-	} else {
-		tmp = createNewAttributesMisp()
-	}
-
+	tmp := lamisp.getAttributesMisp(num)
 	tmp.SharingGroupId = fmt.Sprint(v)
 	lamisp.attributes[num] = tmp
 }
 
 func (lamisp *ListAttributesMispFormat) SetValueCommentAttributesMisp(v interface{}, num int) {
-	var tmp AttributesMispFormat
 	lamisp.Lock()
 	defer lamisp.Unlock()
 
-	if attr, ok := lamisp.attributes[num]; ok {
-		tmp = attr
-	} else {
-		tmp = createNewAttributesMisp()
-	}
-
+	tmp := lamisp.getAttributesMisp(num)
 	tmp.Comment = fmt.Sprint(v)
 	lamisp.attributes[num] = tmp
 }
 
 func (lamisp *ListAttributesMispFormat) SetValueFirstSeenAttributesMisp(v interface{}, num int) {
-	var tmp AttributesMispFormat
 	lamisp.Lock()
 	defer lamisp.Unlock()
 
-	if attr, ok := lamisp.attributes[num]; ok {
-		tmp = attr
-	} else {
-		tmp = createNewAttributesMisp()
-	}
-
+	tmp := lamisp.getAttributesMisp(num)
 	if dt, ok := v.(float64); ok {
 		tmp.FirstSeen = time.UnixMilli(int64(dt)).Format(time.RFC3339)
 	}
@@ -343,16 +276,10 @@ func (lamisp *ListAttributesMispFormat) SetValueFirstSeenAttributesMisp(v interf
 }
 
 func (lamisp *ListAttributesMispFormat) SetValueLastSeenAttributesMisp(v interface{}, num int) {
-	var tmp AttributesMispFormat
 	lamisp.Lock()
 	defer lamisp.Unlock()
 
-	if attr, ok := lamisp.attributes[num]; ok {
-		tmp = attr
-	} else {
-		tmp = createNewAttributesMisp()
-	}
-
+	tmp := lamisp.getAttributesMisp(num)
 	if dt, ok := v.(float64); ok {
 		tmp.LastSeen = time.UnixMilli(int64(dt)).Format(time.RFC3339)
 	}
@@ -361,16 +288,10 @@ func (lamisp *ListAttributesMispFormat) SetValueLastSeenAttributesMisp(v interfa
 }
 
 func (lamisp *ListAttributesMispFormat) SetValueToIdsAttributesMisp(v interface{}, num int) {
-	var tmp AttributesMispFormat
 	lamisp.Lock()
 	defer lamisp.Unlock()
 
-	if attr, ok := lamisp.attributes[num]; ok {
-		tmp = attr
-	} else {
-		tmp = createNewAttributesMisp()
-	}
-
+	tmp := lamisp.getAttributesMisp(num)
 	if data, ok := v.(bool); ok {
 		tmp.ToIds = data
 	}
@@ -379,16 +300,10 @@ func (lamisp *ListAttributesMispFormat) SetValueToIdsAttributesMisp(v interface{
 }
 
 func (lamisp *ListAttributesMispFormat) SetValueDeletedAttributesMisp(v interface{}, num int) {
-	var tmp AttributesMispFormat
 	lamisp.Lock()
 	defer lamisp.Unlock()
 
-	if attr, ok := lamisp.attributes[num]; ok {
-		tmp = attr
-	} else {
-		tmp = createNewAttributesMisp()
-	}
-
+	tmp := lamisp.getAttributesMisp(num)
 	if data, ok := v.(bool); ok {
 		tmp.Deleted = data
 	}
@@ -397,16 +312,10 @@ func (lamisp *ListAttributesMispFormat) SetValueDeletedAttributesMisp(v interfac
 }
 
 func (lamisp *ListAttributesMispFormat) SetValueDisableCorrelationAttributesMisp(v interface{}, num int) {
-	var tmp AttributesMispFormat
 	lamisp.Lock()
 	defer lamisp.Unlock()
 
-	if attr, ok := lamisp.attributes[num]; ok {
-		tmp = attr
-	} else {
-		tmp = createNewAttributesMisp()
-	}
-
+	tmp := lamisp.getAttributesMisp(num)
 	if data, ok := v.(bool); ok {
 		tmp.DisableCorrelation = data
 	}
@@ -415,16 +324,10 @@ func (lamisp *ListAttributesMispFormat) SetValueDisableCorrelationAttributesMisp
 }
 
 func (lamisp *ListAttributesMispFormat) HandlingValueEventIdAttributesMisp(v interface{}, num int) {
-	var tmp AttributesMispFormat
 	lamisp.Lock()
 	defer lamisp.Unlock()
 
-	if attr, ok := lamisp.attributes[num]; ok {
-		tmp = attr
-	} else {
-		tmp = createNewAttributesMisp()
-	}
-
+	tmp := lamisp.getAttributesMisp(num)
 	tmp.EventId = fmt.Sprint(v)
 	lamisp.attributes[num] = tmp
 }
@@ -445,6 +348,18 @@ func (lamisp *ListAttributesMispFormat) HandlingValueDataTypeAttributesMisp(i in
 	if v == "ip_home" {
 		lamisp.SetValueObjectRelationAttributesMisp(v, num)
 	}
+}
+
+func (lamisp *ListAttributesMispFormat) getAttributesMisp(num int) AttributesMispFormat {
+	var tmp AttributesMispFormat
+
+	if attr, ok := lamisp.attributes[num]; ok {
+		tmp = attr
+	} else {
+		tmp = createNewAttributesMisp()
+	}
+
+	return tmp
 }
 
 func HandlingListTags(l []string) [][2]string {

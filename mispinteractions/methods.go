@@ -3,10 +3,27 @@ package mispinteractions
 import (
 	"encoding/json"
 	"fmt"
+	"runtime"
+
 	"placeholder_misp/confighandler"
 	"placeholder_misp/datamodels"
-	"runtime"
 )
+
+func (mmisp ModuleMISP) GetDataReceptionChannel() <-chan OutputSetting {
+	return mmisp.ChanOutput
+}
+
+func (mmisp ModuleMISP) SendingDataOutput(data OutputSetting) {
+	mmisp.ChanOutput <- data
+}
+
+func (mmisp ModuleMISP) GetInputChannel() <-chan InputSettings {
+	return mmisp.ChanInput
+}
+
+func (mmisp ModuleMISP) SendingDataInput(data InputSettings) {
+	mmisp.ChanInput <- data
+}
 
 // setUserSettings добавляет настройки пользователя в хранилище, если
 // пользователь id или email уже есть, ничего не делает

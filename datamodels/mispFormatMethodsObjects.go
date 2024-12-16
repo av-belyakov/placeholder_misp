@@ -38,62 +38,47 @@ func (lomf *ListObjectsMispFormat) GetListObjectsMisp() map[int]ObjectsMispForma
 	return lomf.objects
 }
 
-func (lomf *ListObjectsMispFormat) SetValueEventIdObjectsMisp(v interface{}, num int) {
-	var tmp ObjectsMispFormat
+func (lomf *ListObjectsMispFormat) SetValueIdObjectsMisp(v interface{}, num int) {
 	lomf.Lock()
 	defer lomf.Unlock()
 
-	if obj, ok := lomf.objects[num]; ok {
-		tmp = obj
-	} else {
-		tmp = createNewObjectsMisp()
-	}
+	tmp := lomf.getObjectMisp(num)
+	tmp.ID = fmt.Sprint(v)
+	lomf.objects[num] = tmp
+}
 
+func (lomf *ListObjectsMispFormat) SetValueEventIdObjectsMisp(v interface{}, num int) {
+	lomf.Lock()
+	defer lomf.Unlock()
+
+	tmp := lomf.getObjectMisp(num)
 	tmp.EventId = fmt.Sprint(v)
 	lomf.objects[num] = tmp
 }
 
 func (lomf *ListObjectsMispFormat) SetValueNameObjectsMisp(v interface{}, num int) {
-	var tmp ObjectsMispFormat
 	lomf.Lock()
 	defer lomf.Unlock()
 
-	if obj, ok := lomf.objects[num]; ok {
-		tmp = obj
-	} else {
-		tmp = createNewObjectsMisp()
-	}
-
+	tmp := lomf.getObjectMisp(num)
 	tmp.Name = fmt.Sprint(v)
 	lomf.objects[num] = tmp
 }
 
 func (lomf *ListObjectsMispFormat) SetValueDescriptionObjectsMisp(v interface{}, num int) {
-	var tmp ObjectsMispFormat
 	lomf.Lock()
 	defer lomf.Unlock()
 
-	if obj, ok := lomf.objects[num]; ok {
-		tmp = obj
-	} else {
-		tmp = createNewObjectsMisp()
-	}
-
+	tmp := lomf.getObjectMisp(num)
 	tmp.Description = fmt.Sprint(v)
 	lomf.objects[num] = tmp
 }
 
 func (lomf *ListObjectsMispFormat) SetValueFirstSeenObjectsMisp(v interface{}, num int) {
-	var tmp ObjectsMispFormat
 	lomf.Lock()
 	defer lomf.Unlock()
 
-	if obj, ok := lomf.objects[num]; ok {
-		tmp = obj
-	} else {
-		tmp = createNewObjectsMisp()
-	}
-
+	tmp := lomf.getObjectMisp(num)
 	if dt, ok := v.(float64); ok {
 		tmp.FirstSeen = time.UnixMilli(int64(dt)).Format(time.RFC3339)
 	}
@@ -102,16 +87,10 @@ func (lomf *ListObjectsMispFormat) SetValueFirstSeenObjectsMisp(v interface{}, n
 }
 
 func (lomf *ListObjectsMispFormat) SetValueTimestampObjectsMisp(v interface{}, num int) {
-	var tmp ObjectsMispFormat
 	lomf.Lock()
 	defer lomf.Unlock()
 
-	if obj, ok := lomf.objects[num]; ok {
-		tmp = obj
-	} else {
-		tmp = createNewObjectsMisp()
-	}
-
+	tmp := lomf.getObjectMisp(num)
 	if dt, ok := v.(float64); ok {
 		tmp.Timestamp = fmt.Sprintf("%10.f", dt)[:10]
 	}
@@ -120,24 +99,27 @@ func (lomf *ListObjectsMispFormat) SetValueTimestampObjectsMisp(v interface{}, n
 }
 
 func (lomf *ListObjectsMispFormat) SetValueSizeObjectsMisp(v interface{}, num int) {
-	var tmp ObjectsMispFormat
 	lomf.Lock()
 	defer lomf.Unlock()
 
-	if obj, ok := lomf.objects[num]; ok {
-		tmp = obj
-	} else {
-		tmp = createNewObjectsMisp()
-	}
-
+	tmp := lomf.getObjectMisp(num)
 	tmp.Description = fmt.Sprintf("размер %v байт", v)
 	lomf.objects[num] = tmp
 }
 
 func (lomf *ListObjectsMispFormat) SetValueAttributeObjectsMisp(v interface{}, num int) {
-	var tmp ObjectsMispFormat
 	lomf.Lock()
 	defer lomf.Unlock()
+
+	tmp := lomf.getObjectMisp(num)
+	if newSlice, ok := v.([]AttributeMispFormat); ok {
+		tmp.Attribute = newSlice
+		lomf.objects[num] = tmp
+	}
+}
+
+func (lomf *ListObjectsMispFormat) getObjectMisp(num int) ObjectsMispFormat {
+	var tmp ObjectsMispFormat
 
 	if obj, ok := lomf.objects[num]; ok {
 		tmp = obj
@@ -145,8 +127,5 @@ func (lomf *ListObjectsMispFormat) SetValueAttributeObjectsMisp(v interface{}, n
 		tmp = createNewObjectsMisp()
 	}
 
-	if newSlice, ok := v.([]AttributeMispFormat); ok {
-		tmp.Attribute = newSlice
-		lomf.objects[num] = tmp
-	}
+	return tmp
 }

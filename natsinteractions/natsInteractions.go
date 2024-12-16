@@ -95,8 +95,8 @@ func NewClientNATS(
 	counting chan<- datamodels.DataCounterSettings) (*ModuleNATS, error) {
 
 	var mnats ModuleNATS = ModuleNATS{
-		chanOutputNATS: make(chan SettingsOutputChan),
-		chanInputNATS:  make(chan SettingsInputChan),
+		chanOutput: make(chan OutputSettings),
+		chanInput:  make(chan InputSettings),
 	}
 
 	//инициируем хранилище для дескрипторов сообщений NATS
@@ -138,7 +138,7 @@ func NewClientNATS(
 		//
 		//
 
-		mnats.chanOutputNATS <- SettingsOutputChan{
+		mnats.chanOutput <- OutputSettings{
 			MsgId: ns.setElement(m),
 			Data:  m.Data,
 		}
@@ -155,7 +155,7 @@ func NewClientNATS(
 	// обработка данных приходящих в модуль от ядра приложения фактически это команды на добавления
 	//тега - 'add_case_tag' и команда на добавление MISP id в поле customField
 	go func() {
-		for incomingData := range mnats.chanInputNATS {
+		for incomingData := range mnats.chanInput {
 			//не отправляем eventId в TheHive
 			if !confTheHive.Send {
 				continue

@@ -11,7 +11,7 @@ import (
 )
 
 // SendRequestCommandExecute выполняет отправку запроса с командой в NATS
-func SendRequestCommandExecute(nc *nats.Conn, listenerCommand string, data SettingsInputChan) (string, error) {
+func SendRequestCommandExecute(nc *nats.Conn, listenerCommand string, data InputSettings) (string, error) {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 300*time.Second)
 	defer ctxCancel()
 

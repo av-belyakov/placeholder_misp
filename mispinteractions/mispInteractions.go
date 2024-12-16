@@ -53,8 +53,8 @@ func HandlerMISP(
 	logging chan<- datamodels.MessageLogging) (*ModuleMISP, error) {
 
 	mmisp := ModuleMISP{
-		ChanInputMISP:  make(chan SettingsChanInputMISP),
-		ChanOutputMISP: make(chan SettingChanOutputMISP),
+		ChanInput:  make(chan InputSettings),
+		ChanOutput: make(chan OutputSetting),
 	}
 
 	client, err := NewClientMISP(conf.Host, conf.Auth, false)
@@ -104,7 +104,7 @@ func HandlerMISP(
 			//
 			//
 
-			go func(data SettingsChanInputMISP) {
+			go func(data InputSettings) {
 				// получаем авторизационный ключ пользователя по его email
 				if data.UserEmail != "" {
 					if us, err := connHandler.GetUserData(data.UserEmail); err == nil {
@@ -151,7 +151,7 @@ func addEvent(
 	host string,
 	authKey string,
 	masterKey string,
-	data SettingsChanInputMISP,
+	data InputSettings,
 	mmisp *ModuleMISP,
 	logging chan<- datamodels.MessageLogging) {
 
@@ -239,7 +239,7 @@ func addEvent(
 	//
 
 	//отправляем запрос для добавления в БД Redis, id кейса и нового события
-	mmisp.SendingDataOutput(SettingChanOutputMISP{
+	mmisp.SendingDataOutput(OutputSetting{
 		Command: "set new event id",
 		CaseId:  fmt.Sprint(data.CaseId),
 		EventId: eventId,
@@ -359,7 +359,7 @@ func addEvent(
 	*/
 
 	//отправляем в ядро информацию по event Id
-	mmisp.SendingDataOutput(SettingChanOutputMISP{
+	mmisp.SendingDataOutput(OutputSetting{
 		Command: "send event id",
 		EventId: eventId,
 		CaseId:  fmt.Sprint(data.CaseId),
