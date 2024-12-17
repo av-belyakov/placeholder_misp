@@ -79,7 +79,10 @@ func NewCacheStorage[T any](ctx context.Context, ttl, maxSize int) (*CacheExecut
 // удаления объекта с самым старым timeMain, обращение к очереди за новым объектом
 // предназначенным для обработки.
 func (cache *CacheExecutedObjects[Q]) automaticExecution(ctx context.Context, maxSize int) {
-
+	// !!!!!!!!!!!!!
+	//теперь нужно написать алгоритм работы с кешом на основе вышеперечисленных
+	//пунктов и с использованием написанных, для работы с кешом, методов
+	// !!!!!!!!!!!!!
 }
 
 /*

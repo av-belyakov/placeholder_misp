@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -254,5 +255,24 @@ func TestQueueHandler(t *testing.T) {
 		//
 		//Надо дописать этот тест
 		//
+
+		//очищаем данные из кеша
+		cache.CleanCache_Test()
+
+		cache.AddObjectToCache_TestTimeExpiry("6447-47344", time.Unix(time.Now().Unix()-35, 0), NewSpecialObjectForCache[*datamodels.ListFormatsMISP]())
+		time.Sleep(1 * time.Second)
+
+		cache.AddObjectToCache_TestTimeExpiry("3845-21283", time.Unix(time.Now().Unix()-35, 0), NewSpecialObjectForCache[*datamodels.ListFormatsMISP]())
+		time.Sleep(1 * time.Second)
+
+		cache.AddObjectToCache_TestTimeExpiry("1734-32222", time.Unix(time.Now().Unix()-35, 0), NewSpecialObjectForCache[*datamodels.ListFormatsMISP]())
+		time.Sleep(1 * time.Second)
+
+		indexOldestObject := cache.GetOldestObjectFromCache()
+		assert.Equal(t, indexOldestObject, "6447-47344")
+		assert.Equal(t, cache.GetCacheSize(), 3)
+
+		cache.DeleteForTimeExpiryObjectFromCache()
+		assert.Equal(t, cache.GetCacheSize(), 0)
 	})
 }

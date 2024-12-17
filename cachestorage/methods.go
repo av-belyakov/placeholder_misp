@@ -328,3 +328,11 @@ func (c *CacheExecutedObjects[T]) AddObjectToCache_TestTimeExpiry(key string, ti
 
 	return nil
 }
+
+// CleanCache_Test очищает кэш
+func (c *CacheExecutedObjects[T]) CleanCache_Test() {
+	c.cache.mutex.Lock()
+	defer c.cache.mutex.Unlock()
+
+	c.cache.storages = map[string]storageParameters[T]{}
+}
