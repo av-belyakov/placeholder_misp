@@ -46,6 +46,85 @@ func (emisp *EventsMispFormat) CleanEventsMispFormat() {
 	emisp.SharingGroupId = getSharingGroupId()
 }
 
+// Comparison выполняет сравнение двух объектов типа EventsMispFormat
+func (emisp *EventsMispFormat) Comparison(newEvents *EventsMispFormat) bool {
+	if emisp.Analysis != newEvents.Analysis {
+		return false
+	}
+
+	if emisp.Analysis != newEvents.Analysis {
+		return false
+	}
+
+	if emisp.AttributeCount != newEvents.AttributeCount {
+		return false
+	}
+
+	if emisp.OrgId != newEvents.OrgId {
+		return false
+	}
+
+	if emisp.OrgcId != newEvents.OrgcId {
+		return false
+	}
+
+	if emisp.Distribution != newEvents.Distribution {
+		return false
+	}
+
+	if emisp.Info != newEvents.Info {
+		return false
+	}
+
+	if emisp.Uuid != newEvents.Uuid {
+		return false
+	}
+
+	if emisp.Date != newEvents.Date {
+		return false
+	}
+
+	if emisp.SharingGroupId != newEvents.SharingGroupId {
+		return false
+	}
+
+	if emisp.ThreatLevelId != newEvents.ThreatLevelId {
+		return false
+	}
+
+	if emisp.ExtendsUuid != newEvents.ExtendsUuid {
+		return false
+	}
+
+	if emisp.EventCreatorEmail != newEvents.EventCreatorEmail {
+		return false
+	}
+
+	if emisp.Published != newEvents.Published {
+		return false
+	}
+
+	if emisp.ProposalEmailLock != newEvents.ProposalEmailLock {
+		return false
+	}
+
+	if emisp.Locked != newEvents.Locked {
+		return false
+	}
+
+	if emisp.DisableCorrelation != newEvents.DisableCorrelation {
+		return false
+	}
+
+	// думаю время сравнивать не стоит, потому что большая вероятность получить идентичный
+	//во всех параметрах объект у которого будет отличатся только время, что в данном случае не очень важно
+	//Timestamp
+	//PublishTimestamp
+	//SightingTimestamp
+
+	return true
+}
+
 // GetOrgId возвращает значение OrgId
 func (emisp *EventsMispFormat) GetOrgId() string {
 	return emisp.OrgId

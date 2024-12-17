@@ -23,22 +23,81 @@ func createNewObjectsMisp() ObjectsMispFormat {
 	}
 }
 
-func (lomf *ListObjectsMispFormat) GetCountListObjectsMisp() int {
+// GetCountList количество значений в списке
+func (lomf *ListObjectsMispFormat) GetCountList() int {
 	return len(lomf.objects)
 }
 
-func (lomf *ListObjectsMispFormat) CleanListObjectsMisp() {
+// CleanList очистить список
+func (lomf *ListObjectsMispFormat) CleanList() {
 	lomf.Lock()
 	defer lomf.Unlock()
 
 	lomf.objects = map[int]ObjectsMispFormat{}
 }
 
-func (lomf *ListObjectsMispFormat) GetListObjectsMisp() map[int]ObjectsMispFormat {
+// GetList возвращает список объектов
+func (lomf *ListObjectsMispFormat) GetList() map[int]ObjectsMispFormat {
 	return lomf.objects
 }
 
-func (lomf *ListObjectsMispFormat) SetValueIdObjectsMisp(v interface{}, num int) {
+// Comparison выполняет сравнение двух объектов типа ObjectsMispFormat
+func (o *ObjectsMispFormat) Comparison(newObjects *ObjectsMispFormat) bool {
+	//TemplateUUID `json:"template_uuid"` не стал так как для каждого объекта
+	//с помощью конструктора автоматически формируется свой идентификатор
+	//
+	//TemplateVersion string        `json:"template_version"`
+	//FirstSeen       string        `json:"first_seen"`
+	//Timestamp       string        `json:"timestamp"`
+	//для этих объектов пока не стоит выполнять сравнение
+
+	if o.Name != newObjects.Name {
+		return false
+	}
+
+	if o.Description != newObjects.Description {
+		return false
+	}
+
+	if o.Distribution != newObjects.Distribution {
+		return false
+	}
+
+	if o.EventId != newObjects.EventId {
+		return false
+	}
+
+	if o.MetaCategory != newObjects.MetaCategory {
+		return false
+	}
+
+	if len(o.Attribute) != len(newObjects.MetaCategory) {
+		return false
+	}
+
+	var isEqualList []bool
+	for _, currentAttribute := range o.Attribute {
+		var isEqual bool
+		for _, newAttribute := range newObjects.Attribute {
+			if currentAttribute.Value == newAttribute.Value {
+				isEqual = true
+			}
+		}
+
+		isEqualList = append(isEqualList, isEqual)
+	}
+
+	for _, v := range isEqualList {
+		if !v {
+			return false
+		}
+	}
+
+	return true
+}
+
+// SetValueId устанавливает значение ID
+func (lomf *ListObjectsMispFormat) SetValueId(v interface{}, num int) {
 	lomf.Lock()
 	defer lomf.Unlock()
 
@@ -47,7 +106,8 @@ func (lomf *ListObjectsMispFormat) SetValueIdObjectsMisp(v interface{}, num int)
 	lomf.objects[num] = tmp
 }
 
-func (lomf *ListObjectsMispFormat) SetValueEventIdObjectsMisp(v interface{}, num int) {
+// SetValueEventId устанавливает значение EventId
+func (lomf *ListObjectsMispFormat) SetValueEventId(v interface{}, num int) {
 	lomf.Lock()
 	defer lomf.Unlock()
 
@@ -56,7 +116,8 @@ func (lomf *ListObjectsMispFormat) SetValueEventIdObjectsMisp(v interface{}, num
 	lomf.objects[num] = tmp
 }
 
-func (lomf *ListObjectsMispFormat) SetValueNameObjectsMisp(v interface{}, num int) {
+// SetValueName устанавливает значение Name
+func (lomf *ListObjectsMispFormat) SetValueName(v interface{}, num int) {
 	lomf.Lock()
 	defer lomf.Unlock()
 
@@ -65,7 +126,8 @@ func (lomf *ListObjectsMispFormat) SetValueNameObjectsMisp(v interface{}, num in
 	lomf.objects[num] = tmp
 }
 
-func (lomf *ListObjectsMispFormat) SetValueDescriptionObjectsMisp(v interface{}, num int) {
+// SetValueDescription устанавливает значение Description
+func (lomf *ListObjectsMispFormat) SetValueDescription(v interface{}, num int) {
 	lomf.Lock()
 	defer lomf.Unlock()
 
@@ -74,7 +136,8 @@ func (lomf *ListObjectsMispFormat) SetValueDescriptionObjectsMisp(v interface{},
 	lomf.objects[num] = tmp
 }
 
-func (lomf *ListObjectsMispFormat) SetValueFirstSeenObjectsMisp(v interface{}, num int) {
+// SetValueFirstSeen устанавливает значение FirstSeen
+func (lomf *ListObjectsMispFormat) SetValueFirstSeen(v interface{}, num int) {
 	lomf.Lock()
 	defer lomf.Unlock()
 
@@ -86,7 +149,8 @@ func (lomf *ListObjectsMispFormat) SetValueFirstSeenObjectsMisp(v interface{}, n
 	lomf.objects[num] = tmp
 }
 
-func (lomf *ListObjectsMispFormat) SetValueTimestampObjectsMisp(v interface{}, num int) {
+// SetValueTimestamp устанавливает значение Timestamp
+func (lomf *ListObjectsMispFormat) SetValueTimestamp(v interface{}, num int) {
 	lomf.Lock()
 	defer lomf.Unlock()
 
@@ -98,7 +162,8 @@ func (lomf *ListObjectsMispFormat) SetValueTimestampObjectsMisp(v interface{}, n
 	lomf.objects[num] = tmp
 }
 
-func (lomf *ListObjectsMispFormat) SetValueSizeObjectsMisp(v interface{}, num int) {
+// SetValueSize устанавливает значение Size
+func (lomf *ListObjectsMispFormat) SetValueSize(v interface{}, num int) {
 	lomf.Lock()
 	defer lomf.Unlock()
 
@@ -107,7 +172,8 @@ func (lomf *ListObjectsMispFormat) SetValueSizeObjectsMisp(v interface{}, num in
 	lomf.objects[num] = tmp
 }
 
-func (lomf *ListObjectsMispFormat) SetValueAttributeObjectsMisp(v interface{}, num int) {
+// SetValueAttribute устанавливает значение Attribute
+func (lomf *ListObjectsMispFormat) SetValueAttribute(v interface{}, num int) {
 	lomf.Lock()
 	defer lomf.Unlock()
 

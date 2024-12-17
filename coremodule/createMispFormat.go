@@ -44,29 +44,29 @@ func NewMispFormat(
 		}},
 		//observables -> attributes
 		"observables._id": {
-			listAttributesMisp.SetValueObjectIdAttributesMisp,
-			listObjectsMisp.SetValueIdObjectsMisp,
+			listAttributesMisp.SetValueObjectId,
+			listObjectsMisp.SetValueId,
 		},
-		"observables.data": {listAttributesMisp.SetValueValueAttributesMisp},
+		"observables.data": {listAttributesMisp.SetValueValue},
 		"observables.dataType": {
-			listObjectsMisp.SetValueNameObjectsMisp,
+			listObjectsMisp.SetValueName,
 			//здесь выполняем автоподстановку значений для полей Type и Category
 			//объекта AttributesMisp на основе определенной логике и уже предустановленных
 			//значений, при этом значения, заданные пользователем для этих полей, обрабатываются
 			//отдельно и хранятся в listTags, а после закрытия канала совмещаются с
 			//объектами AttributesMisp и следовательно перезаписывают значения выполненные
 			//через автоподстановку
-			listAttributesMisp.HandlingValueDataTypeAttributesMisp,
+			listAttributesMisp.HandlingValueDataType,
 		},
-		"observables._createdAt": {listAttributesMisp.SetValueTimestampAttributesMisp},
-		"observables.message":    {listAttributesMisp.SetValueCommentAttributesMisp},
+		"observables._createdAt": {listAttributesMisp.SetValueTimestamp},
+		"observables.message":    {listAttributesMisp.SetValueComment},
 		"observables.startDate": {
-			listAttributesMisp.SetValueFirstSeenAttributesMisp,
-			listObjectsMisp.SetValueFirstSeenObjectsMisp,
-			listObjectsMisp.SetValueTimestampObjectsMisp,
+			listAttributesMisp.SetValueFirstSeen,
+			listObjectsMisp.SetValueFirstSeen,
+			listObjectsMisp.SetValueTimestamp,
 		},
 		//observables.attachment -> objects
-		"observables.attachment.size": {listObjectsMisp.SetValueSizeObjectsMisp},
+		"observables.attachment.size": {listObjectsMisp.SetValueSize},
 	}
 
 	var (
@@ -252,10 +252,10 @@ func NewMispFormat(
 		//ответственные за формирование галактик в MISP
 		joinEventTags(leot, createGalaxyTags(listGalaxyTags))
 
-		for k := range listAttributesMisp.GetListAttributesMisp() {
+		for k := range listAttributesMisp.GetList() {
 			if supportiveListExcludeRule.CheckRuleTrue(k) {
 				//удаляем элементы подходящие под правила группы EXCLUDE
-				listAttributesMisp.DelElementListAttributesMisp(k)
+				listAttributesMisp.DelElementList(k)
 			}
 		}
 
@@ -281,10 +281,10 @@ func NewMispFormat(
 				"events": eventsMisp,
 				//getNewListAttributes влияет на поля Category и Type типа Attributes
 				"attributes": getNewListAttributes(
-					listAttributesMisp.GetListAttributesMisp(),
+					listAttributesMisp.GetList(),
 					listTags),
 				"objects": getNewListObjects(
-					listObjectsMisp.GetListObjectsMisp(),
+					listObjectsMisp.GetList(),
 					listAttributeTmp.GetListAttribute()),
 				"event.object.tags": leot.GetListTags(),
 			}})
@@ -294,9 +294,9 @@ func NewMispFormat(
 	userEmail, caseSource = "", ""
 	leot.CleanListTags()
 	eventsMisp.CleanEventsMispFormat()
-	listObjectsMisp.CleanListObjectsMisp()
+	listObjectsMisp.CleanList()
 	listAttributeTmp.CleanAttribute()
-	listAttributesMisp.CleanListAttributesMisp()
+	listAttributesMisp.CleanList()
 
 	// ТОЛЬКО ДЛЯ ТЕСТОВ, что бы завершить гроутину вывода информации и логирования
 	//при выполнения тестирования

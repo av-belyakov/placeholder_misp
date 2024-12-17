@@ -47,156 +47,16 @@ func (o *ListFormatsMISP) ComparisonID(v string) bool {
 
 // ComparisonEvent выполняет сравнение свойств объекта Event
 func (o *ListFormatsMISP) ComparisonEvent(v *EventsMispFormat) bool {
-	if o.Event.Analysis != v.Analysis {
-		return false
-	}
-
-	if o.Event.Analysis != v.Analysis {
-		return false
-	}
-
-	if o.Event.AttributeCount != v.AttributeCount {
-		return false
-	}
-
-	if o.Event.OrgId != v.OrgId {
-		return false
-	}
-
-	if o.Event.OrgcId != v.OrgcId {
-		return false
-	}
-
-	if o.Event.Distribution != v.Distribution {
-		return false
-	}
-
-	if o.Event.Info != v.Info {
-		return false
-	}
-
-	if o.Event.Uuid != v.Uuid {
-		return false
-	}
-
-	if o.Event.Date != v.Date {
-		return false
-	}
-
-	if o.Event.SharingGroupId != v.SharingGroupId {
-		return false
-	}
-
-	if o.Event.ThreatLevelId != v.ThreatLevelId {
-		return false
-	}
-
-	if o.Event.ExtendsUuid != v.ExtendsUuid {
-		return false
-	}
-
-	if o.Event.EventCreatorEmail != v.EventCreatorEmail {
-		return false
-	}
-
-	if o.Event.Published != v.Published {
-		return false
-	}
-
-	if o.Event.ProposalEmailLock != v.ProposalEmailLock {
-		return false
-	}
-
-	if o.Event.Locked != v.Locked {
-		return false
-	}
-
-	if o.Event.DisableCorrelation != v.DisableCorrelation {
-		return false
-	}
-
-	// думаю время сравнивать не стоит, потому что большая вероятность получить идентичный
-	//во всех параметрах объект у которого будет отличатся только время, что в данном случае не очень важно
-	//Timestamp
-	//PublishTimestamp
-	//SightingTimestamp
-
-	return true
+	return o.Event.Comparison(v)
 }
 
 // ComparisonReports выполняет сравнение свойств объекта Reports
 func (o *ListFormatsMISP) ComparisonReports(v *EventReports) bool {
-	if o.Reports.Name != v.Name {
-		return false
-	}
-
-	if o.Reports.Content != v.Content {
-		return false
-	}
-
-	if o.Reports.Distribution != v.Distribution {
-		return false
-	}
-
-	return true
+	return o.Reports.Comparison(v)
 }
 
 // ComparisonAttributes выполняет сравнение свойств объекта Attributes
 func (o *ListFormatsMISP) ComparisonAttributes(v []*AttributesMispFormat) bool {
-	performComparison := func(current, added AttributesMispFormat) bool {
-		if current.ToIds != added.ToIds {
-			return false
-		}
-
-		if current.Deleted != added.Deleted {
-			return false
-		}
-
-		if current.DisableCorrelation != added.DisableCorrelation {
-			return false
-		}
-
-		if current.EventId != added.EventId {
-			return false
-		}
-
-		if current.ObjectRelation != added.ObjectRelation {
-			return false
-		}
-
-		if current.Category != added.Category {
-			return false
-		}
-
-		if current.Type != added.Type {
-			return false
-		}
-
-		if current.Value != added.Value {
-			return false
-		}
-
-		if current.Distribution != added.Distribution {
-			return false
-		}
-		if current.SharingGroupId != added.SharingGroupId {
-			return false
-		}
-		if current.Comment != added.Comment {
-			return false
-		}
-
-		//Uuid `json:"uuid"` не стал так как для каждого объекта через конструктор
-		//автоматически формируется свой идентификатор
-		//
-		//Timestamp `json:"timestamp"`
-		//FirstSeen `json:"first_seen"`
-		//LastSeen `json:"last_seen"`
-		//а с временем вообще не ясно что и когда может поменять TheHive
-
-		return true
-	}
-
 	if len(o.Attributes) != len(v) {
 		return false
 	}
@@ -207,7 +67,7 @@ func (o *ListFormatsMISP) ComparisonAttributes(v []*AttributesMispFormat) bool {
 			if currentAttribute.ObjectId == addedAttribute.ObjectId {
 				isExist = true
 
-				if !performComparison(*currentAttribute, *addedAttribute) {
+				if !currentAttribute.Comparison(addedAttribute) {
 					return false
 				}
 			}
@@ -223,29 +83,6 @@ func (o *ListFormatsMISP) ComparisonAttributes(v []*AttributesMispFormat) bool {
 
 // ComparisonObjects выполняет сравнение свойств объекта Objects
 func (o *ListFormatsMISP) ComparisonObjects(v map[int]*ObjectsMispFormat) bool {
-	performComparison := func(current, added ObjectsMispFormat) bool {
-		/*
-				type ObjectsMispFormat struct {
-				TemplateUUID    string        `json:"template_uuid"`
-				TemplateVersion string        `json:"template_version"`
-				FirstSeen       string        `json:"first_seen"`
-				Timestamp       string        `json:"timestamp"`
-				Name            string        `json:"name"`
-				Description     string        `json:"description"`
-				EventId         string        `json:"event_id"`
-				MetaCategory    string        `json:"meta-category"`
-				Distribution    string        `json:"distribution"`
-				Attribute       ListAttribute `json:"Attribute"`
-			}
-		*/
-
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		// зесь надо дописать сравнение для каждого свойства
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-		return true
-	}
-
 	if len(o.Objects) != len(v) {
 		return false
 	}
@@ -256,7 +93,7 @@ func (o *ListFormatsMISP) ComparisonObjects(v map[int]*ObjectsMispFormat) bool {
 			if currentObject.ID == addedObject.ID {
 				isExist = true
 
-				if !performComparison(*currentObject, *addedObject) {
+				if !currentObject.Comparison(addedObject) {
 					return false
 				}
 			}

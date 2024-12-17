@@ -10,7 +10,7 @@ import (
 // удаляет элемент из списка атрибутов
 func delElementAttributes(er *ExclusionRules, la *datamodels.ListAttributesMispFormat, logging chan<- datamodels.MessageLogging) {
 	for _, v := range er.SearchObjectName("observables") {
-		if attr, ok := la.DelElementListAttributesMisp(v.SequenceNumber); ok {
+		if attr, ok := la.DelElementList(v.SequenceNumber); ok {
 			logging <- datamodels.MessageLogging{
 				MsgData: fmt.Sprintf("'an attribute with a value of '%s' has been removed'", attr.Value),
 				MsgType: "warning",
@@ -41,12 +41,12 @@ func handlerObservablesTags(v interface{},
 			return listTags
 		}
 		//добавляем значение из tags в поле object_relation
-		listAttributesMisp.SetValueObjectRelationAttributesMisp(result, seqNumObservable)
+		listAttributesMisp.SetValueObjectRelation(result, seqNumObservable)
 
 		//Добавляем в свойство Category соответствующее значение
 		//если наименование похоже на наименование типа хеширования
 		if checkHashName(result) {
-			listAttributesMisp.AutoSetValueCategoryAttributesMisp(result, seqNumObservable)
+			listAttributesMisp.AutoSetValueCategory(result, seqNumObservable)
 		}
 	}
 

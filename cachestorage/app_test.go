@@ -2,10 +2,10 @@ package cachestorage_test
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -64,9 +64,6 @@ func (o *SpecialObjectForCache[T]) GetFunc() func(int) bool {
 }
 
 func (o *SpecialObjectForCache[T]) Comparison(objFromCache T) bool {
-	//выполнить сравнение
-	//o.object и objFromCache
-
 	if !o.object.ComparisonID(objFromCache.GetID()) {
 		return false
 	}
@@ -92,10 +89,6 @@ func (o *SpecialObjectForCache[T]) Comparison(objFromCache T) bool {
 		return false
 	}
 
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// доделать метод ComparisonObjects в файле datamodels/methods.go
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 	return true
 }
 
@@ -116,49 +109,74 @@ func TestQueueHandler(t *testing.T) {
 
 		assert.Equal(t, cache.SizeObjectToQueue(), 3)
 
-		_, ok := cache.PullObjectToQueue()
-		assert.True(t, ok)
+		_, ok := cache.PullObjectFromQueue()
+		assert.False(t, ok)
 		assert.Equal(t, cache.SizeObjectToQueue(), 2)
 
-		_, _ = cache.PullObjectToQueue()
-		_, _ = cache.PullObjectToQueue()
+		_, _ = cache.PullObjectFromQueue()
+		_, _ = cache.PullObjectFromQueue()
 		assert.Equal(t, cache.SizeObjectToQueue(), 0)
 
-		_, ok = cache.PullObjectToQueue()
-		assert.False(t, ok)
+		_, ok = cache.PullObjectFromQueue()
+		assert.True(t, ok)
 	})
 
 	t.Run("Тест 1.1. Добавить в очередь некоторое количество объектов", func(t *testing.T) {
 		cache.CleanQueue()
 
 		objectTemplate := datamodels.NewListFormatsMISP()
-
 		objectTemplate.ID = "3255-46673"
 		cache.PushObjectToQueue(objectTemplate)
 		cache.PushObjectToQueue(objectTemplate) //дублирующийся объект
+
+		objectTemplate = datamodels.NewListFormatsMISP()
 		objectTemplate.ID = "8483-78578"
 		cache.PushObjectToQueue(objectTemplate)
+
+		objectTemplate = datamodels.NewListFormatsMISP()
 		objectTemplate.ID = "3132-11223"
 		cache.PushObjectToQueue(objectTemplate)
+
+		objectTemplate = datamodels.NewListFormatsMISP()
 		objectTemplate.ID = "6553-13323"
 		cache.PushObjectToQueue(objectTemplate)
+
+		objectTemplate = datamodels.NewListFormatsMISP()
 		objectTemplate.ID = "8474-37722"
 		cache.PushObjectToQueue(objectTemplate)
+
+		objectTemplate = datamodels.NewListFormatsMISP()
 		objectTemplate.ID = "9123-84885"
 		cache.PushObjectToQueue(objectTemplate)
+
+		objectTemplate = datamodels.NewListFormatsMISP()
 		objectTemplate.ID = "1200-04993"
 		cache.PushObjectToQueue(objectTemplate)
+
+		objectTemplate = datamodels.NewListFormatsMISP()
 		objectTemplate.ID = "4323-29909"
 		cache.PushObjectToQueue(objectTemplate)
+
+		objectTemplate = datamodels.NewListFormatsMISP()
 		objectTemplate.ID = "7605-89493"
 		cache.PushObjectToQueue(objectTemplate)
 
-		assert.Equal(t, cache.SizeObjectToQueue(), 10)
+		objectTemplate = datamodels.NewListFormatsMISP()
+		objectTemplate.ID = "9423-13373"
+		cache.PushObjectToQueue(objectTemplate)
+
+		objectTemplate = datamodels.NewListFormatsMISP()
+		objectTemplate.ID = "5238-74389"
+		cache.PushObjectToQueue(objectTemplate)
+
+		assert.Equal(t, cache.SizeObjectToQueue(), 12)
 	})
 
-	t.Run("Тест 2. Добавить в кэш хранилищя некоторое количество объектов находящихся в очереди", func(t *testing.T) {
-		obj, isEmpty := cache.PullObjectToQueue()
+	t.Run("Тест 2. Добавить в кэш хранилища некоторое количество объектов находящихся в очереди", func(t *testing.T) {
+		//----- первый объект из очереди
+		obj, isEmpty := cache.PullObjectFromQueue()
 		assert.False(t, isEmpty)
+		assert.Equal(t, obj.ID, "3255-46673")
 
 		specialObject := NewSpecialObjectForCache[*datamodels.ListFormatsMISP]()
 		specialObject.SetObject(obj)
@@ -166,44 +184,75 @@ func TestQueueHandler(t *testing.T) {
 			//здесь некий обработчик...
 			//в контексе работы с MISP здесь должен быть код отвечающий
 			//за REST запросы к серверу MISP
+			fmt.Println("function with ID:", obj.ID)
 
 			return true
 		})
 
 		err := cache.AddObjectToCache(specialObject.object.ID, specialObject)
 		assert.NoError(t, err)
-	})
 
-	t.Run("Тест 3. Найти и удалить самую старую запись", func(t *testing.T) {
-		var (
-			index      string
-			timeExpiry time.Time
+		_, ok := cache.GetObjectFromCacheByKey(specialObject.object.ID)
+		assert.True(t, ok)
 
-			timeNow time.Time            = time.Now()
-			listObj map[string]time.Time = map[string]time.Time{
-				"1": timeNow.Add(time.Second * 7),
-				"2": timeNow.Add(time.Second * 3),
-				"3": timeNow.Add(time.Second * 8),
-				"4": timeNow.Add(time.Second * 1),
-				"5": timeNow.Add(time.Second * 4),
-				"6": timeNow.Add(time.Second * 3),
-			}
-		)
+		//----- второй объект из очереди
+		obj, isEmpty = cache.PullObjectFromQueue()
+		assert.False(t, isEmpty)
 
-		for k, v := range listObj {
-			if index == "" {
-				index = k
-				timeExpiry = v
+		specialObject = NewSpecialObjectForCache[*datamodels.ListFormatsMISP]()
+		specialObject.SetObject(obj)
+		specialObject.SetFunc(func(int) bool {
+			//здесь некий обработчик...
+			//в контексе работы с MISP здесь должен быть код отвечающий
+			//за REST запросы к серверу MISP
+			fmt.Println("function with ID:", obj.ID)
 
-				continue
-			}
+			return true
+		})
 
-			if v.Before(timeExpiry) {
-				index = k
-				timeExpiry = v
-			}
+		//должна быть ошибка так как второй в очереди объект имеет такой же
+		//идентификатор как и первый
+		err = cache.AddObjectToCache(specialObject.object.ID, specialObject)
+		assert.Error(t, err)
+
+		_, ok = cache.GetObjectFromCacheByKey(obj.ID)
+		assert.True(t, ok)
+
+		cacheSize := cache.SizeObjectToQueue()
+		for i := 0; i < cacheSize; i++ {
+			obj, isEmpty = cache.PullObjectFromQueue()
+			assert.False(t, isEmpty)
+
+			specialObject = NewSpecialObjectForCache[*datamodels.ListFormatsMISP]()
+			specialObject.SetObject(obj)
+			specialObject.SetFunc(func(int) bool {
+				//здесь некий обработчик...
+				//в контексе работы с MISP здесь должен быть код отвечающий
+				//за REST запросы к серверу MISP
+				fmt.Println("function with ID:", obj.ID)
+
+				return true
+			})
+
+			err := cache.AddObjectToCache(specialObject.object.ID, specialObject)
+			assert.NoError(t, err)
 		}
 
-		assert.Equal(t, index, "4")
+		assert.Equal(t, cache.GetCacheSize(), 10)
+	})
+
+	t.Run("Тест 3. Найти объект с самой старой записью в кэше", func(t *testing.T) {
+		index := cache.GetOldestObjectFromCache()
+		assert.Equal(t, index, "8483-78578")
+
+		obj, ok := cache.GetObjectFromCacheByKey(index)
+		assert.True(t, ok)
+		assert.Equal(t, obj.GetID(), "8483-78578")
+	})
+
+	t.Run("Тест 4. Проверить удаляются ли объекты время жизни которых, time expiry, истекло", func(t *testing.T) {
+		//
+		//Надо дописать этот тест
+		//
 	})
 }
