@@ -22,9 +22,9 @@ package datamodels
 }*/
 
 type MispFormatError struct {
-	Saved   bool                   `json:"saved"`
+	Errors  map[string]interface{} `json:"errors"`
 	Name    string                 `json:"name"`
 	Message string                 `json:"message"`
 	URL     string                 `json:"url"`
-	Errors  map[string]interface{} `json:"errors"`
+	Saved   bool                   `json:"saved"`
 }

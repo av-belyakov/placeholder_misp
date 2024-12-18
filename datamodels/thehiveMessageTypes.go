@@ -2,10 +2,10 @@ package datamodels
 
 // ResponseMessageFromMispToTheHave содержит ответ для TheHive получаемый от MISP
 type ResponseMessageFromMispToTheHave struct {
-	Success  bool                        `json:"success"`
-	Service  string                      `json:"service"`
-	Error    error                       `json:"error"`
 	Commands []ResponseCommandForTheHive `json:"commands"`
+	Error    error                       `json:"error"`
+	Service  string                      `json:"service"`
+	Success  bool                        `json:"success"`
 }
 
 // ResponseCommandForTheHive ответы с командами для TheHive
@@ -45,14 +45,14 @@ type EventMessageTheHive struct {
 	Operation      string       `json:"operation"`
 	ObjectId       string       `json:"objectId"`
 	ObjectType     string       `json:"objectType"`
-	Base           bool         `json:"base"`
-	StartDate      uint64       `json:"startDate"`
 	RootId         string       `json:"rootId"`
 	RequestId      string       `json:"requestId"`
-	Details        EventDetails `json:"details"`
-	Object         EventObject  `json:"object"`
 	OrganisationId string       `json:"organisationId"`
 	Organisation   string       `json:"organisation"`
+	Details        EventDetails `json:"details"`
+	Object         EventObject  `json:"object"`
+	StartDate      uint64       `json:"startDate"`
+	Base           bool         `json:"base"`
 }
 
 // EventDetails детальная информация о событии
@@ -63,12 +63,12 @@ type EventMessageTheHive struct {
 // ImpactStatus - краткое описание воздействия
 // CustomFields - настраиваемые поля
 type EventDetails struct {
-	EndDate          uint64 `json:"endDate"`
+	CustomFields     `json:"customFields"`
 	ResolutionStatus string `json:"resolutionStatus"`
 	Summary          string `json:"summary"`
 	Status           string `json:"status"`
 	ImpactStatus     string `json:"impactStatus"`
-	CustomFields     `json:"customFields"`
+	EndDate          uint64 `json:"endDate"`
 }
 
 // EventObject объект события
@@ -98,31 +98,31 @@ type EventDetails struct {
 // Stats - статистика
 // Permissions - разрешения
 type EventObject struct {
-	UnderliningId    string   `json:"_id"`
-	Id               string   `json:"id"`
-	CreatedBy        string   `json:"createdBy"`
-	UpdatedBy        string   `json:"updatedBy"`
-	CreatedAt        uint64   `json:"createdAt"`
-	UpdatedAt        uint64   `json:"updatedAt"`
-	UnderliningType  string   `json:"_type"`
-	CaseId           int      `json:"caseId"`
-	Title            string   `json:"title"`
-	Description      string   `json:"description"`
-	Severity         int      `json:"severity"`
-	StartDate        uint64   `json:"startDate"`
-	EndDate          uint64   `json:"endDate"`
-	ImpactStatus     string   `json:"impactStatus"`
-	ResolutionStatus string   `json:"resolutionStatus"`
-	Tags             []string `json:"tags"`
-	Flag             bool     `json:"flag"`
-	Tlp              int      `json:"tlp"`
-	Pap              int      `json:"pap"`
-	Status           string   `json:"status"`
-	Summary          string   `json:"summary"`
-	Owner            string   `json:"owner"`
 	CustomFields     `json:"customFields"`
 	Stats            map[string]interface{} `json:"stats"`
+	Tags             []string               `json:"tags"`
 	Permissions      []string               `json:"permissions"`
+	UnderliningId    string                 `json:"_id"`
+	Id               string                 `json:"id"`
+	CreatedBy        string                 `json:"createdBy"`
+	UpdatedBy        string                 `json:"updatedBy"`
+	UnderliningType  string                 `json:"_type"`
+	Title            string                 `json:"title"`
+	Description      string                 `json:"description"`
+	ImpactStatus     string                 `json:"impactStatus"`
+	ResolutionStatus string                 `json:"resolutionStatus"`
+	Status           string                 `json:"status"`
+	Summary          string                 `json:"summary"`
+	Owner            string                 `json:"owner"`
+	CreatedAt        uint64                 `json:"createdAt"`
+	UpdatedAt        uint64                 `json:"updatedAt"`
+	StartDate        uint64                 `json:"startDate"`
+	EndDate          uint64                 `json:"endDate"`
+	CaseId           int                    `json:"caseId"`
+	Severity         int                    `json:"severity"`
+	Tlp              int                    `json:"tlp"`
+	Pap              int                    `json:"pap"`
+	Flag             bool                   `json:"flag"`
 }
 
 // CustomFields настраиваемые поля
@@ -153,23 +153,23 @@ type ObservablesMessageTheHive struct {
 // Tlp - tlp
 // Reports - список отчетов
 type ObservableMessage struct {
-	CreatedAt        uint64                                         `json:"_createdAt"`
+	Reports          map[string]map[string][]map[string]interface{} `json:"reports"`
+	ExtraData        map[string]interface{}                         `json:"extraData"`
+	Tags             []string                                       `json:"tags"`
 	CreatedBy        string                                         `json:"_createdBy"`
 	UnderliningId    string                                         `json:"_id"`
 	UnderliningType  string                                         `json:"_type"`
-	UpdatedAt        uint64                                         `json:"_updatedAt"`
 	UpdatedBy        string                                         `json:"_updatedBy"`
 	Data             string                                         `json:"data"`
 	DataType         string                                         `json:"dataType"`
-	IgnoreSimilarity bool                                           `json:"ignoreSimilarity"`
-	ExtraData        map[string]interface{}                         `json:"extraData"`
-	Ioc              bool                                           `json:"ioc"`
 	Message          string                                         `json:"message"`
-	Sighted          bool                                           `json:"sighted"`
+	CreatedAt        uint64                                         `json:"_createdAt"`
+	UpdatedAt        uint64                                         `json:"_updatedAt"`
 	StartDate        uint64                                         `json:"startDate"`
-	Tags             []string                                       `json:"tags"`
 	Tlp              int                                            `json:"tlp"`
-	Reports          map[string]map[string][]map[string]interface{} `json:"reports"`
+	IgnoreSimilarity bool                                           `json:"ignoreSimilarity"`
+	Ioc              bool                                           `json:"ioc"`
+	Sighted          bool                                           `json:"sighted"`
 }
 
 // TtpsMessageTheHive список TTP сообщений
@@ -186,13 +186,13 @@ type TtpsMessageTheHive struct {
 // PatternId - уникальный идентификатор шаблона
 // Tactic - тактика
 type TtpMessage struct {
-	CreatedAt     uint64              `json:"_createdAt"`
+	ExtraData     ExtraDataTtpMessage `json:"extraData"`
 	CreatedBy     string              `json:"_createdBy"`
 	UnderliningId string              `json:"_id"`
-	ExtraData     ExtraDataTtpMessage `json:"extraData"`
-	OccurDate     uint64              `json:"occurDate"`
 	PatternId     string              `json:"patternId"`
 	Tactic        string              `json:"tactic"`
+	CreatedAt     uint64              `json:"_createdAt"`
+	OccurDate     uint64              `json:"occurDate"`
 }
 
 // ExtraDataTtpMessage дополнительные данные TTP сообщения
@@ -224,23 +224,23 @@ type ExtraDataTtpMessage struct {
 // URL - URL
 // Version - версия
 type PatternExtraData struct {
-	CreatedAt           uint64                 `json:"_createdAt"`
-	CreatedBy           string                 `json:"_createdBy"`
-	UnderliningId       string                 `json:"_id"`
-	UnderliningType     string                 `json:"_type"`
+	ExtraData           map[string]interface{} `json:"extraData"`
 	DataSources         []string               `json:"dataSources"`
 	DefenseBypassed     []string               `json:"defenseBypassed"` //надо проверить тип
-	Description         string                 `json:"description"`
-	ExtraData           map[string]interface{} `json:"extraData"`
-	Name                string                 `json:"name"`
-	PatternId           string                 `json:"patternId"`
-	PatternType         string                 `json:"patternType"`
 	PermissionsRequired []string               `json:"permissionsRequired"`
 	Platforms           []string               `json:"platforms"`
-	RemoteSupport       bool                   `json:"remoteSupport"`
-	Revoked             bool                   `json:"revoked"`
 	SystemRequirements  []string               `json:"systemRequirements"` //надо проверить тип
 	Tactics             []string               `json:"tactics"`
 	URL                 string                 `json:"url"`
 	Version             string                 `json:"version"`
+	CreatedBy           string                 `json:"_createdBy"`
+	UnderliningId       string                 `json:"_id"`
+	UnderliningType     string                 `json:"_type"`
+	Description         string                 `json:"description"`
+	Name                string                 `json:"name"`
+	PatternId           string                 `json:"patternId"`
+	PatternType         string                 `json:"patternType"`
+	CreatedAt           uint64                 `json:"_createdAt"`
+	RemoteSupport       bool                   `json:"remoteSupport"`
+	Revoked             bool                   `json:"revoked"`
 }
