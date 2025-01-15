@@ -13,12 +13,12 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"placeholder_misp/coremodule"
-	"placeholder_misp/datamodels"
-	"placeholder_misp/memorytemporarystorage"
-	"placeholder_misp/mispinteractions"
-	rules "placeholder_misp/rulesinteraction"
-	"placeholder_misp/supportingfunctions"
+	"github.com/av-belyakov/placeholder_misp/coremodule"
+	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
+	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
+	"github.com/av-belyakov/placeholder_misp/memorytemporarystorage"
+	"github.com/av-belyakov/placeholder_misp/mispinteractions"
+	rules "github.com/av-belyakov/placeholder_misp/rulesinteraction"
 )
 
 var _ = Describe("Processingrules", Ordered, func() {

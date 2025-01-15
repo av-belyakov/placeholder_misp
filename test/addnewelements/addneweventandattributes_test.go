@@ -11,13 +11,13 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"placeholder_misp/confighandler"
-	"placeholder_misp/coremodule"
-	"placeholder_misp/datamodels"
-	"placeholder_misp/memorytemporarystorage"
-	"placeholder_misp/mispinteractions"
-	rules "placeholder_misp/rulesinteraction"
-	"placeholder_misp/supportingfunctions"
+	"github.com/av-belyakov/placeholder_misp/cmd/coremodule"
+	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
+	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
+	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
+	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
+	"github.com/av-belyakov/placeholder_misp/memorytemporarystorage"
+	rules "github.com/av-belyakov/placeholder_misp/rulesinteraction"
 )
 
 var _ = Describe("Addneweventandattributes", Ordered, func() {
@@ -26,7 +26,7 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		counting                       chan datamodels.DataCounterSettings
 		confApp                        confighandler.ConfigApp
 		listRules                      *rules.ListRule
-		mispModule                     *mispinteractions.ModuleMISP
+		mispModule                     *mispapi.ModuleMISP
 		storageApp                     *memorytemporarystorage.CommonStorageTemporary
 		exampleByte                    []byte
 		errReadFile, errMisp, errRules error
@@ -121,7 +121,7 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		exampleByte, errReadFile = readFileJson("testing/test_json", "example_caseId_33705.json")
 
 		//инициалиация модуля для взаимодействия с MISP
-		mispModule, errMisp = mispinteractions.HandlerMISP(*confApp.GetAppMISP(), confApp.Organizations, logging)
+		mispModule, errMisp = mispapi.HandlerMISP(*confApp.GetAppMISP(), confApp.Organizations, logging)
 
 		hjm := coremodule.NewHandlerJsonMessage(storageApp, logging, counting)
 		// обработчик JSON документа

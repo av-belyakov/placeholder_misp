@@ -7,9 +7,9 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"placeholder_misp/confighandler"
-	"placeholder_misp/datamodels"
-	"placeholder_misp/mispinteractions"
+	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
+	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
+	"github.com/av-belyakov/placeholder_misp/mispinteractions"
 )
 
 var _ = Describe("Deleteeventmisp", Ordered, func() {

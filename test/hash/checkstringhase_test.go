@@ -6,9 +6,9 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"placeholder_misp/coremodule"
-	"placeholder_misp/datamodels"
-	"placeholder_misp/supportingfunctions"
+	"github.com/av-belyakov/placeholder_misp/coremodule"
+	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
+	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
 var _ = Describe("Checkstringhase", func() {

@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"runtime"
 
-	"placeholder_misp/datamodels"
-	rules "placeholder_misp/rulesinteraction"
+	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
+	rules "github.com/av-belyakov/placeholder_misp/rulesinteraction"
 )
 
 // ChanInputCreateMispFormat

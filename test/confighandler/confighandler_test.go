@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/spf13/viper"
 
-	"placeholder_misp/confighandler"
+	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
 )
 
 var _ = Describe("MainConfigHandler", Ordered, func() {

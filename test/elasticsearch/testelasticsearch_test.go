@@ -17,7 +17,7 @@ import (
 
 	"github.com/elastic/go-elasticsearch/v8"
 
-	"placeholder_misp/supportingfunctions"
+	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
 var _ = Describe("Testelasticsearch", Ordered, func() {

@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"placeholder_misp/memorytemporarystorage"
+	"github.com/av-belyakov/placeholder_misp/memorytemporarystorage"
 )
 
 var _ = Describe("StorageTemporary", Ordered, func() {

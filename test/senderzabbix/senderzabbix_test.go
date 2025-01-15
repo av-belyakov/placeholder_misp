@@ -8,8 +8,8 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"placeholder_misp/datamodels"
-	"placeholder_misp/zabbixinteractions"
+	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
+	"github.com/av-belyakov/placeholder_misp/zabbixinteractions"
 )
 
 var _ = Describe("Senderzabbix", Ordered, func() {

@@ -9,10 +9,10 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"placeholder_misp/coremodule"
-	"placeholder_misp/datamodels"
-	rules "placeholder_misp/rulesinteraction"
-	"placeholder_misp/supportingfunctions"
+	"github.com/av-belyakov/placeholder_misp/coremodule"
+	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
+	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
+	rules "github.com/av-belyakov/placeholder_misp/rulesinteraction"
 )
 
 func addListGalaxyTags(lgt *coremodule.MispGalaxyTags) func(string, any) {

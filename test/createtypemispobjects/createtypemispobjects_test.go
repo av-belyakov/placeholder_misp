@@ -10,16 +10,16 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"placeholder_misp/coremodule"
-	"placeholder_misp/datamodels"
-	"placeholder_misp/memorytemporarystorage"
-	"placeholder_misp/mispinteractions"
-	rules "placeholder_misp/rulesinteraction"
+	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
+	"github.com/av-belyakov/placeholder_misp/coremodule"
+	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
+	"github.com/av-belyakov/placeholder_misp/memorytemporarystorage"
+	rules "github.com/av-belyakov/placeholder_misp/rulesinteraction"
 )
 
-//GetDataReceptionChannel() <-chan mispinteractions.ChanOutputSetting
-//SendingDataOutput(mispinteractions.ChanOutputSetting)
-//SendingDataInput(mispinteractions.ChanInputSettings)
+//GetDataReceptionChannel() <-chan mispiapi.ChanOutputSetting
+//SendingDataOutput(mispiapi.ChanOutputSetting)
+//SendingDataInput(mispiapi.ChanInputSettings)
 
 var _ = Describe("Createtypemispobjects", Ordered, func() {
 	var (
@@ -29,7 +29,7 @@ var _ = Describe("Createtypemispobjects", Ordered, func() {
 		exampleFile string = "../test_json/example_3.json"
 		taskId      string = "new_task_1"
 
-		moduleMisp *mispinteractions.ModuleMISP
+		moduleMisp *mispapi.ModuleMISP
 
 		ctx       context.Context
 		ctxCancel context.CancelFunc
@@ -40,9 +40,9 @@ var _ = Describe("Createtypemispobjects", Ordered, func() {
 		logging := make(chan datamodels.MessageLogging)
 		counting := make(chan datamodels.DataCounterSettings)
 
-		moduleMisp = &mispinteractions.ModuleMISP{
-			ChanInput:  make(chan mispinteractions.InputSettings),
-			ChanOutput: make(chan mispinteractions.OutputSetting),
+		moduleMisp = &mispapi.ModuleMISP{
+			ChanInput:  make(chan mispapi.InputSettings),
+			ChanOutput: make(chan mispapi.OutputSetting),
 		}
 
 		b, err := os.ReadFile(exampleFile)
