@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"runtime"
 
+	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
 )
 
@@ -53,7 +54,7 @@ func sendEventsMispFormat(host, authKey string, d InputSettings) (*http.Response
 }
 
 // sendAttribytesMispFormat отправляет в API MISP список атрибутов в виде среза типов Attribytes и возвращает полученный ответ
-func sendAttribytesMispFormat(host, authKey, eventId string, d InputSettings, logging chan<- datamodels.MessageLogging) (*http.Response, []byte) {
+func sendAttribytesMispFormat(host, authKey, eventId string, d InputSettings, logger commoninterfaces.Logger) (*http.Response, []byte) {
 	var (
 		res         *http.Response
 		resBodyByte = make([]byte, 0)
@@ -62,10 +63,7 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d InputSettings, lo
 	c, err := NewClientMISP(host, authKey, false)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
-		logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("'attributes for event id%s add, %s' %s:%d", eventId, err.Error(), f, l-2),
-			MsgType: "error",
-		}
+		logger.Send("error", fmt.Sprintf("'attributes for event id%s add, %s' %s:%d", eventId, err.Error(), f, l-2))
 
 		return nil, resBodyByte
 	}
@@ -73,10 +71,7 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d InputSettings, lo
 	ad, ok := d.MajorData["attributes"]
 	if !ok {
 		_, f, l, _ := runtime.Caller(0)
-		logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("'the properties of \"attributes\" were not found in the received data' %s:%d", f, l-2),
-			MsgType: "error",
-		}
+		logger.Send("error", fmt.Sprintf("'the properties of \"attributes\" were not found in the received data' %s:%d", f, l-2))
 
 		return nil, resBodyByte
 	}
@@ -84,10 +79,7 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d InputSettings, lo
 	lamf, ok := ad.([]datamodels.AttributesMispFormat)
 	if !ok {
 		_, f, l, _ := runtime.Caller(0)
-		logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("'the received data does not match the type \"attributes\"' %s:%d", f, l-2),
-			MsgType: "error",
-		}
+		logger.Send("error", fmt.Sprintf("'the received data does not match the type \"attributes\"' %s:%d", f, l-2))
 
 		return nil, resBodyByte
 	}
@@ -97,10 +89,7 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d InputSettings, lo
 
 		if lamf[k].Value == "" {
 			_, f, l, _ := runtime.Caller(0)
-			logging <- datamodels.MessageLogging{
-				MsgData: fmt.Sprintf("'attributes for event id №%s is not added, the \"Value\" type property should not be empty' %s:%d", eventId, f, l-1),
-				MsgType: "warning",
-			}
+			logger.Send("warning", fmt.Sprintf("'attributes for event id №%s is not added, the \"Value\" type property should not be empty' %s:%d", eventId, f, l-1))
 
 			continue
 		}
@@ -108,10 +97,7 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d InputSettings, lo
 		b, err := json.Marshal(lamf[k])
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
-			logging <- datamodels.MessageLogging{
-				MsgData: fmt.Sprintf("'attributes №%s add, %s' %s:%d", eventId, err.Error(), f, l-2),
-				MsgType: "warning",
-			}
+			logger.Send("warning", fmt.Sprintf("'attributes №%s add, %s' %s:%d", eventId, err.Error(), f, l-2))
 
 			continue
 		}
@@ -121,26 +107,17 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d InputSettings, lo
 			_, f, l, _ := runtime.Caller(0)
 			attrObject, errMarshal := json.MarshalIndent(lamf[k], "", "  ")
 			if errMarshal != nil {
-				logging <- datamodels.MessageLogging{
-					MsgData: fmt.Sprintf("'the received data does not match the type \"attributes\"' %s:%d", f, l-2),
-					MsgType: "error",
-				}
+				logger.Send("error", fmt.Sprintf("'the received data does not match the type \"attributes\"' %s:%d", f, l-2))
 			}
 
-			logging <- datamodels.MessageLogging{
-				MsgData: fmt.Sprintf("'attributes №%s add, object:\n%s\n%s' %s:%d", eventId, string(attrObject), err.Error(), f, l-2),
-				MsgType: "warning",
-			}
+			logger.Send("warning", fmt.Sprintf("'attributes №%s add, object:\n%s\n%s' %s:%d", eventId, string(attrObject), err.Error(), f, l-2))
 
 			continue
 		}
 
 		if res.StatusCode != http.StatusOK {
 			_, f, l, _ := runtime.Caller(0)
-			logging <- datamodels.MessageLogging{
-				MsgData: fmt.Sprintf("'attributes №%s add, %s' %s:%d", eventId, res.Status, f, l-1),
-				MsgType: "warning",
-			}
+			logger.Send("warning", fmt.Sprintf("'attributes №%s add, %s' %s:%d", eventId, res.Status, f, l-1))
 		}
 	}
 
@@ -148,7 +125,7 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d InputSettings, lo
 }
 
 // sendObjectsMispFormat отправляет в API MISP список объектов содержащихся в свойстве observables.attachment (как правило это описание вложеного файла)
-func sendObjectsMispFormat(host, authKey, eventId string, d InputSettings, logging chan<- datamodels.MessageLogging) (*http.Response, []byte) {
+func sendObjectsMispFormat(host, authKey, eventId string, d InputSettings, logger commoninterfaces.Logger) (*http.Response, []byte) {
 	var (
 		res         *http.Response
 		resBodyByte = make([]byte, 0)
@@ -157,10 +134,7 @@ func sendObjectsMispFormat(host, authKey, eventId string, d InputSettings, loggi
 	c, err := NewClientMISP(host, authKey, false)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
-		logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("'objects for event id:%s add, %s' %s:%d", eventId, err.Error(), f, l-2),
-			MsgType: "error",
-		}
+		logger.Send("error", fmt.Sprintf("'objects for event id:%s add, %s' %s:%d", eventId, err.Error(), f, l-2))
 
 		return nil, resBodyByte
 	}
@@ -168,10 +142,7 @@ func sendObjectsMispFormat(host, authKey, eventId string, d InputSettings, loggi
 	od, ok := d.MajorData["objects"]
 	if !ok {
 		_, f, l, _ := runtime.Caller(0)
-		logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("'the properties of \"objects\" were not found in the received data' %s:%d", f, l-2),
-			MsgType: "error",
-		}
+		logger.Send("error", fmt.Sprintf("'the properties of \"objects\" were not found in the received data' %s:%d", f, l-2))
 
 		return nil, resBodyByte
 	}
@@ -179,10 +150,7 @@ func sendObjectsMispFormat(host, authKey, eventId string, d InputSettings, loggi
 	lomf, ok := od.(map[int]datamodels.ObjectsMispFormat)
 	if !ok {
 		_, f, l, _ := runtime.Caller(0)
-		logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("'the received data does not match the type \"objects\"' %s:%d", f, l-2),
-			MsgType: "error",
-		}
+		logger.Send("error", fmt.Sprintf("'the received data does not match the type \"objects\"' %s:%d", f, l-2))
 
 		return nil, resBodyByte
 	}
@@ -193,10 +161,7 @@ func sendObjectsMispFormat(host, authKey, eventId string, d InputSettings, loggi
 		b, err := json.Marshal(v)
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
-			logging <- datamodels.MessageLogging{
-				MsgData: fmt.Sprintf("'objects №%s add, %s' %s:%d", eventId, err.Error(), f, l-2),
-				MsgType: "warning",
-			}
+			logger.Send("warning", fmt.Sprintf("'objects №%s add, %s' %s:%d", eventId, err.Error(), f, l-2))
 
 			continue
 		}
@@ -204,20 +169,14 @@ func sendObjectsMispFormat(host, authKey, eventId string, d InputSettings, loggi
 		res, resBodyByte, err = c.Post("/objects/add/"+eventId, b)
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
-			logging <- datamodels.MessageLogging{
-				MsgData: fmt.Sprintf("'objects №%s add, %s' %s:%d", eventId, err.Error(), f, l-2),
-				MsgType: "warning",
-			}
+			logger.Send("warning", fmt.Sprintf("'objects №%s add, %s' %s:%d", eventId, err.Error(), f, l-2))
 
 			continue
 		}
 
 		if res.StatusCode != http.StatusOK {
 			_, f, l, _ := runtime.Caller(0)
-			logging <- datamodels.MessageLogging{
-				MsgData: fmt.Sprintf("'objects №%s add, %s' %s:%d", eventId, res.Status, f, l-1),
-				MsgType: "warning",
-			}
+			logger.Send("warning", fmt.Sprintf("'objects №%s add, %s' %s:%d", eventId, res.Status, f, l-1))
 		}
 	}
 
@@ -283,7 +242,7 @@ func sendEventReportsMispFormat(host, authKey, eventId string, caseId float64) e
 	return nil
 }
 
-func sendEventTagsMispFormat(host, authKey, eventId string, d InputSettings, logging chan<- datamodels.MessageLogging) error {
+func sendEventTagsMispFormat(host, authKey, eventId string, d InputSettings, logger commoninterfaces.Logger) error {
 	c, err := NewClientMISP(host, authKey, false)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
@@ -293,10 +252,7 @@ func sendEventTagsMispFormat(host, authKey, eventId string, d InputSettings, log
 	eot, ok := d.MajorData["event.object.tags"]
 	if !ok {
 		_, f, l, _ := runtime.Caller(0)
-		logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("'the properties of \"objects\" were not found in the received data' %s:%d", f, l-2),
-			MsgType: "error",
-		}
+		logger.Send("error", fmt.Sprintf("'the properties of \"objects\" were not found in the received data' %s:%d", f, l-2))
 
 		return nil
 	}
@@ -304,10 +260,7 @@ func sendEventTagsMispFormat(host, authKey, eventId string, d InputSettings, log
 	leot, ok := eot.(datamodels.ListEventObjectTags)
 	if !ok {
 		_, f, l, _ := runtime.Caller(0)
-		logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("'the received data does not match the type \"objects\"' %s:%d", f, l-2),
-			MsgType: "error",
-		}
+		logger.Send("error", fmt.Sprintf("'the received data does not match the type \"objects\"' %s:%d", f, l-2))
 
 		return nil
 	}
@@ -317,10 +270,7 @@ func sendEventTagsMispFormat(host, authKey, eventId string, d InputSettings, log
 	// ***********************************
 	// Это логирование только для теста!!!
 	// ***********************************
-	logging <- datamodels.MessageLogging{
-		MsgData: fmt.Sprintf("TEST_INFO func 'sendEventTagsMispFormat', готовимся добавлять event tags - %v", leot.GetListTags()),
-		MsgType: "testing",
-	}
+	logger.Send("testing", fmt.Sprintf("TEST_INFO func 'sendEventTagsMispFormat', готовимся добавлять event tags - %v", leot.GetListTags()))
 	//
 	//
 
@@ -331,10 +281,7 @@ func sendEventTagsMispFormat(host, authKey, eventId string, d InputSettings, log
 		b, err := json.Marshal(eotmf)
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
-			logging <- datamodels.MessageLogging{
-				MsgData: fmt.Sprintf("'event tags №%s add, %s' %s:%d", eventId, err.Error(), f, l-2),
-				MsgType: "warning",
-			}
+			logger.Send("warning", fmt.Sprintf("'event tags №%s add, %s' %s:%d", eventId, err.Error(), f, l-2))
 
 			continue
 		}
@@ -342,37 +289,25 @@ func sendEventTagsMispFormat(host, authKey, eventId string, d InputSettings, log
 		// ***********************************
 		// Это логирование только для теста!!!
 		// ***********************************
-		logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("TEST_INFO func 'sendEventTagsMispFormat', готовимся отправить POST запрос для добавления тега %s", v),
-			MsgType: "testing",
-		}
+		logger.Send("testing", fmt.Sprintf("TEST_INFO func 'sendEventTagsMispFormat', готовимся отправить POST запрос для добавления тега %s", v))
 		//
 		//
 
 		res, b, err := c.Post("/events/addTag", b)
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
-			logging <- datamodels.MessageLogging{
-				MsgData: fmt.Sprintf("'event tags №%s add, %s' %s:%d", eventId, err.Error(), f, l-2),
-				MsgType: "warning",
-			}
+			logger.Send("warning", fmt.Sprintf("'event tags №%s add, %s' %s:%d", eventId, err.Error(), f, l-2))
 
 			continue
 		}
 
 		resData := decodeResponseMIspMessage(b)
 		resultMsg := fmt.Sprintf("tag: '%s' %s '%s' %s errors:'%s'", v, resData.name, resData.message, resData.success, resData.errors)
-		logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("event tags №%s the result of executing the POST query - '%s'", eventId, resultMsg),
-			MsgType: "warning",
-		}
+		logger.Send("warning", fmt.Sprintf("event tags №%s the result of executing the POST query - '%s'", eventId, resultMsg))
 
 		if res.StatusCode != http.StatusOK {
 			_, f, l, _ := runtime.Caller(0)
-			logging <- datamodels.MessageLogging{
-				MsgData: fmt.Sprintf("'event tags №%s add, %s' %s:%d", eventId, res.Status, f, l-1),
-				MsgType: "warning",
-			}
+			logger.Send("warning", fmt.Sprintf("'event tags №%s add, %s' %s:%d", eventId, res.Status, f, l-1))
 		}
 	}
 

@@ -10,7 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/av-belyakov/placeholder_misp/cachestorage"
+	"github.com/av-belyakov/placeholder_misp/internal/cachestorage"
 	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
 )
 

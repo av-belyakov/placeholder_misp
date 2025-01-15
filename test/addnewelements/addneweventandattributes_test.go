@@ -15,6 +15,7 @@ import (
 	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
 	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
+	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 	"github.com/av-belyakov/placeholder_misp/memorytemporarystorage"
 	rules "github.com/av-belyakov/placeholder_misp/rulesinteraction"
@@ -22,7 +23,7 @@ import (
 
 var _ = Describe("Addneweventandattributes", Ordered, func() {
 	var (
-		logging                        chan datamodels.MessageLogging
+		logging                        *logginghandler.LoggingChan
 		counting                       chan datamodels.DataCounterSettings
 		confApp                        confighandler.ConfigApp
 		listRules                      *rules.ListRule
@@ -57,7 +58,7 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 	}
 
 	BeforeAll(func() {
-		logging = make(chan datamodels.MessageLogging)
+		logging = logginghandler.New()
 		counting = make(chan datamodels.DataCounterSettings)
 
 		// NATS
@@ -76,7 +77,7 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 			fmt.Println("___ Logging START")
 			defer fmt.Println("___ Logging STOP")
 
-			for log := range logging {
+			for log := range logging.GetChan() {
 				fmt.Println("----", log, "----")
 			}
 		}()

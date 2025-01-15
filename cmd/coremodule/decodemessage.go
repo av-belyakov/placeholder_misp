@@ -6,24 +6,24 @@ import (
 	"reflect"
 	"runtime"
 
+	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
 	"github.com/av-belyakov/placeholder_misp/memorytemporarystorage"
 )
 
 type HandlerJsonMessageSettings struct {
 	StorageApp *memorytemporarystorage.CommonStorageTemporary
-	Logging    chan<- datamodels.MessageLogging
+	Logger     commoninterfaces.Logger
 	Counting   chan<- datamodels.DataCounterSettings
 }
 
 func NewHandlerJsonMessage(
 	storageApp *memorytemporarystorage.CommonStorageTemporary,
-	logging chan<- datamodels.MessageLogging,
+	logger commoninterfaces.Logger,
 	counting chan<- datamodels.DataCounterSettings) *HandlerJsonMessageSettings {
-
 	return &HandlerJsonMessageSettings{
 		StorageApp: storageApp,
-		Logging:    logging,
+		Logger:     logger,
 		Counting:   counting,
 	}
 }
@@ -33,14 +33,11 @@ func (s *HandlerJsonMessageSettings) HandlerJsonMessage(b []byte, taskId string)
 
 	go func() {
 		//для карт
-		_, f, l, _ := runtime.Caller(0)
 		listMap := map[string]interface{}{}
 		if err := json.Unmarshal(b, &listMap); err == nil {
+			_, f, l, _ := runtime.Caller(0)
 			if len(listMap) == 0 {
-				s.Logging <- datamodels.MessageLogging{
-					MsgData: fmt.Sprintf("'error decoding the json message, it may be empty' %s:%d", f, l+2),
-					MsgType: "error",
-				}
+				s.Logger.Send("error", fmt.Sprintf("'error decoding the json message, it may be empty' %s:%d", f, l-1))
 
 				return
 			}
@@ -49,22 +46,16 @@ func (s *HandlerJsonMessageSettings) HandlerJsonMessage(b []byte, taskId string)
 			s.StorageApp.SetProcessedDataHiveFormatMessage(taskId, nlt)
 		} else {
 			// для срезов
-			_, f, l, _ = runtime.Caller(0)
 			listSlice := []interface{}{}
 			if err = json.Unmarshal(b, &listSlice); err != nil {
-				s.Logging <- datamodels.MessageLogging{
-					MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l+2),
-					MsgType: "error",
-				}
+				_, f, l, _ := runtime.Caller(0)
+				s.Logger.Send("error", fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-1))
 
 				return
 			}
 
 			if len(listSlice) == 0 {
-				s.Logging <- datamodels.MessageLogging{
-					MsgData: fmt.Sprintf("'error decoding the json message, it may be empty' %s:%d", f, l+2),
-					MsgType: "error",
-				}
+				s.Logger.Send("error", fmt.Sprintf("'error decoding the json message, it may be empty'"))
 
 				return
 			}
@@ -81,10 +72,7 @@ func (s *HandlerJsonMessageSettings) HandlerJsonMessage(b []byte, taskId string)
 		// ***********************************
 		// Это логирование только для теста!!!
 		// ***********************************
-		s.Logging <- datamodels.MessageLogging{
-			MsgData: "TEST_INFO func 'HandlerJsonMessage', handling json message",
-			MsgType: "testing",
-		}
+		s.Logger.Send("testing", "TEST_INFO func 'HandlerJsonMessage', handling json message")
 		//
 		//
 

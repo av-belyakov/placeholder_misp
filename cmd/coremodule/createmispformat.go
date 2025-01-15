@@ -6,8 +6,8 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/av-belyakov/placeholder_misp/cmd/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
+	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
 	rules "github.com/av-belyakov/placeholder_misp/rulesinteraction"
 )
@@ -15,9 +15,9 @@ import (
 func NewMispFormat(
 	chanOutputDecodeJson <-chan ChanInputCreateMispFormat,
 	taskId string,
-	mispModule commoninterfaces.ModuleMispHandler,
+	mispModule mispapi.ModuleMispHandler,
 	listRule *rules.ListRule,
-	logging chan<- datamodels.MessageLogging,
+	logger commoninterfaces.Logger,
 	counting chan<- datamodels.DataCounterSettings) {
 
 	eventsMisp := datamodels.NewEventMisp()
@@ -113,11 +113,7 @@ func NewMispFormat(
 		newValue, _, err := listRule.ReplacementRuleHandler(tmf.ValueType, tmf.FieldBranch, tmf.Value)
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
-
-			logging <- datamodels.MessageLogging{
-				MsgData: fmt.Sprintf("'search value \"%s\" from rule of section \"REPLACE\" is not fulfilled' %s:%d", tmf.Value, f, l-1),
-				MsgType: "warning",
-			}
+			logger.Send("warning", fmt.Sprintf("'search value \"%s\" from rule of section \"REPLACE\" is not fulfilled' %s:%d", tmf.Value, f, l-2))
 		}
 		//обработка правил PASS (пропуск)
 		listRule.PassRuleHandler(tmf.FieldBranch, newValue)
@@ -218,7 +214,7 @@ func NewMispFormat(
 	}
 
 	//удаляем те объекты Attributes которые соответствуют правилам EXCLUDE
-	delElementAttributes(exclusionRules, listAttributesMisp, logging)
+	delElementAttributes(exclusionRules, listAttributesMisp, logger)
 
 	//выполняет очистку значения StatementExpression что равно отсутствию совпадений в правилах Pass
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -232,18 +228,11 @@ func NewMispFormat(
 		// ***********************************
 		// Это логирование только для теста!!!
 		// ***********************************
-		logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("TEST_INFO func 'NewMispFormat', case with id '%d' does not comply with the rules", int(caseId)),
-			MsgType: "testing",
-		}
+		logger.Send("testing", fmt.Sprintf("TEST_INFO func 'NewMispFormat', case with id '%d' does not comply with the rules", int(caseId)))
 		//
 		//
 
-		_, f, l, _ := runtime.Caller(0)
-		logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("'the message with case id %d was not sent to MISP because it does not comply with the rules' %s:%d", int(caseId), f, l-1),
-			MsgType: "warning",
-		}
+		logger.Send("warning", fmt.Sprintf("'the message with case id %d was not sent to MISP because it does not comply with the rules'", int(caseId)))
 	} else {
 		//добавляем case id в поле Info
 		eventsMisp.Info += fmt.Sprintf(" :::TheHive case id '%d':::", int(caseId))
@@ -262,10 +251,7 @@ func NewMispFormat(
 		// ***********************************
 		// Это логирование только для теста!!!
 		// ***********************************
-		logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("TEST_INFO func 'NewMispFormat', case with id '%d' equal rules, send data to MISP module", int(caseId)),
-			MsgType: "testing",
-		}
+		logger.Send("testing", fmt.Sprintf("TEST_INFO func 'NewMispFormat', case with id '%d' equal rules, send data to MISP module", int(caseId)))
 		//
 		//
 
@@ -300,8 +286,5 @@ func NewMispFormat(
 
 	// ТОЛЬКО ДЛЯ ТЕСТОВ, что бы завершить гроутину вывода информации и логирования
 	//при выполнения тестирования
-	logging <- datamodels.MessageLogging{
-		MsgData: "",
-		MsgType: "STOP TEST",
-	}
+	logger.Send("STOP TEST", "")
 }

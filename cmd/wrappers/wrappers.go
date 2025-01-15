@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/av-belyakov/placeholder_misp/cmd/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	zabbixapicommunicator "github.com/av-belyakov/zabbixapicommunicator/cmd"
 )
 

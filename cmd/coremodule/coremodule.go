@@ -13,10 +13,10 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/av-belyakov/placeholder_misp/cmd/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
 	"github.com/av-belyakov/placeholder_misp/cmd/natsapi"
 	"github.com/av-belyakov/placeholder_misp/cmd/redisapi"
+	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 	"github.com/av-belyakov/placeholder_misp/memorytemporarystorage"
@@ -25,40 +25,37 @@ import (
 
 type CoreHandlerSettings struct {
 	storageApp *memorytemporarystorage.CommonStorageTemporary
-	logging    chan<- datamodels.MessageLogging
+	logger     commoninterfaces.Logger
 	counting   chan<- datamodels.DataCounterSettings
 }
 
 func NewCoreHandler(
 	storage *memorytemporarystorage.CommonStorageTemporary,
-	log chan<- datamodels.MessageLogging,
+	logger commoninterfaces.Logger,
 	count chan<- datamodels.DataCounterSettings) *CoreHandlerSettings {
 	return &CoreHandlerSettings{
 		storageApp: storage,
-		logging:    log,
+		logger:     logger,
 		counting:   count,
 	}
 }
 
 func (settings *CoreHandlerSettings) CoreHandler(
 	ctx context.Context,
-	natsModule commoninterfaces.ModuleNatsHandler,
-	mispModule commoninterfaces.ModuleMispHandler,
+	natsModule natsapi.ModuleNatsHandler,
+	mispModule mispapi.ModuleMispHandler,
 	redisModule *redisapi.ModuleRedis,
 	listRule *rules.ListRule) error {
 
 	chanNatsReception := natsModule.GetDataReceptionChannel()
 	chanMispReception := mispModule.GetDataReceptionChannel()
 	chanRedisReception := redisModule.GetDataReceptionChannel()
-	hjm := NewHandlerJsonMessage(settings.storageApp, settings.logging, settings.counting)
+	hjm := NewHandlerJsonMessage(settings.storageApp, settings.logger, settings.counting)
 
 	for {
 		select {
 		case <-ctx.Done():
-			settings.logging <- datamodels.MessageLogging{
-				MsgData: "TEST_INFO func 'CoreHandler', reseived ctx.Done()!!!!",
-				MsgType: "testing",
-			}
+			settings.logger.Send("testing", "TEST_INFO func 'CoreHandler', reseived ctx.Done()!!!!")
 
 			return ctx.Err()
 
@@ -66,10 +63,7 @@ func (settings *CoreHandlerSettings) CoreHandler(
 			// ***********************************
 			// Это логирование только для теста!!!
 			// ***********************************
-			settings.logging <- datamodels.MessageLogging{
-				MsgData: "TEST_INFO func 'CoreHandler', reseived new object",
-				MsgType: "testing",
-			}
+			settings.logger.Send("testing", "TEST_INFO func 'CoreHandler', reseived new object")
 			//
 			//
 
@@ -90,19 +84,13 @@ func (settings *CoreHandlerSettings) CoreHandler(
 					// ***********************************
 					// Это логирование только для теста!!!
 					// ***********************************
-					settings.logging <- datamodels.MessageLogging{
-						MsgData: "TEST_INFO func 'CoreHandler', reseived new data",
-						MsgType: "testing",
-					}
+					settings.logger.Send("testing", "TEST_INFO func 'CoreHandler', reseived new data")
 					//
 					//
 				}
 
 				if err == nil {
-					settings.logging <- datamodels.MessageLogging{
-						MsgData: fmt.Sprintf("\t---------------\n\tEVENTS:\n%s\n", str),
-						MsgType: "events",
-					}
+					settings.logger.Send("events", fmt.Sprintf("\t---------------\n\tEVENTS:\n%s\n", str))
 				}
 			}()
 
@@ -110,7 +98,7 @@ func (settings *CoreHandlerSettings) CoreHandler(
 			chanOutputDecodeJson := hjm.HandlerJsonMessage(data.Data, data.MsgId)
 
 			//формирование итоговых документов в формате MISP
-			go NewMispFormat(chanOutputDecodeJson, data.MsgId, mispModule, listRule, settings.logging, settings.counting)
+			go NewMispFormat(chanOutputDecodeJson, data.MsgId, mispModule, listRule, settings.logger, settings.counting)
 
 		case data := <-chanMispReception:
 			switch data.Command {
@@ -120,10 +108,7 @@ func (settings *CoreHandlerSettings) CoreHandler(
 				// ***********************************
 				// Это логирование только для теста!!!
 				// ***********************************
-				settings.logging <- datamodels.MessageLogging{
-					MsgData: "TEST_INFO func 'CoreHandler', send EventId to ----> NATS",
-					MsgType: "testing",
-				}
+				settings.logger.Send("testing", "TEST_INFO func 'CoreHandler', send EventId to ----> NATS")
 				//
 				//
 
@@ -151,10 +136,7 @@ func (settings *CoreHandlerSettings) CoreHandler(
 				eventId, ok := data.Result.(string)
 				if !ok {
 					_, f, l, _ := runtime.Caller(0)
-					settings.logging <- datamodels.MessageLogging{
-						MsgData: fmt.Sprintf("'it is not possible to convert a value to a string' %s:%d", f, l-1),
-						MsgType: "error",
-					}
+					settings.logger.Send("error", fmt.Sprintf("'it is not possible to convert a value to a string' %s:%d", f, l-2))
 
 					break
 				}

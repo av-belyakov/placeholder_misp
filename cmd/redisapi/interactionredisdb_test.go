@@ -14,7 +14,7 @@ import (
 	"github.com/av-belyakov/placeholder_misp/cmd/redisapi"
 	"github.com/av-belyakov/placeholder_misp/constants"
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
-	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
+	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 	"github.com/av-belyakov/placeholder_misp/memorytemporarystorage"
 )
@@ -55,7 +55,7 @@ var _ = Describe("Interactionredisdb", Ordered, func() {
 		ca, _ := confighandler.New(constants.Root_Dir, constants.Conf_Dir)
 
 		// канал для логирования
-		logging := make(chan datamodels.MessageLogging)
+		logging := logginghandler.New()
 
 		exampleByte, errReadFile = readFileJson("testing/test_json", "example_caseId_33705_1.json")
 
@@ -66,7 +66,7 @@ var _ = Describe("Interactionredisdb", Ordered, func() {
 		module = redisapi.HandlerRedis(ctxRedis, ca.AppConfigRedis, storageApp, logging)
 
 		go func() {
-			for log := range logging {
+			for log := range logging.GetChan() {
 				fmt.Println("LOGGING: ", log)
 			}
 		}()

@@ -10,7 +10,7 @@ import (
 
 	redis "github.com/redis/go-redis/v9"
 
-	"github.com/av-belyakov/placeholder_misp/cmd/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
 	"github.com/av-belyakov/placeholder_misp/memorytemporarystorage"
 )

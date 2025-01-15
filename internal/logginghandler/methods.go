@@ -1,13 +1,11 @@
 package logginghandler
 
 import (
-	"github.com/av-belyakov/placeholder_misp/cmd/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 )
 
 func New() *LoggingChan {
-	return &LoggingChan{
-		logChan: make(chan commoninterfaces.Messager),
-	}
+	return &LoggingChan{logChan: make(chan commoninterfaces.Messager)}
 }
 
 func (l *LoggingChan) GetChan() <-chan commoninterfaces.Messager {

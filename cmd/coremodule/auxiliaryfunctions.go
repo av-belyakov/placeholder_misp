@@ -3,18 +3,16 @@ package coremodule
 import (
 	"fmt"
 
+	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
 	rules "github.com/av-belyakov/placeholder_misp/rulesinteraction"
 )
 
 // удаляет элемент из списка атрибутов
-func delElementAttributes(er *ExclusionRules, la *datamodels.ListAttributesMispFormat, logging chan<- datamodels.MessageLogging) {
+func delElementAttributes(er *ExclusionRules, la *datamodels.ListAttributesMispFormat, logger commoninterfaces.Logger) {
 	for _, v := range er.SearchObjectName("observables") {
 		if attr, ok := la.DelElementList(v.SequenceNumber); ok {
-			logging <- datamodels.MessageLogging{
-				MsgData: fmt.Sprintf("'an attribute with a value of '%s' has been removed'", attr.Value),
-				MsgType: "warning",
-			}
+			logger.Send("warning", fmt.Sprintf("'an attribute with a value of '%s' has been removed'", attr.Value))
 		}
 	}
 }

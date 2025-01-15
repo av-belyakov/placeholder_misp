@@ -2,6 +2,12 @@ package mispapi
 
 import "net/http"
 
+type ModuleMispHandler interface {
+	GetDataReceptionChannel() <-chan OutputSetting
+	SendingDataOutput(OutputSetting)
+	SendingDataInput(InputSettings)
+}
+
 type ConnectMISPHandler interface {
 	NetworkSender
 	SetterAuthData

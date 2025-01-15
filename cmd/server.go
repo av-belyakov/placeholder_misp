@@ -109,8 +109,6 @@ func server(ctx context.Context) {
 	defer close(counting)
 	go counterHandler(channelZabbix, storageApp, simpleLogger, counting)
 
-	// логирование данных
-
 	//******************************************************************
 	//********** инициализация обработчика логирования данных **********
 	logging := logginghandler.New()

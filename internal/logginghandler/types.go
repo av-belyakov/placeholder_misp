@@ -1,6 +1,6 @@
 package logginghandler
 
-import "github.com/av-belyakov/placeholder_misp/cmd/commoninterfaces"
+import "github.com/av-belyakov/placeholder_misp/commoninterfaces"
 
 type LoggingChan struct {
 	logChan chan commoninterfaces.Messager

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/av-belyakov/placeholder_misp/cmd/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 )
 
 // LoggingHandler обработчик и распределитель логов

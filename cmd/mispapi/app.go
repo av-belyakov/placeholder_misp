@@ -1,4 +1,4 @@
-// Пакет mispinteractions реализует методы для взаимодействия с API MISP
+// Пакет mispapi реализует методы для взаимодействия с API MISP
 package mispapi
 
 import (
@@ -8,15 +8,15 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
-	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
 )
 
 type RespMISP struct {
 	Event map[string]interface{} `json:"event"`
 }
 
-// NewClientMISP возвращает структуру типа ClientMISP с предустановленными значениями
+// NewClientMISP конструктор API MISP
 func NewClientMISP(h, a string, v bool) (*ClientMISP, error) {
 	urlBase, err := url.Parse("http://" + h)
 	if err != nil {
@@ -41,17 +41,10 @@ func NewStorageAuthorizationDataMISP() *StorageAuthorizationData {
 
 // NewHandlerAuthorizationMISP создает новый обработчик соединений с MISP
 func NewHandlerAuthorizationMISP(c ConnectMISPHandler, s *StorageAuthorizationData) *AuthorizationDataMISP {
-	return &AuthorizationDataMISP{
-		c,
-		s,
-	}
+	return &AuthorizationDataMISP{c, s}
 }
 
-func HandlerMISP(
-	conf confighandler.AppConfigMISP,
-	organistions []confighandler.Organization,
-	logging chan<- datamodels.MessageLogging) (*ModuleMISP, error) {
-
+func HandlerMISP(conf confighandler.AppConfigMISP, organistions []confighandler.Organization, logger commoninterfaces.Logger) (*ModuleMISP, error) {
 	mmisp := ModuleMISP{
 		ChanInput:  make(chan InputSettings),
 		ChanOutput: make(chan OutputSetting),
@@ -60,33 +53,21 @@ func HandlerMISP(
 	client, err := NewClientMISP(conf.Host, conf.Auth, false)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
-		logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
-			MsgType: "error",
-		}
+		logger.Send("error", fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2))
 	}
 
 	connHandler := NewHandlerAuthorizationMISP(client, NewStorageAuthorizationDataMISP())
 	err = connHandler.GetListAllOrganisation(organistions)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
-		logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
-			MsgType: "error",
-		}
+		logger.Send("error", fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2))
 	}
 
 	if countUser, err := connHandler.GetListAllUsers(); err != nil {
 		_, f, l, _ := runtime.Caller(0)
-		logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
-			MsgType: "error",
-		}
+		logger.Send("error", fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2))
 	} else {
-		logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("at the start of the application, all user information was downloaded %d", countUser),
-			MsgType: "info",
-		}
+		logger.Send("info", fmt.Sprintf("at the start of the application, all user information was downloaded %d", countUser))
 	}
 
 	//здесь обрабатываем данные из входного канала модуля MISP
@@ -97,10 +78,7 @@ func HandlerMISP(
 			// ***********************************
 			// Это логирование только для теста!!!
 			// ***********************************
-			logging <- datamodels.MessageLogging{
-				MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', reseived command '%s', case Id '%d'", msg.Command, int(msg.CaseId)),
-				MsgType: "testing",
-			}
+			logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerMISP', reseived command '%s', case Id '%d'", msg.Command, int(msg.CaseId)))
 			//
 			//
 
@@ -111,34 +89,24 @@ func HandlerMISP(
 						authKey = us.AuthKey
 					} else {
 						_, f, l, _ := runtime.Caller(0)
-						logging <- datamodels.MessageLogging{
-							MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-3),
-							MsgType: "error",
-						}
+						logger.Send("error", fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-3))
 
 						if us, err = connHandler.CreateNewUser(data.UserEmail, data.CaseSource); err != nil {
 							_, f, l, _ = runtime.Caller(0)
-							logging <- datamodels.MessageLogging{
-								MsgData: fmt.Sprintf("'%s, case id %d' %s:%d", err.Error(), int(data.CaseId), f, l-3),
-								MsgType: "error",
-							}
+							logger.Send("error", fmt.Sprintf("'%s, case id %d' %s:%d", err.Error(), int(data.CaseId), f, l-3))
 						} else {
 							authKey = us.AuthKey
-
-							logging <- datamodels.MessageLogging{
-								MsgData: fmt.Sprintf("a new user %s has been successfully created", data.UserEmail),
-								MsgType: "info",
-							}
+							logger.Send("info", fmt.Sprintf("a new user %s has been successfully created", data.UserEmail))
 						}
 					}
 				}
 
 				switch data.Command {
 				case "add event":
-					addEvent(conf.Host, authKey, conf.Auth, data, &mmisp, logging)
+					addEvent(conf.Host, authKey, conf.Auth, data, &mmisp, logger)
 
 				case "del event by id":
-					delEventById(conf, data.EventId, logging)
+					delEventById(conf, data.EventId, logger)
 				}
 			}(msg)
 		}
@@ -153,15 +121,12 @@ func addEvent(
 	masterKey string,
 	data InputSettings,
 	mmisp *ModuleMISP,
-	logging chan<- datamodels.MessageLogging) {
+	logger commoninterfaces.Logger) {
 
 	// ***********************************
 	// Это логирование только для теста!!!
 	// ***********************************
-	logging <- datamodels.MessageLogging{
-		MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', send EVENTS to ----> MISP	USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId),
-		MsgType: "testing",
-	}
+	logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerMISP', send EVENTS to ----> MISP	USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId))
 	//
 	//
 
@@ -169,10 +134,7 @@ func addEvent(
 	_, resBodyByte, err := sendEventsMispFormat(host, authKey, data)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
-		logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
-			MsgType: "error",
-		}
+		logger.Send("error", fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2))
 
 		return
 	}
@@ -180,10 +142,7 @@ func addEvent(
 	resMisp := RespMISP{}
 	if err := json.Unmarshal(resBodyByte, &resMisp); err != nil {
 		_, f, l, _ := runtime.Caller(0)
-		logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
-			MsgType: "error",
-		}
+		logger.Send("error", fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2))
 
 		return
 	}
@@ -201,10 +160,7 @@ func addEvent(
 
 	if eventId == "" {
 		_, f, l, _ := runtime.Caller(0)
-		logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("'the formation of events of the 'Attributes' type was not performed because the EventID is empty' %s:%d", f, l-1),
-			MsgType: "error",
-		}
+		logger.Send("error", fmt.Sprintf("'the formation of events of the 'Attributes' type was not performed because the EventID is empty' %s:%d", f, l-1))
 
 		return
 	}
@@ -212,29 +168,20 @@ func addEvent(
 	// ***********************************
 	// Это логирование только для теста!!!
 	// ***********************************
-	logging <- datamodels.MessageLogging{
-		MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', send EVENTS REPORTS to ----> MISP	USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId),
-		MsgType: "testing",
-	}
+	logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerMISP', send EVENTS REPORTS to ----> MISP	USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId))
 	//
 	//
 
 	// добавляем event_reports
 	if err := sendEventReportsMispFormat(host, authKey, eventId, data.CaseId); err != nil {
 		_, f, l, _ := runtime.Caller(0)
-		logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
-			MsgType: "error",
-		}
+		logger.Send("error", fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2))
 	}
 
 	// ***********************************
 	// Это логирование только для теста!!!
 	// ***********************************
-	logging <- datamodels.MessageLogging{
-		MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', send data to ----> RedisDB USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId),
-		MsgType: "testing",
-	}
+	logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerMISP', send data to ----> RedisDB USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId))
 	//
 	//
 
@@ -248,28 +195,22 @@ func addEvent(
 	// ***********************************
 	// Это логирование только для теста!!!
 	// ***********************************
-	logging <- datamodels.MessageLogging{
-		MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', send ATTRIBYTES to ----> MISP	USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId),
-		MsgType: "testing",
-	}
+	logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerMISP', send ATTRIBYTES to ----> MISP	USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId))
 	//
 	//
 
 	//добавляем атрибуты
-	_, _ = sendAttribytesMispFormat(host, authKey, eventId, data, logging)
+	_, _ = sendAttribytesMispFormat(host, authKey, eventId, data, logger)
 
 	// ***********************************
 	// Это логирование только для теста!!!
 	// ***********************************
-	logging <- datamodels.MessageLogging{
-		MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', send OBJECTS to ----> MISP	USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId),
-		MsgType: "testing",
-	}
+	logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerMISP', send OBJECTS to ----> MISP	USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId))
 	//
 	//
 
 	// добавляем объекты
-	_, _ = sendObjectsMispFormat(host, authKey, eventId, data, logging)
+	_, _ = sendObjectsMispFormat(host, authKey, eventId, data, logger)
 
 	//берем небольшой таймаут
 	time.Sleep(4 * time.Second)
@@ -277,29 +218,20 @@ func addEvent(
 	// ***********************************
 	// Это логирование только для теста!!!
 	// ***********************************
-	logging <- datamodels.MessageLogging{
-		MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', send EVENT_TAGS to ----> MISP	USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId),
-		MsgType: "testing",
-	}
+	logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerMISP', send EVENT_TAGS to ----> MISP	USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId))
 	//
 	//
 
 	// добавляем event_tags
-	if err := sendEventTagsMispFormat(host, masterKey, eventId, data, logging); err != nil {
+	if err := sendEventTagsMispFormat(host, masterKey, eventId, data, logger); err != nil {
 		_, f, l, _ := runtime.Caller(0)
-		logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
-			MsgType: "error",
-		}
+		logger.Send("error", fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2))
 	}
 
 	// ***********************************
 	// Это логирование только для теста!!!
 	// ***********************************
-	logging <- datamodels.MessageLogging{
-		MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', send PUBLISH to ----> MISP	USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId),
-		MsgType: "testing",
-	}
+	logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerMISP', send PUBLISH to ----> MISP	USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId))
 	//
 	//
 
@@ -310,25 +242,16 @@ func addEvent(
 	resMsg, err := sendRequestPublishEvent(host, masterKey, eventId)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
-		logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
-			MsgType: "error",
-		}
+		logger.Send("error", fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2))
 	}
 	if resMsg != "" {
-		logging <- datamodels.MessageLogging{
-			MsgData: resMsg,
-			MsgType: "warning",
-		}
+		logger.Send("warning", resMsg)
 	}
 
 	// ***********************************
 	// Это логирование только для теста!!!
 	// ***********************************
-	logging <- datamodels.MessageLogging{
-		MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', send EventId to ----> CORE	USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId),
-		MsgType: "testing",
-	}
+	logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerMISP', send EventId to ----> CORE	USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId))
 	//
 	//
 
@@ -368,18 +291,12 @@ func addEvent(
 	})
 }
 
-func delEventById(
-	conf confighandler.AppConfigMISP,
-	eventId string,
-	logging chan<- datamodels.MessageLogging) {
+func delEventById(conf confighandler.AppConfigMISP, eventId string, logger commoninterfaces.Logger) {
 
 	// ***********************************
 	// Это логирование только для теста!!!
 	// ***********************************
-	logging <- datamodels.MessageLogging{
-		MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', удаление события типа event, где event id: %s", eventId),
-		MsgType: "testing",
-	}
+	logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerMISP', удаление события типа event, где event id: %s", eventId))
 	//
 	//
 
@@ -387,29 +304,20 @@ func delEventById(
 	_, err := delEventsMispFormat(conf.Host, conf.Auth, eventId)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
-		logging <- datamodels.MessageLogging{
-			MsgData: fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2),
-			MsgType: "error",
-		}
+		logger.Send("error", fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2))
 	}
 
 	// ***********************************
 	// Это логирование только для теста!!!
 	// ***********************************
-	logging <- datamodels.MessageLogging{
-		MsgData: fmt.Sprintf("TEST_INFO func 'HandlerMISP', должно было быть успешно выполненно удаление события event id: %s", eventId),
-		MsgType: "testing",
-	}
+	logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerMISP', должно было быть успешно выполненно удаление события event id: %s", eventId))
 	//
 	//
 
 	// ***********************************
 	// Это логирование только для теста!!!
 	// ***********************************
-	logging <- datamodels.MessageLogging{
-		MsgData: "TEST_INFO STOP",
-		MsgType: "testing",
-	}
+	logger.Send("testing", "TEST_INFO STOP")
 	//
 	//
 
