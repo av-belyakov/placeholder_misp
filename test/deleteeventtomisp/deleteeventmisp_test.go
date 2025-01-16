@@ -2,28 +2,36 @@ package testdeleteeventtomisp_test
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
+	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/constants"
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
-	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
-	"github.com/av-belyakov/placeholder_misp/mispinteractions"
+	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
+	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
 var _ = Describe("Deleteeventmisp", Ordered, func() {
 	var (
 		confApp *confighandler.ConfigApp
 		//redismodule               *redisinteractions.ModuleRedis
-		mispmodule                *mispinteractions.ModuleMISP
+		mispmodule                *mispapi.ModuleMISP
+		logging                   commoninterfaces.Logger
 		errConfApp, errMispModule error
 	)
 
-	logging := make(chan datamodels.MessageLogging)
-
 	BeforeAll(func() {
-		confApp, errConfApp = confighandler.NewConfig("placeholder_misp")
+		rootPath, err := supportingfunctions.GetRootPath(constants.Root_Dir)
+		if err != nil {
+			log.Fatalf("error, it is impossible to form root path (%s)", err.Error())
+		}
+
+		confApp, errConfApp = confighandler.New(rootPath, constants.Conf_Dir)
 		confApp.AppConfigRedis = confighandler.AppConfigRedis{
 			Host: "192.168.9.208",
 			Port: 16379,
@@ -33,8 +41,10 @@ var _ = Describe("Deleteeventmisp", Ordered, func() {
 			Auth: "TvHkjH8jVQEIdvAxjxnL4H6wDoKyV7jobDjndvAo",
 		}
 
+		logging = logginghandler.New()
+
 		//redismodule = redisinteractions.HandlerRedis(context.Background(), confApp.AppConfigRedis, storageApp, logging)
-		mispmodule, errMispModule = mispinteractions.HandlerMISP(confApp.AppConfigMISP, confApp.Organizations, logging)
+		mispmodule, errMispModule = mispapi.HandlerMISP(confApp.AppConfigMISP, confApp.Organizations, logging)
 	})
 
 	Context("Тест 1. Проверка успешной инициализации модулей", func() {
@@ -52,8 +62,8 @@ var _ = Describe("Deleteeventmisp", Ordered, func() {
 				fmt.Println("___ Logging START")
 				defer fmt.Println("___ Logging STOP")
 
-				for log := range logging {
-					if log.MsgData == "TEST_INFO STOP" {
+				for log := range logging.GetChan() {
+					if log.GetMessage() == "TEST_INFO STOP" {
 						chanDone <- struct{}{}
 
 						return
@@ -63,7 +73,7 @@ var _ = Describe("Deleteeventmisp", Ordered, func() {
 				}
 			}()
 
-			mispmodule.SendingDataInput(mispinteractions.InputSettings{
+			mispmodule.SendingDataInput(mispapi.InputSettings{
 				Command: "del event by id",
 				EventId: "7418",
 			})

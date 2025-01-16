@@ -13,19 +13,21 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/av-belyakov/placeholder_misp/coremodule"
+	"github.com/av-belyakov/placeholder_misp/cmd/coremodule"
+	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
+	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
+	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 	"github.com/av-belyakov/placeholder_misp/memorytemporarystorage"
-	"github.com/av-belyakov/placeholder_misp/mispinteractions"
 	rules "github.com/av-belyakov/placeholder_misp/rulesinteraction"
 )
 
 var _ = Describe("Processingrules", Ordered, func() {
 	var (
 		lr          *rules.ListRule
-		logging     chan datamodels.MessageLogging
-		moduleMisp  *mispinteractions.ModuleMISP
+		logging     commoninterfaces.Logger
+		moduleMisp  *mispapi.ModuleMISP
 		exampleByte []byte
 		counting    chan datamodels.DataCounterSettings
 		errReadFile, errGetRule/*, errHMisp*/ error
@@ -56,10 +58,10 @@ var _ = Describe("Processingrules", Ordered, func() {
 	}
 
 	BeforeAll(func() {
-		//канал для логирования
-		logging = make(chan datamodels.MessageLogging)
 		//канал для подсчета обработанных кейсов
 		counting = make(chan datamodels.DataCounterSettings)
+
+		logging = logginghandler.New()
 
 		//читаем тестовый файл
 		exampleByte, errReadFile = readFileJson("testing/test_json", "example_caseId_33705.json")
@@ -68,9 +70,9 @@ var _ = Describe("Processingrules", Ordered, func() {
 		lr, _, errGetRule = rules.NewListRule("placeholder_misp", "rules", "mispmsgrule.yaml")
 
 		//эмулируем результат инициализации модуля MISP
-		moduleMisp = &mispinteractions.ModuleMISP{
-			ChanInput:  make(chan mispinteractions.InputSettings),
-			ChanOutput: make(chan mispinteractions.OutputSetting),
+		moduleMisp = &mispapi.ModuleMISP{
+			ChanInput:  make(chan mispapi.InputSettings),
+			ChanOutput: make(chan mispapi.OutputSetting),
 		}
 	})
 
@@ -176,12 +178,12 @@ var _ = Describe("Processingrules", Ordered, func() {
 
 				for {
 					select {
-					case log := <-logging:
-						if log.MsgType == "warning" {
-							fmt.Println("___ Log = ", log.MsgData, " ____")
+					case log := <-logging.GetChan():
+						if log.GetType() == "warning" {
+							fmt.Println("___ Log = ", log.GetMessage(), " ____")
 						}
 
-						if log.MsgType == "STOP TEST" {
+						if log.GetType() == "STOP TEST" {
 							fmt.Println("-== STOP function SHOW Logs and Counts ==-")
 
 							done <- struct{}{}

@@ -10,9 +10,11 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	"github.com/av-belyakov/placeholder_misp/cmd/coremodule"
 	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
-	"github.com/av-belyakov/placeholder_misp/coremodule"
+	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
+	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
 	"github.com/av-belyakov/placeholder_misp/memorytemporarystorage"
 	rules "github.com/av-belyakov/placeholder_misp/rulesinteraction"
 )
@@ -37,13 +39,14 @@ var _ = Describe("Createtypemispobjects", Ordered, func() {
 
 	BeforeAll(func() {
 		ctx, ctxCancel = context.WithCancel(context.Background())
-		logging := make(chan datamodels.MessageLogging)
 		counting := make(chan datamodels.DataCounterSettings)
 
 		moduleMisp = &mispapi.ModuleMISP{
 			ChanInput:  make(chan mispapi.InputSettings),
 			ChanOutput: make(chan mispapi.OutputSetting),
 		}
+
+		logging := logginghandler.New()
 
 		b, err := os.ReadFile(exampleFile)
 		Expect(err).ShouldNot(HaveOccurred())
@@ -67,14 +70,14 @@ var _ = Describe("Createtypemispobjects", Ordered, func() {
 		Expect(err).ShouldNot(HaveOccurred())
 
 		//сообщения для логирования
-		go func(ctx context.Context, chl <-chan datamodels.MessageLogging) {
+		go func(ctx context.Context, logging commoninterfaces.Logger) {
 			for {
 				select {
 				case <-ctx.Done():
 					return
 
-				case msg := <-chl:
-					fmt.Printf("log type:'%s', message:'%s'\n", msg.MsgType, msg.MsgData)
+				case msg := <-logging.GetChan():
+					fmt.Printf("log type:'%s', message:'%s'\n", msg.GetType(), msg.GetMessage())
 				}
 			}
 		}(ctx, logging)

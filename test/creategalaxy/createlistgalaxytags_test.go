@@ -9,8 +9,9 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/av-belyakov/placeholder_misp/coremodule"
-	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
+	"github.com/av-belyakov/placeholder_misp/cmd/coremodule"
+	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 	rules "github.com/av-belyakov/placeholder_misp/rulesinteraction"
 )
@@ -80,7 +81,6 @@ var _ = Describe("Createlistgalaxytags", Ordered, func() {
 		exampleByte    []byte
 		errReadFile    error
 		errRules       error
-		logging        chan datamodels.MessageLogging
 		chanInput      chan ChanInputCreateMispFormat
 		chanDone       chan struct{}
 		stopped        chan bool
@@ -113,11 +113,11 @@ var _ = Describe("Createlistgalaxytags", Ordered, func() {
 	}
 
 	BeforeAll(func() {
-		logging = make(chan datamodels.MessageLogging)
 		chanInput = make(chan ChanInputCreateMispFormat)
 		chanDone = make(chan struct{})
 		stopped = make(chan bool)
 
+		logging := logginghandler.New()
 		listGalaxyTags = coremodule.NewMispGalaxyTags()
 
 		exampleByte, errReadFile = readFileJson("testing/test_json", "example_caseId_33705.json")
@@ -125,11 +125,11 @@ var _ = Describe("Createlistgalaxytags", Ordered, func() {
 		//инициализация списка правил
 		listRules, _, errRules = rules.NewListRule("placeholder_misp", "rules", "mispmsgrule.yaml")
 
-		go func(logging <-chan datamodels.MessageLogging) {
+		go func(logging commoninterfaces.Logger) {
 			for {
 				select {
-				case msg := <-logging:
-					fmt.Println("LOG MSG:", msg.MsgData)
+				case msg := <-logging.GetChan():
+					fmt.Println("LOG MSG:", msg.GetMessage())
 				case <-chanDone:
 					fmt.Println("---=== STOPED DECODE JSON OBJECT ===---")
 

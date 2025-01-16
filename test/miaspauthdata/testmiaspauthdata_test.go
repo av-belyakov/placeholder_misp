@@ -8,18 +8,18 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
-	"github.com/av-belyakov/placeholder_misp/mispinteractions"
 )
 
 // NewClientMISP возвращает структуру типа ClientMISP с предустановленными значениями
-func NewClientMISP(h, a string, v bool) (*mispinteractions.ClientMISP, error) {
+func NewClientMISP(h, a string, v bool) (*mispapi.ClientMISP, error) {
 	urlBase, err := url.Parse("http://" + h)
 	if err != nil {
-		return &mispinteractions.ClientMISP{}, err
+		return &mispapi.ClientMISP{}, err
 	}
 
-	return &mispinteractions.ClientMISP{
+	return &mispapi.ClientMISP{
 		BaseURL:  urlBase,
 		Host:     h,
 		AuthHash: a,
@@ -28,25 +28,22 @@ func NewClientMISP(h, a string, v bool) (*mispinteractions.ClientMISP, error) {
 }
 
 // NewStorageAuthorizationDataMISP создает новое хранилище с данными пользователей MISP
-func NewStorageAuthorizationDataMISP() *mispinteractions.StorageAuthorizationData {
-	return &mispinteractions.StorageAuthorizationData{
-		AuthList:         []mispinteractions.UserSettings{},
-		OrganisationList: map[string]mispinteractions.OrganisationOptions{},
+func NewStorageAuthorizationDataMISP() *mispapi.StorageAuthorizationData {
+	return &mispapi.StorageAuthorizationData{
+		AuthList:         []mispapi.UserSettings{},
+		OrganisationList: map[string]mispapi.OrganisationOptions{},
 	}
 }
 
 // NewHandlerAuthorizationMISP создает новый обработчик соединений с MISP
-func NewHandlerAuthorizationMISP(c mispinteractions.ConnectMISPHandler, s *mispinteractions.StorageAuthorizationData) *mispinteractions.AuthorizationDataMISP {
-	return &mispinteractions.AuthorizationDataMISP{
-		c,
-		s,
-	}
+func NewHandlerAuthorizationMISP(c mispapi.ConnectMISPHandler, s *mispapi.StorageAuthorizationData) *mispapi.AuthorizationDataMISP {
+	return &mispapi.AuthorizationDataMISP{c, s}
 }
 
 var _ = Describe("Testmiaspauthdata", Ordered, func() {
 	var (
 		confOrgs        []confighandler.Organization
-		handler         *mispinteractions.AuthorizationDataMISP
+		handler         *mispapi.AuthorizationDataMISP
 		errGetListOrgs  error
 		errGetListUsers error
 		countUser       int

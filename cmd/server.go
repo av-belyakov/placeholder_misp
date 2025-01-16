@@ -7,19 +7,17 @@ import (
 	"os"
 	"runtime"
 	"strings"
-	"time"
 
-	"github.com/av-belyakov/placeholder_misp/cmd/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/cmd/coremodule"
 	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
 	"github.com/av-belyakov/placeholder_misp/cmd/natsapi"
 	"github.com/av-belyakov/placeholder_misp/cmd/redisapi"
 	"github.com/av-belyakov/placeholder_misp/cmd/wrappers"
+	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/constants"
 	"github.com/av-belyakov/placeholder_misp/internal/appname"
 	"github.com/av-belyakov/placeholder_misp/internal/appversion"
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
-	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
 	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 	"github.com/av-belyakov/placeholder_misp/memorytemporarystorage"
@@ -39,8 +37,8 @@ func server(ctx context.Context) {
 		log.Fatalf("error module 'confighandler': %v", err)
 	}
 
-	// ******************************************************
-	// ********** инициализация модуля логирования **********
+	// ****************************************************************************
+	// ********************* инициализация модуля логирования *********************
 	simpleLogger, err := simplelogger.NewSimpleLogger(ctx, constants.Root_Dir, getLoggerSettings(confApp.GetListLogs()))
 	if err != nil {
 		log.Fatalf("error module 'simplelogger': %v", err)
@@ -55,28 +53,22 @@ func server(ctx context.Context) {
 
 		log.Fatalf("error module 'rulesinteraction': %v\n", err)
 	}
-	// если есть какие либо логические ошибки в файле с YAML правилами для обработки сообщений поступающих от NATS
-	if len(warnings) > 0 {
-		var warningStr string
 
-		for _, v := range warnings {
-			warningStr += fmt.Sprintln(v)
-		}
-
+	//проверяем наличие правил Pass или Passany которые являются обязательными,
+	//а также отсутсвие логических ошибок в файле с правилами
+	msgWarning, err := checkListRule(lr, warnings)
+	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
-		_ = simpleLogger.Write("warning", fmt.Sprintf("%s:%d\n%v", f, l, warningStr))
+		_ = simpleLogger.Write("error", fmt.Sprintf("%v %s:%d", err, f, l-2))
+
+		log.Fatal(err)
 	}
-	// проверяем наличие правил Pass или Passany
-	if len(lr.GetRulePass()) == 0 && !lr.GetRulePassany() {
-		msg := "there are no rules for handling messages received from NATS or all rules have failed validation"
-		_, f, l, _ := runtime.Caller(0)
-		_ = simpleLogger.Write("error", fmt.Sprintf(" '%s' %s:%d", msg, f, l-3))
-
-		log.Fatalln(msg)
+	if msgWarning != "" {
+		_ = simpleLogger.Write("warning", msgWarning)
 	}
 
-	// ******************************************************************
-	// ********** инициализация модуля взаимодействия с Zabbix **********
+	// ************************************************************************
+	// ************* инициализация модуля взаимодействия с Zabbix *************
 	channelZabbix := make(chan commoninterfaces.Messager)
 	wzis := wrappers.WrappersZabbixInteractionSettings{
 		NetworkPort: confApp.Zabbix.NetworkPort,
@@ -98,25 +90,21 @@ func server(ctx context.Context) {
 	wzis.EventTypes = eventTypes
 	wrappers.WrappersZabbixInteraction(ctx, wzis, simpleLogger, channelZabbix)
 
-	// ********************************************************************
-	// ******* инициализируем модуль временного хранения информации *******
-	storageApp := memorytemporarystorage.NewTemporaryStorage()
-	// добавляем время инициализации счетчика хранения
-	storageApp.SetStartTimeDataCounter(time.Now())
-
-	// вывод данных счетчика
-	counting := make(chan datamodels.DataCounterSettings)
-	defer close(counting)
-	go counterHandler(channelZabbix, storageApp, simpleLogger, counting)
-
-	//******************************************************************
-	//********** инициализация обработчика логирования данных **********
+	//***************************************************************************
+	//************** инициализация обработчика логирования данных ***************
 	logging := logginghandler.New()
 	go logginghandler.LoggingHandler(ctx, simpleLogger, channelZabbix, logging.GetChan())
 
-	// ******************************************************************
-	// ********* инициализация модуля для взаимодействия с NATS *********
-	// ********** (Данный модуль обязателен для взаимодействия) *********
+	// ***************************************************************************
+	// ************ инициализируем модуль временного хранения информации *********
+	storageApp := memorytemporarystorage.NewTemporaryStorage()
+
+	// вывод данных счетчика
+	counting := counterHandler(ctx, storageApp, simpleLogger, channelZabbix)
+
+	// ***************************************************************************
+	// ************** инициализация модуля для взаимодействия с NATS *************
+	// *************** (Данный модуль обязателен для взаимодействия) *************
 	natsModule, err := natsapi.NewClientNATS(confApp.AppConfigNATS, confApp.AppConfigTheHive, storageApp, logging, counting)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
@@ -125,12 +113,12 @@ func server(ctx context.Context) {
 		log.Fatal(err)
 	}
 
-	// ******************************************************************
-	// ****** инициализация модуля для взаимодействия с СУБД Redis ******
+	// ***************************************************************************
+	// *********** инициализация модуля для взаимодействия с СУБД Redis **********
 	redisModule := redisapi.HandlerRedis(ctx, *confApp.GetAppRedis(), storageApp, logging)
 
-	// ***************************************************************
-	// ******** инициалиация модуля для взаимодействия с MISP ********
+	// ***************************************************************************
+	// *************** инициалиация модуля для взаимодействия с MISP *************
 	mispModule, err := mispapi.HandlerMISP(*confApp.GetAppMISP(), confApp.GetListOrganization(), logging)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)

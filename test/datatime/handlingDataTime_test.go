@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	// "placeholder_misp"
-	"github.com/av-belyakov/placeholder_misp/coremodule"
+	"github.com/av-belyakov/placeholder_misp/cmd/coremodule"
 )
 
 var _ = Describe("Testing/Testdatatime/HandlingDataTime", func() {
