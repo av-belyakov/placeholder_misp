@@ -12,7 +12,6 @@ import (
 
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
-	"github.com/av-belyakov/placeholder_misp/memorytemporarystorage"
 )
 
 const (
@@ -23,7 +22,6 @@ const (
 func HandlerRedis(
 	ctx context.Context,
 	conf confighandler.AppConfigRedis,
-	storageApp *memorytemporarystorage.CommonStorageTemporary,
 	logger commoninterfaces.Logger) *ModuleRedis {
 	mredis := ModuleRedis{
 		chanInputRedis:  make(chan SettingsChanInputRedis),

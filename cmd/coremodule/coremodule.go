@@ -17,26 +17,20 @@ import (
 	"github.com/av-belyakov/placeholder_misp/cmd/natsapi"
 	"github.com/av-belyakov/placeholder_misp/cmd/redisapi"
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
-	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
+	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
-	"github.com/av-belyakov/placeholder_misp/memorytemporarystorage"
 	rules "github.com/av-belyakov/placeholder_misp/rulesinteraction"
 )
 
 type CoreHandlerSettings struct {
-	storageApp *memorytemporarystorage.CommonStorageTemporary
-	logger     commoninterfaces.Logger
-	counting   chan<- datamodels.DataCounterSettings
+	logger   commoninterfaces.Logger
+	counting *countermessage.CounterMessage
 }
 
-func NewCoreHandler(
-	storage *memorytemporarystorage.CommonStorageTemporary,
-	logger commoninterfaces.Logger,
-	count chan<- datamodels.DataCounterSettings) *CoreHandlerSettings {
+func NewCoreHandler(counting *countermessage.CounterMessage, logger commoninterfaces.Logger) *CoreHandlerSettings {
 	return &CoreHandlerSettings{
-		storageApp: storage,
-		logger:     logger,
-		counting:   count,
+		logger:   logger,
+		counting: counting,
 	}
 }
 
@@ -50,7 +44,7 @@ func (settings *CoreHandlerSettings) CoreHandler(
 	chanNatsReception := natsModule.GetDataReceptionChannel()
 	chanMispReception := mispModule.GetDataReceptionChannel()
 	chanRedisReception := redisModule.GetDataReceptionChannel()
-	hjm := NewHandlerJsonMessage(settings.storageApp, settings.logger, settings.counting)
+	hjm := NewHandlerJsonMessage(settings.counting, settings.logger)
 
 	for {
 		select {
@@ -98,7 +92,7 @@ func (settings *CoreHandlerSettings) CoreHandler(
 			chanOutputDecodeJson := hjm.HandlerJsonMessage(data.Data, data.MsgId)
 
 			//формирование итоговых документов в формате MISP
-			go NewMispFormat(chanOutputDecodeJson, data.MsgId, mispModule, listRule, settings.logger, settings.counting)
+			go NewMispFormat(chanOutputDecodeJson, data.MsgId, mispModule, listRule, settings.counting, settings.logger)
 
 		case data := <-chanMispReception:
 			switch data.Command {

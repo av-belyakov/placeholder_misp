@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 	"runtime"
 	"strings"
+
+	"github.com/av-belyakov/simplelogger"
 
 	"github.com/av-belyakov/placeholder_misp/cmd/coremodule"
 	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
@@ -15,14 +16,11 @@ import (
 	"github.com/av-belyakov/placeholder_misp/cmd/wrappers"
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/constants"
-	"github.com/av-belyakov/placeholder_misp/internal/appname"
-	"github.com/av-belyakov/placeholder_misp/internal/appversion"
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
+	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
 	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
-	"github.com/av-belyakov/placeholder_misp/memorytemporarystorage"
 	rules "github.com/av-belyakov/placeholder_misp/rulesinteraction"
-	"github.com/av-belyakov/simplelogger"
 )
 
 func server(ctx context.Context) {
@@ -31,7 +29,8 @@ func server(ctx context.Context) {
 		log.Fatalf("error, it is impossible to form root path (%s)", err.Error())
 	}
 
-	// инициализируем модуль чтения конфигурационного файла
+	// ****************************************************************************
+	// *********** инициализируем модуль чтения конфигурационного файла ***********
 	confApp, err := confighandler.New(rootPath, constants.Conf_Dir)
 	if err != nil {
 		log.Fatalf("error module 'confighandler': %v", err)
@@ -69,7 +68,7 @@ func server(ctx context.Context) {
 
 	// ************************************************************************
 	// ************* инициализация модуля взаимодействия с Zabbix *************
-	channelZabbix := make(chan commoninterfaces.Messager)
+	chZabbix := make(chan commoninterfaces.Messager)
 	wzis := wrappers.WrappersZabbixInteractionSettings{
 		NetworkPort: confApp.Zabbix.NetworkPort,
 		NetworkHost: confApp.Zabbix.NetworkHost,
@@ -88,24 +87,24 @@ func server(ctx context.Context) {
 		})
 	}
 	wzis.EventTypes = eventTypes
-	wrappers.WrappersZabbixInteraction(ctx, wzis, simpleLogger, channelZabbix)
+	wrappers.WrappersZabbixInteraction(ctx, wzis, simpleLogger, chZabbix)
 
 	//***************************************************************************
 	//************** инициализация обработчика логирования данных ***************
 	logging := logginghandler.New()
-	go logginghandler.LoggingHandler(ctx, simpleLogger, channelZabbix, logging.GetChan())
+	go logginghandler.LoggingHandler(ctx, simpleLogger, chZabbix, logging.GetChan())
 
 	// ***************************************************************************
-	// ************ инициализируем модуль временного хранения информации *********
-	storageApp := memorytemporarystorage.NewTemporaryStorage()
-
-	// вывод данных счетчика
-	counting := counterHandler(ctx, storageApp, simpleLogger, channelZabbix)
+	// *********** инициализируем модуль счётчика для подсчёта сообщений *********
+	counting := countermessage.New(chZabbix)
+	if err = counting.Handler(ctx); err != nil {
+		_, f, l, _ := runtime.Caller(0)
+		_ = simpleLogger.Write("error", fmt.Sprintf(" '%s' %s:%d", err, f, l-2))
+	}
 
 	// ***************************************************************************
 	// ************** инициализация модуля для взаимодействия с NATS *************
-	// *************** (Данный модуль обязателен для взаимодействия) *************
-	natsModule, err := natsapi.NewClientNATS(confApp.AppConfigNATS, confApp.AppConfigTheHive, storageApp, logging, counting)
+	natsModule, err := natsapi.NewClientNATS(confApp.AppConfigNATS, confApp.AppConfigTheHive, counting, logging)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 		_ = simpleLogger.Write("error", fmt.Sprintf(" '%s' %s:%d", err, f, l-2))
@@ -115,7 +114,7 @@ func server(ctx context.Context) {
 
 	// ***************************************************************************
 	// *********** инициализация модуля для взаимодействия с СУБД Redis **********
-	redisModule := redisapi.HandlerRedis(ctx, *confApp.GetAppRedis(), storageApp, logging)
+	redisModule := redisapi.HandlerRedis(ctx, *confApp.GetAppRedis(), logging)
 
 	// ***************************************************************************
 	// *************** инициалиация модуля для взаимодействия с MISP *************
@@ -125,24 +124,18 @@ func server(ctx context.Context) {
 		_ = simpleLogger.Write("error", fmt.Sprintf(" '%s' %s:%d", err, f, l-2))
 	}
 
-	appStatus := fmt.Sprintf("%vproduction%v", constants.Ansi_Bright_Blue, constants.Ansi_Reset)
-	envValue, ok := os.LookupEnv("GO_PHMISP_MAIN")
-	if ok && envValue == "development" {
-		appStatus = fmt.Sprintf("%v%s%v", constants.Ansi_Bright_Red, envValue, constants.Ansi_Reset)
-	}
+	// вывод информационного сообщения при старте приложения
+	msg := getInformationMessage()
 
-	msg := fmt.Sprintf("Application '%s' v%s was successfully launched", appname.GetAppName(), appversion.GetAppVersion())
-	fmt.Printf("\n\n%v%v%s.%v\n", constants.Bold_Font, constants.Ansi_Bright_Green, msg, constants.Ansi_Reset)
-	fmt.Printf("%v%vApplication status is '%s'.%v\n", constants.Underlining, constants.Ansi_Bright_Green, appStatus, constants.Ansi_Reset)
 	_ = simpleLogger.Write("info", strings.ToLower(msg))
 
-	// выполняется для записи в файл и отправки в Zabbix
-	_ = simpleLogger.Write("info", msg)
-
-	core := coremodule.NewCoreHandler(storageApp, logging, counting)
+	// *****************************************************************
+	// *************** инициализируем ядро приложения ******************
+	core := coremodule.NewCoreHandler(counting, logging)
 	if err := core.CoreHandler(ctx, natsModule, mispModule, redisModule, lr); err != nil {
 		_, f, l, _ := runtime.Caller(0)
 		_ = simpleLogger.Write("error", fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-1))
+
 		log.Fatalln(err)
 	}
 }

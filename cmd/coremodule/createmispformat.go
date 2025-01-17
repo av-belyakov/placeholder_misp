@@ -8,6 +8,7 @@ import (
 
 	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
 	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
 	rules "github.com/av-belyakov/placeholder_misp/rulesinteraction"
 )
@@ -17,8 +18,8 @@ func NewMispFormat(
 	taskId string,
 	mispModule mispapi.ModuleMispHandler,
 	listRule *rules.ListRule,
-	logger commoninterfaces.Logger,
-	counting chan<- datamodels.DataCounterSettings) {
+	counting *countermessage.CounterMessage,
+	logger commoninterfaces.Logger) {
 
 	eventsMisp := datamodels.NewEventMisp()
 	listObjectsMisp := datamodels.NewListObjectsMispFormat()
@@ -207,10 +208,7 @@ func NewMispFormat(
 		isAllowed = true
 
 		//сетчик кейсов соответствующих или не соответствующих правилам
-		counting <- datamodels.DataCounterSettings{
-			DataType: "update events meet rules",
-			Count:    1,
-		}
+		counting.SendMessage("update events meet rules", 1)
 	}
 
 	//удаляем те объекты Attributes которые соответствуют правилам EXCLUDE

@@ -11,8 +11,7 @@ import (
 
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
-	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
-	"github.com/av-belyakov/placeholder_misp/memorytemporarystorage"
+	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
 )
 
 const (
@@ -22,11 +21,10 @@ const (
 
 // NewClientNATS конструктор API NATS
 func NewClientNATS(
-	conf confighandler.AppConfigNATS,
+	confNats confighandler.AppConfigNATS,
 	confTheHive confighandler.AppConfigTheHive,
-	storageApp *memorytemporarystorage.CommonStorageTemporary,
-	logger commoninterfaces.Logger,
-	counting chan<- datamodels.DataCounterSettings) (*ModuleNATS, error) {
+	counting *countermessage.CounterMessage,
+	logger commoninterfaces.Logger) (*ModuleNATS, error) {
 
 	var mnats ModuleNATS = ModuleNATS{
 		chanOutput: make(chan OutputSettings),
@@ -37,7 +35,7 @@ func NewClientNATS(
 	ns := NewStorageNATS()
 
 	nc, err := nats.Connect(
-		fmt.Sprintf("%s:%d", conf.Host, conf.Port),
+		fmt.Sprintf("%s:%d", confNats.Host, confNats.Port),
 		nats.MaxReconnects(-1),
 		nats.ReconnectWait(3*time.Second))
 	if err != nil {
@@ -57,7 +55,7 @@ func NewClientNATS(
 		logger.Send("info", fmt.Sprintf("the connection to NATS has been re-established %s:%d", f, l-1))
 	})
 
-	nc.Subscribe(conf.Subscriptions.SenderCase, func(m *nats.Msg) {
+	nc.Subscribe(confNats.Subscriptions.SenderCase, func(m *nats.Msg) {
 		// ***********************************
 		// Это логирование только для теста!!!
 		// ***********************************
@@ -71,13 +69,10 @@ func NewClientNATS(
 		}
 
 		//счетчик принятых кейсов
-		counting <- datamodels.DataCounterSettings{
-			DataType: "update accepted events",
-			Count:    1,
-		}
+		counting.SendMessage("update accepted events", 1)
 	})
 
-	log.Printf("%vConnect to NATS with address %s:%d%v\n", Ansi_Dark_Gray, conf.Host, conf.Port, Ansi_Reset)
+	log.Printf("%vConnect to NATS with address %s:%d%v\n", Ansi_Dark_Gray, confNats.Host, confNats.Port, Ansi_Reset)
 
 	// обработка данных приходящих в модуль от ядра приложения фактически это команды на добавления
 	//тега - 'add_case_tag' и команда на добавление MISP id в поле customField
@@ -90,7 +85,7 @@ func NewClientNATS(
 
 			//отправляем команды на установку тега и значения поля customFields
 			go func() {
-				info, err := SendRequestCommandExecute(nc, conf.Subscriptions.ListenerCommand, incomingData)
+				info, err := SendRequestCommandExecute(nc, confNats.Subscriptions.ListenerCommand, incomingData)
 				if err != nil {
 					_, f, l, _ := runtime.Caller(0)
 					logger.Send("error", fmt.Sprintf("%v %s:%d", err, f, l-1))

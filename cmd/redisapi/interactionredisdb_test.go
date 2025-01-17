@@ -16,7 +16,6 @@ import (
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
 	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
-	"github.com/av-belyakov/placeholder_misp/memorytemporarystorage"
 )
 
 var _ = Describe("Interactionredisdb", Ordered, func() {
@@ -59,11 +58,8 @@ var _ = Describe("Interactionredisdb", Ordered, func() {
 
 		exampleByte, errReadFile = readFileJson("testing/test_json", "example_caseId_33705_1.json")
 
-		// инициализируем модуль временного хранения информации
-		storageApp := memorytemporarystorage.NewTemporaryStorage()
-
 		ctxRedis, _ := context.WithTimeout(context.Background(), 2*time.Second)
-		module = redisapi.HandlerRedis(ctxRedis, ca.AppConfigRedis, storageApp, logging)
+		module = redisapi.HandlerRedis(ctxRedis, ca.AppConfigRedis, logging)
 
 		go func() {
 			for log := range logging.GetChan() {

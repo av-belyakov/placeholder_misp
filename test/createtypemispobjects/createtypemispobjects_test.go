@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -13,9 +12,8 @@ import (
 	"github.com/av-belyakov/placeholder_misp/cmd/coremodule"
 	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
-	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
+	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
 	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
-	"github.com/av-belyakov/placeholder_misp/memorytemporarystorage"
 	rules "github.com/av-belyakov/placeholder_misp/rulesinteraction"
 )
 
@@ -38,8 +36,10 @@ var _ = Describe("Createtypemispobjects", Ordered, func() {
 	)
 
 	BeforeAll(func() {
+		chZabbix := make(chan commoninterfaces.Messager)
+
 		ctx, ctxCancel = context.WithCancel(context.Background())
-		counting := make(chan datamodels.DataCounterSettings)
+		counting := countermessage.New(chZabbix)
 
 		moduleMisp = &mispapi.ModuleMISP{
 			ChanInput:  make(chan mispapi.InputSettings),
@@ -51,20 +51,6 @@ var _ = Describe("Createtypemispobjects", Ordered, func() {
 		b, err := os.ReadFile(exampleFile)
 		Expect(err).ShouldNot(HaveOccurred())
 
-		//f, err = os.Open(exampleFile)
-
-		//b := []byte(nil)
-		//_, err = f.Read(b)
-		//Expect(err).ShouldNot(HaveOccurred())
-
-		//wr := bytes.Buffer{}
-		//sc := bufio.NewScanner(f)
-		//for sc.Scan() {
-		//wr.WriteString(sc.Text())
-		//if _, err := wr.Write(sc.Bytes()); err != nil {
-		//log.Fatalln(err)
-		//}
-		//}
 		//инициализируем модуль чтения правил обработки MISP сообщений
 		lr, _, err := rules.NewListRule(rootDir, rulesDir, rulesFile)
 		Expect(err).ShouldNot(HaveOccurred())
@@ -83,28 +69,22 @@ var _ = Describe("Createtypemispobjects", Ordered, func() {
 		}(ctx, logging)
 
 		//заглушка для счетчика
-		go func(ctx context.Context, chc <-chan datamodels.DataCounterSettings) {
+		go func(ctx context.Context, chz <-chan commoninterfaces.Messager) {
 			for {
 				select {
 				case <-ctx.Done():
 					return
 
-				case c := <-chc:
-					fmt.Printf("\tcounting:'%d'\n", c.Count)
+				case c := <-chz:
+					fmt.Printf("\tmessage type:'%s', message:'%s'\n", c.GetType(), c.GetMessage())
 				}
 			}
-		}(ctx, counting)
+		}(ctx, chZabbix)
 
-		//инициализируем модуль временного хранения информации
-		storageApp := memorytemporarystorage.NewTemporaryStorage()
-
-		//добавляем время инициализации счетчика хранения
-		storageApp.SetStartTimeDataCounter(time.Now())
-
-		handler := coremodule.NewHandlerJsonMessage(storageApp, logging, counting)
+		handler := coremodule.NewHandlerJsonMessage(counting, logging)
 		chDecode := handler.HandlerJsonMessage(b, "twe83475js")
 
-		go coremodule.NewMispFormat(chDecode, taskId, moduleMisp, lr, logging, counting)
+		go coremodule.NewMispFormat(chDecode, taskId, moduleMisp, lr, counting, logging)
 	})
 
 	Context("Тест 1. Формирование документов в формате MISP", func() {

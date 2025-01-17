@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"time"
 
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
@@ -13,22 +12,21 @@ import (
 
 	"github.com/av-belyakov/placeholder_misp/cmd/coremodule"
 	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
+	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
-	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
+	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
 	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
-	"github.com/av-belyakov/placeholder_misp/memorytemporarystorage"
 	rules "github.com/av-belyakov/placeholder_misp/rulesinteraction"
 )
 
 var _ = Describe("Addneweventandattributes", Ordered, func() {
 	var (
 		logging                        *logginghandler.LoggingChan
-		counting                       chan datamodels.DataCounterSettings
+		counting                       *countermessage.CounterMessage
 		confApp                        confighandler.ConfigApp
 		listRules                      *rules.ListRule
 		mispModule                     *mispapi.ModuleMISP
-		storageApp                     *memorytemporarystorage.CommonStorageTemporary
 		exampleByte                    []byte
 		errReadFile, errMisp, errRules error
 	)
@@ -58,8 +56,9 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 	}
 
 	BeforeAll(func() {
+		chZabbix := make(chan commoninterfaces.Messager)
 		logging = logginghandler.New()
-		counting = make(chan datamodels.DataCounterSettings)
+		counting = countermessage.New(chZabbix)
 
 		// NATS
 		confApp.AppConfigNATS.Host = "nats.cloud.gcm"
@@ -82,36 +81,14 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 			}
 		}()
 
-		//вывод данных счетчика
+		//вывод данных для Zabbix
 		go func() {
-			dc := storageApp.GetDataCounter()
-			d, h, m, s := supportingfunctions.GetDifference(dc.StartTime, time.Now())
-
-			fmt.Printf("\tСОБЫТИЙ принятых/обработанных: %d/%d, соответствие/не соответствие правилам: %d/%d, время со старта приложения: дней %d, часов %d, минут %d, секунд %d\n", dc.AcceptedEvents, dc.ProcessedEvents, dc.EventsMeetRules, dc.EventsDoNotMeetRules, d, h, m, s)
-
-			for d := range counting {
-				switch d.DataType {
-				case "update accepted events":
-					storageApp.SetAcceptedEventsDataCounter(d.Count)
-				case "update processed events":
-					storageApp.SetProcessedEventsDataCounter(d.Count)
-				case "update events meet rules":
-					storageApp.SetEventsMeetRulesDataCounter(d.Count)
-				case "events do not meet rules":
-					storageApp.SetEventsDoNotMeetRulesDataCounter(d.Count)
-				}
-
-				dc := storageApp.GetDataCounter()
-				d, h, m, s := supportingfunctions.GetDifference(dc.StartTime, time.Now())
-
-				fmt.Printf("\tСОБЫТИЙ принятых/обработанных: %d/%d, соответствие/не соответствие правилам: %d/%d, время со старта приложения: дней %d, часов %d, минут %d, секунд %d\n", dc.AcceptedEvents, dc.ProcessedEvents, dc.EventsMeetRules, dc.EventsDoNotMeetRules, d, h, m, s)
+			for msg := range chZabbix {
+				fmt.Println("message for Zabbix:", msg)
 			}
 		}()
 
 		taskId := uuid.New().String()
-
-		//инициализируем модуль временного хранения информации
-		storageApp = memorytemporarystorage.NewTemporaryStorage()
 
 		//инициализация списка правил
 		listRules, _, errRules = rules.NewListRule("placeholder_misp", "rules", "mispmsgrule.yaml")
@@ -124,11 +101,11 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		//инициалиация модуля для взаимодействия с MISP
 		mispModule, errMisp = mispapi.HandlerMISP(*confApp.GetAppMISP(), confApp.Organizations, logging)
 
-		hjm := coremodule.NewHandlerJsonMessage(storageApp, logging, counting)
+		hjm := coremodule.NewHandlerJsonMessage(counting, logging)
 		// обработчик JSON документа
 		chanOutputDecodeJson := hjm.HandlerJsonMessage(exampleByte, taskId)
 		//формирование итоговых документов в формате MISP
-		go coremodule.NewMispFormat(chanOutputDecodeJson, taskId, mispModule, listRules, logging, counting)
+		go coremodule.NewMispFormat(chanOutputDecodeJson, taskId, mispModule, listRules, counting, logging)
 	})
 
 	Context("Тест 1. Проверка инициализации модулей", func() {

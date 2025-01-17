@@ -16,10 +16,10 @@ import (
 	"github.com/av-belyakov/placeholder_misp/cmd/coremodule"
 	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
 	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
 	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
-	"github.com/av-belyakov/placeholder_misp/memorytemporarystorage"
 	rules "github.com/av-belyakov/placeholder_misp/rulesinteraction"
 )
 
@@ -29,7 +29,9 @@ var _ = Describe("Processingrules", Ordered, func() {
 		logging     commoninterfaces.Logger
 		moduleMisp  *mispapi.ModuleMISP
 		exampleByte []byte
-		counting    chan datamodels.DataCounterSettings
+		counting    *countermessage.CounterMessage
+		chZabbix    chan commoninterfaces.Messager
+
 		errReadFile, errGetRule/*, errHMisp*/ error
 	)
 
@@ -58,9 +60,15 @@ var _ = Describe("Processingrules", Ordered, func() {
 	}
 
 	BeforeAll(func() {
-		//канал для подсчета обработанных кейсов
-		counting = make(chan datamodels.DataCounterSettings)
+		chZabbix = make(chan commoninterfaces.Messager)
 
+		go func() {
+			for msg := range chZabbix {
+				fmt.Println("received message:", msg.GetMessage())
+			}
+		}()
+
+		counting = countermessage.New(chZabbix)
 		logging = logginghandler.New()
 
 		//читаем тестовый файл
@@ -79,6 +87,10 @@ var _ = Describe("Processingrules", Ordered, func() {
 	BeforeEach(func() {
 		//выполняет очистку значения StatementExpression что равно отсутствию совпадений в правилах Pass
 		lr.CleanStatementExpressionRulePass()
+	})
+
+	AfterAll(func() {
+		close(chZabbix)
 	})
 
 	Context("Тест 0. Проверка функции PassRuleHandler", func() {
@@ -190,8 +202,6 @@ var _ = Describe("Processingrules", Ordered, func() {
 
 							return
 						}
-					case numData := <-counting:
-						fmt.Printf("Counter processed object, type:%s, count:%d\n", numData.DataType, numData.Count)
 					}
 				}
 			}()
@@ -297,14 +307,12 @@ var _ = Describe("Processingrules", Ordered, func() {
 			}()
 
 			msgId := uuid.New().String()
-			// инициализируем модуль временного хранения информации
-			storageApp := memorytemporarystorage.NewTemporaryStorage()
 
-			hjm := coremodule.NewHandlerJsonMessage(storageApp, logging, counting)
+			hjm := coremodule.NewHandlerJsonMessage(counting, logging)
 			// обработчик JSON документа
 			chanOutputDecodeJson := hjm.HandlerJsonMessage(exampleByte, msgId)
 			//формирование итоговых документов в формате MISP
-			go coremodule.NewMispFormat(chanOutputDecodeJson, msgId, moduleMisp, lr, logging, counting)
+			go coremodule.NewMispFormat(chanOutputDecodeJson, msgId, moduleMisp, lr, counting, logging)
 
 			wg.Wait()
 
