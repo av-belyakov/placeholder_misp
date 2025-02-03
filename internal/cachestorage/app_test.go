@@ -110,16 +110,16 @@ func TestQueueHandler(t *testing.T) {
 
 		assert.Equal(t, cache.SizeObjectToQueue(), 3)
 
-		_, ok := cache.PullObjectFromQueue()
-		assert.False(t, ok)
+		_, siEmpty := cache.PullObjectFromQueue()
+		assert.False(t, siEmpty)
 		assert.Equal(t, cache.SizeObjectToQueue(), 2)
 
 		_, _ = cache.PullObjectFromQueue()
 		_, _ = cache.PullObjectFromQueue()
 		assert.Equal(t, cache.SizeObjectToQueue(), 0)
 
-		_, ok = cache.PullObjectFromQueue()
-		assert.True(t, ok)
+		_, siEmpty = cache.PullObjectFromQueue()
+		assert.True(t, siEmpty)
 	})
 
 	t.Run("Тест 1.1. Добавить в очередь некоторое количество объектов", func(t *testing.T) {

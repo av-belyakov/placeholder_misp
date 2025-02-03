@@ -5,10 +5,11 @@ import (
 	"time"
 )
 
+// CacheExecutedObjects кеш выполненных объектов
 type CacheExecutedObjects[T any] struct {
-	maxTTL time.Duration       //максимальное время, через которое запись в cacheStorages будет удалена
+	maxTtl time.Duration       //максимальное время, по истечении которого запись в cacheStorages будет удалена
 	queue  listQueueObjects[T] //очередь объектов предназначенных для выполнения
-	cache  cacheStorages[T]    //кеш хранилища
+	cache  cacheStorages[T]    //кеш хранилища обработанных объектов
 }
 
 type listQueueObjects[T any] struct {
@@ -17,25 +18,25 @@ type listQueueObjects[T any] struct {
 }
 
 type cacheStorages[T any] struct {
-	mutex   sync.RWMutex
+	mutex sync.RWMutex
+	//максимальный размер кеша при привышении которого выполняется удаление самой старой записи
 	maxSize int
-	//максимальный размер кеша при привышении которого выполняется
-	//удаление самой старой записи
+	//основное хранилище
 	storages map[string]storageParameters[T]
 }
 
 type storageParameters[T any] struct {
-	isExecution bool
 	//статус выполнения
-	isCompletedSuccessfully bool
+	isExecution bool
 	//результат выполнения
-	timeMain time.Time
+	isCompletedSuccessfully bool
 	//основное время, по данному времени можно найти самый старый объект в кеше
-	timeExpiry time.Time
+	timeMain time.Time
 	//общее время истечения жизни, время по истечению которого объект удаляется в любом
 	//случае в независимости от того, был ли он выполнен или нет, формируется time.Now().Add(c.maxTTL)
+	timeExpiry time.Time
+	//исходный объект над которым выполняются действия
 	originalObject T
-	//cacheFunc      CacheStorageFuncHandler[T] //func(int) bool
-	cacheFunc func(int) bool
 	//фунция-обертка выполнения
+	cacheFunc func(int) bool
 }

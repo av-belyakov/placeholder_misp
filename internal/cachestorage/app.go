@@ -24,7 +24,7 @@ import (
 // секунд, где 86400 секунд равны одним суткам.
 func NewCacheStorage[T any](ctx context.Context, ttl, maxSize int) (*CacheExecutedObjects[T], error) {
 	cacheExObj := &CacheExecutedObjects[T]{
-		maxTTL: time.Duration(30 * time.Second),
+		maxTtl: time.Duration(30 * time.Second),
 		queue: listQueueObjects[T]{
 			storages: []T(nil),
 		},
@@ -43,7 +43,7 @@ func NewCacheStorage[T any](ctx context.Context, ttl, maxSize int) (*CacheExecut
 		return cacheExObj, err
 	}
 
-	cacheExObj.maxTTL = timeToLive
+	cacheExObj.maxTtl = timeToLive
 
 	go cacheExObj.automaticExecution(ctx, 10)
 
@@ -53,7 +53,7 @@ func NewCacheStorage[T any](ctx context.Context, ttl, maxSize int) (*CacheExecut
 //	isExecution             bool           //статус выполнения
 //	isCompletedSuccessfully bool           //результат выполнения
 
-// automaticExecution работает с очередями и кешом объектов
+// automaticExecution работает с очередями и кешем объектов
 // С заданным интервалом времени выполняет следующие действия:
 // 1. Проверка, есть ли в кеше объекты. Если кеш пустой, проверка
 // наличия объектов в очереди, если она пуста - ожидание. Если очередь
@@ -61,9 +61,9 @@ func NewCacheStorage[T any](ctx context.Context, ttl, maxSize int) (*CacheExecut
 // добавленного объекта. Если кеш не пуст, то выполняется пункт 2.
 // 2. Проверка, есть ли в кеше объект со стаусом isExecution=true, если
 // есть, то ожидание завершения выполнения объекта в результате которого
-// меняется статус объекта на isExecution=true и isCompletedSuccessfully=true.
-// Если статус объекта меняется на isExecution=true, а isCompletedSuccessfully=false
-// то выполняется повторный запуск объекта. Если статус объекта isExecution=true
+// меняется статус объекта на isExecution=true (может быть false?) и isCompletedSuccessfully=true.
+// Если статус объекта меняется на isExecution=true (может быть false?), а isCompletedSuccessfully=false
+// то выполняется повторный запуск объекта. Если статус объекта isExecution=true (может быть false?)
 // и isCompletedSuccessfully=true, то выполняется пункт 3.
 // 3. Проверка, есть ли в кеше свободное место, равное переменной maxSize, если
 // свободное место есть, выполняется ПОИСК в кеше, по уникальному ключу, объекта

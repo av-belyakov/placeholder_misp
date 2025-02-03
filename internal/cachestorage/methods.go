@@ -65,7 +65,7 @@ func (c *CacheExecutedObjects[T]) AddObjectToCache(key string, value CacheStorag
 	if !ok {
 		c.cache.storages[key] = storageParameters[T]{
 			timeMain:       time.Now(),
-			timeExpiry:     time.Now().Add(c.maxTTL),
+			timeExpiry:     time.Now().Add(c.maxTtl),
 			originalObject: value.GetObject(),
 			cacheFunc:      value.GetFunc(),
 		}
@@ -86,7 +86,7 @@ func (c *CacheExecutedObjects[T]) AddObjectToCache(key string, value CacheStorag
 	}
 
 	storage.timeMain = time.Now()
-	storage.timeExpiry = time.Now().Add(c.maxTTL)
+	storage.timeExpiry = time.Now().Add(c.maxTtl)
 	storage.isExecution = false
 	storage.isCompletedSuccessfully = false
 	storage.originalObject = value.GetObject()
@@ -191,7 +191,7 @@ func (c *CacheExecutedObjects[T]) SetTimeExpiry(key string) {
 	defer c.cache.mutex.Unlock()
 
 	if storage, ok := c.cache.storages[key]; ok {
-		storage.timeExpiry = time.Now().Add(c.maxTTL)
+		storage.timeExpiry = time.Now().Add(c.maxTtl)
 		c.cache.storages[key] = storage
 	}
 }
