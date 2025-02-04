@@ -3,7 +3,6 @@ package cachestorage
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 )
 
@@ -19,41 +18,47 @@ import (
 //в MISP. При успешном добавлении ставится тригер 'успешно обработано' и статус 'не выполняется'.
 //При не успешном выполнении статус 'успешно обработано' не ставится.
 
-// NewCacheStorage создает новое кэширующее хранилище. Время по истечение которого
-// данные из кэша будут удалены, задается в секундах в диапазоне от 10 до 86400
-// секунд, где 86400 секунд равны одним суткам.
-func NewCacheStorage[T any](ctx context.Context, ttl, maxSize int) (*CacheExecutedObjects[T], error) {
+/*
+кэширующее хранилище произвольных объектов с очередью и обработкой этих объектов в автоматическом режиме по средствам выполнения функций переданных пользователем
+*/
+
+// NewCacheStorage создает новое кэширующее хранилище, а также очередь из которой будут, в автоматическом
+// режиме, братся объекты предназначенные для обработки. Для обработки объектов будет использоватся
+// пользовательская функция-обёртка, которую, как и обрабатываемый объект, добавляют с использованием
+// вспомогательного пользовательского типа.
+func NewCacheStorage[T any](ctx context.Context, opts ...cacheOptions[T]) (*CacheExecutedObjects[T], error) {
 	cacheExObj := &CacheExecutedObjects[T]{
+		//значение по умолчанию для интервала автоматической обработки
+		timeTick: time.Duration(5 * time.Second),
+		//значение по умолчанию для времени жизни объекта
 		maxTtl: time.Duration(30 * time.Second),
+		//очередь
 		queue: listQueueObjects[T]{
 			storages: []T(nil),
 		},
 		cache: cacheStorages[T]{
-			maxSize:  maxSize,
+			//значение по умолчанию максимального размера кэша
+			maxSize: 8,
+			//основное хранилище
 			storages: map[string]storageParameters[T]{},
 		},
 	}
 
-	if ttl < 10 || ttl > 86400 {
-		return cacheExObj, errors.New("the lifetime of the temporary information should not be less than 10 seconds and more than 86400 seconds")
+	for _, opt := range opts {
+		if err := opt(cacheExObj); err != nil {
+			return cacheExObj, err
+		}
 	}
-
-	timeToLive, err := time.ParseDuration(fmt.Sprintf("%ds", ttl))
-	if err != nil {
-		return cacheExObj, err
-	}
-
-	cacheExObj.maxTtl = timeToLive
 
 	go cacheExObj.automaticExecution(ctx, 10)
 
-	return cacheExObj, err
+	return cacheExObj, nil
 }
 
 //	isExecution             bool           //статус выполнения
 //	isCompletedSuccessfully bool           //результат выполнения
 
-// automaticExecution работает с очередями и кешем объектов
+// automaticExecution работает с очередями и кэшем объектов
 // С заданным интервалом времени выполняет следующие действия:
 // 1. Проверка, есть ли в кеше объекты. Если кеш пустой, проверка
 // наличия объектов в очереди, если она пуста - ожидание. Если очередь
@@ -79,10 +84,51 @@ func NewCacheStorage[T any](ctx context.Context, ttl, maxSize int) (*CacheExecut
 // удаления объекта с самым старым timeMain, обращение к очереди за новым объектом
 // предназначенным для обработки.
 func (cache *CacheExecutedObjects[Q]) automaticExecution(ctx context.Context, maxSize int) {
-	// !!!!!!!!!!!!!
-	//теперь нужно написать алгоритм работы с кешем на основе вышеперечисленных
-	//пунктов и с использованием написанных, для работы с кешем, методов
-	// !!!!!!!!!!!!!
+	//удаляем объекты время жизни которых превысело максимальное значение cache.maxTtl
+	//if cache.maxTtl.storage.timeExpiry.Before(time.Now())
+
+}
+
+// WithMaxTtl устанавливает максимальное время, по истечении которого запись в cacheStorages будет
+// удалена, допустимый интервал времени хранения записи от 10 до 86400 секунд
+func WithMaxTtl[T any](v int) cacheOptions[T] {
+	return func(ceo *CacheExecutedObjects[T]) error {
+		if v < 10 || v > 86400 {
+			return errors.New("the maximum time after which an entry in the cache will be deleted should not be less than 10 seconds or more than 24 hours (86400 seconds)")
+		}
+
+		ceo.maxTtl = time.Duration(v)
+
+		return nil
+	}
+}
+
+// WithTimeTick устанавливает интервал времени, заданное время такта, по истечении которого
+// запускается новый виток автоматической обработки содержимого кэша, интервал значений должен
+// быть в диапазоне от 3 до 120 секунд
+func WithTimeTick[T any](v int) cacheOptions[T] {
+	return func(ceo *CacheExecutedObjects[T]) error {
+		if v < 3 || v > 120 {
+			return errors.New("the set clock cycle time should not be less than 3 seconds or more than 120 seconds")
+		}
+
+		ceo.timeTick = time.Duration(v)
+
+		return nil
+	}
+}
+
+// WithMaxSize устанавливает максимальный размер кэша, не может быть меньше 3 и больше 1000 хранимых объектов
+func WithMaxSize[T any](v int) cacheOptions[T] {
+	return func(ceo *CacheExecutedObjects[T]) error {
+		if v < 3 || v > 1000 {
+			return errors.New("the maximum cache size cannot be less than 3 or more than 1000 objects")
+		}
+
+		ceo.cache.maxSize = v
+
+		return nil
+	}
 }
 
 /*

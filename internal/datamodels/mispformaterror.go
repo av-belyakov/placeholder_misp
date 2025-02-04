@@ -1,6 +1,8 @@
 package datamodels
 
-/*{
+/*
+Пример ошибок от MISP
+{
     "saved": false,
     "name": "Could not add Attribute",
     "message": "Could not add Attribute",

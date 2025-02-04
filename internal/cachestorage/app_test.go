@@ -94,7 +94,12 @@ func (o *SpecialObjectForCache[T]) Comparison(objFromCache T) bool {
 }
 
 func TestMain(m *testing.M) {
-	cache, err = cachestorage.NewCacheStorage[*datamodels.ListFormatsMISP](context.Background(), 30, 10)
+	cache, err = cachestorage.NewCacheStorage[*datamodels.ListFormatsMISP](
+		context.Background(),
+		cachestorage.WithMaxTtl[*datamodels.ListFormatsMISP](60),
+		cachestorage.WithTimeTick[*datamodels.ListFormatsMISP](3),
+		cachestorage.WithMaxSize[*datamodels.ListFormatsMISP](10))
+
 	if err != nil {
 		log.Fatalln(err)
 	}

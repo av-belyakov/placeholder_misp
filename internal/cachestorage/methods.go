@@ -80,7 +80,7 @@ func (c *CacheExecutedObjects[T]) AddObjectToCache(key string, value CacheStorag
 		return fmt.Errorf("an object has been received whose key ID '%s' matches the already running object, ignore it", key)
 	}
 
-	//сравнение объектов из кеша и полученного из очереди
+	//сравнение объектов из кэша и полученного из очереди
 	if value.Comparison(storage.originalObject) {
 		return fmt.Errorf("objects with key ID '%s' are completely identical, adding an object to the cache is not performed", key)
 	}
@@ -312,7 +312,7 @@ func (c *CacheExecutedObjects[T]) AddObjectToCache_TestTimeExpiry(key string, ti
 		return fmt.Errorf("an object has been received whose key ID '%s' matches the already running object, ignore it", key)
 	}
 
-	//сравнение объектов из кеша и полученного из очереди
+	//сравнение объектов из кэша и полученного из очереди
 	if value.Comparison(storage.originalObject) {
 		return fmt.Errorf("objects with key ID '%s' are completely identical, adding an object to the cache is not performed", key)
 	}
