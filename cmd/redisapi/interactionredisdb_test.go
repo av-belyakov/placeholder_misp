@@ -51,7 +51,7 @@ var _ = Describe("Interactionredisdb", Ordered, func() {
 
 	BeforeAll(func() {
 		// инициализация модуля конфига
-		ca, _ := confighandler.New(constants.Root_Dir, constants.Conf_Dir)
+		ca, _ := confighandler.New(constants.Root_Dir)
 
 		// канал для логирования
 		logging := logginghandler.New()

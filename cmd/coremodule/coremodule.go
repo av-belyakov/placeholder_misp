@@ -18,8 +18,8 @@ import (
 	"github.com/av-belyakov/placeholder_misp/cmd/redisapi"
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
+	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
-	rules "github.com/av-belyakov/placeholder_misp/rulesinteraction"
 )
 
 type CoreHandlerSettings struct {

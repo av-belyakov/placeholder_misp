@@ -1,45 +1,42 @@
 // Пакет rules выполняет чтение списка специализированных правил
-package rules
+package ruleshandler
 
 import (
 	"fmt"
-	"path"
-	"runtime"
+	"path/filepath"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
+
+	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
 // NewListRule создает новый список правил
 func NewListRule(rootDir, workDir, fileName string) (*ListRule, []string, error) {
 	lr := ListRule{}
 
-	_, f, l, _ := runtime.Caller(0)
-	rootPath, err := getRootPath(rootDir)
+	rootPath, err := supportingfunctions.GetRootPath(rootDir)
 	if err != nil {
-		return &lr, []string{}, fmt.Errorf("'%s' %s:%d", err.Error(), f, l+1)
+		return &lr, []string{}, supportingfunctions.CustomError(err)
 	}
 
-	viper.SetConfigFile(path.Join(rootPath, workDir, fileName))
-	viper.SetConfigType("yaml")
+	viper.SetConfigFile(filepath.Join(rootPath, workDir, fileName))
+	viper.SetConfigType("yml")
 
-	_, f, l, _ = runtime.Caller(0)
 	err = viper.ReadInConfig()
 	if err != nil {
-		return &lr, []string{}, fmt.Errorf("'%s' %s:%d", err.Error(), f, l+1)
+		return &lr, []string{}, supportingfunctions.CustomError(err)
 	}
 
-	_, f, l, _ = runtime.Caller(0)
 	if ok := viper.IsSet("RULES"); !ok {
-		return &lr, []string{}, fmt.Errorf("'the \"RULES\" property is missing in the file \"%s\"' %s:%d", fileName, f, l+1)
+		return &lr, []string{}, supportingfunctions.CustomError(fmt.Errorf("the 'RULES' property is missing in the file '%s'", fileName))
 	}
 
-	_, f, l, _ = runtime.Caller(0)
 	err = viper.GetViper().Unmarshal(&lr, func(dc *mapstructure.DecoderConfig) {
 		dc.Squash = true
 	})
 	if err != nil {
-		return &lr, []string{}, fmt.Errorf("'%s' %s:%d", err.Error(), f, l+1)
+		return &lr, []string{}, supportingfunctions.CustomError(err)
 	}
 
 	warningCheckRules := lr.verification()

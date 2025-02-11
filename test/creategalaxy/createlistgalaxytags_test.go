@@ -12,8 +12,8 @@ import (
 	"github.com/av-belyakov/placeholder_misp/cmd/coremodule"
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
+	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
-	rules "github.com/av-belyakov/placeholder_misp/rulesinteraction"
 )
 
 func addListGalaxyTags(lgt *coremodule.MispGalaxyTags) func(string, any) {

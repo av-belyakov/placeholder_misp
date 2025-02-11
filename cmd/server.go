@@ -19,8 +19,8 @@ import (
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
 	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
 	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
+	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
-	rules "github.com/av-belyakov/placeholder_misp/rulesinteraction"
 )
 
 func server(ctx context.Context) {
@@ -31,7 +31,7 @@ func server(ctx context.Context) {
 
 	// ****************************************************************************
 	// *********** инициализируем модуль чтения конфигурационного файла ***********
-	confApp, err := confighandler.New(rootPath, constants.Conf_Dir)
+	confApp, err := confighandler.New(rootPath)
 	if err != nil {
 		log.Fatalf("error module 'confighandler': %v", err)
 	}

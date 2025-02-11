@@ -7,7 +7,7 @@ import (
 	"runtime"
 
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
-	rules "github.com/av-belyakov/placeholder_misp/rulesinteraction"
+	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
 )
 
 // ChanInputCreateMispFormat

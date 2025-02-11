@@ -9,7 +9,7 @@ import (
 	"github.com/av-belyakov/placeholder_misp/internal/appname"
 	"github.com/av-belyakov/placeholder_misp/internal/appversion"
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
-	rules "github.com/av-belyakov/placeholder_misp/rulesinteraction"
+	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
 	"github.com/av-belyakov/simplelogger"
 )
 

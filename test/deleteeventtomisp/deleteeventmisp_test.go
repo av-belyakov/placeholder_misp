@@ -31,7 +31,7 @@ var _ = Describe("Deleteeventmisp", Ordered, func() {
 			log.Fatalf("error, it is impossible to form root path (%s)", err.Error())
 		}
 
-		confApp, errConfApp = confighandler.New(rootPath, constants.Conf_Dir)
+		confApp, errConfApp = confighandler.New(rootPath)
 		confApp.AppConfigRedis = confighandler.AppConfigRedis{
 			Host: "192.168.9.208",
 			Port: 16379,

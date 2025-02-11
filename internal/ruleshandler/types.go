@@ -1,4 +1,4 @@
-package rules
+package ruleshandler
 
 // ListRule содержит список правил
 type ListRule struct {

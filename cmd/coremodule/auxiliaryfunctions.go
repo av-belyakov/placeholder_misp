@@ -5,7 +5,7 @@ import (
 
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
-	rules "github.com/av-belyakov/placeholder_misp/rulesinteraction"
+	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
 )
 
 // удаляет элемент из списка атрибутов

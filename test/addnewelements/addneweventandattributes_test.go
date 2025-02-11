@@ -16,8 +16,8 @@ import (
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
 	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
 	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
+	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
-	rules "github.com/av-belyakov/placeholder_misp/rulesinteraction"
 )
 
 var _ = Describe("Addneweventandattributes", Ordered, func() {

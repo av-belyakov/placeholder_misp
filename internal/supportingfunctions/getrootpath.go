@@ -1,7 +1,9 @@
 package supportingfunctions
 
 import (
+	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -11,20 +13,10 @@ func GetRootPath(rootDir string) (string, error) {
 		return "", err
 	}
 
-	tmp := strings.Split(currentDir, "/")
-
-	if tmp[len(tmp)-1] == rootDir {
-		return currentDir, nil
+	beforeStr, _, ok := strings.Cut(currentDir, rootDir)
+	if !ok {
+		return "", fmt.Errorf("it is impossible to get a prefix from a string '%s'", currentDir)
 	}
 
-	var path string = ""
-	for _, v := range tmp {
-		path += v + "/"
-
-		if v == rootDir {
-			return path, nil
-		}
-	}
-
-	return path, nil
+	return filepath.Join(beforeStr, rootDir), nil
 }

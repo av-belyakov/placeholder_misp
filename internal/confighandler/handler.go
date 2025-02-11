@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
-	"path"
+	"path/filepath"
 	"strconv"
 
 	"github.com/go-playground/validator/v10"
@@ -14,7 +14,7 @@ import (
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
-func New(rootDir, confDir string) (*ConfigApp, error) {
+func New(rootDir string) (*ConfigApp, error) {
 	conf := &ConfigApp{}
 
 	var (
@@ -46,7 +46,7 @@ func New(rootDir, confDir string) (*ConfigApp, error) {
 	getFileName := func(sf, confPath string, lfs []fs.DirEntry) (string, error) {
 		for _, v := range lfs {
 			if v.Name() == sf && !v.IsDir() {
-				return path.Join(confPath, v.Name()), nil
+				return filepath.Join(confPath, v.Name()), nil
 			}
 		}
 
@@ -55,7 +55,7 @@ func New(rootDir, confDir string) (*ConfigApp, error) {
 
 	setCommonSettings := func(fn string) error {
 		viper.SetConfigFile(fn)
-		viper.SetConfigType("yaml")
+		viper.SetConfigType("yml")
 		if err := viper.ReadInConfig(); err != nil {
 			return err
 		}
@@ -102,7 +102,7 @@ func New(rootDir, confDir string) (*ConfigApp, error) {
 
 	setSpecial := func(fn string) error {
 		viper.SetConfigFile(fn)
-		viper.SetConfigType("yaml")
+		viper.SetConfigType("yml")
 		if err := viper.ReadInConfig(); err != nil {
 			return err
 		}
@@ -170,15 +170,37 @@ func New(rootDir, confDir string) (*ConfigApp, error) {
 		return conf, err
 	}
 
-	confPath := path.Join(rootPath, confDir)
-
+	confPath := filepath.Join(rootPath, "config")
 	list, err := os.ReadDir(confPath)
 	if err != nil {
 		return conf, err
 	}
 
-	fileNameCommon, err := getFileName("config.yaml", confPath, list)
+	/*
+		validate = validator.New(validator.WithRequiredStructEnabled())
+
+		for v := range envList {
+			if env, ok := os.LookupEnv(v); ok {
+				envList[v] = env
+			}
+		}
+
+		rootPath, err := supportingfunctions.GetRootPath(rootDir)
+		if err != nil {
+			return conf, err
+		}
+
+		confPath := filepath.Join(rootPath, confDir)
+		list, err := os.ReadDir(confPath)
+		if err != nil {
+			return conf, err
+		}
+	*/
+
+	fileNameCommon, err := getFileName("config.yml", confPath, list)
 	if err != nil {
+		fmt.Println("ERRROR 1:", err)
+
 		return conf, err
 	}
 
@@ -189,13 +211,17 @@ func New(rootDir, confDir string) (*ConfigApp, error) {
 
 	var fn string
 	if envList["GO_PHMISP_MAIN"] == "development" {
-		fn, err = getFileName("config_dev.yaml", confPath, list)
+		fn, err = getFileName("config_dev.yml", confPath, list)
 		if err != nil {
+			fmt.Println("ERRROR 2:", err)
+
 			return conf, err
 		}
 	} else {
-		fn, err = getFileName("config_prod.yaml", confPath, list)
+		fn, err = getFileName("config_prod.yml", confPath, list)
 		if err != nil {
+			fmt.Println("ERRROR 3:", err)
+
 			return conf, err
 		}
 	}
