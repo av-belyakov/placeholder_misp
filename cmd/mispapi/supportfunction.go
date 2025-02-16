@@ -2,12 +2,14 @@ package mispapi
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"runtime"
 
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
+	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
 // sendEventsMispFormat отправляет в API MISP событие в виде типа Event и возвращает полученный ответ
@@ -62,24 +64,21 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d InputSettings, lo
 
 	c, err := NewClientMISP(host, authKey, false)
 	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		logger.Send("error", fmt.Sprintf("'attributes for event id%s add, %s' %s:%d", eventId, err.Error(), f, l-2))
+		logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("'attributes' for event id:'%s' add, %w", eventId, err)).Error())
 
 		return nil, resBodyByte
 	}
 
 	ad, ok := d.MajorData["attributes"]
 	if !ok {
-		_, f, l, _ := runtime.Caller(0)
-		logger.Send("error", fmt.Sprintf("'the properties of \"attributes\" were not found in the received data' %s:%d", f, l-2))
+		logger.Send("error", supportingfunctions.CustomError(errors.New("the properties of 'attributes' were not found in the received data")).Error())
 
 		return nil, resBodyByte
 	}
 
 	lamf, ok := ad.([]datamodels.AttributesMispFormat)
 	if !ok {
-		_, f, l, _ := runtime.Caller(0)
-		logger.Send("error", fmt.Sprintf("'the received data does not match the type \"attributes\"' %s:%d", f, l-2))
+		logger.Send("error", supportingfunctions.CustomError(errors.New("the received data does not match the type 'attributes'")).Error())
 
 		return nil, resBodyByte
 	}
@@ -88,36 +87,32 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d InputSettings, lo
 		lamf[k].EventId = eventId
 
 		if lamf[k].Value == "" {
-			_, f, l, _ := runtime.Caller(0)
-			logger.Send("warning", fmt.Sprintf("'attributes for event id №%s is not added, the \"Value\" type property should not be empty' %s:%d", eventId, f, l-1))
+			logger.Send("warning", fmt.Sprintf("'attributes' for event id:'%s' is not added, the 'Value' type property should not be empty", eventId))
 
 			continue
 		}
 
 		b, err := json.Marshal(lamf[k])
 		if err != nil {
-			_, f, l, _ := runtime.Caller(0)
-			logger.Send("warning", fmt.Sprintf("'attributes №%s add, %s' %s:%d", eventId, err.Error(), f, l-2))
+			logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("'attributes' id:'%s' add, %w", eventId, err)).Error())
 
 			continue
 		}
 
 		res, resBodyByte, err = c.Post("/attributes/add/"+eventId, b)
 		if err != nil {
-			_, f, l, _ := runtime.Caller(0)
 			attrObject, errMarshal := json.MarshalIndent(lamf[k], "", "  ")
 			if errMarshal != nil {
-				logger.Send("error", fmt.Sprintf("'the received data does not match the type \"attributes\"' %s:%d", f, l-2))
+				logger.Send("error", supportingfunctions.CustomError(errors.New("the received data does not match the type 'attributes'")).Error())
 			}
 
-			logger.Send("warning", fmt.Sprintf("'attributes №%s add, object:\n%s\n%s' %s:%d", eventId, string(attrObject), err.Error(), f, l-2))
+			logger.Send("warning", fmt.Sprintf("'attributes' with id:'%s' add, object:\n%s\n%s", eventId, string(attrObject), err.Error()))
 
 			continue
 		}
 
 		if res.StatusCode != http.StatusOK {
-			_, f, l, _ := runtime.Caller(0)
-			logger.Send("warning", fmt.Sprintf("'attributes №%s add, %s' %s:%d", eventId, res.Status, f, l-1))
+			logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("'attributes' with id:'%s' add, %s", eventId, res.Status)).Error())
 		}
 	}
 
@@ -133,24 +128,21 @@ func sendObjectsMispFormat(host, authKey, eventId string, d InputSettings, logge
 
 	c, err := NewClientMISP(host, authKey, false)
 	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		logger.Send("error", fmt.Sprintf("'objects for event id:%s add, %s' %s:%d", eventId, err.Error(), f, l-2))
+		logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("objects for event id:'%s' add, %w", eventId, err)).Error())
 
 		return nil, resBodyByte
 	}
 
 	od, ok := d.MajorData["objects"]
 	if !ok {
-		_, f, l, _ := runtime.Caller(0)
-		logger.Send("error", fmt.Sprintf("'the properties of \"objects\" were not found in the received data' %s:%d", f, l-2))
+		logger.Send("error", supportingfunctions.CustomError(errors.New("the properties of 'objects' were not found in the received data")).Error())
 
 		return nil, resBodyByte
 	}
 
 	lomf, ok := od.(map[int]datamodels.ObjectsMispFormat)
 	if !ok {
-		_, f, l, _ := runtime.Caller(0)
-		logger.Send("error", fmt.Sprintf("'the received data does not match the type \"objects\"' %s:%d", f, l-2))
+		logger.Send("error", supportingfunctions.CustomError(errors.New("the received data does not match the type 'objects'")).Error())
 
 		return nil, resBodyByte
 	}
@@ -160,23 +152,20 @@ func sendObjectsMispFormat(host, authKey, eventId string, d InputSettings, logge
 
 		b, err := json.Marshal(v)
 		if err != nil {
-			_, f, l, _ := runtime.Caller(0)
-			logger.Send("warning", fmt.Sprintf("'objects №%s add, %s' %s:%d", eventId, err.Error(), f, l-2))
+			logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("objects with id:'%s' add, %w", eventId, err)).Error())
 
 			continue
 		}
 
 		res, resBodyByte, err = c.Post("/objects/add/"+eventId, b)
 		if err != nil {
-			_, f, l, _ := runtime.Caller(0)
-			logger.Send("warning", fmt.Sprintf("'objects №%s add, %s' %s:%d", eventId, err.Error(), f, l-2))
+			logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("objects with id:'%s' add, %w", eventId, err)).Error())
 
 			continue
 		}
 
 		if res.StatusCode != http.StatusOK {
-			_, f, l, _ := runtime.Caller(0)
-			logger.Send("warning", fmt.Sprintf("'objects №%s add, %s' %s:%d", eventId, res.Status, f, l-1))
+			logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("objects with id:'%s' add, %s", eventId, res.Status)).Error())
 		}
 	}
 
@@ -188,25 +177,19 @@ func sendRequestPublishEvent(host, authKey, eventId string) (string, error) {
 
 	c, err := NewClientMISP(host, authKey, false)
 	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-
-		return resultMsg, fmt.Errorf("'event publish add, %s' %s:%d", err.Error(), f, l-2)
+		return resultMsg, supportingfunctions.CustomError(fmt.Errorf("event publish add, %w", err))
 	}
 
 	res, b, err := c.Post("/events/publish/"+eventId, []byte{})
 	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-
-		return resultMsg, fmt.Errorf("'event publish add, %s' %s:%d", err.Error(), f, l-2)
+		return resultMsg, supportingfunctions.CustomError(fmt.Errorf("event publish add, %w", err))
 	}
 
 	resData := decodeResponseMIspMessage(b)
 	resultMsg = fmt.Sprintf("result published event with id '%s' - %s '%s' %s", eventId, resData.name, resData.message, resData.success)
 
 	if res.StatusCode != http.StatusOK {
-		_, f, l, _ := runtime.Caller(0)
-
-		return resultMsg, fmt.Errorf("'event publish add, %s' %s:%d", res.Status, f, l-1)
+		return resultMsg, supportingfunctions.CustomError(fmt.Errorf("event publish add, %s", res.Status))
 	}
 
 	return resultMsg, nil
@@ -215,8 +198,7 @@ func sendRequestPublishEvent(host, authKey, eventId string) (string, error) {
 func sendEventReportsMispFormat(host, authKey, eventId string, caseId float64) error {
 	c, err := NewClientMISP(host, authKey, false)
 	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		return fmt.Errorf("'event report add, %s' %s:%d", err.Error(), f, l-2)
+		return supportingfunctions.CustomError(fmt.Errorf("event report add, %w", err))
 	}
 
 	b, err := json.Marshal(datamodels.EventReports{
@@ -224,19 +206,16 @@ func sendEventReportsMispFormat(host, authKey, eventId string, caseId float64) e
 		Distribution: "1",
 	})
 	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		return fmt.Errorf("'event report add, %s' %s:%d", err.Error(), f, l-2)
+		return supportingfunctions.CustomError(fmt.Errorf("event report add, %w", err))
 	}
 
 	res, _, err := c.Post("/event_reports/add/"+eventId, b)
 	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		return fmt.Errorf("'event report add, %s' %s:%d", err.Error(), f, l-2)
+		return supportingfunctions.CustomError(fmt.Errorf("event report add, %w", err))
 	}
 
 	if res.StatusCode != http.StatusOK {
-		_, f, l, _ := runtime.Caller(0)
-		return fmt.Errorf("'event report add, %s' %s:%d", res.Status, f, l-1)
+		return supportingfunctions.CustomError(fmt.Errorf("event report add, %s", res.Status))
 	}
 
 	return nil
@@ -245,22 +224,19 @@ func sendEventReportsMispFormat(host, authKey, eventId string, caseId float64) e
 func sendEventTagsMispFormat(host, authKey, eventId string, d InputSettings, logger commoninterfaces.Logger) error {
 	c, err := NewClientMISP(host, authKey, false)
 	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		return fmt.Errorf("'event tags add, %s' %s:%d", err.Error(), f, l-2)
+		return supportingfunctions.CustomError(fmt.Errorf("event tags add, %w", err))
 	}
 
 	eot, ok := d.MajorData["event.object.tags"]
 	if !ok {
-		_, f, l, _ := runtime.Caller(0)
-		logger.Send("error", fmt.Sprintf("'the properties of \"objects\" were not found in the received data' %s:%d", f, l-2))
+		logger.Send("error", supportingfunctions.CustomError(errors.New("the properties of 'objects' were not found in the received data")).Error())
 
 		return nil
 	}
 
 	leot, ok := eot.(datamodels.ListEventObjectTags)
 	if !ok {
-		_, f, l, _ := runtime.Caller(0)
-		logger.Send("error", fmt.Sprintf("'the received data does not match the type \"objects\"' %s:%d", f, l-2))
+		logger.Send("error", supportingfunctions.CustomError(errors.New("the received data does not match the type 'objects'")).Error())
 
 		return nil
 	}
@@ -280,8 +256,7 @@ func sendEventTagsMispFormat(host, authKey, eventId string, d InputSettings, log
 
 		b, err := json.Marshal(eotmf)
 		if err != nil {
-			_, f, l, _ := runtime.Caller(0)
-			logger.Send("warning", fmt.Sprintf("'event tags №%s add, %s' %s:%d", eventId, err.Error(), f, l-2))
+			logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("'event tags with id:'%s' add, %w", eventId, err)).Error())
 
 			continue
 		}
@@ -295,19 +270,17 @@ func sendEventTagsMispFormat(host, authKey, eventId string, d InputSettings, log
 
 		res, b, err := c.Post("/events/addTag", b)
 		if err != nil {
-			_, f, l, _ := runtime.Caller(0)
-			logger.Send("warning", fmt.Sprintf("'event tags №%s add, %s' %s:%d", eventId, err.Error(), f, l-2))
+			logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("'event tags with id:'%s' add, %w", eventId, err)).Error())
 
 			continue
 		}
 
 		resData := decodeResponseMIspMessage(b)
 		resultMsg := fmt.Sprintf("tag: '%s' %s '%s' %s errors:'%s'", v, resData.name, resData.message, resData.success, resData.errors)
-		logger.Send("warning", fmt.Sprintf("event tags №%s the result of executing the POST query - '%s'", eventId, resultMsg))
+		logger.Send("warning", fmt.Sprintf("event tags with id:'%s' the result of executing the POST query - '%s'", eventId, resultMsg))
 
 		if res.StatusCode != http.StatusOK {
-			_, f, l, _ := runtime.Caller(0)
-			logger.Send("warning", fmt.Sprintf("'event tags №%s add, %s' %s:%d", eventId, res.Status, f, l-1))
+			logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("'event tags with id:'%s' add, %s", eventId, res.Status)).Error())
 		}
 	}
 
@@ -318,8 +291,7 @@ func sendEventTagsMispFormat(host, authKey, eventId string, d InputSettings, log
 func delEventsMispFormat(host, authKey, eventId string) (*http.Response, error) {
 	c, err := NewClientMISP(host, authKey, false)
 	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		return nil, fmt.Errorf("'events delete, %s' %s:%d", err.Error(), f, l-2)
+		return nil, supportingfunctions.CustomError(fmt.Errorf("events delete, %w", err))
 	}
 
 	res, _, err := c.Delete("/events/delete/" + eventId)

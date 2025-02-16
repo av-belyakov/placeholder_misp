@@ -11,10 +11,10 @@ import (
 // Value - любые передаваемые данные
 // FieldBranch - 'путь' до значения в как в JSON формате, например 'event.details.customFields.class'
 type ChanInputCreateMispFormat struct {
+	Value       interface{}
 	UUID        string
 	FieldName   string
 	ValueType   string
-	Value       interface{}
 	FieldBranch string
 }
 
@@ -55,8 +55,8 @@ type ExclusionRules []ExclusionRule
 // SequenceNumber - порядковый номер в списке объектов
 // NameList - наименование объекта
 type ExclusionRule struct {
-	SequenceNumber int
 	NameList       string
+	SequenceNumber int
 }
 
 // Add добавляет информацию об объекте подлежащего исключению из списка передаваемых в MISP

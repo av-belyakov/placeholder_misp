@@ -4,7 +4,6 @@ package natsapi
 import (
 	"fmt"
 	"log"
-	"runtime"
 	"time"
 
 	"github.com/nats-io/nats.go"
@@ -12,6 +11,7 @@ import (
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
 	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
+	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
 const (
@@ -39,20 +39,17 @@ func NewClientNATS(
 		nats.MaxReconnects(-1),
 		nats.ReconnectWait(3*time.Second))
 	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		return &mnats, fmt.Errorf("'%s' %s:%d", err.Error(), f, l-5)
+		return &mnats, supportingfunctions.CustomError(err)
 	}
 
 	//обработка разрыва соединения с NATS
 	nc.SetDisconnectErrHandler(func(c *nats.Conn, err error) {
-		_, f, l, _ := runtime.Caller(0)
-		logger.Send("error", fmt.Sprintf("the connection with NATS has been disconnected (%v) %s:%d", err, f, l-1))
+		logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("the connection with NATS has been disconnected %w", err)).Error())
 	})
 
 	//обработка переподключения к NATS
 	nc.SetReconnectHandler(func(c *nats.Conn) {
-		_, f, l, _ := runtime.Caller(0)
-		logger.Send("info", fmt.Sprintf("the connection to NATS has been re-established %s:%d", f, l-1))
+		logger.Send("info", "the connection to NATS has been re-established")
 	})
 
 	nc.Subscribe(confNats.Subscriptions.SenderCase, func(m *nats.Msg) {
@@ -87,8 +84,7 @@ func NewClientNATS(
 			go func() {
 				info, err := SendRequestCommandExecute(nc, confNats.Subscriptions.ListenerCommand, incomingData)
 				if err != nil {
-					_, f, l, _ := runtime.Caller(0)
-					logger.Send("error", fmt.Sprintf("%v %s:%d", err, f, l-1))
+					logger.Send("error", supportingfunctions.CustomError(err).Error())
 
 					return
 				}

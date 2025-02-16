@@ -9,14 +9,14 @@ type ModuleRedis struct {
 }
 
 type SettingsChanInputRedis struct {
+	RawData []byte
 	Command string
 	Data    string
-	RawData []byte
 }
 
 type SettingChanOutputRedis struct {
-	CommandResult string
 	Result        interface{}
+	CommandResult string
 }
 
 func (mmisp ModuleRedis) GetDataReceptionChannel() <-chan SettingChanOutputRedis {

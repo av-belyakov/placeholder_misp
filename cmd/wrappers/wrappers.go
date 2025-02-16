@@ -3,10 +3,10 @@ package wrappers
 import (
 	"context"
 	"fmt"
-	"runtime"
 	"time"
 
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 	zabbixapicommunicator "github.com/av-belyakov/zabbixapicommunicator/cmd"
 )
 
@@ -26,8 +26,7 @@ func WrappersZabbixInteraction(
 		ConnectionTimeout: &connTimeout,
 	})
 	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		writerLoggingData.Write("error", fmt.Sprintf("zabbix module: '%s' %s:%d", err.Error(), f, l-1))
+		writerLoggingData.Write("error", supportingfunctions.CustomError(fmt.Errorf("zabbix module: %w", err)).Error())
 
 		return
 	}
@@ -44,8 +43,7 @@ func WrappersZabbixInteraction(
 
 	recipient := make(chan zabbixapicommunicator.Messager)
 	if err = zc.Start(ctx, et, recipient); err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		writerLoggingData.Write("error", fmt.Sprintf("zabbix module: '%s' %s:%d", err.Error(), f, l-1))
+		writerLoggingData.Write("error", supportingfunctions.CustomError(fmt.Errorf("zabbix module: %w", err)).Error())
 
 		return
 	}
@@ -64,7 +62,7 @@ func WrappersZabbixInteraction(
 				recipient <- newMessageSettings
 
 			case errMsg := <-zc.GetChanErr():
-				writerLoggingData.Write("error", fmt.Sprintf("zabbix module: '%s'", errMsg.Error()))
+				writerLoggingData.Write("error", supportingfunctions.CustomError(fmt.Errorf("zabbix module: %W", errMsg)).Error())
 
 			}
 		}

@@ -5,13 +5,13 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"runtime"
 	"strings"
 
 	redis "github.com/redis/go-redis/v9"
 
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
+	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
 const (
@@ -62,8 +62,7 @@ func HandlerRedis(
 
 				tmp := strings.Split(data.Data, ":")
 				if len(tmp) == 0 {
-					_, f, l, _ := runtime.Caller(0)
-					logger.Send("warning", fmt.Sprintf("'it is not possible to split a string '%s' to add case and event information to the Redis DB' %s:%d", data.Data, f, l-1))
+					logger.Send("warning", fmt.Sprintf("it is not possible to split a string '%s' to add case and event information to the Redis DB", data.Data))
 
 					continue
 				}
@@ -89,8 +88,7 @@ func HandlerRedis(
 				//заменяем старое значение (если есть) или создаем новое
 				//tmp[0] - caseId и tmp[1] - eventId
 				if err := rdb.Set(ctx, tmp[0], tmp[1], 0).Err(); err != nil {
-					_, f, l, _ := runtime.Caller(0)
-					logger.Send("error", fmt.Sprintf("'%s' %s:%d", fmt.Sprint(err), f, l-1))
+					logger.Send("error", supportingfunctions.CustomError(err).Error())
 
 					continue
 				}
@@ -106,8 +104,6 @@ func HandlerRedis(
 				/*
 
 					Тут нужно добавить RAW данные кейса из TheHive в List
-
-
 
 				*/
 

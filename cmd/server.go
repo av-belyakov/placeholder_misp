@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
-	"runtime"
+	"net/http"
+	_ "net/http/pprof"
 	"strings"
 
 	"github.com/av-belyakov/simplelogger"
@@ -47,8 +47,7 @@ func server(ctx context.Context) {
 	// ******* инициализируем модуль чтения правил обработки MISP сообщений *******
 	lr, warnings, err := rules.NewListRule(constants.Root_Dir, confApp.RulesProcMSGMISP.Directory, confApp.RulesProcMSGMISP.File)
 	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		_ = simpleLogger.Write("error", fmt.Sprintf("%v %s:%d", err, f, l-2))
+		_ = simpleLogger.Write("error", supportingfunctions.CustomError(err).Error())
 
 		log.Fatalf("error module 'rulesinteraction': %v\n", err)
 	}
@@ -57,8 +56,7 @@ func server(ctx context.Context) {
 	//а также отсутсвие логических ошибок в файле с правилами
 	msgWarning, err := checkListRule(lr, warnings)
 	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		_ = simpleLogger.Write("error", fmt.Sprintf("%v %s:%d", err, f, l-2))
+		_ = simpleLogger.Write("error", supportingfunctions.CustomError(err).Error())
 
 		log.Fatal(err)
 	}
@@ -98,16 +96,14 @@ func server(ctx context.Context) {
 	// *********** инициализируем модуль счётчика для подсчёта сообщений *********
 	counting := countermessage.New(chZabbix)
 	if err = counting.Handler(ctx); err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		_ = simpleLogger.Write("error", fmt.Sprintf(" '%s' %s:%d", err, f, l-2))
+		_ = simpleLogger.Write("error", supportingfunctions.CustomError(err).Error())
 	}
 
 	// ***************************************************************************
 	// ************** инициализация модуля для взаимодействия с NATS *************
 	natsModule, err := natsapi.NewClientNATS(confApp.AppConfigNATS, confApp.AppConfigTheHive, counting, logging)
 	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		_ = simpleLogger.Write("error", fmt.Sprintf(" '%s' %s:%d", err, f, l-2))
+		_ = simpleLogger.Write("error", supportingfunctions.CustomError(err).Error())
 
 		log.Fatal(err)
 	}
@@ -120,8 +116,7 @@ func server(ctx context.Context) {
 	// *************** инициалиация модуля для взаимодействия с MISP *************
 	mispModule, err := mispapi.HandlerMISP(*confApp.GetAppMISP(), confApp.GetListOrganization(), logging)
 	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		_ = simpleLogger.Write("error", fmt.Sprintf(" '%s' %s:%d", err, f, l-2))
+		_ = simpleLogger.Write("error", supportingfunctions.CustomError(err).Error())
 	}
 
 	// вывод информационного сообщения при старте приложения
@@ -129,12 +124,16 @@ func server(ctx context.Context) {
 
 	_ = simpleLogger.Write("info", strings.ToLower(msg))
 
+	//для отладки через pprof
+	go func() {
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
+
 	// *****************************************************************
 	// *************** инициализируем ядро приложения ******************
-	core := coremodule.NewCoreHandler(counting, logging)
-	if err := core.CoreHandler(ctx, natsModule, mispModule, redisModule, lr); err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		_ = simpleLogger.Write("error", fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-1))
+	core := coremodule.NewCoreHandler(counting, lr, logging)
+	if err := core.Start(ctx, natsModule, mispModule, redisModule); err != nil {
+		_ = simpleLogger.Write("error", supportingfunctions.CustomError(err).Error())
 
 		log.Fatalln(err)
 	}

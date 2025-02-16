@@ -10,8 +10,8 @@ package coremodule
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"runtime"
 
 	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
 	"github.com/av-belyakov/placeholder_misp/cmd/natsapi"
@@ -23,23 +23,27 @@ import (
 )
 
 type CoreHandlerSettings struct {
-	logger   commoninterfaces.Logger
-	counting *countermessage.CounterMessage
+	logger    commoninterfaces.Logger
+	listRules *rules.ListRule
+	counting  *countermessage.CounterMessage
 }
 
-func NewCoreHandler(counting *countermessage.CounterMessage, logger commoninterfaces.Logger) *CoreHandlerSettings {
+func NewCoreHandler(
+	counting *countermessage.CounterMessage,
+	listRules *rules.ListRule,
+	logger commoninterfaces.Logger) *CoreHandlerSettings {
 	return &CoreHandlerSettings{
-		logger:   logger,
-		counting: counting,
+		logger:    logger,
+		listRules: listRules,
+		counting:  counting,
 	}
 }
 
-func (settings *CoreHandlerSettings) CoreHandler(
+func (settings *CoreHandlerSettings) Start(
 	ctx context.Context,
 	natsModule natsapi.ModuleNatsHandler,
 	mispModule mispapi.ModuleMispHandler,
-	redisModule *redisapi.ModuleRedis,
-	listRule *rules.ListRule) error {
+	redisModule *redisapi.ModuleRedis) error {
 
 	chanNatsReception := natsModule.GetDataReceptionChannel()
 	chanMispReception := mispModule.GetDataReceptionChannel()
@@ -92,7 +96,7 @@ func (settings *CoreHandlerSettings) CoreHandler(
 			chanOutputDecodeJson := hjm.HandlerJsonMessage(data.Data, data.MsgId)
 
 			//формирование итоговых документов в формате MISP
-			go NewMispFormat(chanOutputDecodeJson, data.MsgId, mispModule, listRule, settings.counting, settings.logger)
+			go NewMispFormat(chanOutputDecodeJson, data.MsgId, mispModule, settings.listRules, settings.counting, settings.logger)
 
 		case data := <-chanMispReception:
 			switch data.Command {
@@ -129,8 +133,7 @@ func (settings *CoreHandlerSettings) CoreHandler(
 			case "found event id":
 				eventId, ok := data.Result.(string)
 				if !ok {
-					_, f, l, _ := runtime.Caller(0)
-					settings.logger.Send("error", fmt.Sprintf("'it is not possible to convert a value to a string' %s:%d", f, l-2))
+					settings.logger.Send("error", supportingfunctions.CustomError(errors.New("it is not possible to convert a value to a string")).Error())
 
 					break
 				}

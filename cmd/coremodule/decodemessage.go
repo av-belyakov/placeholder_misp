@@ -2,12 +2,13 @@ package coremodule
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"reflect"
-	"runtime"
 
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
+	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
 type HandlerJsonMessageSettings struct {
@@ -29,9 +30,8 @@ func (s *HandlerJsonMessageSettings) HandlerJsonMessage(b []byte, taskId string)
 		//для карт
 		listMap := map[string]interface{}{}
 		if err := json.Unmarshal(b, &listMap); err == nil {
-			_, f, l, _ := runtime.Caller(0)
 			if len(listMap) == 0 {
-				s.logger.Send("error", fmt.Sprintf("'error decoding the json message, it may be empty' %s:%d", f, l-1))
+				s.logger.Send("error", supportingfunctions.CustomError(errors.New("error decoding the json message, it may be empty")).Error())
 
 				return
 			}
@@ -41,14 +41,13 @@ func (s *HandlerJsonMessageSettings) HandlerJsonMessage(b []byte, taskId string)
 			// для срезов
 			listSlice := []interface{}{}
 			if err = json.Unmarshal(b, &listSlice); err != nil {
-				_, f, l, _ := runtime.Caller(0)
-				s.logger.Send("error", fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-1))
+				s.logger.Send("error", supportingfunctions.CustomError(err).Error())
 
 				return
 			}
 
 			if len(listSlice) == 0 {
-				s.logger.Send("error", fmt.Sprintf("'error decoding the json message, it may be empty'"))
+				s.logger.Send("error", supportingfunctions.CustomError(errors.New("error decoding the json message, it may be empty")).Error())
 
 				return
 			}

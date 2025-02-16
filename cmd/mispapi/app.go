@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
-	"runtime"
 	"time"
 
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
+	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
 type RespMISP struct {
@@ -17,17 +17,17 @@ type RespMISP struct {
 }
 
 // NewClientMISP конструктор API MISP
-func NewClientMISP(h, a string, v bool) (*ClientMISP, error) {
-	urlBase, err := url.Parse("http://" + h)
+func NewClientMISP(host, authKey string, verify bool) (*ClientMISP, error) {
+	urlBase, err := url.Parse("http://" + host)
 	if err != nil {
 		return &ClientMISP{}, err
 	}
 
 	return &ClientMISP{
 		BaseURL:  urlBase,
-		Host:     h,
-		AuthHash: a,
-		Verify:   v,
+		Host:     host,
+		AuthHash: authKey,
+		Verify:   verify,
 	}, nil
 }
 
@@ -44,7 +44,11 @@ func NewHandlerAuthorizationMISP(c ConnectMISPHandler, s *StorageAuthorizationDa
 	return &AuthorizationDataMISP{c, s}
 }
 
-func HandlerMISP(conf confighandler.AppConfigMISP, organistions []confighandler.Organization, logger commoninterfaces.Logger) (*ModuleMISP, error) {
+// HandlerMISP взаимодействие с API MISP
+func HandlerMISP(
+	conf confighandler.AppConfigMISP,
+	organistions []confighandler.Organization,
+	logger commoninterfaces.Logger) (*ModuleMISP, error) {
 	mmisp := ModuleMISP{
 		ChanInput:  make(chan InputSettings),
 		ChanOutput: make(chan OutputSetting),
@@ -52,20 +56,17 @@ func HandlerMISP(conf confighandler.AppConfigMISP, organistions []confighandler.
 
 	client, err := NewClientMISP(conf.Host, conf.Auth, false)
 	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		logger.Send("error", fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2))
+		logger.Send("error", supportingfunctions.CustomError(err).Error())
 	}
 
 	connHandler := NewHandlerAuthorizationMISP(client, NewStorageAuthorizationDataMISP())
 	err = connHandler.GetListAllOrganisation(organistions)
 	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		logger.Send("error", fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2))
+		logger.Send("error", supportingfunctions.CustomError(err).Error())
 	}
 
 	if countUser, err := connHandler.GetListAllUsers(); err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		logger.Send("error", fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2))
+		logger.Send("error", supportingfunctions.CustomError(err).Error())
 	} else {
 		logger.Send("info", fmt.Sprintf("at the start of the application, all user information was downloaded %d", countUser))
 	}
@@ -88,15 +89,13 @@ func HandlerMISP(conf confighandler.AppConfigMISP, organistions []confighandler.
 					if us, err := connHandler.GetUserData(data.UserEmail); err == nil {
 						authKey = us.AuthKey
 					} else {
-						_, f, l, _ := runtime.Caller(0)
-						logger.Send("error", fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-3))
+						logger.Send("error", supportingfunctions.CustomError(err).Error())
 
 						if us, err = connHandler.CreateNewUser(data.UserEmail, data.CaseSource); err != nil {
-							_, f, l, _ = runtime.Caller(0)
-							logger.Send("error", fmt.Sprintf("'%s, case id %d' %s:%d", err.Error(), int(data.CaseId), f, l-3))
+							logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("%w, case id:'%d'", err, int(data.CaseId))).Error())
 						} else {
 							authKey = us.AuthKey
-							logger.Send("info", fmt.Sprintf("a new user %s has been successfully created", data.UserEmail))
+							logger.Send("info", fmt.Sprintf("a new user '%s' has been successfully created", data.UserEmail))
 						}
 					}
 				}
@@ -133,16 +132,14 @@ func addEvent(
 	//обработка только для события типа 'events'
 	_, resBodyByte, err := sendEventsMispFormat(host, authKey, data)
 	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		logger.Send("error", fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2))
+		logger.Send("error", supportingfunctions.CustomError(err).Error())
 
 		return
 	}
 
 	resMisp := RespMISP{}
 	if err := json.Unmarshal(resBodyByte, &resMisp); err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		logger.Send("error", fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2))
+		logger.Send("error", supportingfunctions.CustomError(err).Error())
 
 		return
 	}
@@ -159,8 +156,7 @@ func addEvent(
 	}
 
 	if eventId == "" {
-		_, f, l, _ := runtime.Caller(0)
-		logger.Send("error", fmt.Sprintf("'the formation of events of the 'Attributes' type was not performed because the EventID is empty' %s:%d", f, l-1))
+		logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("the formation of events of the 'Attributes' type was not performed because the EventID is empty")).Error())
 
 		return
 	}
@@ -174,8 +170,7 @@ func addEvent(
 
 	// добавляем event_reports
 	if err := sendEventReportsMispFormat(host, authKey, eventId, data.CaseId); err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		logger.Send("error", fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2))
+		logger.Send("error", supportingfunctions.CustomError(err).Error())
 	}
 
 	// ***********************************
@@ -224,8 +219,7 @@ func addEvent(
 
 	// добавляем event_tags
 	if err := sendEventTagsMispFormat(host, masterKey, eventId, data, logger); err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		logger.Send("error", fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2))
+		logger.Send("error", supportingfunctions.CustomError(err).Error())
 	}
 
 	// ***********************************
@@ -241,8 +235,7 @@ func addEvent(
 	//обычные пользователи
 	resMsg, err := sendRequestPublishEvent(host, masterKey, eventId)
 	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		logger.Send("error", fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2))
+		logger.Send("error", supportingfunctions.CustomError(err).Error())
 	}
 	if resMsg != "" {
 		logger.Send("warning", resMsg)
@@ -303,8 +296,7 @@ func delEventById(conf confighandler.AppConfigMISP, eventId string, logger commo
 	// удаление события типа event
 	_, err := delEventsMispFormat(conf.Host, conf.Auth, eventId)
 	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		logger.Send("error", fmt.Sprintf("'%s' %s:%d", err.Error(), f, l-2))
+		logger.Send("error", supportingfunctions.CustomError(err).Error())
 	}
 
 	// ***********************************

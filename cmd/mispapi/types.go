@@ -12,14 +12,14 @@ type ModuleMISP struct {
 
 // ChanInputSettings параметры канала для приема данных в модуль
 type InputSettings struct {
-	CaseId     float64
+	MajorData  map[string]interface{}
 	Command    string
 	TaskId     string
 	RootId     string
 	CaseSource string
 	EventId    string
 	UserEmail  string
-	MajorData  map[string]interface{}
+	CaseId     float64
 }
 
 // SettingChanOutputMISP параметры канала для передачи данных из модуля
