@@ -155,7 +155,7 @@ func sendObjectsMispFormat(host, authKey, eventId string, d InputSettings, logge
 		}
 
 		if res.StatusCode != http.StatusOK {
-			logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("objects with id:'%s' add, %s", eventId, res.Status)).Error())
+			logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("objects with id:'%s' add, status '%s'", eventId, res.Status)).Error())
 		}
 	}
 
@@ -205,7 +205,7 @@ func sendEventReportsMispFormat(host, authKey, eventId string, caseId float64) e
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return supportingfunctions.CustomError(fmt.Errorf("event report add, %s", res.Status))
+		return supportingfunctions.CustomError(fmt.Errorf("event report add, status '%s'", res.Status))
 	}
 
 	return nil
@@ -270,7 +270,7 @@ func sendEventTagsMispFormat(host, authKey, eventId string, d InputSettings, log
 		logger.Send("warning", fmt.Sprintf("event tags with id:'%s' the result of executing the POST query - '%s'", eventId, resultMsg))
 
 		if res.StatusCode != http.StatusOK {
-			logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("'event tags with id:'%s' add, %s", eventId, res.Status)).Error())
+			logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("'event tags with id:'%s' add, status '%s'", eventId, res.Status)).Error())
 		}
 	}
 
