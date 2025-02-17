@@ -10,19 +10,19 @@ import (
 )
 
 func (mmisp ModuleMISP) GetDataReceptionChannel() <-chan OutputSetting {
-	return mmisp.ChanOutput
+	return mmisp.chOutput
 }
 
 func (mmisp ModuleMISP) SendingDataOutput(data OutputSetting) {
-	mmisp.ChanOutput <- data
+	mmisp.chOutput <- data
 }
 
 func (mmisp ModuleMISP) GetInputChannel() <-chan InputSettings {
-	return mmisp.ChanInput
+	return mmisp.chInput
 }
 
 func (mmisp ModuleMISP) SendingDataInput(data InputSettings) {
-	mmisp.ChanInput <- data
+	mmisp.chInput <- data
 }
 
 // setUserSettings добавляет настройки пользователя в хранилище, если

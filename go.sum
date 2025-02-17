@@ -1,3 +1,7 @@
+github.com/av-belyakov/cachingstoragewithqueue v0.0.0-20250214120945-4e600c02a2be h1:qeCaVO0W6KEqx4uHnAUxDWRpSGgNZ1D4fpHJ7c3LPNY=
+github.com/av-belyakov/cachingstoragewithqueue v0.0.0-20250214120945-4e600c02a2be/go.mod h1:KWRLxhLhcltDkzJUBrbHeH454lhscBuh1TrjwEYYBhg=
+github.com/av-belyakov/objectsmispformat v0.0.0-20250204110928-f6063df54ece h1:B5W8iwWtaUjhZqSN7Ey6T/N+f4bb21MldJmOeqC86K0=
+github.com/av-belyakov/objectsmispformat v0.0.0-20250204110928-f6063df54ece/go.mod h1:WJPWAhA0MCqMLf2awNurOwMBRQhPT963g9tV7sejh4E=
 github.com/av-belyakov/simplelogger v0.0.0-20250113074237-c90989ef4b7e h1:Nuyap04s2KGKUrd313QSxFJKXvaj1e6x/NxA5gIMayE=
 github.com/av-belyakov/simplelogger v0.0.0-20250113074237-c90989ef4b7e/go.mod h1:yW2ev3nXPP3WY8svBWJpg4PQRl67MTGIaaiXJ0ULRZ8=
 github.com/av-belyakov/zabbixapicommunicator v0.0.0-20241225064839-9c19184470aa h1:ivXQuTb7UxYUy568EOIOvRDExKLU3tDnw634d+WTGto=

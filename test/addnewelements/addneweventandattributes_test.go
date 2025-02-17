@@ -99,7 +99,7 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		exampleByte, errReadFile = readFileJson("testing/test_json", "example_caseId_33705.json")
 
 		//инициалиация модуля для взаимодействия с MISP
-		mispModule, errMisp = mispapi.HandlerMISP(*confApp.GetAppMISP(), confApp.Organizations, logging)
+		mispModule, errMisp = mispapi.NewModuleMISP(*confApp.GetAppMISP(), confApp.Organizations, logging)
 
 		hjm := coremodule.NewHandlerJsonMessage(counting, logging)
 		// обработчик JSON документа

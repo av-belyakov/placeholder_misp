@@ -2,12 +2,22 @@ package mispapi
 
 import (
 	"sync"
+
+	"github.com/av-belyakov/cachingstoragewithqueue"
+	"github.com/av-belyakov/objectsmispformat"
+	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
 )
 
 // ModuleMISP инициализированный модуль
 type ModuleMISP struct {
-	ChanInput  chan InputSettings //канал для отправки данных В модуль
-	ChanOutput chan OutputSetting //канал для отправки данных ИЗ модуля
+	cache        *cachingstoragewithqueue.CacheStorageWithQueue[*objectsmispformat.ListFormatsMISP]
+	organistions []confighandler.Organization
+	host         string
+	authKey      string
+	logger       commoninterfaces.Logger
+	chInput      chan InputSettings //канал для отправки данных В модуль
+	chOutput     chan OutputSetting //канал для отправки данных ИЗ модуля
 }
 
 // ChanInputSettings параметры канала для приема данных в модуль
@@ -56,4 +66,8 @@ type RecivedOrganisation struct {
 type AuthorizationDataMISP struct {
 	ConnectMISPHandler
 	Storage *StorageAuthorizationData
+}
+
+type RespMISP struct {
+	Event map[string]interface{} `json:"event"`
 }

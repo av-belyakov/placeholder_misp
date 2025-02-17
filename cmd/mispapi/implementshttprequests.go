@@ -8,9 +8,9 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"runtime"
 
 	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
+	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
 type ClientMISP struct {
@@ -72,36 +72,30 @@ func (client *ClientMISP) Do(method, path string, data []byte) (*http.Response, 
 
 	resp, err := httpClient.Do(httpReq)
 	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-
-		return nil, resBodyByte, fmt.Errorf(" '%s' %s:%d", err.Error(), f, l-2)
+		return nil, resBodyByte, supportingfunctions.CustomError(err)
 	}
 	defer resp.Body.Close()
 
 	resBodyByte, err = io.ReadAll(resp.Body)
 	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-
-		return resp, resBodyByte, fmt.Errorf(" '%s' %s:%d", err.Error(), f, l-2)
+		return nil, resBodyByte, supportingfunctions.CustomError(err)
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		_, f, l, _ := runtime.Caller(0)
-
 		mferr := datamodels.MispFormatError{Errors: map[string]interface{}{}}
 		if err := json.Unmarshal(resBodyByte, &mferr); err != nil {
 			lerr := []interface{}{}
 			if err := json.Unmarshal(resBodyByte, &lerr); err == nil {
-				return resp, resBodyByte, fmt.Errorf("message from MISP: '%s: err - %v' %s:%d", resp.Status, lerr, f, l-1)
+				return resp, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("message from MISP: status '%s', error - %s", resp.Status, lerr))
 			}
 
 			var serr string
 			if err := json.Unmarshal(resBodyByte, &serr); err == nil {
-				return resp, resBodyByte, fmt.Errorf("message from MISP: '%s: err - %s' %s:%d", resp.Status, serr, f, l-1)
+				return resp, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("message from MISP: status '%s' error - %s", resp.Status, serr))
 			}
 		}
 
-		return resp, resBodyByte, fmt.Errorf("message from MISP: '%s: msg - %s, url - %s, err - %v' %s:%d", resp.Status, mferr.Message, mferr.URL, mferr.Errors, f, l-1)
+		return resp, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("message from MISP: staus '%s', message '%s', url '%s', error - %s", resp.Status, mferr.Message, mferr.URL, mferr.Errors))
 	}
 
 	return resp, resBodyByte, err

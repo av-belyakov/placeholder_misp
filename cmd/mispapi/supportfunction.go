@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"runtime"
 
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
@@ -21,35 +20,26 @@ func sendEventsMispFormat(host, authKey string, d InputSettings) (*http.Response
 
 	c, err := NewClientMISP(host, authKey, false)
 	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		return nil, resBodyByte, fmt.Errorf("'events add, %s' %s:%d", err.Error(), f, l-2)
+		return nil, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("events add, %w", err))
 	}
 
 	ed, ok := d.MajorData["events"]
 	if !ok {
-		_, f, l, _ := runtime.Caller(0)
-
-		return nil, resBodyByte, fmt.Errorf("'the properties of \"events\" were not found in the received data' %s:%d", f, l-2)
+		return nil, resBodyByte, supportingfunctions.CustomError(errors.New("the properties of 'events' were not found in the received data"))
 	}
 
 	b, err := json.Marshal(ed)
 	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-
-		return nil, resBodyByte, fmt.Errorf("'events add, %s' %s:%d", err.Error(), f, l-2)
+		return nil, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("events add, %w", err))
 	}
 
 	res, resBodyByte, err = c.Post("/events/add", b)
 	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-
-		return nil, resBodyByte, fmt.Errorf("'events add, %s' %s:%d", err.Error(), f, l-2)
+		return nil, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("events add, %w", err))
 	}
 
 	if res.StatusCode != http.StatusOK {
-		_, f, l, _ := runtime.Caller(0)
-
-		return nil, resBodyByte, fmt.Errorf("'events add, %s' %s:%d", res.Status, f, l-1)
+		return nil, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("events add, status '%s'", res.Status))
 	}
 
 	return res, resBodyByte, nil
@@ -112,7 +102,7 @@ func sendAttribytesMispFormat(host, authKey, eventId string, d InputSettings, lo
 		}
 
 		if res.StatusCode != http.StatusOK {
-			logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("'attributes' with id:'%s' add, %s", eventId, res.Status)).Error())
+			logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("'attributes' with id:'%s' add, status '%s'", eventId, res.Status)).Error())
 		}
 	}
 
@@ -189,7 +179,7 @@ func sendRequestPublishEvent(host, authKey, eventId string) (string, error) {
 	resultMsg = fmt.Sprintf("result published event with id '%s' - %s '%s' %s", eventId, resData.name, resData.message, resData.success)
 
 	if res.StatusCode != http.StatusOK {
-		return resultMsg, supportingfunctions.CustomError(fmt.Errorf("event publish add, %s", res.Status))
+		return resultMsg, supportingfunctions.CustomError(fmt.Errorf("event publish add, status '%s'", res.Status))
 	}
 
 	return resultMsg, nil

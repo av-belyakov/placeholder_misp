@@ -114,10 +114,11 @@ func server(ctx context.Context) {
 
 	// ***************************************************************************
 	// *************** инициалиация модуля для взаимодействия с MISP *************
-	mispModule, err := mispapi.HandlerMISP(*confApp.GetAppMISP(), confApp.GetListOrganization(), logging)
+	mispModule, err := mispapi.NewModuleMISP(confApp.GetAppMISP().Host, confApp.GetAppMISP().Auth, confApp.GetListOrganization(), logging)
 	if err != nil {
 		_ = simpleLogger.Write("error", supportingfunctions.CustomError(err).Error())
 	}
+	mispModule.Start(ctx)
 
 	// вывод информационного сообщения при старте приложения
 	msg := getInformationMessage()
