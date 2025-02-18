@@ -11,7 +11,7 @@ import (
 
 // ModuleMISP инициализированный модуль
 type ModuleMISP struct {
-	cache        *cachingstoragewithqueue.CacheStorageWithQueue[*objectsmispformat.ListFormatsMISP]
+	cache        *cachingstoragewithqueue.CacheStorageWithQueue[objectsmispformat.ListFormatsMISP]
 	organistions []confighandler.Organization
 	host         string
 	authKey      string
@@ -22,7 +22,8 @@ type ModuleMISP struct {
 
 // ChanInputSettings параметры канала для приема данных в модуль
 type InputSettings struct {
-	MajorData  map[string]interface{}
+	//MajorData  map[string]interface{}
+	Data       objectsmispformat.ListFormatsMISP
 	Command    string
 	TaskId     string
 	RootId     string
@@ -37,12 +38,14 @@ type OutputSetting struct {
 	Command, CaseId, EventId, TaskId, RootId string
 }
 
+// StorageAuthorizationData хранилище с авторизационными настройками пользователя
 type StorageAuthorizationData struct {
 	AuthList         []UserSettings
 	OrganisationList map[string]OrganisationOptions
 	sync.Mutex
 }
 
+// UserSettings авторизационныt настройки пользователя
 type UserSettings struct {
 	UserId  string
 	OrgId   string
@@ -52,6 +55,7 @@ type UserSettings struct {
 	Role    string
 }
 
+// OrganisationOptions yfcnhjqrb jhufybpfwbb
 type OrganisationOptions struct {
 	Id   string `json:"id"`
 	Name string `json:"name"`
@@ -70,4 +74,11 @@ type AuthorizationDataMISP struct {
 
 type RespMISP struct {
 	Event map[string]interface{} `json:"event"`
+}
+
+// CacheSpecialObject специальный объект соответствующий интерфейсу cachingstoragewithqueue.CacheStorageHandler
+type CacheSpecialObject[T SpecialObjectComparator] struct {
+	object      T
+	handlerFunc func(int) bool
+	id          string
 }

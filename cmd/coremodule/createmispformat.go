@@ -6,10 +6,10 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/av-belyakov/objectsmispformat"
 	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
-	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
 	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
 )
 
@@ -21,11 +21,11 @@ func NewMispFormat(
 	counting *countermessage.CounterMessage,
 	logger commoninterfaces.Logger) {
 
-	eventsMisp := datamodels.NewEventMisp()
-	listObjectsMisp := datamodels.NewListObjectsMispFormat()
-	listAttributeTmp := datamodels.NewListAttributeTmp()
-	listAttributesMisp := datamodels.NewListAttributesMispFormat()
-	leot := datamodels.NewListEventObjectTags()
+	eventsMisp := objectsmispformat.NewEventMisp()
+	listObjectsMisp := objectsmispformat.NewListObjectsMispFormat()
+	listAttributeTmp := objectsmispformat.NewListAttributeTmp()
+	listAttributesMisp := objectsmispformat.NewListAttributesMispFormat()
+	leot := objectsmispformat.NewListEventObjectTags()
 
 	supportiveListExcludeRule := NewSupportiveListExcludeRuleTmp(listRule.GetRuleExclude())
 
@@ -253,6 +253,18 @@ func NewMispFormat(
 		//
 		//
 
+		mispFormat := objectsmispformat.NewListFormatsMISP()
+		mispFormat.ID = rootId
+		mispFormat.Event = eventsMisp
+		mispFormat.Objects = getNewListObjects(listObjectsMisp.GetList(), listAttributeTmp.GetListAttribute())
+		tmpListTags := leot.GetListTags()
+		mispFormat.ObjectTags = &tmpListTags
+		mispFormat.Attributes = getNewListAttributes(listAttributesMisp.GetList(), listTags)
+		reports := objectsmispformat.NewEventReports()
+		reports.SetName(fmt.Sprint(caseId))
+		reports.SetDistribution("1")
+		mispFormat.Reports = reports
+
 		//тут отправляем сформированные по формату MISP пользовательские структуры
 		mispModule.SendingDataInput(mispapi.InputSettings{
 			Command:    "add event",
@@ -261,17 +273,8 @@ func NewMispFormat(
 			RootId:     rootId,
 			CaseSource: caseSource,
 			UserEmail:  userEmail,
-			MajorData: map[string]interface{}{
-				"events": eventsMisp,
-				//getNewListAttributes влияет на поля Category и Type типа Attributes
-				"attributes": getNewListAttributes(
-					listAttributesMisp.GetList(),
-					listTags),
-				"objects": getNewListObjects(
-					listObjectsMisp.GetList(),
-					listAttributeTmp.GetListAttribute()),
-				"event.object.tags": leot.GetListTags(),
-			}})
+			Data:       *mispFormat,
+		})
 	}
 
 	//очищаем события, список аттрибутов и текущий email пользователя

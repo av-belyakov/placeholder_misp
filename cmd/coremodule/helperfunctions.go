@@ -5,12 +5,11 @@ import (
 
 	"github.com/av-belyakov/objectsmispformat"
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
-	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
 	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
 )
 
 // удаляет элемент из списка атрибутов
-func delElementAttributes(er *ExclusionRules, la *datamodels.ListAttributesMispFormat, logger commoninterfaces.Logger) {
+func delElementAttributes(er *ExclusionRules, la *objectsmispformat.ListAttributesMispFormat, logger commoninterfaces.Logger) {
 	for _, v := range er.SearchObjectName("observables") {
 		if attr, ok := la.DelElementList(v.SequenceNumber); ok {
 			logger.Send("warning", fmt.Sprintf("'an attribute with a value of '%s' has been removed'", attr.Value))
@@ -21,7 +20,7 @@ func delElementAttributes(er *ExclusionRules, la *datamodels.ListAttributesMispF
 // обрабатывает значение свойства observables.tags
 func handlerObservablesTags(v interface{},
 	listTags map[int][2]string,
-	listAttributesMisp *datamodels.ListAttributesMispFormat,
+	listAttributesMisp *objectsmispformat.ListAttributesMispFormat,
 	seqNumObservable int) map[int][2]string {
 	tag, ok := v.(string)
 	if !ok {
@@ -271,8 +270,8 @@ func searchOwnerEmail(tmf ChanInputCreateMispFormat) (string, bool) {
 // getNewListAttributes устанавливает значения в свойствах Category и Type и в том
 // числе изменяет состояние свойства DisableCorrelation (которое по умолчанию ВЫКЛЮЧЕНО)
 // на значение информирующее MISP нужно ли выполнять корреляцию или нет
-func getNewListAttributes(al map[int]datamodels.AttributesMispFormat, lat map[int][2]string) []datamodels.AttributesMispFormat {
-	nal := make([]datamodels.AttributesMispFormat, 0, len(al))
+func getNewListAttributes(al map[int]objectsmispformat.AttributesMispFormat, lat map[int][2]string) []*objectsmispformat.AttributesMispFormat {
+	nal := make([]*objectsmispformat.AttributesMispFormat, 0, len(al))
 
 	for k, v := range al {
 		if elem, ok := lat[k]; ok {
@@ -289,7 +288,7 @@ func getNewListAttributes(al map[int]datamodels.AttributesMispFormat, lat map[in
 			v.DisableCorrelation = true
 		}
 
-		nal = append(nal, v)
+		nal = append(nal, &v)
 	}
 
 	return nal
@@ -367,22 +366,7 @@ func getNewListObjects(
 	return nlo
 }
 
-/*func getNewListObjects(
-	listObjects map[int]datamodels.ObjectsMispFormat,
-	attachment map[int][]datamodels.AttributeMispFormat) map[int]datamodels.ObjectsMispFormat {
-	nlo := make(map[int]datamodels.ObjectsMispFormat, len(attachment))
-
-	for k, v := range attachment {
-		if obj, ok := listObjects[k]; ok {
-			obj.Attribute = v
-			nlo[k] = obj
-		}
-	}
-
-	return nlo
-}*/
-
-func joinEventTags(listTags *datamodels.ListEventObjectTags, galaxyTags []string) {
+func joinEventTags(listTags *objectsmispformat.ListEventObjectTags, galaxyTags []string) {
 	for _, v := range galaxyTags {
 		listTags.SetTag(v)
 	}

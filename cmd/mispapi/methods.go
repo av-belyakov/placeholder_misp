@@ -9,6 +9,9 @@ import (
 	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
 )
 
+//****** каналы *******
+//
+
 func (mmisp ModuleMISP) GetDataReceptionChannel() <-chan OutputSetting {
 	return mmisp.chOutput
 }
@@ -24,6 +27,9 @@ func (mmisp ModuleMISP) GetInputChannel() <-chan InputSettings {
 func (mmisp ModuleMISP) SendingDataInput(data InputSettings) {
 	mmisp.chInput <- data
 }
+
+//****** хранилище пользовательских данных и настроек организаций ******
+//
 
 // setUserSettings добавляет настройки пользователя в хранилище, если
 // пользователь id или email уже есть, ничего не делает
@@ -99,6 +105,9 @@ func (s *StorageAuthorizationData) GetOrganisationOptions(key string) (*Organisa
 func (s *StorageAuthorizationData) GetOptionsAllOrganisations() map[string]OrganisationOptions {
 	return s.OrganisationList
 }
+
+//****** управление авторизационными данными *******
+//
 
 func (ad *AuthorizationDataMISP) getListAllUsers() ([]datamodels.UsersSettingsMispFormat, error) {
 	usmispf := []datamodels.UsersSettingsMispFormat{}
@@ -292,4 +301,64 @@ func (ad *AuthorizationDataMISP) CreateNewUser(email, source string) (UserSettin
 	_ = ad.Storage.setUserSettings(newUser)
 
 	return newUser, nil
+}
+
+//******* методы вспомогательного типа используемого для кэша ********
+
+// NewCacheSpecialObject конструктор вспомогательного типа реализующий интерфейс CacheStorageFuncHandler[T any]
+func NewCacheSpecialObject[T SpecialObjectComparator]() *CacheSpecialObject[T] {
+	return &CacheSpecialObject[T]{}
+}
+
+func (o *CacheSpecialObject[T]) SetID(v string) {
+	o.id = v
+}
+
+func (o *CacheSpecialObject[T]) GetID() string {
+	return o.id
+}
+
+func (o *CacheSpecialObject[T]) SetObject(v T) {
+	o.object = v
+}
+
+func (o *CacheSpecialObject[T]) GetObject() T {
+	return o.object
+}
+
+func (o *CacheSpecialObject[T]) SetFunc(f func(int) bool) {
+	o.handlerFunc = f
+}
+
+func (o *CacheSpecialObject[T]) GetFunc() func(int) bool {
+	return o.handlerFunc
+}
+
+func (o *CacheSpecialObject[T]) Comparison(objFromCache T) bool {
+	if !o.object.ComparisonID(objFromCache.GetID()) {
+		return false
+	}
+
+	if !o.object.ComparisonEvent(objFromCache.GetEvent()) {
+		return false
+	}
+
+	if !o.object.ComparisonReports(objFromCache.GetReports()) {
+		return false
+	}
+
+	if !o.object.ComparisonAttributes(objFromCache.GetAttributes()) {
+		return false
+
+	}
+
+	if !o.object.ComparisonObjects(objFromCache.GetObjects()) {
+		return false
+	}
+
+	if !o.object.ComparisonObjectTags(o.object.GetObjectTags()) {
+		return false
+	}
+
+	return true
 }

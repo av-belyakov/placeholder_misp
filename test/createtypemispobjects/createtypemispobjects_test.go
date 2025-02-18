@@ -42,8 +42,8 @@ var _ = Describe("Createtypemispobjects", Ordered, func() {
 		counting := countermessage.New(chZabbix)
 
 		moduleMisp = &mispapi.ModuleMISP{
-			ChanInput:  make(chan mispapi.InputSettings),
-			ChanOutput: make(chan mispapi.OutputSetting),
+			chInput:  make(chan mispapi.InputSettings),
+			chOutput: make(chan mispapi.OutputSetting),
 		}
 
 		logging := logginghandler.New()

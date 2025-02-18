@@ -44,7 +44,7 @@ var _ = Describe("Deleteeventmisp", Ordered, func() {
 		logging = logginghandler.New()
 
 		//redismodule = redisinteractions.HandlerRedis(context.Background(), confApp.AppConfigRedis, storageApp, logging)
-		mispmodule, errMispModule = mispapi.NewModuleMISP(confApp.AppConfigMISP, confApp.Organizations, logging)
+		mispmodule, errMispModule = mispapi.NewModuleMISP(confApp.GetAppMISP().Host, confApp.GetAppMISP().Auth, confApp.GetListOrganization(), logging)
 	})
 
 	Context("Тест 1. Проверка успешной инициализации модулей", func() {
