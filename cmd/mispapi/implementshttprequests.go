@@ -2,12 +2,14 @@ package mispapi
 
 import (
 	"bytes"
+	"context"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
@@ -28,25 +30,32 @@ func (client *ClientMISP) GetAuthData() string {
 	return client.AuthHash
 }
 
-func (client *ClientMISP) Get(path string, data []byte) (*http.Response, []byte, error) {
-	return client.Do("GET", path, data)
+func (client *ClientMISP) Get(ctx context.Context, path string, data []byte) (*http.Response, []byte, error) {
+	return client.Do(ctx, "GET", path, data)
 }
 
-func (client *ClientMISP) Post(path string, data []byte) (*http.Response, []byte, error) {
-	return client.Do("POST", path, data)
+func (client *ClientMISP) Post(ctx context.Context, path string, data []byte) (*http.Response, []byte, error) {
+	return client.Do(ctx, "POST", path, data)
 }
 
-func (client *ClientMISP) Delete(path string) (*http.Response, []byte, error) {
-	return client.Do("DELETE", path, []byte{})
+func (client *ClientMISP) Delete(ctx context.Context, path string) (*http.Response, []byte, error) {
+	return client.Do(ctx, "DELETE", path, []byte{})
 }
 
 // Do выполняет запрос к API MISP и возвращает заголовок ответа и и тело ответа в виде среза байт
-func (client *ClientMISP) Do(method, path string, data []byte) (*http.Response, []byte, error) {
+func (client *ClientMISP) Do(ctx context.Context, method, path string, data []byte) (*http.Response, []byte, error) {
+	ctxTimeout, CancelFunc := context.WithTimeout(ctx, time.Second*15)
+	defer CancelFunc()
+
 	dataLen := 0
 	resBodyByte := []byte{}
 
-	httpReq := &http.Request{}
 	reader := bytes.NewReader(data)
+	httpReq, err := http.NewRequestWithContext(ctxTimeout, method, path, reader)
+	if err != nil {
+		return nil, resBodyByte, supportingfunctions.CustomError(err)
+	}
+
 	dataLen = reader.Len()
 	if dataLen > 0 && method == "POST" {
 		httpReq.ContentLength = int64(dataLen)
@@ -57,7 +66,6 @@ func (client *ClientMISP) Do(method, path string, data []byte) (*http.Response, 
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: !client.Verify},
 	}
 
-	httpReq.Method = method
 	httpReq.URL = client.BaseURL
 	httpReq.URL.Path = path
 

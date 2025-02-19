@@ -72,9 +72,17 @@ type AuthorizationDataMISP struct {
 	Storage *StorageAuthorizationData
 }
 
-type RespMISP struct {
+type MispResponse struct {
 	Event map[string]interface{} `json:"event"`
 }
+
+type requestMISP struct {
+	host          string
+	userAuthKey   string
+	masterAuthKey string
+}
+
+type RequestMISPOptions func(*requestMISP) error
 
 // CacheSpecialObject специальный объект соответствующий интерфейсу cachingstoragewithqueue.CacheStorageHandler
 type CacheSpecialObject[T SpecialObjectComparator] struct {

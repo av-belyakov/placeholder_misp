@@ -1,16 +1,16 @@
 package mispapi
 
 import (
+	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
-	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
-	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
+/*
 // sendEventsMispFormat отправляет в API MISP событие в виде типа Event и возвращает полученный ответ
 func sendEventsMispFormat(host, authKey string, d InputSettings) (*http.Response, []byte, error) {
 	var (
@@ -275,16 +275,19 @@ func sendEventTagsMispFormat(host, authKey, eventId string, d InputSettings, log
 	}
 
 	return nil
-}
+}*/
 
 // удаляем дублирующиеся события из MISP
-func delEventsMispFormat(host, authKey, eventId string) (*http.Response, error) {
+func delEventsMispFormat(ctx context.Context, host, authKey, eventId string) (*http.Response, error) {
+	ctxTimeout, CancelFunc := context.WithTimeout(ctx, time.Second*15)
+	defer CancelFunc()
+
 	c, err := NewClientMISP(host, authKey, false)
 	if err != nil {
 		return nil, supportingfunctions.CustomError(fmt.Errorf("events delete, %w", err))
 	}
 
-	res, _, err := c.Delete("/events/delete/" + eventId)
+	res, _, err := c.Delete(ctxTimeout, "/events/delete/"+eventId)
 	if err != nil {
 		return nil, err
 	}

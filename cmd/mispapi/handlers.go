@@ -1,14 +1,14 @@
 package mispapi
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
-	"time"
 
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
+/*
 func addEvent(
 	host string,
 	authKey string,
@@ -32,7 +32,7 @@ func addEvent(
 		return
 	}
 
-	resMisp := RespMISP{}
+	resMisp := MispResponse{}
 	if err := json.Unmarshal(resBodyByte, &resMisp); err != nil {
 		logger.Send("error", supportingfunctions.CustomError(err).Error())
 
@@ -143,31 +143,29 @@ func addEvent(
 	//
 	//
 
-	/*
-	   типы команд для передачи в NATS
 
-	   requests := map[string][]byte{
-	   					"add_case_tag": []byte(
-	   						fmt.Sprintf(`{
-	   							"service": "MISP",
-	   							"command": "add_case_tag",
-	   							"root_id": "%s",
-	   							"case_id": "%s",
-	   							"value": "Webhook: send=\"MISP\""}`,
-	   							data.RootId,
-	   							data.CaseId)),
-	   					"set_case_custom_field": []byte(
-	   						fmt.Sprintf(`{
-	   							"service": "MISP",
-	   							"command": "set_case_custom_field",
-	   							"root_id": "%s",
-	   	  						"field_name": "misp-event-id.string",
-	   							"value": "%s"}`,
-	   							data.RootId,
-	   							data.EventId)),
-	   				}
-
-	*/
+	//   типы команд для передачи в NATS
+    //
+	//   requests := map[string][]byte{
+	//   					"add_case_tag": []byte(
+	//   						fmt.Sprintf(`{
+	//   							"service": "MISP",
+	//   							"command": "add_case_tag",
+	//   							"root_id": "%s",
+	//   							"case_id": "%s",
+	//   							"value": "Webhook: send=\"MISP\""}`,
+	//   							data.RootId,
+	//   							data.CaseId)),
+	//   					"set_case_custom_field": []byte(
+	//   						fmt.Sprintf(`{
+	//   							"service": "MISP",
+	//   							"command": "set_case_custom_field",
+	//   							"root_id": "%s",
+	//   	  						"field_name": "misp-event-id.string",
+	//   							"value": "%s"}`,
+	//   							data.RootId,
+	//   							data.EventId)),
+	//   				}
 
 	//отправляем в ядро информацию по event Id
 	mmisp.SendingDataOutput(OutputSetting{
@@ -177,9 +175,9 @@ func addEvent(
 		RootId:  data.RootId,
 		TaskId:  data.TaskId,
 	})
-}
+}*/
 
-func delEventById(host, authKey, eventId string, logger commoninterfaces.Logger) {
+func delEventById(ctx context.Context, host, authKey, eventId string, logger commoninterfaces.Logger) {
 
 	// ***********************************
 	// Это логирование только для теста!!!
@@ -189,7 +187,7 @@ func delEventById(host, authKey, eventId string, logger commoninterfaces.Logger)
 	//
 
 	// удаление события типа event
-	_, err := delEventsMispFormat(host, authKey, eventId)
+	_, err := delEventsMispFormat(ctx, host, authKey, eventId)
 	if err != nil {
 		logger.Send("error", supportingfunctions.CustomError(err).Error())
 	}

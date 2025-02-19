@@ -7,6 +7,7 @@ import (
 
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
 	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
+	"golang.org/x/net/context"
 )
 
 //****** каналы *******
@@ -109,9 +110,9 @@ func (s *StorageAuthorizationData) GetOptionsAllOrganisations() map[string]Organ
 //****** управление авторизационными данными *******
 //
 
-func (ad *AuthorizationDataMISP) getListAllUsers() ([]datamodels.UsersSettingsMispFormat, error) {
+func (ad *AuthorizationDataMISP) getListAllUsers(ctx context.Context) ([]datamodels.UsersSettingsMispFormat, error) {
 	usmispf := []datamodels.UsersSettingsMispFormat{}
-	_, resByte, err := ad.Get("/admin/users", nil)
+	_, resByte, err := ad.Get(ctx, "/admin/users", nil)
 	if err != nil {
 		return usmispf, err
 	}
@@ -128,9 +129,9 @@ func (ad *AuthorizationDataMISP) getListAllUsers() ([]datamodels.UsersSettingsMi
 // и добавляет их в хранилище. Внимание, перед добавлением списка пользователей,
 // данные о пользователях которые оставались в хранилище будут удалены. Но только
 // если при обращении к MISP не будет ошибок
-func (ad *AuthorizationDataMISP) GetListAllUsers() (int, error) {
+func (ad *AuthorizationDataMISP) GetListAllUsers(ctx context.Context) (int, error) {
 	var countUser int
-	lus, err := ad.getListAllUsers()
+	lus, err := ad.getListAllUsers(ctx)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 		return countUser, fmt.Errorf("'%s' %s:%d", err.Error(), f, l-2)
@@ -156,12 +157,12 @@ func (ad *AuthorizationDataMISP) GetListAllUsers() (int, error) {
 
 // GetUserData проверяет наличие пользователя в памяти, если его там нет то
 // делает запрос к MISP и обновляет данные в памяти если что то пришло
-func (ad *AuthorizationDataMISP) GetUserData(user string) (UserSettings, error) {
+func (ad *AuthorizationDataMISP) GetUserData(ctx context.Context, user string) (UserSettings, error) {
 	if us, ok := ad.Storage.GetUserSettingsByEmail(user); ok {
 		return *us, nil
 	}
 
-	lus, err := ad.getListAllUsers()
+	lus, err := ad.getListAllUsers(ctx)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 		return UserSettings{}, fmt.Errorf("'%s' %s:%d", err.Error(), f, l-2)
@@ -219,8 +220,8 @@ func (ad *AuthorizationDataMISP) DelUserData(user string) (int, bool) {
 
 // GetListAllOrganisation получает список всех организаций добавленых в MISP
 // коррелирует с данными из конфигурационного файла и сохраняет в хранилище
-func (ad *AuthorizationDataMISP) GetListAllOrganisation(confOrg []confighandler.Organization) error {
-	_, resByte, err := ad.Get("/organisations", nil)
+func (ad *AuthorizationDataMISP) GetListAllOrganisation(ctx context.Context, confOrg []confighandler.Organization) error {
+	_, resByte, err := ad.Get(ctx, "/organisations", nil)
 	if err != nil {
 		return err
 	}
@@ -257,7 +258,7 @@ func (ad *AuthorizationDataMISP) GetListAllOrganisation(confOrg []confighandler.
 //	"rcmnvs": "РЦМ (г. Новосибирск)", "SFO-RCM"
 //	"rcmkha": "РЦМ (г. Хабаровск)", "DFO-RCM"
 //	"rcmmsk": "РЦМ (г. Москва и МО)", "CFO-RCM"
-func (ad *AuthorizationDataMISP) CreateNewUser(email, source string) (UserSettings, error) {
+func (ad *AuthorizationDataMISP) CreateNewUser(ctx context.Context, email, source string) (UserSettings, error) {
 	orgId := "1"
 	if org, ok := ad.Storage.GetOrganisationOptions(source); ok {
 		orgId = org.Id
@@ -277,7 +278,7 @@ func (ad *AuthorizationDataMISP) CreateNewUser(email, source string) (UserSettin
 		return UserSettings{}, fmt.Errorf("'%s' %s:%d", err.Error(), f, l-2)
 	}
 
-	_, resByte, err := ad.Post("/admin/users/add", b)
+	_, resByte, err := ad.Post(ctx, "/admin/users/add", b)
 	if err != nil {
 		_, f, l, _ := runtime.Caller(0)
 		return UserSettings{}, fmt.Errorf("'%s' %s:%d", err.Error(), f, l-2)
@@ -303,7 +304,7 @@ func (ad *AuthorizationDataMISP) CreateNewUser(email, source string) (UserSettin
 	return newUser, nil
 }
 
-//******* методы вспомогательного типа используемого для кэша ********
+//******* методы вспомогательного типа, используемого для кэша ********
 
 // NewCacheSpecialObject конструктор вспомогательного типа реализующий интерфейс CacheStorageFuncHandler[T any]
 func NewCacheSpecialObject[T SpecialObjectComparator]() *CacheSpecialObject[T] {
