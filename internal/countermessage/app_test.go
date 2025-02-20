@@ -55,7 +55,7 @@ func TestCounterMessage(t *testing.T) {
 	reg, err := regexp.Compile(`\d`)
 	assert.NoError(t, err)
 
-	go cm.Handler(ctx)
+	cm.Start(ctx)
 	go func() {
 		var num int = 1
 		for {

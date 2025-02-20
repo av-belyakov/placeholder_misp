@@ -13,20 +13,20 @@ import (
 //****** каналы *******
 //
 
-func (mmisp ModuleMISP) GetDataReceptionChannel() <-chan OutputSetting {
-	return mmisp.chOutput
+func (m ModuleMISP) GetDataReceptionChannel() <-chan OutputSetting {
+	return m.chOutput
 }
 
-func (mmisp ModuleMISP) SendingDataOutput(data OutputSetting) {
-	mmisp.chOutput <- data
+func (m ModuleMISP) SendingDataOutput(data OutputSetting) {
+	m.chOutput <- data
 }
 
-func (mmisp ModuleMISP) GetInputChannel() <-chan InputSettings {
-	return mmisp.chInput
+func (m ModuleMISP) GetInputChannel() <-chan InputSettings {
+	return m.chInput
 }
 
-func (mmisp ModuleMISP) SendingDataInput(data InputSettings) {
-	mmisp.chInput <- data
+func (m ModuleMISP) SendingDataInput(data InputSettings) {
+	m.chInput <- data
 }
 
 //****** хранилище пользовательских данных и настроек организаций ******
@@ -216,6 +216,16 @@ func (ad *AuthorizationDataMISP) DelUserData(user string) (int, bool) {
 	ad.Storage.AuthList = newList
 
 	return num, isExist
+}
+
+// DeleteUser удаление пользователя из MISP
+func (ad *AuthorizationDataMISP) DeleteUser(ctx context.Context, userId string) error {
+	_, _, err := ad.Delete(ctx, fmt.Sprintf("/admin/users/delete/%s", userId))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // GetListAllOrganisation получает список всех организаций добавленых в MISP

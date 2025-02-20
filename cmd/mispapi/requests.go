@@ -6,11 +6,14 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/av-belyakov/objectsmispformat"
+	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
+// NewMispRequest конструктор запроса к MISP
 func NewMispRequest(opts ...RequestMISPOptions) (*requestMISP, error) {
 	mispReq := &requestMISP{}
 
@@ -62,7 +65,7 @@ func WithMasterAuthKey(v string) RequestMISPOptions {
 	}
 }
 
-// sendEvent отправляет в API MISP событие в виде типа Event и возвращает полученный ответ
+// sendEvent добавляет в MISP объект типа 'event'
 func (rmisp *requestMISP) sendEvent(ctx context.Context, data *objectsmispformat.EventsMispFormat) (*http.Response, []byte, error) {
 	var (
 		res         *http.Response
@@ -84,9 +87,202 @@ func (rmisp *requestMISP) sendEvent(ctx context.Context, data *objectsmispformat
 		return nil, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("events add, %w", err))
 	}
 
-	if res.StatusCode != http.StatusOK {
-		return nil, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("events add, status '%s'", res.Status))
-	}
+	//по логике здесь это отрабатывать не надо, так как метод ClientMISP.Do уже
+	// обрабатывает подобные статусы и генерирует ошибку с подробным описанием
+	//if res.StatusCode != http.StatusOK {
+	//	return nil, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("events add, status '%s'", res.Status))
+	//}
 
 	return res, resBodyByte, nil
+}
+
+// sendEventReports добавляет в MISP объект типа 'event_reports'
+func (rmisp *requestMISP) sendEventReports(ctx context.Context, eventId string, data *objectsmispformat.EventReports) error {
+	c, err := NewClientMISP(rmisp.host, rmisp.userAuthKey, false)
+	if err != nil {
+		return supportingfunctions.CustomError(fmt.Errorf("event report add, %w", err))
+	}
+
+	b, err := json.Marshal(data)
+	if err != nil {
+		return supportingfunctions.CustomError(fmt.Errorf("event report add, %w", err))
+	}
+
+	_, _, err = c.Post(ctx, "/event_reports/add/"+eventId, b)
+	if err != nil {
+		return supportingfunctions.CustomError(fmt.Errorf("event report add, %w", err))
+	}
+
+	//по логике здесь это отрабатывать не надо, так как метод ClientMISP.Do уже
+	// обрабатывает подобные статусы и генерирует ошибку с подробным описанием
+	//if res.StatusCode != http.StatusOK {
+	//	return supportingfunctions.CustomError(fmt.Errorf("event report add, status '%s'", res.Status))
+	//}
+
+	return nil
+}
+
+// sendAttribytes отправляет в MISP список атрибутов в виде среза объектов типа 'attribytes'
+func (rmisp *requestMISP) sendAttribytes(ctx context.Context, eventId string, data []*objectsmispformat.AttributesMispFormat) (*http.Response, []byte, string, error) {
+	var (
+		c           *ClientMISP
+		res         *http.Response
+		resBodyByte = make([]byte, 0)
+
+		err error
+	)
+
+	warning := strings.Builder{}
+	defer warning.Reset()
+
+	c, err = NewClientMISP(rmisp.host, rmisp.userAuthKey, false)
+	if err != nil {
+		return nil, resBodyByte, warning.String(), supportingfunctions.CustomError(fmt.Errorf("'attributes' for event id:'%s' add, %w", eventId, err))
+	}
+
+	for k := range data {
+		data[k].EventId = eventId
+
+		if data[k].Value == "" {
+			warning.WriteString(fmt.Sprintf("'attributes' for event id:'%s' is not added, the 'Value' type property should not be empty\n", eventId))
+
+			continue
+		}
+
+		b, errTmp := json.Marshal(data[k])
+		if errTmp != nil {
+			err = errors.Join(err, supportingfunctions.CustomError(fmt.Errorf("'attributes' id:'%s' add, %w", eventId, errTmp)))
+
+			continue
+		}
+
+		res, resBodyByte, errTmp = c.Post(ctx, "/attributes/add/"+eventId, b)
+		if errTmp != nil {
+			err = errors.Join(err, supportingfunctions.CustomError(fmt.Errorf("'attributes' id:'%s' add, %w", eventId, errTmp)))
+
+			attrObject, errTmp := json.MarshalIndent(data[k], "", "  ")
+			if errTmp != nil {
+				err = errors.Join(err, supportingfunctions.CustomError(fmt.Errorf("'attributes' id:'%s' add, %w", eventId, errTmp)))
+			}
+
+			warning.WriteString(fmt.Sprintf("'attributes' with id:'%s' add, object:%s\n", eventId, string(attrObject)))
+
+			continue
+		}
+
+		//по логике здесь это отрабатывать не надо, так как метод ClientMISP.Do уже
+		// обрабатывает подобные статусы и генерирует ошибку с подробным описанием
+		//if res.StatusCode != http.StatusOK {
+		//	err = errors.Join(err, supportingfunctions.CustomError(fmt.Errorf("'attributes' with id:'%s' add, status '%s'", eventId, res.Status)))
+		//}
+	}
+
+	return res, resBodyByte, warning.String(), err
+}
+
+// sendObjects отправляет в MISP список объектов содержащихся в свойстве observables.attachment
+// (как правило это описание вложеного файла)
+func (rmisp *requestMISP) sendObjects(ctx context.Context, eventId string, data map[int]*objectsmispformat.ObjectsMispFormat) (*http.Response, []byte, error) {
+	var (
+		c           *ClientMISP
+		res         *http.Response
+		resBodyByte = make([]byte, 0)
+
+		err error
+	)
+
+	c, err = NewClientMISP(rmisp.host, rmisp.userAuthKey, false)
+	if err != nil {
+		return nil, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("objects for event id:'%s' add, %w", eventId, err))
+	}
+
+	for _, v := range data {
+		v.EventId = eventId
+
+		b, errTmp := json.Marshal(v)
+		if errTmp != nil {
+			err = errors.Join(err, supportingfunctions.CustomError(fmt.Errorf("objects with id:'%s' add, %w", eventId, errTmp)))
+
+			continue
+		}
+
+		res, resBodyByte, errTmp = c.Post(ctx, "/objects/add/"+eventId, b)
+		if errTmp != nil {
+			err = errors.Join(err, supportingfunctions.CustomError(fmt.Errorf("objects with id:'%s' add, %w", eventId, errTmp)))
+
+			continue
+		}
+
+		//по логике здесь это отрабатывать не надо, так как метод ClientMISP.Do уже
+		// обрабатывает подобные статусы и генерирует ошибку с подробным описанием
+		//if res.StatusCode != http.StatusOK {
+		//	logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("objects with id:'%s' add, status '%s'", eventId, res.Status)).Error())
+		//}
+	}
+
+	return res, resBodyByte, err
+}
+
+// sendEventTags отправляет в MISP объекты типа 'tags'
+func (rmisp *requestMISP) sendEventTags(ctx context.Context, eventId string, data *objectsmispformat.ListEventObjectTags) error {
+	var (
+		c *ClientMISP
+
+		err error
+	)
+
+	c, err = NewClientMISP(rmisp.host, rmisp.userAuthKey, false)
+	if err != nil {
+		return supportingfunctions.CustomError(fmt.Errorf("event tags add, %w", err))
+	}
+
+	eotmf := datamodels.EventObjectTagsMispFormat{}
+	for _, v := range *data {
+		eotmf.Event = eventId
+		eotmf.Tag = v
+
+		b, errTmp := json.Marshal(eotmf)
+		if errTmp != nil {
+			err = errors.Join(err, supportingfunctions.CustomError(fmt.Errorf("'event tags with id:'%s' add, %w", eventId, errTmp)))
+
+			continue
+		}
+
+		_, b, errTmp = c.Post(ctx, "/events/addTag", b)
+		if errTmp != nil {
+			err = errors.Join(err, supportingfunctions.CustomError(fmt.Errorf("'event tags with id:'%s' add, %w", eventId, err)))
+
+			continue
+		}
+
+		//
+		//resData := decodeResponseMIspMessage(b)
+		//resultMsg := fmt.Sprintf("tag: '%s' %s '%s' %s errors:'%s'", v, resData.name, resData.message, resData.success, resData.errors)
+		//logger.Send("warning", fmt.Sprintf("event tags with id:'%s' the result of executing the POST query - '%s'", eventId, resultMsg))
+		//if res.StatusCode != http.StatusOK {
+		//	logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("'event tags with id:'%s' add, status '%s'", eventId, res.Status)).Error())
+		//}
+	}
+
+	return nil
+}
+
+// sendRequestPublishEvent запрос на публикацию события
+func (rmisp *requestMISP) sendRequestPublishEvent(ctx context.Context, eventId string) (string, error) {
+	var resultMsg string
+
+	c, err := NewClientMISP(rmisp.host, rmisp.userAuthKey, false)
+	if err != nil {
+		return resultMsg, supportingfunctions.CustomError(fmt.Errorf("event publish add, %w", err))
+	}
+
+	_, b, err := c.Post(ctx, "/events/publish/"+eventId, []byte{})
+	if err != nil {
+		return resultMsg, supportingfunctions.CustomError(fmt.Errorf("event publish add, %w", err))
+	}
+
+	resData := decodeResponseMIspMessage(b)
+	resultMsg = fmt.Sprintf("result published event with id '%s' - %s '%s' %s", eventId, resData.name, resData.message, resData.success)
+
+	return resultMsg, nil
 }

@@ -48,7 +48,7 @@ func (settings *CoreHandlerSettings) Start(
 	chanNatsReception := natsModule.GetDataReceptionChannel()
 	chanMispReception := mispModule.GetDataReceptionChannel()
 	chanRedisReception := redisModule.GetDataReceptionChannel()
-	hjm := NewHandlerJsonMessage(settings.counting, settings.logger)
+	hjson := NewHandlerJSON(settings.counting, settings.logger)
 
 	for {
 		select {
@@ -93,10 +93,10 @@ func (settings *CoreHandlerSettings) Start(
 			}()
 
 			// обработчик JSON документа
-			chanOutputDecodeJson := hjm.HandlerJsonMessage(data.Data, data.MsgId)
+			chanOutputDecodeJson := hjson.Start(data.Data, data.MsgId)
 
 			//формирование итоговых документов в формате MISP
-			go NewMispFormat(chanOutputDecodeJson, data.MsgId, mispModule, settings.listRules, settings.counting, settings.logger)
+			go CreateObjectsFormatMISP(chanOutputDecodeJson, data.MsgId, mispModule, settings.listRules, settings.counting, settings.logger)
 
 		case data := <-chanMispReception:
 			switch data.Command {

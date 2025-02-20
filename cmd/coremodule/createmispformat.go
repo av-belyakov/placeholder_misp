@@ -3,7 +3,6 @@ package coremodule
 import (
 	"fmt"
 	"regexp"
-	"runtime"
 	"strings"
 
 	"github.com/av-belyakov/objectsmispformat"
@@ -13,14 +12,25 @@ import (
 	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
 )
 
-func NewMispFormat(
-	chanOutputDecodeJson <-chan ChanInputCreateMispFormat,
+// CreateObjectsFormatMISP создаёт набор объектов в формате MISP
+func CreateObjectsFormatMISP(
+	chDecodeJSON <-chan ChanInputCreateMispFormat,
 	taskId string,
 	mispModule mispapi.ModuleMispHandler,
 	listRule *rules.ListRule,
 	counting *countermessage.CounterMessage,
 	logger commoninterfaces.Logger) {
+	var (
+		maxCountObservables int
+		seqNumObservable    int
+		caseId              float64
+		rootId              string
+		userEmail           string
+		caseSource          string
+		patterIsNum         *regexp.Regexp = regexp.MustCompile(`^\d+$`)
+	)
 
+	//формируем шаблоны для заполнения
 	eventsMisp := objectsmispformat.NewEventMisp()
 	listObjectsMisp := objectsmispformat.NewListObjectsMispFormat()
 	listAttributeTmp := objectsmispformat.NewListAttributeTmp()
@@ -70,16 +80,6 @@ func NewMispFormat(
 		"observables.attachment.size": {listObjectsMisp.SetValueSize},
 	}
 
-	var (
-		maxCountObservables int
-		seqNumObservable    int
-		caseId              float64
-		rootId              string
-		userEmail           string
-		caseSource          string
-		patterIsNum         *regexp.Regexp = regexp.MustCompile(`^\d+$`)
-	)
-
 	svn := NewStorageValueName()
 	exclusionRules := NewExclusionRules()
 	listGalaxyTags := NewMispGalaxyTags()
@@ -93,55 +93,54 @@ func NewMispFormat(
 
 	listTags := make(map[int][2]string)
 
-	for tmf := range chanOutputDecodeJson {
+	for msg := range chDecodeJSON {
 		//ищем источник события
-		if source, ok := searchEventSource(tmf); ok {
+		if source, ok := searchEventSource(msg); ok {
 			caseSource = source
 		}
 
 		//ищем id события
-		if cid, ok := searchCaseId(tmf); ok {
+		if cid, ok := searchCaseId(msg); ok {
 			caseId = cid
 		}
 
 		// ищем email владельца события
-		if uemail, ok := searchOwnerEmail(tmf); ok {
+		if uemail, ok := searchOwnerEmail(msg); ok {
 			userEmail = uemail
 		}
 
 		//*************** Обработка правил ***************
 		//обработка правил REPLACEMENT (замена)
-		newValue, _, err := listRule.ReplacementRuleHandler(tmf.ValueType, tmf.FieldBranch, tmf.Value)
+		newValue, _, err := listRule.ReplacementRuleHandler(msg.ValueType, msg.FieldBranch, msg.Value)
 		if err != nil {
-			_, f, l, _ := runtime.Caller(0)
-			logger.Send("warning", fmt.Sprintf("'search value \"%s\" from rule of section \"REPLACE\" is not fulfilled' %s:%d", tmf.Value, f, l-2))
+			logger.Send("warning", fmt.Sprintf("search value '%s' from rule of section 'REPLACE' is not fulfilled", msg.Value))
 		}
 		//обработка правил PASS (пропуск)
-		listRule.PassRuleHandler(tmf.FieldBranch, newValue)
+		listRule.PassRuleHandler(msg.FieldBranch, newValue)
 		//**********************************************
 
 		//для observables которые содержат свойства, являющиеся картами,
 		//такими как свойства 'attachment', 'reports' и т.д. не
 		//осуществлять подсчет свойств
-		isObservables := strings.Contains(tmf.FieldBranch, "observables")
-		countOne := strings.Count(tmf.FieldBranch, ".") <= 1
+		isObservables := strings.Contains(msg.FieldBranch, "observables")
+		countOne := strings.Count(msg.FieldBranch, ".") <= 1
 
 		if isObservables && countOne {
-			var newFieldName = tmf.FieldName
+			var newFieldName = msg.FieldName
 			//сделал проверку на число что бы исключить повторение
 			//имен для свойств являющихся срезами, так как в данной ситуации
-			//имя содержащееся в tmf.FieldName представляет собой числовой
+			//имя содержащееся в msg.FieldName представляет собой числовой
 			//индекс, соответственное, если будет еще одно свойство являющееся
 			//срезом, то может быть совпадение имен и изменение seqNumObservable, а как
 			//результат будет переход на другой объект 'observables'
-			if patterIsNum.MatchString(tmf.FieldName) {
-				tmp := strings.Split(tmf.FieldBranch, ".")
+			if patterIsNum.MatchString(msg.FieldName) {
+				tmp := strings.Split(msg.FieldBranch, ".")
 				var nameTmp string
 				if len(tmp) > 0 {
 					nameTmp = tmp[len(tmp)-1] + "_"
 				}
 
-				newFieldName = nameTmp + tmf.FieldName
+				newFieldName = nameTmp + msg.FieldName
 			}
 
 			//подсчет свойств для объектов типа 'observables' выполняется для
@@ -154,18 +153,18 @@ func NewMispFormat(
 			svn.SetValueName(newFieldName)
 
 			// ************* обработка правил EXCLUSION (исключения) *************
-			if addrRule, isEqual := listRule.ExcludeRuleHandler(tmf.FieldBranch, newValue); isEqual {
-				supportiveListExcludeRule.Add(seqNumObservable, tmf.FieldBranch, newValue, addrRule, isEqual)
+			if addrRule, isEqual := listRule.ExcludeRuleHandler(msg.FieldBranch, newValue); isEqual {
+				supportiveListExcludeRule.Add(seqNumObservable, msg.FieldBranch, newValue, addrRule, isEqual)
 			}
 		}
 
 		//обрабатываем свойство observables.attachment
-		if strings.Contains(tmf.FieldBranch, "attachment") {
-			listAttributeTmp.AddAttribute(tmf.FieldBranch, newValue, seqNumObservable)
+		if strings.Contains(msg.FieldBranch, "attachment") {
+			listAttributeTmp.AddAttribute(msg.FieldBranch, newValue, seqNumObservable)
 		}
 
 		//получаем rootId
-		if tmf.FieldBranch == "event.object.rootId" {
+		if msg.FieldBranch == "event.object.rootId" {
 			if rid, ok := newValue.(string); ok {
 				rootId = rid
 			}
@@ -173,7 +172,7 @@ func NewMispFormat(
 
 		//обрабатываем свойство event.object.tags, оно ответственно за
 		//наполнение поля "Теги" MISP
-		if tmf.FieldBranch == "event.object.tags" {
+		if msg.FieldBranch == "event.object.tags" {
 			if tag, ok := newValue.(string); ok {
 				leot.SetTag(tag)
 			}
@@ -182,10 +181,10 @@ func NewMispFormat(
 		//заполняем временный объект listGalaxyTags данными, предназначенными
 		//для формирования специализированных тегов на основе которых в MISP
 		//будут формироватся галактики
-		addFuncGalaxyTags(tmf.FieldBranch, newValue)
+		addFuncGalaxyTags(msg.FieldBranch, newValue)
 
 		//обрабатываем свойство observables.tags
-		if tmf.FieldBranch == "observables.tags" {
+		if msg.FieldBranch == "observables.tags" {
 			listTags = handlerObservablesTags(newValue, listTags, listAttributesMisp, seqNumObservable)
 		}
 
@@ -193,9 +192,9 @@ func NewMispFormat(
 		//это главный обработчик который выполняет всю работу, особенно если выше идущие
 		//обработчики не выполнялись так как принимаемые значения не соответствовали
 		//параметрам для их вызова
-		lf, ok := listHandlerMisp[tmf.FieldBranch]
+		lf, ok := listHandlerMisp[msg.FieldBranch]
 		if ok {
-			//основной обработчик путей из tmf.FieldBranch
+			//основной обработчик путей из msg.FieldBranch
 			for _, f := range lf {
 				f(newValue, seqNumObservable)
 			}
@@ -284,8 +283,4 @@ func NewMispFormat(
 	listObjectsMisp.CleanList()
 	listAttributeTmp.CleanAttribute()
 	listAttributesMisp.CleanList()
-
-	// ТОЛЬКО ДЛЯ ТЕСТОВ, что бы завершить гроутину вывода информации и логирования
-	//при выполнения тестирования
-	logger.Send("STOP TEST", "")
 }

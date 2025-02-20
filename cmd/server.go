@@ -95,9 +95,7 @@ func server(ctx context.Context) {
 	// ***************************************************************************
 	// *********** инициализируем модуль счётчика для подсчёта сообщений *********
 	counting := countermessage.New(chZabbix)
-	if err = counting.Handler(ctx); err != nil {
-		_ = simpleLogger.Write("error", supportingfunctions.CustomError(err).Error())
-	}
+	counting.Start(ctx)
 
 	// ***************************************************************************
 	// ************** инициализация модуля для взаимодействия с NATS *************

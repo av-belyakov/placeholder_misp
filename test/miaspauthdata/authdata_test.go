@@ -62,7 +62,7 @@ func TestAuthData(t *testing.T) {
 		assert.NoError(t, err)
 
 		newListOrg := handlerAuth.Storage.GetOptionsAllOrganisations()
-		fmt.Println("Organization list:")
+		fmt.Printf("Test 1.\nOrganization list:\n")
 		for k, v := range newListOrg {
 			fmt.Printf("Key:'%s' Id:'%s' Name:'%s'\n", k, v.Id, v.Name)
 		}
@@ -76,7 +76,7 @@ func TestAuthData(t *testing.T) {
 		countUsers, err := handlerAuth.GetListAllUsers(ctx)
 		assert.NoError(t, err)
 
-		fmt.Printf("\nIt was added %d users\n", countUsers)
+		fmt.Printf("\nTest 2.\nIt was added %d users\n", countUsers)
 
 		usersSettings := handlerAuth.Storage.GetSettingsAllUsers()
 		fmt.Println("\nSettings all users:")
@@ -125,7 +125,8 @@ func TestAuthData(t *testing.T) {
 		userset, err := handlerAuth.CreateNewUser(ctx, Test_User_Email, "rcmkha")
 		assert.NoError(t, err)
 		assert.Equal(t, userset.Email, Test_User_Email)
-		fmt.Println("userset.AuthKey:", userset.AuthKey)
+
+		fmt.Printf("\nTest 5.\nCreated new user:%+v\n", userset)
 
 		//поиск в хранилище
 		nus, ok := handlerAuth.Storage.GetUserSettingsByEmail(Test_User_Email)
@@ -137,26 +138,28 @@ func TestAuthData(t *testing.T) {
 		ctx, CancelFunc := context.WithTimeout(context.Background(), time.Second*10)
 		defer CancelFunc()
 
-		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		//
-		//тут не понятно удаляет только с хранилища?
-		//а как же удаление с MISP?
-		//
-		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+		//удаляем пользователя с хранилища
 		num, ok := handlerAuth.DelUserData(Test_User_Email)
 		assert.True(t, ok)
-		fmt.Println("USER num = ", num)
+		fmt.Printf("Test 6.\nUSER num = %d\n", num)
 
 		// ищем пользователя в хранилище
-		us, ok := handlerAuth.Storage.GetUserSettingsByEmail(Test_User_Email)
-		fmt.Println("user not found", us)
-		assert.True(t, ok)
+		user, ok := handlerAuth.Storage.GetUserSettingsByEmail(Test_User_Email)
+		fmt.Println("user not found", user)
+		assert.False(t, ok)
+
+		// получаем данные пользователя включая его userId
+		userSettings, err := handlerAuth.GetUserData(ctx, Test_User_Email)
+		assert.NoError(t, err)
+
+		//удаляем пользователя из MISP
+		err = handlerAuth.DeleteUser(ctx, userSettings.UserId)
+		assert.NoError(t, err)
 
 		// ищем пользователя в хранилище и MISP
-		s, err := handlerAuth.GetUserData(ctx, Test_User_Email)
-		fmt.Println("us", s)
+		userSettings, err = handlerAuth.GetUserData(ctx, Test_User_Email)
+		fmt.Printf("user settings:%+v\n", userSettings)
 		assert.NoError(t, err)
-		assert.Equal(t, s.Email, Test_User_Email)
+		assert.Equal(t, userSettings.Email, Test_User_Email)
 	})
 }

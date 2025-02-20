@@ -16,14 +16,16 @@ type HandlerJsonMessageSettings struct {
 	counting *countermessage.CounterMessage
 }
 
-func NewHandlerJsonMessage(counting *countermessage.CounterMessage, logger commoninterfaces.Logger) *HandlerJsonMessageSettings {
+// NewHandlerJSON конструктор нового обработчика JSON сообщения
+func NewHandlerJSON(counting *countermessage.CounterMessage, logger commoninterfaces.Logger) *HandlerJsonMessageSettings {
 	return &HandlerJsonMessageSettings{
 		logger:   logger,
 		counting: counting,
 	}
 }
 
-func (s *HandlerJsonMessageSettings) HandlerJsonMessage(b []byte, taskId string) chan ChanInputCreateMispFormat {
+// Start инициализация обработки
+func (s *HandlerJsonMessageSettings) Start(b []byte, taskId string) chan ChanInputCreateMispFormat {
 	chanInput := make(chan ChanInputCreateMispFormat)
 
 	go func() {
@@ -65,6 +67,7 @@ func (s *HandlerJsonMessageSettings) HandlerJsonMessage(b []byte, taskId string)
 		//
 		//
 
+		fmt.Println("HandlerJsonMessageSettings.Start, close channel")
 		close(chanInput)
 	}()
 

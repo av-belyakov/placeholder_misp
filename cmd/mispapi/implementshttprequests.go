@@ -78,33 +78,33 @@ func (client *ClientMISP) Do(ctx context.Context, method, path string, data []by
 		Transport: httpTrp,
 	}
 
-	resp, err := httpClient.Do(httpReq)
+	res, err := httpClient.Do(httpReq)
 	if err != nil {
 		return nil, resBodyByte, supportingfunctions.CustomError(err)
 	}
-	defer resp.Body.Close()
+	defer res.Body.Close()
 
-	resBodyByte, err = io.ReadAll(resp.Body)
+	resBodyByte, err = io.ReadAll(res.Body)
 	if err != nil {
 		return nil, resBodyByte, supportingfunctions.CustomError(err)
 	}
 
-	if resp.StatusCode != http.StatusOK {
+	if res.StatusCode != http.StatusOK {
 		mferr := datamodels.MispFormatError{Errors: map[string]interface{}{}}
 		if err := json.Unmarshal(resBodyByte, &mferr); err != nil {
 			lerr := []interface{}{}
 			if err := json.Unmarshal(resBodyByte, &lerr); err == nil {
-				return resp, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("message from MISP: status '%s', error - %s", resp.Status, lerr))
+				return res, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("message from MISP: status '%s', error - %s", res.Status, lerr))
 			}
 
 			var serr string
 			if err := json.Unmarshal(resBodyByte, &serr); err == nil {
-				return resp, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("message from MISP: status '%s' error - %s", resp.Status, serr))
+				return res, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("message from MISP: status '%s' error - %s", res.Status, serr))
 			}
 		}
 
-		return resp, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("message from MISP: staus '%s', message '%s', url '%s', error - %s", resp.Status, mferr.Message, mferr.URL, mferr.Errors))
+		return res, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("message from MISP: staus '%s', message '%s', url '%s', error - %s", res.Status, mferr.Message, mferr.URL, mferr.Errors))
 	}
 
-	return resp, resBodyByte, err
+	return res, resBodyByte, err
 }

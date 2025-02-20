@@ -101,11 +101,11 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		//инициалиация модуля для взаимодействия с MISP
 		mispModule, errMisp = mispapi.NewModuleMISP(confApp.GetAppMISP().Host, confApp.GetAppMISP().Auth, confApp.GetListOrganization(), logging)
 
-		hjm := coremodule.NewHandlerJsonMessage(counting, logging)
+		hjson := coremodule.NewHandlerJSON(counting, logging)
 		// обработчик JSON документа
-		chanOutputDecodeJson := hjm.HandlerJsonMessage(exampleByte, taskId)
+		chanOutputDecodeJson := hjson.Start(exampleByte, taskId)
 		//формирование итоговых документов в формате MISP
-		go coremodule.NewMispFormat(chanOutputDecodeJson, taskId, mispModule, listRules, counting, logging)
+		go coremodule.CreateObjectsFormatMISP(chanOutputDecodeJson, taskId, mispModule, listRules, counting, logging)
 	})
 
 	Context("Тест 1. Проверка инициализации модулей", func() {

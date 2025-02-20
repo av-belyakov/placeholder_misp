@@ -49,21 +49,21 @@ LOGGING:
       writingFile: true,
       pathDirectory: "logs",
       writingStdout: false,
-      maxFileSize: 10000,
+      maxFileSize: 100000,
     }
   - {
       msgTypeName: "warning",
       writingFile: true,
       pathDirectory: "logs",
       writingStdout: false,
-      maxFileSize: 10000,
+      maxFileSize: 100000,
     }
   - {
       msgTypeName: "info",
       writingFile: true,
       pathDirectory: "logs",
       writingStdout: true,
-      maxFileSize: 10000,
+      maxFileSize: 100000,
     }
   - {
       msgTypeName: "debug",
@@ -77,14 +77,14 @@ LOGGING:
       writingFile: true,
       pathDirectory: "logs",
       writingStdout: false,
-      maxFileSize: 10000,
+      maxFileSize: 1000000,
     }
   - {
       msgTypeName: "testing",
       writingFile: true,
       pathDirectory: "logs",
       writingStdout: false,
-      maxFileSize: 10000,
+      maxFileSize: 100000,
     }
 ZABBIX:
   networkHost: "192.168.9.45"

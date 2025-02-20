@@ -312,7 +312,7 @@ var _ = Describe("Processingrules", Ordered, func() {
 			// обработчик JSON документа
 			chanOutputDecodeJson := hjm.HandlerJsonMessage(exampleByte, msgId)
 			//формирование итоговых документов в формате MISP
-			go coremodule.NewMispFormat(chanOutputDecodeJson, msgId, moduleMisp, lr, counting, logging)
+			go coremodule.CreateObjectsFormatMISP(chanOutputDecodeJson, msgId, moduleMisp, lr, counting, logging)
 
 			wg.Wait()
 
