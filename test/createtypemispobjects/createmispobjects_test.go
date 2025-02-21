@@ -16,6 +16,7 @@ import (
 	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
 	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
 	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
+	"github.com/av-belyakov/simplelogger"
 )
 
 const (
@@ -70,9 +71,14 @@ func (m *ModuleMISPForTest) GetInputChannel() <-chan mispapi.InputSettings {
 func TestMain(m *testing.M) {
 	chZabbix = make(chan commoninterfaces.Messager)
 	counting = countermessage.New(chZabbix)
-	logging = logginghandler.New()
 
-	var err error
+	simpleLogger, err := simplelogger.NewSimpleLogger(context.Background(), "palceholder_misp", simplelogger.CreateOptions())
+	if err != nil {
+		log.Fatalf("error module 'simplelogger': %v", err)
+	}
+
+	logging = logginghandler.New(simpleLogger, chZabbix)
+
 	//инициализируем модуль чтения правил обработки MISP сообщений
 	listRules, _, err = rules.NewListRule(Root_Dir, Rules_Dir, Rules_File)
 	if err != nil {

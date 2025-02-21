@@ -8,27 +8,8 @@ import (
 	"github.com/av-belyakov/placeholder_misp/constants"
 	"github.com/av-belyakov/placeholder_misp/internal/appname"
 	"github.com/av-belyakov/placeholder_misp/internal/appversion"
-	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
 	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
-	"github.com/av-belyakov/simplelogger"
 )
-
-func getLoggerSettings(cls []confighandler.LogSet) []simplelogger.Options {
-	loggerConf := make([]simplelogger.Options, 0, len(cls))
-
-	for _, v := range cls {
-		loggerConf = append(loggerConf, simplelogger.Options{
-			WritingToStdout: v.WritingStdout,
-			WritingToFile:   v.WritingFile,
-			WritingToDB:     v.WritingDB,
-			MsgTypeName:     v.MsgTypeName,
-			PathDirectory:   v.PathDirectory,
-			MaxFileSize:     v.MaxFileSize,
-		})
-	}
-
-	return loggerConf
-}
 
 func checkListRule(listRule *rules.ListRule, warnings []string) (msgWarning string, err error) {
 	// поиск логических ошибок в файле с YAML правилами

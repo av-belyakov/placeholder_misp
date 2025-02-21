@@ -10,13 +10,13 @@ type ConfigApp struct {
 }
 
 type CommonAppConfig struct {
-	LogList       []LogSet
+	LogList       []*LogSet
 	Organizations []Organization
 	Zabbix        ZabbixOptions
 }
 
 type Logs struct {
-	Logging []LogSet
+	Logging []*LogSet
 }
 
 type LogSet struct {

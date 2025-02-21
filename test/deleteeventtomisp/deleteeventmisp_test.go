@@ -1,6 +1,7 @@
 package testdeleteeventtomisp_test
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"time"
@@ -14,6 +15,7 @@ import (
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
 	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
+	"github.com/av-belyakov/simplelogger"
 )
 
 var _ = Describe("Deleteeventmisp", Ordered, func() {
@@ -41,7 +43,13 @@ var _ = Describe("Deleteeventmisp", Ordered, func() {
 			Auth: "TvHkjH8jVQEIdvAxjxnL4H6wDoKyV7jobDjndvAo",
 		}
 
-		logging = logginghandler.New()
+		chZabbix := make(chan commoninterfaces.Messager)
+		simpleLogger, err := simplelogger.NewSimpleLogger(context.Background(), "palceholder_misp", simplelogger.CreateOptions())
+		if err != nil {
+			log.Fatalf("error module 'simplelogger': %v", err)
+		}
+
+		logging = logginghandler.New(simpleLogger, chZabbix)
 
 		//redismodule = redisinteractions.HandlerRedis(context.Background(), confApp.AppConfigRedis, storageApp, logging)
 		mispmodule, errMispModule = mispapi.NewModuleMISP(confApp.GetAppMISP().Host, confApp.GetAppMISP().Auth, confApp.GetListOrganization(), logging)

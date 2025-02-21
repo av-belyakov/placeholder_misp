@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"path"
 	"time"
@@ -12,10 +13,12 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/av-belyakov/placeholder_misp/cmd/redisapi"
+	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/constants"
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
 	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
+	"github.com/av-belyakov/simplelogger"
 )
 
 var _ = Describe("Interactionredisdb", Ordered, func() {
@@ -53,9 +56,16 @@ var _ = Describe("Interactionredisdb", Ordered, func() {
 		// инициализация модуля конфига
 		ca, _ := confighandler.New(constants.Root_Dir)
 
-		// канал для логирования
-		logging := logginghandler.New()
+		simpleLogger, err := simplelogger.NewSimpleLogger(context.Background(), constants.Root_Dir, []simplelogger.Options{})
+		if err != nil {
+			log.Fatalf("error module 'simplelogger': %v", err)
+		}
 
+		chZabbix := make(chan commoninterfaces.Messager)
+
+		// канал для логирования
+		logging := logginghandler.New(simpleLogger, chZabbix)
+		//logging.Start(ctx)
 		exampleByte, errReadFile = readFileJson("testing/test_json", "example_caseId_33705_1.json")
 
 		ctxRedis, _ := context.WithTimeout(context.Background(), 2*time.Second)

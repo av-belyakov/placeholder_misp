@@ -2,7 +2,9 @@ package testaddnewelements_test
 
 import (
 	"bufio"
+	"context"
 	"fmt"
+	"log"
 	"os"
 	"path"
 
@@ -13,11 +15,13 @@ import (
 	"github.com/av-belyakov/placeholder_misp/cmd/coremodule"
 	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/constants"
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
 	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
 	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
 	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
+	"github.com/av-belyakov/simplelogger"
 )
 
 var _ = Describe("Addneweventandattributes", Ordered, func() {
@@ -56,9 +60,14 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 	}
 
 	BeforeAll(func() {
+		simpleLogger, err := simplelogger.NewSimpleLogger(context.Background(), constants.Root_Dir, []simplelogger.Options{})
+		if err != nil {
+			log.Fatalf("error module 'simplelogger': %v", err)
+		}
+
 		chZabbix := make(chan commoninterfaces.Messager)
-		logging = logginghandler.New()
 		counting = countermessage.New(chZabbix)
+		logging = logginghandler.New(simpleLogger, chZabbix)
 
 		// NATS
 		confApp.AppConfigNATS.Host = "nats.cloud.gcm"

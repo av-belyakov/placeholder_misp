@@ -2,7 +2,9 @@ package testcreategalaxy_test
 
 import (
 	"bufio"
+	"context"
 	"fmt"
+	"log"
 	"os"
 	"path"
 
@@ -14,6 +16,7 @@ import (
 	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
 	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
+	"github.com/av-belyakov/simplelogger"
 )
 
 func addListGalaxyTags(lgt *coremodule.MispGalaxyTags) func(string, any) {
@@ -117,7 +120,14 @@ var _ = Describe("Createlistgalaxytags", Ordered, func() {
 		chanDone = make(chan struct{})
 		stopped = make(chan bool)
 
-		logging := logginghandler.New()
+		chZabbix := make(chan commoninterfaces.Messager)
+
+		simpleLogger, err := simplelogger.NewSimpleLogger(context.Background(), "palceholder_misp", simplelogger.CreateOptions())
+		if err != nil {
+			log.Fatalf("error module 'simplelogger': %v", err)
+		}
+
+		logging := logginghandler.New(simpleLogger, chZabbix)
 		listGalaxyTags = coremodule.NewMispGalaxyTags()
 
 		exampleByte, errReadFile = readFileJson("testing/test_json", "example_caseId_33705.json")

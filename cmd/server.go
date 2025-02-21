@@ -38,14 +38,19 @@ func server(ctx context.Context) {
 
 	// ****************************************************************************
 	// ********************* инициализация модуля логирования *********************
-	simpleLogger, err := simplelogger.NewSimpleLogger(ctx, constants.Root_Dir, getLoggerSettings(confApp.GetListLogs()))
+	var listLog []simplelogger.OptionsManager
+	for _, v := range confApp.GetListLogs() {
+		listLog = append(listLog, v)
+	}
+	opts := simplelogger.CreateOptions(listLog...)
+	simpleLogger, err := simplelogger.NewSimpleLogger(ctx, constants.Root_Dir, opts)
 	if err != nil {
 		log.Fatalf("error module 'simplelogger': %v", err)
 	}
 
 	// ****************************************************************************
 	// ******* инициализируем модуль чтения правил обработки MISP сообщений *******
-	lr, warnings, err := rules.NewListRule(constants.Root_Dir, confApp.RulesProcMSGMISP.Directory, confApp.RulesProcMSGMISP.File)
+	listRules, warnings, err := rules.NewListRule(constants.Root_Dir, confApp.RulesProcMSGMISP.Directory, confApp.RulesProcMSGMISP.File)
 	if err != nil {
 		_ = simpleLogger.Write("error", supportingfunctions.CustomError(err).Error())
 
@@ -54,7 +59,7 @@ func server(ctx context.Context) {
 
 	//проверяем наличие правил Pass или Passany которые являются обязательными,
 	//а также отсутсвие логических ошибок в файле с правилами
-	msgWarning, err := checkListRule(lr, warnings)
+	msgWarning, err := checkListRule(listRules, warnings)
 	if err != nil {
 		_ = simpleLogger.Write("error", supportingfunctions.CustomError(err).Error())
 
@@ -89,8 +94,8 @@ func server(ctx context.Context) {
 
 	//***************************************************************************
 	//************** инициализация обработчика логирования данных ***************
-	logging := logginghandler.New()
-	go logginghandler.LoggingHandler(ctx, simpleLogger, chZabbix, logging.GetChan())
+	logging := logginghandler.New(simpleLogger, chZabbix)
+	logging.Start(ctx)
 
 	// ***************************************************************************
 	// *********** инициализируем модуль счётчика для подсчёта сообщений *********
@@ -120,7 +125,6 @@ func server(ctx context.Context) {
 
 	// вывод информационного сообщения при старте приложения
 	msg := getInformationMessage()
-
 	_ = simpleLogger.Write("info", strings.ToLower(msg))
 
 	//для отладки через pprof
@@ -130,7 +134,7 @@ func server(ctx context.Context) {
 
 	// *****************************************************************
 	// *************** инициализируем ядро приложения ******************
-	core := coremodule.NewCoreHandler(counting, lr, logging)
+	core := coremodule.NewCoreHandler(counting, listRules, logging)
 	if err := core.Start(ctx, natsModule, mispModule, redisModule); err != nil {
 		_ = simpleLogger.Write("error", supportingfunctions.CustomError(err).Error())
 
