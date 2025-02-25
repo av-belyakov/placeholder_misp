@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"runtime"
 
-	"placeholder_misp/datamodels"
-	rules "placeholder_misp/rulesinteraction"
+	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
+	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
 )
 
 // ChanInputCreateMispFormat
@@ -29,19 +29,19 @@ func DecodeJsonObject(
 	cmispf chan<- ChanInputCreateMispFormat,
 	b []byte,
 	listRule *rules.ListRule,
-	logging chan<- datamodels.MessageLogging,
+	logger commoninterfaces.Logger,
 	cmispfDone chan<- bool,
 ) {
 	listMap := map[string]interface{}{}
 	if err := json.Unmarshal(b, &listMap); err == nil {
-		_ = processingReflectMap(logging, cmispf, listMap, listRule, "")
+		_ = processingReflectMap(logger, cmispf, listMap, listRule, "")
 	}
 
 	cmispfDone <- true
 }
 
 func processingReflectAnySimpleType(
-	logging chan<- datamodels.MessageLogging,
+	logger commoninterfaces.Logger,
 	chanOutMispFormat chan<- ChanInputCreateMispFormat,
 	name interface{},
 	anyType interface{},
@@ -68,11 +68,7 @@ func processingReflectAnySimpleType(
 		ncv, num, err := lr.ReplacementRuleHandler("string", nameStr, result)
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
-
-			logging <- datamodels.MessageLogging{
-				MsgData: fmt.Sprintf("'search value \"%s\" from rule number \"%d\" of section \"REPLACE\" is not fulfilled' %s:%d", result, num, f, l-1),
-				MsgType: "warning",
-			}
+			logger.Send("warning", fmt.Sprintf("'search value \"%s\" from rule number \"%d\" of section \"REPLACE\" is not fulfilled' %s:%d", result, num, f, l-2))
 		}
 
 		lr.PassRuleHandler(fieldBranch, ncv)
@@ -91,11 +87,7 @@ func processingReflectAnySimpleType(
 		ncv, num, err := lr.ReplacementRuleHandler("int", nameStr, result)
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
-
-			logging <- datamodels.MessageLogging{
-				MsgData: fmt.Sprintf("'search value \"%d\" from rule number \"%d\" of section \"REPLACE\" is not fulfilled' %s:%d", result, num, f, l-1),
-				MsgType: "warning",
-			}
+			logger.Send("warning", fmt.Sprintf("'search value \"%d\" from rule number \"%d\" of section \"REPLACE\" is not fulfilled' %s:%d", result, num, f, l-2))
 		}
 
 		lr.PassRuleHandler(fieldBranch, ncv)
@@ -114,11 +106,7 @@ func processingReflectAnySimpleType(
 		ncv, num, err := lr.ReplacementRuleHandler("uint", nameStr, result)
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
-
-			logging <- datamodels.MessageLogging{
-				MsgData: fmt.Sprintf("'search value \"%d\" from rule number \"%d\" of section \"REPLACE\" is not fulfilled' %s:%d", result, num, f, l-1),
-				MsgType: "warning",
-			}
+			logger.Send("warning", fmt.Sprintf("'search value \"%d\" from rule number \"%d\" of section \"REPLACE\" is not fulfilled' %s:%d", result, num, f, l-2))
 		}
 
 		lr.PassRuleHandler(fieldBranch, ncv)
@@ -137,11 +125,7 @@ func processingReflectAnySimpleType(
 		ncv, num, err := lr.ReplacementRuleHandler("float", nameStr, result)
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
-
-			logging <- datamodels.MessageLogging{
-				MsgData: fmt.Sprintf("'search value \"%v\" from rule number \"%d\" of section \"REPLACE\" is not fulfilled' %s:%d", result, num, f, l-1),
-				MsgType: "warning",
-			}
+			logger.Send("warning", fmt.Sprintf("'search value \"%v\" from rule number \"%d\" of section \"REPLACE\" is not fulfilled' %s:%d", result, num, f, l-2))
 		}
 
 		lr.PassRuleHandler(fieldBranch, ncv)
@@ -160,11 +144,7 @@ func processingReflectAnySimpleType(
 		ncv, num, err := lr.ReplacementRuleHandler("bool", nameStr, result)
 		if err != nil {
 			_, f, l, _ := runtime.Caller(0)
-
-			logging <- datamodels.MessageLogging{
-				MsgData: fmt.Sprintf("'search value \"%v\" from rule number \"%d\" of section \"REPLACE\" is not fulfilled' %s:%d", result, num, f, l-1),
-				MsgType: "warning",
-			}
+			logger.Send("warning", fmt.Sprintf("'search value \"%v\" from rule number \"%d\" of section \"REPLACE\" is not fulfilled' %s:%d", result, num, f, l-2))
 		}
 
 		lr.PassRuleHandler(fieldBranch, ncv)
@@ -183,7 +163,7 @@ func processingReflectAnySimpleType(
 }
 
 func processingReflectMap(
-	logging chan<- datamodels.MessageLogging,
+	logger commoninterfaces.Logger,
 	chanOutMispFormat chan<- ChanInputCreateMispFormat,
 	l map[string]interface{},
 	lr *rules.ListRule,
@@ -213,18 +193,18 @@ func processingReflectMap(
 		switch r.Kind() {
 		case reflect.Map:
 			if v, ok := v.(map[string]interface{}); ok {
-				newMap = processingReflectMap(logging, chanOutMispFormat, v, lr, fbTmp)
+				newMap = processingReflectMap(logger, chanOutMispFormat, v, lr, fbTmp)
 				nl[k] = newMap
 			}
 
 		case reflect.Slice:
 			if v, ok := v.([]interface{}); ok {
-				newList = processingReflectSlice(logging, chanOutMispFormat, v, lr, fbTmp)
+				newList = processingReflectSlice(logger, chanOutMispFormat, v, lr, fbTmp)
 				nl[k] = newList
 			}
 
 		default:
-			nl[k] = processingReflectAnySimpleType(logging, chanOutMispFormat, k, v, lr, fbTmp)
+			nl[k] = processingReflectAnySimpleType(logger, chanOutMispFormat, k, v, lr, fbTmp)
 		}
 	}
 
@@ -232,7 +212,7 @@ func processingReflectMap(
 }
 
 func processingReflectSlice(
-	logging chan<- datamodels.MessageLogging,
+	logger commoninterfaces.Logger,
 	chanOutMispFormat chan<- ChanInputCreateMispFormat,
 	l []interface{},
 	lr *rules.ListRule,
@@ -254,20 +234,20 @@ func processingReflectSlice(
 		switch r.Kind() {
 		case reflect.Map:
 			if v, ok := v.(map[string]interface{}); ok {
-				newMap = processingReflectMap(logging, chanOutMispFormat, v, lr, fieldBranch)
+				newMap = processingReflectMap(logger, chanOutMispFormat, v, lr, fieldBranch)
 
 				nl = append(nl, newMap)
 			}
 
 		case reflect.Slice:
 			if v, ok := v.([]interface{}); ok {
-				newList = processingReflectSlice(logging, chanOutMispFormat, v, lr, fieldBranch)
+				newList = processingReflectSlice(logger, chanOutMispFormat, v, lr, fieldBranch)
 
 				nl = append(nl, newList...)
 			}
 
 		default:
-			nl = append(nl, processingReflectAnySimpleType(logging, chanOutMispFormat, k, v, lr, fieldBranch))
+			nl = append(nl, processingReflectAnySimpleType(logger, chanOutMispFormat, k, v, lr, fieldBranch))
 		}
 	}
 

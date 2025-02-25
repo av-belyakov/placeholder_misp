@@ -13,21 +13,25 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"placeholder_misp/coremodule"
-	"placeholder_misp/datamodels"
-	"placeholder_misp/memorytemporarystorage"
-	"placeholder_misp/mispinteractions"
-	rules "placeholder_misp/rulesinteraction"
-	"placeholder_misp/supportingfunctions"
+	"github.com/av-belyakov/placeholder_misp/cmd/coremodule"
+	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
+	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
+	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
+	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
+	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
+	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
 var _ = Describe("Processingrules", Ordered, func() {
 	var (
 		lr          *rules.ListRule
-		logging     chan datamodels.MessageLogging
-		moduleMisp  *mispinteractions.ModuleMISP
+		logging     commoninterfaces.Logger
+		moduleMisp  *mispapi.ModuleMISP
 		exampleByte []byte
-		counting    chan datamodels.DataCounterSettings
+		counting    *countermessage.CounterMessage
+		chZabbix    chan commoninterfaces.Messager
+
 		errReadFile, errGetRule/*, errHMisp*/ error
 	)
 
@@ -56,10 +60,16 @@ var _ = Describe("Processingrules", Ordered, func() {
 	}
 
 	BeforeAll(func() {
-		//канал для логирования
-		logging = make(chan datamodels.MessageLogging)
-		//канал для подсчета обработанных кейсов
-		counting = make(chan datamodels.DataCounterSettings)
+		chZabbix = make(chan commoninterfaces.Messager)
+
+		go func() {
+			for msg := range chZabbix {
+				fmt.Println("received message:", msg.GetMessage())
+			}
+		}()
+
+		counting = countermessage.New(chZabbix)
+		logging = logginghandler.New()
 
 		//читаем тестовый файл
 		exampleByte, errReadFile = readFileJson("test/test_json", "examplenew.json")
@@ -68,15 +78,19 @@ var _ = Describe("Processingrules", Ordered, func() {
 		lr, _, errGetRule = rules.NewListRule("placeholder_misp", "rules", "mispmsgrule.yaml")
 
 		//эмулируем результат инициализации модуля MISP
-		moduleMisp = &mispinteractions.ModuleMISP{
-			ChanInputMISP:  make(chan mispinteractions.SettingsChanInputMISP),
-			ChanOutputMISP: make(chan mispinteractions.SettingChanOutputMISP),
+		moduleMisp = &mispapi.ModuleMISP{
+			ChanInput:  make(chan mispapi.InputSettings),
+			ChanOutput: make(chan mispapi.OutputSetting),
 		}
 	})
 
 	BeforeEach(func() {
 		//выполняет очистку значения StatementExpression что равно отсутствию совпадений в правилах Pass
 		lr.CleanStatementExpressionRulePass()
+	})
+
+	AfterAll(func() {
+		close(chZabbix)
 	})
 
 	Context("Тест 0. Проверка функции PassRuleHandler", func() {
@@ -176,20 +190,18 @@ var _ = Describe("Processingrules", Ordered, func() {
 
 				for {
 					select {
-					case log := <-logging:
-						if log.MsgType == "warning" {
-							fmt.Println("___ Log = ", log.MsgData, " ____")
+					case log := <-logging.GetChan():
+						if log.GetType() == "warning" {
+							fmt.Println("___ Log = ", log.GetMessage(), " ____")
 						}
 
-						if log.MsgType == "STOP TEST" {
+						if log.GetType() == "STOP TEST" {
 							fmt.Println("-== STOP function SHOW Logs and Counts ==-")
 
 							done <- struct{}{}
 
 							return
 						}
-					case numData := <-counting:
-						fmt.Printf("Counter processed object, type:%s, count:%d\n", numData.DataType, numData.Count)
 					}
 				}
 			}()
@@ -316,14 +328,12 @@ var _ = Describe("Processingrules", Ordered, func() {
 			}()
 
 			msgId := uuid.New().String()
-			// инициализируем модуль временного хранения информации
-			storageApp := memorytemporarystorage.NewTemporaryStorage()
 
-			hjm := coremodule.NewHandlerJsonMessage(storageApp, logging, counting)
+			hjm := coremodule.NewHandlerJsonMessage(counting, logging)
 			// обработчик JSON документа
 			chanOutputDecodeJson := hjm.HandlerJsonMessage(exampleByte, msgId)
 			//формирование итоговых документов в формате MISP
-			go coremodule.NewMispFormat(chanOutputDecodeJson, msgId, moduleMisp, lr, logging, counting)
+			go coremodule.CreateObjectsFormatMISP(chanOutputDecodeJson, msgId, moduleMisp, lr, counting, logging)
 
 			wg.Wait()
 

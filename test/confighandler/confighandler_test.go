@@ -2,19 +2,26 @@ package confighandler
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/spf13/viper"
 
-	"placeholder_misp/confighandler"
+	"github.com/av-belyakov/placeholder_misp/constants"
+	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
+	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
 var _ = Describe("MainConfigHandler", Ordered, func() {
 	const ROOT_DIR = "placeholder_misp"
+	var (
+		rootPath string
+
+		err error
+	)
 
 	BeforeAll(func() {
 		os.Unsetenv("GO_PHMISP_MAIN")
@@ -25,11 +32,18 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 		os.Unsetenv("GO_PHMISP_NCACHETTL")
 		os.Unsetenv("GO_PHMISP_NSUBSENDERCASE")
 		os.Unsetenv("GO_PHMISP_NSUBLISTENERCOMMAND")
+
+		rootPath, err = supportingfunctions.GetRootPath(constants.Root_Dir)
+		if err != nil {
+			log.Fatalf("error, it is impossible to form root path (%s)", err.Error())
+		}
 	})
 
 	Context("Тест 1. Проверяем работу функции NewConfig с разными значениями переменной окружения GO_PHMISP_MAIN", func() {
-		It("Должно быть получено содержимое общего файла 'config.yaml'", func() {
-			conf, err := confighandler.NewConfig(ROOT_DIR)
+		It("Должно быть получено содержимое общего файла 'config.yml'", func() {
+			// инициализируем модуль чтения конфигурационного файла
+			conf, err := confighandler.New(rootPath)
+			Expect(err).ShouldNot(HaveOccurred())
 
 			//fmt.Println("conf = ", conf)
 
@@ -60,10 +74,11 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 			Expect(conf.GetAppTheHive().Send).Should(BeTrue())
 		})
 
-		It("Должно быть получено содержимое файла 'config_prod.yaml' при пустом значении переменной GO_PHMISP_MAIN", func() {
+		It("Должно быть получено содержимое файла 'config_prod.yml' при пустом значении переменной GO_PHMISP_MAIN", func() {
 			os.Setenv("GO_PHMISP_MAIN", "")
 
-			conf, err := confighandler.NewConfig(ROOT_DIR)
+			// инициализируем модуль чтения конфигурационного файла
+			conf, err := confighandler.New(rootPath)
 			Expect(err).ShouldNot(HaveOccurred())
 
 			confNats := conf.GetAppNATS()
@@ -76,10 +91,10 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 			Expect(conf.GetAppMISP().Host).Should(Equal("misp-center.cloud.gcm"))
 		})
 
-		It("Должно быть получено содержимое файла 'config_dev.yaml' при значении переменной GO_PHMISP_MAIN=development", func() {
+		It("Должно быть получено содержимое файла 'config_dev.yml' при значении переменной GO_PHMISP_MAIN=development", func() {
 			os.Setenv("GO_PHMISP_MAIN", "development")
 
-			conf, err := confighandler.NewConfig(ROOT_DIR)
+			conf, err := confighandler.New(rootPath)
 			Expect(err).ShouldNot(HaveOccurred())
 
 			confNats := conf.GetAppNATS()
@@ -101,7 +116,7 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 			os.Setenv("GO_PHMISP_NSUBSENDERCASE", "object.casetype.test")
 			os.Setenv("GO_PHMISP_NSUBLISTENERCOMMAND", "object.commandstype.test")
 
-			conf, err := confighandler.NewConfig(ROOT_DIR)
+			conf, err := confighandler.New(rootPath)
 			Expect(err).ShouldNot(HaveOccurred())
 
 			confNats := conf.GetAppNATS()
@@ -143,25 +158,6 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 
 			Expect(err).ShouldNot(HaveOccurred())
 			Expect(rootPath).Should(Equal("/home/artemij/go/src/placeholder_misp/"))
-		})
-	})
-
-	Context("Тест 3. Проверка выполнения анмаршалинга конфигурационного файла", func() {
-		It("Должен быть выполнен анмаршалинг части основного конфигурационного файла", func() {
-			ls := confighandler.Logs{}
-
-			viper.SetConfigFile("../../configs//config.yaml")
-			viper.SetConfigType("yaml")
-
-			errRC := viper.ReadInConfig()
-			Expect(errRC).ShouldNot(HaveOccurred())
-
-			ok := viper.IsSet("LOGGING")
-			err := viper.GetViper().Unmarshal(&ls)
-			Expect(len(ls.Logging)).ShouldNot(Equal(0))
-
-			Expect(ok).Should(BeTrue())
-			Expect(err).ShouldNot(HaveOccurred())
 		})
 	})
 })
