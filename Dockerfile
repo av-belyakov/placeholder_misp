@@ -22,7 +22,7 @@ FROM alpine
 LABEL author='Artemij Belyakov'
 ARG VERSION
 ARG USERNAME=dockeruser
-ARG US_DIR=/opt/thehivehook_go_package
+ARG US_DIR=/opt/placeholder_misp
 RUN addgroup --g 1500 groupcontainer
 RUN adduser -u 1500 -G groupcontainer -D ${USERNAME} --home ${US_DIR}
 USER ${USERNAME}
