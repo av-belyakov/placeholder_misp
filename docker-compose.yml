@@ -1,0 +1,20 @@
+version: "3.4"
+
+services:
+  app:
+    container_name: placeholder_misp
+    environment:
+      - GO_PLACEHOLDER_MISP_AUTHKEY_MISP=$ #тут переменная в gillab
+    image: gitlab.cloud.gcm:5050/a.belyakov/placeholder_misp:test
+    restart: unless-stopped
+    #пробрасываем user ID для корректной записи в логов
+    user: root
+    command: chmod 777 /opt/placeholder_misp/logs && \
+             chown 1500:1500 /opt/placeholder_misp/logs
+    volumes:
+      - /var/log/placeholder_misp:/opt/placeholder_misp/logs:rw
+      - ./config:/opt/placeholder_misp/config:rw
+      #выполняем для корректного отображения даты с учетом временной зоны
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    network_mode: "host"
