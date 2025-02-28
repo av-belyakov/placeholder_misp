@@ -64,4 +64,24 @@
   приложения, например, одно из подобных значений это type:<значение> которое может совпадать или быть схожем со содержимым в observables.dataType, то это
   значение добавляется в AttributesMispFormat.ObjectRelation
 
-6.  После успешной отправки в MISP сформированных сообщений в TheHive отправляется JSON сообщение формата "{'success': True, 'service': 'MISP', 'commands': [{'command': 'addtag', 'string': 'Webhook: send="MISP"'}, {'command': 'setcustomfield', 'name': 'misp-event-id.string', 'string': '115199'}]}" содержащее идентификационный номер события полученного от MISP.
+6.  После успешной отправки в MISP сформированных сообщений в TheHive отправляется JSON сообщение формата:
+
+```json
+{
+  'success': True,
+  'service': 'MISP',
+  'commands': [
+    {
+    'command': 'addtag',
+    'string': '',
+    'Webhook: send="MISP"'},
+    {
+      'command': 'setcustomfield',
+      'name': 'misp-event-id.string',
+      'string': '115199'
+    }
+  ]
+}
+```
+
+содержащее идентификационный номер события полученного от MISP.
