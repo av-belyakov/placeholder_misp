@@ -127,9 +127,6 @@ func New(rootDir string) (*ConfigApp, error) {
 		if viper.IsSet("MISP.host") {
 			conf.AppConfigMISP.Host = viper.GetString("MISP.host")
 		}
-		if viper.IsSet("MISP.auth") {
-			conf.AppConfigMISP.Auth = viper.GetString("MISP.auth")
-		}
 
 		//Настройки для модуля подключения к СУБД Redis
 		if viper.IsSet("REDIS.host") {

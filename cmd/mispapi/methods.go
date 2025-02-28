@@ -7,17 +7,18 @@ import (
 
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
 	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
+	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 	"golang.org/x/net/context"
 )
 
 //****** каналы *******
 //
 
-func (m ModuleMISP) GetDataReceptionChannel() <-chan OutputSetting {
+func (m ModuleMISP) GetReceptionChannel() <-chan OutputSetting {
 	return m.chOutput
 }
 
-func (m ModuleMISP) SendingDataOutput(data OutputSetting) {
+func (m ModuleMISP) SendDataOutput(data OutputSetting) {
 	m.chOutput <- data
 }
 
@@ -25,7 +26,7 @@ func (m ModuleMISP) GetInputChannel() <-chan InputSettings {
 	return m.chInput
 }
 
-func (m ModuleMISP) SendingDataInput(data InputSettings) {
+func (m ModuleMISP) SendDataInput(data InputSettings) {
 	m.chInput <- data
 }
 
@@ -133,8 +134,7 @@ func (ad *AuthorizationDataMISP) GetListAllUsers(ctx context.Context) (int, erro
 	var countUser int
 	lus, err := ad.getListAllUsers(ctx)
 	if err != nil {
-		_, f, l, _ := runtime.Caller(0)
-		return countUser, fmt.Errorf("'%s' %s:%d", err.Error(), f, l-2)
+		return countUser, supportingfunctions.CustomError(err)
 	}
 
 	//очищаем хранилище с данными пользователей

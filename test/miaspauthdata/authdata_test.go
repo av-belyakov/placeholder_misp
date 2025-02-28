@@ -43,7 +43,7 @@ func TestMain(m *testing.M) {
 		log.Fatalln(err)
 	}
 
-	client, err = mispapi.NewClientMISP("misp-center.cloud.gcm", os.Getenv("GO_PLACEHOLDER_MISP_AUTHKEY_MISP"), false)
+	client, err = mispapi.NewClientMISP("misp-center.cloud.gcm", os.Getenv("GO_PHMISP_MAUTH"), false)
 	if err != nil {
 		log.Fatalln(err)
 	}

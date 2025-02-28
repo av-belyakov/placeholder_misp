@@ -8,9 +8,9 @@ import (
 )
 
 type ModuleMispHandler interface {
-	GetDataReceptionChannel() <-chan OutputSetting
-	SendingDataOutput(OutputSetting)
-	SendingDataInput(InputSettings)
+	GetReceptionChannel() <-chan OutputSetting
+	SendDataOutput(OutputSetting)
+	SendDataInput(InputSettings)
 }
 
 type ConnectMISPHandler interface {

@@ -46,8 +46,8 @@ func (settings *CoreHandlerSettings) Start(
 	redisModule *redisapi.ModuleRedis) error {
 
 	chanNatsReception := natsModule.GetDataReceptionChannel()
-	chanMispReception := mispModule.GetDataReceptionChannel()
-	chanRedisReception := redisModule.GetDataReceptionChannel()
+	chanMispReception := mispModule.GetReceptionChannel()
+	chanRedisReception := redisModule.GetReceptionChannel()
 	hjson := NewHandlerJSON(settings.counting, settings.logger)
 
 	for {
@@ -121,7 +121,7 @@ func (settings *CoreHandlerSettings) Start(
 			//отправка данных в Redis
 			case "set new event id":
 				//обработка запроса на добавления новой связки caseId:eventId в Redis
-				redisModule.SendingDataInput(redisapi.SettingsChanInputRedis{
+				redisModule.SendDataInput(redisapi.SettingsInput{
 					Command: "set case id",
 					Data:    fmt.Sprintf("%s:%s", data.CaseId, data.EventId),
 				})
@@ -138,7 +138,7 @@ func (settings *CoreHandlerSettings) Start(
 					break
 				}
 
-				mispModule.SendingDataInput(mispapi.InputSettings{
+				mispModule.SendDataInput(mispapi.InputSettings{
 					Command: "del event by id",
 					EventId: eventId,
 				})

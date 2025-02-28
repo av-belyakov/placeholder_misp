@@ -1,6 +1,6 @@
 RULES_PROC_MSG_FOR_MISP:
   directory: rules
-  file: mispmsgrule.yaml
+  file: mispmsgrule.yml
 REDIS:
   host: "127.0.0.1"
   port: 6379
@@ -13,6 +13,5 @@ NATS:
     listener_command: "object.commandstype"
 MISP:
   host: misp-center.cloud.gcm
-  auth: Z2PwRBdP5lFP7rdDJBzxmSahaLEwIvJoeOuwhRYQ
 THEHIVE:
   send: true

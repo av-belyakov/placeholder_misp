@@ -232,7 +232,8 @@ func CreateObjectsFormatMISP(
 		logger.Send("warning", fmt.Sprintf("'the message with case id %d was not sent to MISP because it does not comply with the rules'", int(caseId)))
 	} else {
 		//добавляем case id в поле Info
-		eventsMisp.Info += fmt.Sprintf(" :::TheHive case id '%d':::", int(caseId))
+		//		eventsMisp.Info += fmt.Sprintf(" :::TheHive case id '%d':::", int(caseId))
+		eventsMisp.Info += fmt.Sprintf(" $$$_TheHive case id '%d'_$$$", int(caseId))
 
 		//добавляем в datemodels.ListObjectEventTags дополнительные теги
 		//ответственные за формирование галактик в MISP
@@ -265,7 +266,7 @@ func CreateObjectsFormatMISP(
 		mispFormat.Reports = reports
 
 		//тут отправляем сформированные по формату MISP пользовательские структуры
-		mispModule.SendingDataInput(mispapi.InputSettings{
+		mispModule.SendDataInput(mispapi.InputSettings{
 			Command:    "add event",
 			TaskId:     taskId,
 			CaseId:     caseId,

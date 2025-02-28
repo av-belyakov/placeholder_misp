@@ -88,7 +88,7 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 		//
 
 		//отправляем запрос для добавления в БД Redis, id кейса и нового события
-		m.SendingDataOutput(OutputSetting{
+		m.SendDataOutput(OutputSetting{
 			Command: "set new event id",
 			CaseId:  fmt.Sprint(data.CaseId),
 			EventId: eventId,
@@ -174,7 +174,7 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 		//
 
 		// отправляем в ядро информацию по event Id
-		m.SendingDataOutput(OutputSetting{
+		m.SendDataOutput(OutputSetting{
 			Command: "send event id",
 			EventId: eventId,
 			CaseId:  fmt.Sprint(data.CaseId),

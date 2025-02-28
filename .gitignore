@@ -1,3 +1,4 @@
 logs/
 placeholder_misp
 .env
+misp_module

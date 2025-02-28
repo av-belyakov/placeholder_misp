@@ -9,14 +9,10 @@ import (
 	"github.com/nats-io/nats.go"
 
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/constants"
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
 	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
-)
-
-const (
-	Ansi_Reset     = "\033[0m"
-	Ansi_Dark_Gray = "\033[90m"
 )
 
 // NewClientNATS конструктор API NATS
@@ -69,7 +65,9 @@ func NewClientNATS(
 		counting.SendMessage("update accepted events", 1)
 	})
 
-	log.Printf("%vConnect to NATS with address %s:%d%v\n", Ansi_Dark_Gray, confNats.Host, confNats.Port, Ansi_Reset)
+	nc.Flush()
+
+	log.Printf("%vconnect to NATS with address %v%s:%d%v\n", constants.Ansi_Bright_Green, constants.Ansi_Dark_Gray, confNats.Host, confNats.Port, constants.Ansi_Reset)
 
 	// обработка данных приходящих в модуль от ядра приложения фактически это команды на добавления
 	//тега - 'add_case_tag' и команда на добавление MISP id в поле customField

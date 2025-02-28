@@ -4,7 +4,7 @@ services:
   app:
     container_name: placeholder_misp
     environment:
-      - GO_PLACEHOLDER_MISP_AUTHKEY_MISP=$ #тут переменная в gillab
+      - GO_PHMISP_MAUTH=$ #тут переменная в gillab
     image: gitlab.cloud.gcm:5050/a.belyakov/placeholder_misp:test
     restart: unless-stopped
     #пробрасываем user ID для корректной записи в логов

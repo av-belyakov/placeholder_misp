@@ -12,6 +12,7 @@ const (
 	Ansi_Bright_Green          = "\033[92m"
 	Ansi_Bright_Magenta        = "\033[95m"
 	Ansi_Dark_Redbackground    = "\033[42m"
+	Ansi_Dark_Gray             = "\033[90m"
 	Ansi_Dark_Green_Background = "\033[42m"
 
 	Bold_Font   = "\033[1m"

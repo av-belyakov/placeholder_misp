@@ -47,7 +47,8 @@ func NewModuleMISP(
 	authKey string,
 	org []confighandler.Organization,
 	logger commoninterfaces.Logger) (*ModuleMISP, error) {
-	cache, err := cachingstoragewithqueue.NewCacheStorage[objectsmispformat.ListFormatsMISP](
+
+	cache, err := cachingstoragewithqueue.NewCacheStorage(
 		cachingstoragewithqueue.WithMaxTtl[objectsmispformat.ListFormatsMISP](300),
 		cachingstoragewithqueue.WithTimeTick[objectsmispformat.ListFormatsMISP](3),
 		cachingstoragewithqueue.WithMaxSize[objectsmispformat.ListFormatsMISP](10),
@@ -63,6 +64,7 @@ func NewModuleMISP(
 		authKey:      authKey,
 		chInput:      make(chan InputSettings),
 		chOutput:     make(chan OutputSetting),
+		logger:       logger,
 	}
 
 	return module, nil
@@ -71,20 +73,17 @@ func NewModuleMISP(
 func (m *ModuleMISP) Start(ctx context.Context) error {
 	client, err := NewClientMISP(m.host, m.authKey, false)
 	if err != nil {
-		//m.logger.Send("error", supportingfunctions.CustomError(err).Error())
 		return err
 	}
 
 	connHandler := NewHandlerAuthorizationMISP(client, NewStorageAuthorizationDataMISP())
 	err = connHandler.GetListAllOrganisation(ctx, m.organistions)
 	if err != nil {
-		//m.logger.Send("error", supportingfunctions.CustomError(err).Error())
 		return err
 	}
 
 	countUser, err := connHandler.GetListAllUsers(ctx)
 	if err != nil {
-		//m.logger.Send("error", supportingfunctions.CustomError(err).Error())
 		return err
 	}
 

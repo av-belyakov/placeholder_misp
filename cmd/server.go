@@ -31,7 +31,7 @@ func server(ctx context.Context) {
 
 	// ****************************************************************************
 	// *********** инициализируем модуль чтения конфигурационного файла ***********
-	confApp, err := confighandler.New(rootPath)
+	conf, err := confighandler.New(rootPath)
 	if err != nil {
 		log.Fatalf("error module 'confighandler': %v", err)
 	}
@@ -39,7 +39,7 @@ func server(ctx context.Context) {
 	// ****************************************************************************
 	// ********************* инициализация модуля логирования *********************
 	var listLog []simplelogger.OptionsManager
-	for _, v := range confApp.GetListLogs() {
+	for _, v := range conf.GetListLogs() {
 		listLog = append(listLog, v)
 	}
 	opts := simplelogger.CreateOptions(listLog...)
@@ -50,7 +50,7 @@ func server(ctx context.Context) {
 
 	// ****************************************************************************
 	// ******* инициализируем модуль чтения правил обработки MISP сообщений *******
-	listRules, warnings, err := rules.NewListRule(constants.Root_Dir, confApp.RulesProcMSGMISP.Directory, confApp.RulesProcMSGMISP.File)
+	listRules, warnings, err := rules.NewListRule(constants.Root_Dir, conf.RulesProcMSGMISP.Directory, conf.RulesProcMSGMISP.File)
 	if err != nil {
 		_ = simpleLogger.Write("error", supportingfunctions.CustomError(err).Error())
 
@@ -73,12 +73,12 @@ func server(ctx context.Context) {
 	// ************* инициализация модуля взаимодействия с Zabbix *************
 	chZabbix := make(chan commoninterfaces.Messager)
 	wzis := wrappers.WrappersZabbixInteractionSettings{
-		NetworkPort: confApp.Zabbix.NetworkPort,
-		NetworkHost: confApp.Zabbix.NetworkHost,
-		ZabbixHost:  confApp.Zabbix.ZabbixHost,
+		NetworkPort: conf.Zabbix.NetworkPort,
+		NetworkHost: conf.Zabbix.NetworkHost,
+		ZabbixHost:  conf.Zabbix.ZabbixHost,
 	}
 	eventTypes := []wrappers.EventType(nil)
-	for _, v := range confApp.Zabbix.EventTypes {
+	for _, v := range conf.Zabbix.EventTypes {
 		eventTypes = append(eventTypes, wrappers.EventType{
 			IsTransmit: v.IsTransmit,
 			EventType:  v.EventType,
@@ -102,9 +102,12 @@ func server(ctx context.Context) {
 	counting := countermessage.New(chZabbix)
 	counting.Start(ctx)
 
+	// вывод информационного сообщения при старте приложения
+	msg := getInformationMessage()
+
 	// ***************************************************************************
 	// ************** инициализация модуля для взаимодействия с NATS *************
-	natsModule, err := natsapi.NewClientNATS(confApp.AppConfigNATS, confApp.AppConfigTheHive, counting, logging)
+	natsModule, err := natsapi.NewClientNATS(conf.AppConfigNATS, conf.AppConfigTheHive, counting, logging)
 	if err != nil {
 		_ = simpleLogger.Write("error", supportingfunctions.CustomError(err).Error())
 
@@ -113,24 +116,36 @@ func server(ctx context.Context) {
 
 	// ***************************************************************************
 	// *********** инициализация модуля для взаимодействия с СУБД Redis **********
-	redisModule := redisapi.HandlerRedis(ctx, *confApp.GetAppRedis(), logging)
+	redisModule := redisapi.NewModuleRedis(conf.AppConfigRedis.Host, conf.AppConfigRedis.Port, logging)
+	if err = redisModule.Start(ctx); err != nil {
+		_ = simpleLogger.Write("error", supportingfunctions.CustomError(err).Error())
+
+		log.Fatalln(err)
+	}
 
 	// ***************************************************************************
 	// *************** инициалиация модуля для взаимодействия с MISP *************
-	mispModule, err := mispapi.NewModuleMISP(confApp.GetAppMISP().Host, confApp.GetAppMISP().Auth, confApp.GetListOrganization(), logging)
+	mispModule, err := mispapi.NewModuleMISP(conf.GetAppMISP().Host, conf.GetAppMISP().Auth, conf.GetListOrganization(), logging)
 	if err != nil {
 		_ = simpleLogger.Write("error", supportingfunctions.CustomError(err).Error())
 	}
-	mispModule.Start(ctx)
+	if err = mispModule.Start(ctx); err != nil {
+		_ = simpleLogger.Write("error", supportingfunctions.CustomError(err).Error())
 
-	// вывод информационного сообщения при старте приложения
-	msg := getInformationMessage()
+		log.Fatalln(err)
+	}
+
 	_ = simpleLogger.Write("info", strings.ToLower(msg))
 
 	//для отладки через pprof
+	//http://localhost:6060/debug/pprof/
+	//go tool pprof http://localhost:6161/debug/pprof/heap
+	//go tool pprof http://localhost:6161/debug/pprof/goroutine
+	//go tool pprof http://localhost:6161/debug/pprof/allocs
 	go func() {
-		log.Println(http.ListenAndServe("localhost:6060", nil))
+		log.Println(http.ListenAndServe("localhost:6161", nil))
 	}()
+	//------------------------
 
 	// *****************************************************************
 	// *************** инициализируем ядро приложения ******************

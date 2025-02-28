@@ -73,8 +73,8 @@ type SubscriptionsNATS struct {
 }
 
 type AppConfigMISP struct {
-	Host string `yaml:"host"`
-	Auth string `yaml:"auth"`
+	Host string `validate:"required" yaml:"host"`
+	Auth string `validate:"required" yaml:"auth"`
 }
 
 type AppConfigRedis struct {
