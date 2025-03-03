@@ -1,5 +1,34 @@
 package natsapi
 
+import (
+	"github.com/nats-io/nats.go"
+
+	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
+)
+
+// ApiNatsModule настройки для API NATS
+type ApiNatsModule struct {
+	natsConn      *nats.Conn
+	logger        commoninterfaces.Logger
+	counting      *countermessage.CounterMessage
+	subscriptions subscription
+	host          string
+	chanOutput    chan OutputSettings //канал для отправки данных ИЗ модуля
+	chanInput     chan InputSettings  //канал для приема данных В модуль
+	cachettl      int
+	port          int
+	sendCommand   bool
+}
+
+type subscription struct {
+	listenerCase  string
+	senderCommand string
+}
+
+// NatsApiOptions функциональные опции
+type NatsApiOptions func(*ApiNatsModule) error
+
 // ModuleNATS инициализированный модуль
 type ModuleNATS struct {
 	chanOutput chan OutputSettings //канал для отправки данных ИЗ модуля

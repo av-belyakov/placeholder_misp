@@ -30,8 +30,8 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 		os.Unsetenv("GO_PHMISP_NHOST")
 		os.Unsetenv("GO_PHMISP_NPORT")
 		os.Unsetenv("GO_PHMISP_NCACHETTL")
-		os.Unsetenv("GO_PHMISP_NSUBSENDERCASE")
-		os.Unsetenv("GO_PHMISP_NSUBLISTENERCOMMAND")
+		os.Unsetenv("GO_PHMISP_NSUBLISTENERCASE")
+		os.Unsetenv("GO_PHMISP_NSUBSENDERCOMMAND")
 
 		rootPath, err = supportingfunctions.GetRootPath(constants.Root_Dir)
 		if err != nil {
@@ -85,8 +85,8 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 			Expect(confNats.Host).Should(Equal("nats.cloud.gcm"))
 			Expect(confNats.Port).Should(Equal(4222))
 			Expect(confNats.CacheTTL).Should(Equal(3600))
-			Expect(confNats.Subscriptions.SenderCase).Should(Equal("object.casetype"))
-			Expect(confNats.Subscriptions.ListenerCommand).Should(Equal("object.commandstype"))
+			Expect(confNats.Subscriptions.ListenerCase).Should(Equal("object.casetype"))
+			Expect(confNats.Subscriptions.SenderCommand).Should(Equal("object.commandstype"))
 
 			Expect(conf.GetAppMISP().Host).Should(Equal("misp-center.cloud.gcm"))
 		})
@@ -101,8 +101,8 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 			Expect(confNats.Host).Should(Equal("nats.cloud.gcm"))
 			Expect(confNats.Port).Should(Equal(4222))
 			Expect(confNats.CacheTTL).Should(Equal(3600))
-			Expect(confNats.Subscriptions.SenderCase).Should(Equal("object.casetype"))
-			Expect(confNats.Subscriptions.ListenerCommand).Should(Equal("object.commandstype"))
+			Expect(confNats.Subscriptions.ListenerCase).Should(Equal("object.casetype.local"))
+			Expect(confNats.Subscriptions.SenderCommand).Should(Equal("object.commandstype"))
 
 			Expect(conf.GetAppMISP().Host).Should(Equal("misp-world.cloud.gcm"))
 		})
@@ -113,8 +113,8 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 			os.Setenv("GO_PHMISP_NHOST", "78.87.78.87")
 			os.Setenv("GO_PHMISP_NPORT", "11111")
 			os.Setenv("GO_PHMISP_NCACHETTL", "4500")
-			os.Setenv("GO_PHMISP_NSUBSENDERCASE", "object.casetype.test")
-			os.Setenv("GO_PHMISP_NSUBLISTENERCOMMAND", "object.commandstype.test")
+			os.Setenv("GO_PHMISP_NSUBLISTENERCASE", "object.casetype.test")
+			os.Setenv("GO_PHMISP_NSUBSENDERCOMMAND", "object.commandstype.test")
 
 			conf, err := confighandler.New(rootPath)
 			Expect(err).ShouldNot(HaveOccurred())
@@ -123,8 +123,8 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 			Expect(confNats.Host).Should(Equal("78.87.78.87"))
 			Expect(confNats.Port).Should(Equal(11111))
 			Expect(confNats.CacheTTL).Should(Equal(4500))
-			Expect(confNats.Subscriptions.SenderCase).Should(Equal("object.casetype.test"))
-			Expect(confNats.Subscriptions.ListenerCommand).Should(Equal("object.commandstype.test"))
+			Expect(confNats.Subscriptions.ListenerCase).Should(Equal("object.casetype.test"))
+			Expect(confNats.Subscriptions.SenderCommand).Should(Equal("object.commandstype.test"))
 		})
 	})
 

@@ -30,6 +30,8 @@ func CreateObjectsFormatMISP(
 		patterIsNum         *regexp.Regexp = regexp.MustCompile(`^\d+$`)
 	)
 
+	fmt.Println("func 'CreateObjectsFormatMISP', START...")
+
 	//формируем шаблоны для заполнения
 	eventsMisp := objectsmispformat.NewEventMisp()
 	listObjectsMisp := objectsmispformat.NewListObjectsMispFormat()
@@ -229,7 +231,9 @@ func CreateObjectsFormatMISP(
 		//
 		//
 
-		logger.Send("warning", fmt.Sprintf("'the message with case id %d was not sent to MISP because it does not comply with the rules'", int(caseId)))
+		fmt.Printf("func 'CreateObjectsFormatMISP', the message with case id %v was not sent to MISP because it does not comply with the rules\n", caseId)
+
+		logger.Send("warning", fmt.Sprintf("the message with case id %d was not sent to MISP because it does not comply with the rules", int(caseId)))
 	} else {
 		//добавляем case id в поле Info
 		//		eventsMisp.Info += fmt.Sprintf(" :::TheHive case id '%d':::", int(caseId))
@@ -264,6 +268,9 @@ func CreateObjectsFormatMISP(
 		reports.SetName(fmt.Sprint(caseId))
 		reports.SetDistribution("1")
 		mispFormat.Reports = reports
+
+		fmt.Println("func 'CreateObjectsFormatMISP', mispFormat:", *mispFormat)
+		fmt.Println("func 'CreateObjectsFormatMISP', send to MISP")
 
 		//тут отправляем сформированные по формату MISP пользовательские структуры
 		mispModule.SendDataInput(mispapi.InputSettings{

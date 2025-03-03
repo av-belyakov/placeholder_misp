@@ -107,8 +107,21 @@ func server(ctx context.Context) {
 
 	// ***************************************************************************
 	// ************** инициализация модуля для взаимодействия с NATS *************
-	natsModule, err := natsapi.NewClientNATS(conf.AppConfigNATS, conf.AppConfigTheHive, counting, logging)
+	confNats := conf.AppConfigNATS
+	apiNats, err := natsapi.New(
+		logging,
+		counting,
+		natsapi.WithHost(confNats.Host),
+		natsapi.WithPort(confNats.Port),
+		natsapi.WithCacheTTL(confNats.CacheTTL),
+		natsapi.WithListenerCase(confNats.Subscriptions.ListenerCase),
+		natsapi.WithSenderCommand(confNats.Subscriptions.SenderCommand))
 	if err != nil {
+		_ = simpleLogger.Write("error", supportingfunctions.CustomError(err).Error())
+
+		log.Fatal(err)
+	}
+	if err = apiNats.Start(ctx); err != nil {
 		_ = simpleLogger.Write("error", supportingfunctions.CustomError(err).Error())
 
 		log.Fatal(err)
@@ -150,7 +163,7 @@ func server(ctx context.Context) {
 	// *****************************************************************
 	// *************** инициализируем ядро приложения ******************
 	core := coremodule.NewCoreHandler(counting, listRules, logging)
-	if err := core.Start(ctx, natsModule, mispModule, redisModule); err != nil {
+	if err := core.Start(ctx, apiNats, mispModule, redisModule); err != nil {
 		_ = simpleLogger.Write("error", supportingfunctions.CustomError(err).Error())
 
 		log.Fatalln(err)

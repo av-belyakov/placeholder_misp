@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -12,6 +13,9 @@ func main() {
 
 	go func() {
 		<-ctx.Done()
+
+		fmt.Println("Placeholder_misp module is stop")
+
 		stop()
 	}()
 

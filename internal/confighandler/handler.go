@@ -27,10 +27,11 @@ func New(rootDir string) (*ConfigApp, error) {
 			"GO_PHMISP_MAUTH": "",
 
 			//Подключение к NATS
-			"GO_PHMISP_NHOST":               "",
-			"GO_PHMISP_NPORT":               "",
-			"GO_PHMISP_NSUBSENDERCASE":      "",
-			"GO_PHMISP_NSUBLISTENERCOMMAND": "",
+			"GO_PHMISP_NHOST":             "",
+			"GO_PHMISP_NPORT":             "",
+			"GO_PHMISP_NCACHETTL":         "",
+			"GO_PHMISP_NSUBLISTENERCASE":  "",
+			"GO_PHMISP_NSUBSENDERCOMMAND": "",
 
 			//Подключение к Redis DB
 			"GO_PHMISP_REDISHOST": "",
@@ -116,11 +117,11 @@ func New(rootDir string) (*ConfigApp, error) {
 		if viper.IsSet("NATS.cacheTtl") {
 			conf.AppConfigNATS.CacheTTL = viper.GetInt("NATS.cacheTtl")
 		}
-		if viper.IsSet("NATS.subscriptions.sender_case") {
-			conf.AppConfigNATS.Subscriptions.SenderCase = viper.GetString("NATS.subscriptions.sender_case")
+		if viper.IsSet("NATS.subscriptions.listener_case") {
+			conf.AppConfigNATS.Subscriptions.ListenerCase = viper.GetString("NATS.subscriptions.listener_case")
 		}
-		if viper.IsSet("NATS.subscriptions.listener_command") {
-			conf.AppConfigNATS.Subscriptions.ListenerCommand = viper.GetString("NATS.subscriptions.listener_command")
+		if viper.IsSet("NATS.subscriptions.sender_command") {
+			conf.AppConfigNATS.Subscriptions.SenderCommand = viper.GetString("NATS.subscriptions.sender_command")
 		}
 
 		//Настройки для модуля подключения к MISP
@@ -234,11 +235,16 @@ func New(rootDir string) (*ConfigApp, error) {
 			conf.AppConfigNATS.Port = p
 		}
 	}
-	if envList["GO_PHMISP_NSUBSENDERCASE"] != "" {
-		conf.AppConfigNATS.Subscriptions.SenderCase = envList["GO_PHMISP_NSUBSENDERCASE"]
+	if envList["GO_PHMISP_NCACHETTL"] != "" {
+		if ttl, err := strconv.Atoi(envList["GO_PHMISP_NCACHETTL"]); err == nil {
+			conf.AppConfigNATS.CacheTTL = ttl
+		}
 	}
-	if envList["GO_PHMISP_NSUBLISTENERCOMMAND"] != "" {
-		conf.AppConfigNATS.Subscriptions.ListenerCommand = envList["GO_PHMISP_NSUBLISTENERCOMMAND"]
+	if envList["GO_PHMISP_NSUBLISTENERCASE"] != "" {
+		conf.AppConfigNATS.Subscriptions.ListenerCase = envList["GO_PHMISP_NSUBLISTENERCASE"]
+	}
+	if envList["GO_PHMISP_NSUBSENDERCOMMAND"] != "" {
+		conf.AppConfigNATS.Subscriptions.SenderCommand = envList["GO_PHMISP_NSUBSENDERCOMMAND"]
 	}
 
 	//Настройки для модуля подключения к MISP

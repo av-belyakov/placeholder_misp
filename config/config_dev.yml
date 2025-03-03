@@ -9,8 +9,8 @@ NATS:
   port: 4222
   cacheTtl: 3600
   subscriptions:
-    sender_case: "object.casetype"
-    listener_command: "object.commandstype"
+    listener_case: "object.casetype.local"
+    sender_command: "object.commandstype"
 MISP:
   host: "misp-world.cloud.gcm"
 THEHIVE:

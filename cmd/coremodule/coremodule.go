@@ -41,11 +41,11 @@ func NewCoreHandler(
 
 func (settings *CoreHandlerSettings) Start(
 	ctx context.Context,
-	natsModule natsapi.ModuleNatsHandler,
+	natsModule *natsapi.ApiNatsModule,
 	mispModule mispapi.ModuleMispHandler,
 	redisModule *redisapi.ModuleRedis) error {
 
-	chanNatsReception := natsModule.GetDataReceptionChannel()
+	chanNatsReception := natsModule.GetChannelFromModule()
 	chanMispReception := mispModule.GetReceptionChannel()
 	chanRedisReception := redisModule.GetReceptionChannel()
 	hjson := NewHandlerJSON(settings.counting, settings.logger)
@@ -55,9 +55,13 @@ func (settings *CoreHandlerSettings) Start(
 		case <-ctx.Done():
 			settings.logger.Send("testing", "TEST_INFO func 'CoreHandler', reseived ctx.Done()!!!!")
 
+			fmt.Println("func 'CoreHandlerSettings.Start' is stop")
+
 			return ctx.Err()
 
 		case data := <-chanNatsReception:
+			fmt.Printf("func 'CoreHandlerSettings.Start', reseived new case")
+
 			// ***********************************
 			// Это логирование только для теста!!!
 			// ***********************************

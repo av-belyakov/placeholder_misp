@@ -68,8 +68,8 @@ type AppConfigNATS struct {
 }
 
 type SubscriptionsNATS struct {
-	SenderCase      string `validate:"required" yaml:"sender_case"`
-	ListenerCommand string `validate:"required" yaml:"listener_command"`
+	ListenerCase  string `validate:"required" yaml:"listener_case"`
+	SenderCommand string `validate:"required" yaml:"sender_command"`
 }
 
 type AppConfigMISP struct {
