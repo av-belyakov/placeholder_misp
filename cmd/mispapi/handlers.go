@@ -12,10 +12,15 @@ import (
 )
 
 func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data InputSettings) {
+	fmt.Println("func 'addNewObject', START...")
+
 	specialObject := NewCacheSpecialObject[*objectsmispformat.ListFormatsMISP]()
 	specialObject.SetID(data.RootId)
 	specialObject.SetObject(&data.Data)
 	specialObject.SetFunc(func(i int) bool {
+
+		fmt.Println("func 'specialObject.SetFunc', START... |||")
+
 		rmisp, err := NewMispRequest(
 			WithHost(m.host),
 			WithUserAuthKey(userAuthKey),

@@ -1,4 +1,4 @@
-package natsapi
+package supportingfunctions
 
 import (
 	"sync"

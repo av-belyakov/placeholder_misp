@@ -7,6 +7,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/nats-io/nats.go"
 
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
@@ -67,7 +68,7 @@ func (api *ApiNatsModule) Start(ctx context.Context) error {
 
 	//приём кейсов
 	nc.Subscribe(api.subscriptions.listenerCase, func(m *nats.Msg) {
-		fmt.Printf("func 'NewClientNATS', reseived new case")
+		fmt.Println("func 'NewClientNATS', reseived new case")
 
 		// ***********************************
 		// Это логирование только для теста!!!
@@ -76,26 +77,30 @@ func (api *ApiNatsModule) Start(ctx context.Context) error {
 		//
 		//
 
+		fmt.Println("func 'NewClientNATS', reseived new case 11111")
+
 		api.SendingDataOutput(OutputSettings{
-			MsgId: ns.setElement(m),
+			MsgId: uuid.NewString(),
 			Data:  m.Data,
 		})
 
+		fmt.Println("func 'NewClientNATS', reseived new case 222222")
+
 		//счетчик принятых кейсов
 		api.counting.SendMessage("update accepted events", 1)
+
+		fmt.Println("func 'NewClientNATS', reseived new case 333333")
+
 	})
 
-	nc.Flush()
+	//nc.Flush()
 
-	log.Printf("%vconnect to NATS with address %v%s:%d%v\n", constants.Ansi_Bright_Green, constants.Ansi_Dark_Gray, api.host, api.port, constants.Ansi_Reset)
+	lisSub := fmt.Sprintf("%v, listening to a subscription:%v'%s'%v", constants.Ansi_Bright_Green, constants.Ansi_Dark_Gray, api.subscriptions.listenerCase, constants.Ansi_Reset)
+	log.Printf("%vconnect to NATS with address %v%s:%d%v%s\n", constants.Ansi_Bright_Green, constants.Ansi_Dark_Gray, api.host, api.port, constants.Ansi_Reset, lisSub)
 
 	go func(ctx context.Context, nc *nats.Conn) {
 		<-ctx.Done()
-
-		fmt.Println("ApiNatsModule, stop 1")
-
 		nc.Drain()
-		nc.Close()
 	}(ctx, nc)
 
 	// обработка данных приходящих в модуль от ядра приложения фактически это команды на добавления
@@ -104,8 +109,6 @@ func (api *ApiNatsModule) Start(ctx context.Context) error {
 		for {
 			select {
 			case <-ctx.Done():
-				fmt.Println("ApiNatsModule, stop 2")
-
 				return
 
 			case incomingData := <-api.GetChannelToModule():

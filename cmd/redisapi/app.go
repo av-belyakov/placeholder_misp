@@ -30,6 +30,15 @@ func NewModuleRedis(host string, port int, logger commoninterfaces.Logger) *Modu
 
 // Start запуск модуля
 func (r *ModuleRedis) Start(ctx context.Context) error {
+	defer func() {
+		close(r.chInput)
+		close(r.chOutput)
+	}()
+
+	if ctx.Err() != nil {
+		return ctx.Err()
+	}
+
 	if err := r.client.Ping(ctx).Err(); err != nil {
 		return supportingfunctions.CustomError(fmt.Errorf("module Redis API, %w", err))
 	}
@@ -37,71 +46,71 @@ func (r *ModuleRedis) Start(ctx context.Context) error {
 	log.Printf("%vconnect to Redis database with address %v%s:%d%v\n", constants.Ansi_Bright_Green, constants.Ansi_Dark_Gray, r.host, r.port, constants.Ansi_Reset)
 
 	go func() {
-		defer func() {
-			<-ctx.Done()
-			close(r.chInput)
-			close(r.chOutput)
-		}()
+		for {
+			select {
+			case <-ctx.Done():
+				return
 
-		for msg := range r.chInput {
-			switch msg.Command {
-			case "search caseId":
-				strCmd := r.client.Get(ctx, msg.Data)
-				if strResult, err := strCmd.Result(); err == nil {
-					r.SendDataOutput(SettingsOutput{
-						CommandResult: "found caseId",
-						//возвращает eventId MISP
-						Result: strResult,
-					})
-				}
+			case msg := <-r.chInput:
+				switch msg.Command {
+				case "search caseId":
+					strCmd := r.client.Get(ctx, msg.Data)
+					if strResult, err := strCmd.Result(); err == nil {
+						r.SendDataOutput(SettingsOutput{
+							CommandResult: "found caseId",
+							//возвращает eventId MISP
+							Result: strResult,
+						})
+					}
 
-			case "set case id":
-				// ***********************************
-				// Это логирование только для теста!!!
-				// ***********************************
-				r.logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerRedis', обрабатываем добавление CaseID и EventId '%s' to REDIS DB", msg.Data))
-				//
-				//
-
-				tmp := strings.Split(msg.Data, ":")
-				if len(tmp) == 0 {
-					r.logger.Send("warning", fmt.Sprintf("it is not possible to split a string '%s' to add case and event information to the Redis DB", msg.Data))
-
-					continue
-				}
-
-				//получаем старое значение eventId по текущему caseId (если оно есть)
-				strCmd := r.client.Get(ctx, tmp[0])
-				eventId, err := strCmd.Result()
-				if err == nil {
+				case "set case id":
 					// ***********************************
 					// Это логирование только для теста!!!
 					// ***********************************
-					r.logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerRedis', НАЙДЕНО СТАРОЕ значение CaseID '%s' отправляем в ядро найденное событие с event id '%s'", tmp[0], eventId))
+					r.logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerRedis', обрабатываем добавление CaseID и EventId '%s' to REDIS DB", msg.Data))
 					//
 					//
 
-					//отправляем eventId для удаления события в MISP
-					r.SendDataOutput(SettingsOutput{
-						CommandResult: "found event id",
-						Result:        eventId,
-					})
+					tmp := strings.Split(msg.Data, ":")
+					if len(tmp) == 0 {
+						r.logger.Send("warning", fmt.Sprintf("it is not possible to split a string '%s' to add case and event information to the Redis DB", msg.Data))
+
+						continue
+					}
+
+					//получаем старое значение eventId по текущему caseId (если оно есть)
+					strCmd := r.client.Get(ctx, tmp[0])
+					eventId, err := strCmd.Result()
+					if err == nil {
+						// ***********************************
+						// Это логирование только для теста!!!
+						// ***********************************
+						r.logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerRedis', НАЙДЕНО СТАРОЕ значение CaseID '%s' отправляем в ядро найденное событие с event id '%s'", tmp[0], eventId))
+						//
+						//
+
+						//отправляем eventId для удаления события в MISP
+						r.SendDataOutput(SettingsOutput{
+							CommandResult: "found event id",
+							Result:        eventId,
+						})
+					}
+
+					//заменяем старое значение (если есть) или создаем новое
+					//tmp[0] - caseId и tmp[1] - eventId
+					if err := r.client.Set(ctx, tmp[0], tmp[1], 0).Err(); err != nil {
+						r.logger.Send("error", supportingfunctions.CustomError(err).Error())
+
+						continue
+					}
+
+					// ***********************************
+					// Это логирование только для теста!!!
+					// ***********************************
+					r.logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerRedis', выполнили замену старого значения event id: %s новым значением event id: %s, для case id: %s", eventId, tmp[1], tmp[0]))
+					//
+					//
 				}
-
-				//заменяем старое значение (если есть) или создаем новое
-				//tmp[0] - caseId и tmp[1] - eventId
-				if err := r.client.Set(ctx, tmp[0], tmp[1], 0).Err(); err != nil {
-					r.logger.Send("error", supportingfunctions.CustomError(err).Error())
-
-					continue
-				}
-
-				// ***********************************
-				// Это логирование только для теста!!!
-				// ***********************************
-				r.logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerRedis', выполнили замену старого значения event id: %s новым значением event id: %s, для case id: %s", eventId, tmp[1], tmp[0]))
-				//
-				//
 			}
 		}
 	}()

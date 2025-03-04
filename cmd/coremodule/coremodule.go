@@ -43,7 +43,7 @@ func (settings *CoreHandlerSettings) Start(
 	ctx context.Context,
 	natsModule *natsapi.ApiNatsModule,
 	mispModule mispapi.ModuleMispHandler,
-	redisModule *redisapi.ModuleRedis) error {
+	redisModule *redisapi.ModuleRedis) {
 
 	chanNatsReception := natsModule.GetChannelFromModule()
 	chanMispReception := mispModule.GetReceptionChannel()
@@ -53,21 +53,10 @@ func (settings *CoreHandlerSettings) Start(
 	for {
 		select {
 		case <-ctx.Done():
-			settings.logger.Send("testing", "TEST_INFO func 'CoreHandler', reseived ctx.Done()!!!!")
-
-			fmt.Println("func 'CoreHandlerSettings.Start' is stop")
-
-			return ctx.Err()
+			return
 
 		case data := <-chanNatsReception:
-			fmt.Printf("func 'CoreHandlerSettings.Start', reseived new case")
-
-			// ***********************************
-			// Это логирование только для теста!!!
-			// ***********************************
-			settings.logger.Send("testing", "TEST_INFO func 'CoreHandler', reseived new object")
-			//
-			//
+			fmt.Println("func 'CoreHandlerSettings.Start', reseived new case")
 
 			//нужно только для хранения событий в RedisDB для последующей обработки
 			//объектов которые не были добавлены в MISP из-за отсутствия доступа
@@ -96,11 +85,13 @@ func (settings *CoreHandlerSettings) Start(
 				}
 			}()
 
-			// обработчик JSON документа
-			chanOutputDecodeJson := hjson.Start(data.Data, data.MsgId)
+			go func() {
+				// обработчик JSON документа
+				chanOutputDecodeJson := hjson.Start(data.Data, data.MsgId)
 
-			//формирование итоговых документов в формате MISP
-			go CreateObjectsFormatMISP(chanOutputDecodeJson, data.MsgId, mispModule, settings.listRules, settings.counting, settings.logger)
+				//формирование итоговых документов в формате MISP
+				go CreateObjectsFormatMISP(chanOutputDecodeJson, data.MsgId, mispModule, settings.listRules, settings.counting, settings.logger)
+			}()
 
 		case data := <-chanMispReception:
 			switch data.Command {
@@ -132,21 +123,22 @@ func (settings *CoreHandlerSettings) Start(
 			}
 
 		case data := <-chanRedisReception:
-			switch data.CommandResult {
 			//получаем eventId из Redis для удаления события в MISP
-			case "found event id":
-				eventId, ok := data.Result.(string)
-				if !ok {
-					settings.logger.Send("error", supportingfunctions.CustomError(errors.New("it is not possible to convert a value to a string")).Error())
-
-					break
-				}
-
-				mispModule.SendDataInput(mispapi.InputSettings{
-					Command: "del event by id",
-					EventId: eventId,
-				})
+			if data.CommandResult != "found event id" {
+				continue
 			}
+
+			eventId, ok := data.Result.(string)
+			if !ok {
+				settings.logger.Send("error", supportingfunctions.CustomError(errors.New("it is not possible to convert a value to a string")).Error())
+
+				continue
+			}
+
+			mispModule.SendDataInput(mispapi.InputSettings{
+				Command: "del event by id",
+				EventId: eventId,
+			})
 		}
 	}
 }

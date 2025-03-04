@@ -29,12 +29,6 @@ type subscription struct {
 // NatsApiOptions функциональные опции
 type NatsApiOptions func(*ApiNatsModule) error
 
-// ModuleNATS инициализированный модуль
-type ModuleNATS struct {
-	chanOutput chan OutputSettings //канал для отправки данных ИЗ модуля
-	chanInput  chan InputSettings  //канал для приема данных В модуль
-}
-
 // OutputSettings параметры для канала отправки данных из модуля
 type OutputSettings struct {
 	Data  []byte
@@ -52,9 +46,9 @@ type InputSettings struct {
 }
 
 type ResponseToCommand struct {
-	Data       interface{} `json:"data"`
-	ID         string      `json:"id"`
-	Error      string      `json:"error"`
-	Command    string      `json:"command"`
-	StatusCode int         `json:"status_code"`
+	Data       any    `json:"data"`
+	ID         string `json:"id"`
+	Error      string `json:"error"`
+	Command    string `json:"command"`
+	StatusCode int    `json:"status_code"`
 }

@@ -102,9 +102,6 @@ func server(ctx context.Context) {
 	counting := countermessage.New(chZabbix)
 	counting.Start(ctx)
 
-	// вывод информационного сообщения при старте приложения
-	msg := getInformationMessage()
-
 	// ***************************************************************************
 	// ************** инициализация модуля для взаимодействия с NATS *************
 	confNats := conf.AppConfigNATS
@@ -148,6 +145,8 @@ func server(ctx context.Context) {
 		log.Fatalln(err)
 	}
 
+	// вывод информационного сообщения при старте приложения
+	msg := getInformationMessage()
 	_ = simpleLogger.Write("info", strings.ToLower(msg))
 
 	//для отладки через pprof
@@ -163,9 +162,9 @@ func server(ctx context.Context) {
 	// *****************************************************************
 	// *************** инициализируем ядро приложения ******************
 	core := coremodule.NewCoreHandler(counting, listRules, logging)
-	if err := core.Start(ctx, apiNats, mispModule, redisModule); err != nil {
-		_ = simpleLogger.Write("error", supportingfunctions.CustomError(err).Error())
-
-		log.Fatalln(err)
-	}
+	core.Start(ctx, apiNats, mispModule, redisModule)
+	//; err != nil {
+	//	_ = simpleLogger.Write("error", supportingfunctions.CustomError(err).Error())
+	//	log.Fatalln(err)
+	//}
 }

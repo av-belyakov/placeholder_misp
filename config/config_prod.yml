@@ -5,11 +5,11 @@ REDIS:
   host: "127.0.0.1"
   port: 6379
 NATS:
-  host: "nats.cloud.gcm"
+  host: "192.168.9.208"
   port: 4222
   cacheTtl: 3600
   subscriptions:
-    listener_case: "object.casetype"
+    listener_case: "object.casetype.local"
     sender_command: "object.commandstype"
 MISP:
   host: misp-center.cloud.gcm
