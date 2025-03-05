@@ -65,6 +65,10 @@ func WithMasterAuthKey(v string) RequestMISPOptions {
 	}
 }
 
+func (rmisp *requestMISP) SendEvent_ForTest(ctx context.Context, data *objectsmispformat.EventsMispFormat) (*http.Response, []byte, error) {
+	return rmisp.sendEvent(ctx, data)
+}
+
 // sendEvent добавляет в MISP объект типа 'event'
 func (rmisp *requestMISP) sendEvent(ctx context.Context, data *objectsmispformat.EventsMispFormat) (*http.Response, []byte, error) {
 	var (
@@ -96,6 +100,10 @@ func (rmisp *requestMISP) sendEvent(ctx context.Context, data *objectsmispformat
 	return res, resBodyByte, nil
 }
 
+func (rmisp *requestMISP) SendEventReports_ForTest(ctx context.Context, eventId string, data *objectsmispformat.EventReports) error {
+	return rmisp.sendEventReports(ctx, eventId, data)
+}
+
 // sendEventReports добавляет в MISP объект типа 'event_reports'
 func (rmisp *requestMISP) sendEventReports(ctx context.Context, eventId string, data *objectsmispformat.EventReports) error {
 	c, err := NewClientMISP(rmisp.host, rmisp.userAuthKey, false)
@@ -120,6 +128,10 @@ func (rmisp *requestMISP) sendEventReports(ctx context.Context, eventId string, 
 	//}
 
 	return nil
+}
+
+func (rmisp *requestMISP) SendAttribytes_ForTest(ctx context.Context, eventId string, data []*objectsmispformat.AttributesMispFormat) (*http.Response, []byte, string, error) {
+	return rmisp.sendAttribytes(ctx, eventId, data)
 }
 
 // sendAttribytes отправляет в MISP список атрибутов в виде среза объектов типа 'attribytes'
@@ -180,6 +192,10 @@ func (rmisp *requestMISP) sendAttribytes(ctx context.Context, eventId string, da
 	return res, resBodyByte, warning.String(), err
 }
 
+func (rmisp *requestMISP) SendObjects_ForTest(ctx context.Context, eventId string, data map[int]*objectsmispformat.ObjectsMispFormat) (*http.Response, []byte, error) {
+	return rmisp.sendObjects(ctx, eventId, data)
+}
+
 // sendObjects отправляет в MISP список объектов содержащихся в свойстве observables.attachment
 // (как правило это описание вложеного файла)
 func (rmisp *requestMISP) sendObjects(ctx context.Context, eventId string, data map[int]*objectsmispformat.ObjectsMispFormat) (*http.Response, []byte, error) {
@@ -223,6 +239,10 @@ func (rmisp *requestMISP) sendObjects(ctx context.Context, eventId string, data 
 	return res, resBodyByte, err
 }
 
+func (rmisp *requestMISP) SendEventTags_ForTest(ctx context.Context, eventId string, data *objectsmispformat.ListEventObjectTags) error {
+	return rmisp.sendEventTags(ctx, eventId, data)
+}
+
 // sendEventTags отправляет в MISP объекты типа 'tags'
 func (rmisp *requestMISP) sendEventTags(ctx context.Context, eventId string, data *objectsmispformat.ListEventObjectTags) error {
 	var (
@@ -248,7 +268,7 @@ func (rmisp *requestMISP) sendEventTags(ctx context.Context, eventId string, dat
 			continue
 		}
 
-		_, b, errTmp = c.Post(ctx, "/events/addTag", b)
+		_, _, errTmp = c.Post(ctx, "/events/addTag", b)
 		if errTmp != nil {
 			err = errors.Join(err, supportingfunctions.CustomError(fmt.Errorf("'event tags with id:'%s' add, %w", eventId, err)))
 
@@ -265,6 +285,10 @@ func (rmisp *requestMISP) sendEventTags(ctx context.Context, eventId string, dat
 	}
 
 	return nil
+}
+
+func (rmisp *requestMISP) SendRequestPublishEvent_ForTest(ctx context.Context, eventId string) (string, error) {
+	return rmisp.sendRequestPublishEvent(ctx, eventId)
 }
 
 // sendRequestPublishEvent запрос на публикацию события

@@ -48,6 +48,12 @@ func server(ctx context.Context) {
 		log.Fatalf("error module 'simplelogger': %v", err)
 	}
 
+	/*
+
+		здесь надо, думаю, сделать настройку логирования для передачи информации в БД
+
+	*/
+
 	// ****************************************************************************
 	// ******* инициализируем модуль чтения правил обработки MISP сообщений *******
 	listRules, warnings, err := rules.NewListRule(constants.Root_Dir, conf.RulesProcMSGMISP.Directory, conf.RulesProcMSGMISP.File)
@@ -150,7 +156,7 @@ func server(ctx context.Context) {
 	_ = simpleLogger.Write("info", strings.ToLower(msg))
 
 	//для отладки через pprof
-	//http://localhost:6060/debug/pprof/
+	//http://localhost:6161/debug/pprof/
 	//go tool pprof http://localhost:6161/debug/pprof/heap
 	//go tool pprof http://localhost:6161/debug/pprof/goroutine
 	//go tool pprof http://localhost:6161/debug/pprof/allocs
@@ -163,8 +169,4 @@ func server(ctx context.Context) {
 	// *************** инициализируем ядро приложения ******************
 	core := coremodule.NewCoreHandler(counting, listRules, logging)
 	core.Start(ctx, apiNats, mispModule, redisModule)
-	//; err != nil {
-	//	_ = simpleLogger.Write("error", supportingfunctions.CustomError(err).Error())
-	//	log.Fatalln(err)
-	//}
 }

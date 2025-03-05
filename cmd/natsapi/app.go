@@ -49,22 +49,24 @@ func (api *ApiNatsModule) Start(ctx context.Context) error {
 	nc, err := nats.Connect(
 		fmt.Sprintf("%s:%d", api.host, api.port),
 		//nats.RetryOnFailedConnect(true),
+		//имя клиента
+		nats.Name("placeholder_misp"),
+		//неограниченное количество попыток переподключения
 		nats.MaxReconnects(-1),
-		nats.ReconnectWait(3*time.Second))
+		//время ожидания до следующей попытки переподключения (по умолчанию 2 сек.)
+		nats.ReconnectWait(3*time.Second),
+		//обработка разрыва соединения с NATS
+		nats.DisconnectErrHandler(func(c *nats.Conn, err error) {
+			api.logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("the connection with NATS has been disconnected (%w)", err)).Error())
+		}),
+		//обработка переподключения к NATS
+		nats.ReconnectHandler(func(c *nats.Conn) {
+			api.logger.Send("info", "the connection to NATS has been re-established")
+		}))
 	if err != nil {
 		return supportingfunctions.CustomError(err)
 	}
 	api.natsConn = nc
-
-	//обработка разрыва соединения с NATS
-	nc.SetDisconnectErrHandler(func(c *nats.Conn, err error) {
-		api.logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("the connection with NATS has been disconnected (%w)", err)).Error())
-	})
-
-	//обработка переподключения к NATS
-	nc.SetReconnectHandler(func(c *nats.Conn) {
-		api.logger.Send("info", "the connection to NATS has been re-established")
-	})
 
 	//приём кейсов
 	nc.Subscribe(api.subscriptions.listenerCase, func(m *nats.Msg) {

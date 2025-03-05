@@ -30,11 +30,6 @@ func NewModuleRedis(host string, port int, logger commoninterfaces.Logger) *Modu
 
 // Start запуск модуля
 func (r *ModuleRedis) Start(ctx context.Context) error {
-	defer func() {
-		close(r.chInput)
-		close(r.chOutput)
-	}()
-
 	if ctx.Err() != nil {
 		return ctx.Err()
 	}
@@ -46,6 +41,11 @@ func (r *ModuleRedis) Start(ctx context.Context) error {
 	log.Printf("%vconnect to Redis database with address %v%s:%d%v\n", constants.Ansi_Bright_Green, constants.Ansi_Dark_Gray, r.host, r.port, constants.Ansi_Reset)
 
 	go func() {
+		defer func() {
+			close(r.chInput)
+			close(r.chOutput)
+		}()
+
 		for {
 			select {
 			case <-ctx.Done():

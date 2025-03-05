@@ -81,7 +81,7 @@ var _ = Describe("Deleteeventmisp", Ordered, func() {
 				}
 			}()
 
-			mispmodule.SendingDataInput(mispapi.InputSettings{
+			mispmodule.SendDataInput(mispapi.InputSettings{
 				Command: "del event by id",
 				EventId: "7418",
 			})

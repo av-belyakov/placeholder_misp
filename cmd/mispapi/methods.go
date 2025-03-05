@@ -257,13 +257,13 @@ func (ad *AuthorizationDataMISP) GetListAllOrganisation(ctx context.Context, con
 // source name:
 //
 //	"gcm": "ГЦМ (г.Москва)", "GCM"
+//	"rcmsr": "РЦМ (г. Симферополь)", "CR-RCM"
 //	"rcmlnx": "РЦМ (г. Смоленск)", "SMOL-RCM"
 //	"rcmros": "РЦМ (г. Ростов-на-дону)", "UFO-RCM"
 //	"rcmkgd": "РЦМ (г. Калининград)", "KGD-RCM"
 //	"rcmspb": "РЦМ (г. Санкт-Петербург)", "SZFO-RCM"
 //	"rcmsve": "РЦМ (г. Екатеринбург)", "UralFO-RCM"
 //	"rcmniz": "РЦМ (г. Нижний Новгород)", "PFO-RCM"
-//	"rcmsr": "РЦМ (г. Симферополь)", "CR-RCM"
 //	"rcmsta": "РЦМ (г. Ставрополь)", "SKFO-RCM"
 //	"rcmnvs": "РЦМ (г. Новосибирск)", "SFO-RCM"
 //	"rcmkha": "РЦМ (г. Хабаровск)", "DFO-RCM"

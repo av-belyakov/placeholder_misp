@@ -1,12 +1,12 @@
 
-FROM golang:1.23.6-alpine AS packages_image
+FROM golang:1.23.7-alpine AS packages_image
 ENV PATH /usr/local/go/bin:$PATH
 WORKDIR /go/src
 COPY go.mod go.sum ./
 RUN echo 'packages_image' && \
     go mod download
 
-FROM golang:1.23.6-alpine AS build_image
+FROM golang:1.23.7-alpine AS build_image
 LABEL temporary=''
 ARG BRANCH
 WORKDIR /go/

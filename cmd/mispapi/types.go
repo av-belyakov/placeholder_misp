@@ -11,7 +11,7 @@ import (
 
 // ModuleMISP инициализированный модуль
 type ModuleMISP struct {
-	cache        *cachingstoragewithqueue.CacheStorageWithQueue[objectsmispformat.ListFormatsMISP]
+	cache        *cachingstoragewithqueue.CacheStorageWithQueue[*objectsmispformat.ListFormatsMISP]
 	organistions []confighandler.Organization
 	host         string
 	authKey      string

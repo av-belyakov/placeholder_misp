@@ -1,6 +1,6 @@
 module github.com/av-belyakov/placeholder_misp
 
-go 1.23.4
+go 1.23.7
 
 require (
 	github.com/av-belyakov/simplelogger v0.0.0-20250221120631-077109604215
@@ -18,7 +18,7 @@ require (
 )
 
 require (
-	github.com/av-belyakov/cachingstoragewithqueue v0.0.0-20250214120945-4e600c02a2be // indirect
+	github.com/av-belyakov/cachingstoragewithqueue v0.0.0-20250305091508-a88cbf607b32 // indirect
 	github.com/av-belyakov/objectsmispformat v0.0.0-20250204110928-f6063df54ece // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect

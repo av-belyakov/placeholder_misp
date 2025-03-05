@@ -16,6 +16,7 @@ import (
 	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
 	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
 	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
+	"github.com/av-belyakov/placeholder_misp/test/createtypemispobjects"
 	"github.com/av-belyakov/simplelogger"
 )
 
@@ -23,16 +24,15 @@ const (
 	Root_Dir     string = "placeholder_misp"
 	Rules_Dir    string = "rules"
 	Rules_File   string = "mispmsgrule.yml"
-	Example_File string = "../test_json/example_3.json"
+	Example_File string = "../test_json/event_39100.json"
 	Task_Id      string = "7s7qeytyyy2e27tr73213143a"
 )
 
 var (
-	counting   *countermessage.CounterMessage
-	logging    *logginghandler.LoggingChan
-	chZabbix   chan commoninterfaces.Messager
-	listRules  *rules.ListRule
-	moduleMisp *mispapi.ModuleMISP
+	counting  *countermessage.CounterMessage
+	logging   *logginghandler.LoggingChan
+	chZabbix  chan commoninterfaces.Messager
+	listRules *rules.ListRule
 )
 
 // ModuleMISPForTest имитация подключения к MISP API (только для тестов)
@@ -48,11 +48,11 @@ func NewModuleMISPForTest() *ModuleMISPForTest {
 	}
 }
 
-func (m *ModuleMISPForTest) GetDataReceptionChannel() <-chan mispapi.OutputSetting {
+func (m *ModuleMISPForTest) GetReceptionChannel() <-chan mispapi.OutputSetting {
 	return m.chOutput
 }
 
-func (m *ModuleMISPForTest) SendingDataOutput(s mispapi.OutputSetting) {
+func (m *ModuleMISPForTest) SendDataOutput(s mispapi.OutputSetting) {
 	m.chOutput <- s
 }
 
@@ -60,7 +60,7 @@ func (m *ModuleMISPForTest) GetOutputChannel() <-chan mispapi.OutputSetting {
 	return m.chOutput
 }
 
-func (m *ModuleMISPForTest) SendingDataInput(s mispapi.InputSettings) {
+func (m *ModuleMISPForTest) SendDataInput(s mispapi.InputSettings) {
 	m.chInput <- s
 }
 
@@ -139,6 +139,23 @@ func TestCreateMispObjects(t *testing.T) {
 
 	t.Run("Формирование документов в формате MISP", func(t *testing.T) {
 		msg := <-moduleMisp.GetInputChannel()
+
+		/*
+			!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+			выполнить этот тест через debug
+
+			!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		*/
+
+		createtypemispobjects.AddNewObject(
+			context.Background(),
+			msg,
+			createtypemispobjects.OptionsAddNewObject{
+				Host:        "misp-center.cloud.gcm",
+				AuthKey:     os.Getenv("GO_PHMISP_MAUTH"),
+				UserAuthKey: os.Getenv("GO_PHMISP_MAUTH"),
+			})
 
 		b, err = json.MarshalIndent(msg, "", " ")
 		assert.NoError(t, err)

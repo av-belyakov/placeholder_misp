@@ -48,11 +48,13 @@ func NewModuleMISP(
 	org []confighandler.Organization,
 	logger commoninterfaces.Logger) (*ModuleMISP, error) {
 
+	l := NewLogWrite(logger)
 	cache, err := cachingstoragewithqueue.NewCacheStorage(
-		cachingstoragewithqueue.WithMaxTtl[objectsmispformat.ListFormatsMISP](300),
-		cachingstoragewithqueue.WithTimeTick[objectsmispformat.ListFormatsMISP](3),
-		cachingstoragewithqueue.WithMaxSize[objectsmispformat.ListFormatsMISP](10),
-		cachingstoragewithqueue.WithEnableAsyncProcessing[objectsmispformat.ListFormatsMISP](1))
+		cachingstoragewithqueue.WithMaxTtl[*objectsmispformat.ListFormatsMISP](300),
+		cachingstoragewithqueue.WithTimeTick[*objectsmispformat.ListFormatsMISP](3),
+		cachingstoragewithqueue.WithMaxSize[*objectsmispformat.ListFormatsMISP](10),
+		cachingstoragewithqueue.WithLogging[*objectsmispformat.ListFormatsMISP](l),
+		cachingstoragewithqueue.WithEnableAsyncProcessing[*objectsmispformat.ListFormatsMISP](1))
 	if err != nil {
 		return &ModuleMISP{}, err
 	}
@@ -86,6 +88,9 @@ func (m *ModuleMISP) Start(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+
+	//инициализируем автоматическую обработку объектов попадающих в кеш
+	m.cache.StartAutomaticExecution(ctx)
 
 	m.logger.Send("info", fmt.Sprintf("at the start of the application, all user information was downloaded %d", countUser))
 
@@ -123,7 +128,7 @@ func (m *ModuleMISP) Start(ctx context.Context) error {
 								m.logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("%w, case id:'%d'", err, int(data.CaseId))).Error())
 							} else {
 								userAuthKey = us.AuthKey
-								m.logger.Send("info", fmt.Sprintf("a new user '%s' has been successfully created", data.UserEmail))
+								m.logger.Send("info", fmt.Sprintf("a new user '%s' from %s has been successfully created", data.UserEmail, data.CaseSource))
 							}
 						}
 					}
@@ -137,7 +142,6 @@ func (m *ModuleMISP) Start(ctx context.Context) error {
 
 					}
 				}(msg)
-
 			}
 		}
 	}()

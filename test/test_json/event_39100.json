@@ -1,6 +1,12 @@
 {
     "source": "gcm_test",
     "event": {
+        "requestId": "ddd5f9518ab25c5d:-4908860b:1953cfa9b7c:-8000:2141672",
+        "rootId": "~88678416456",
+        "startDate": 1741095119695,
+        "details": {
+            "description": "Это тестовый кейс для Белякова А.В. Просьба не удалять. Глава Мюнхенской конференции по безопасности Кристоф Хойсген расплакался, выступая перед участниками по случаю закрытия мероприятия.\"Профессия стикеровщика названа самой оплачиваемой позицией для пенсионеров\" - надо бы Жене Лукашину сообщить. Тарам-парам!!! Лень полезна для здоровья, — врачи?!! Некое наименование чего либо.Зеленский подпишет соглашение о передаче украинских недр американцам, никаких гарантий безопасности Трамп Украине не даст, мир будут подписан в той форме, о которой договорятся Трамп и Путин. Точка?"
+        },
         "object": {
             "tlp": 2,
             "caseId": 39100,
@@ -49,28 +55,12 @@
             "severity": 2,
             "startDate": 1729064520000
         },
-        "stats": {},
         "objectId": "~88678416456",
-        "requestId": "ddd5f9518ab25c5d:-4908860b:1953cfa9b7c:-8000:2141672",
-        "details": {
-            "tags": [
-                "Webhook: send=\"Elasticsearch\"",
-                "Webhook: send=\"{TeSt}-[TaG]\"",
-                "PHP-injection",
-                "Webhook: send=\"MISP\"",
-                "OfferGate",
-                "Webhook:send=\"WEBKOOK_helpers\"",
-                "NewGate",
-                "Webhook:send=\"ZK\""
-            ],
-            "objectType": "case",
-            "operation": "update",
-            "organisation": "GCM",
-            "organisationId": "~4192",
-            "rootId": "~88678416456",
-            "startDate": 1741095119695,
-            "base": true
-        }
+        "base": true,
+        "objectType": "case",
+        "operation": "update",
+        "organisation": "GCM",
+        "organisationId": "~4192"
     },
     "observables": [
         {

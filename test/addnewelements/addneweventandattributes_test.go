@@ -133,7 +133,7 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 
 	Context("Тест 2. Проверяем обработчик кейсов", func() {
 		It("Должны прийти два события от модуля misp", func() {
-			mispOutput := mispModule.GetDataReceptionChannel()
+			mispOutput := mispModule.GetReceptionChannel()
 
 			var err error
 

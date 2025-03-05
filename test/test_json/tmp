@@ -1,0 +1,276 @@
+"source": "gcm_test"
+event:
+  "requestId": "af18699ced459e6b:-381918e7:19566072b40:-8000:486"
+  "rootId": "~88678416456"
+  "startDate": 1741173709052
+  details:
+    "description": "Это тестовый кейс для Белякова А.В. Просьба не удалять. Глава Мюнхенской конференции по безопасности Кристоф Хойсген расплакался, выступая перед участниками по случаю закрытия мероприятия."Профессия стикеровщика названа самой оплачиваемой позицией для пенсионеров" - надо бы Жене Лукашину сообщить. Тарам-парам!!! Лень полезна для здоровья, — врачи?!! Некое наименование чего либо.Зеленский подпишет соглашение о передаче украинских недр американцам, никаких гарантий безопасности Трамп Украине не даст, мир будут подписан в той форме, о которой договорятся Трамп и Путин. Точка?"
+  object:
+    "tlp": 2
+    "caseId": 39100
+    "description": "Это тестовый кейс для Белякова А.В. Просьба не удалять. Глава Мюнхенской конференции по безопасности Кристоф Хойсген расплакался, выступая перед участниками по случаю закрытия мероприятия."Профессия стикеровщика названа самой оплачиваемой позицией для пенсионеров" - надо бы Жене Лукашину сообщить. Тарам-парам!!! Лень полезна для здоровья, — врачи?!! Некое наименование чего либо.Зеленский подпишет соглашение о передаче украинских недр американцам, никаких гарантий безопасности Трамп Украине не даст, мир будут подписан в той форме, о которой договорятся Трамп и Путин. Точка?"
+    "endDate": 1734000409885
+    "flag": false
+    "id": "~88678416456"
+    "impactStatus": "WithImpact"
+    "pap": 2
+    "status": "Resolved"
+    "createdBy": "a.belyakov@cloud.gcm"
+    customFields:
+      attack-type:
+        "order": 0
+        "string": "attack type XSS (XJS)"
+      class-attack:
+        "order": 0
+        "string": "sql-injection"
+      misp-event-id:
+        "order": 0
+        "string": "135709"
+    "resolutionStatus": "TruePositive"
+    "title": "Test Case for Belyakov AV"
+    "updatedAt": 1741173708915
+    "updatedBy": "a.belyakov@cloud.gcm"
+    permissions:
+    "createdAt": 1729065240364
+    "summary": "тестовое закрытие как итог"
+    tags:
+      1. "Webhook: send="Elasticsearch""
+      2. "ffRat"
+      3. "Webhook: send="{TeSt}-[TaG]""
+      4. "PHP-injection"
+      5. "Webhook: send="MISP""
+      6. "OfferGate"
+      7. "Webhook:send="WEBKOOK_helpers""
+      8. "NewGate"
+      9. "Webhook:send="ZK""
+    "_id": "~88678416456"
+    "_type": "case"
+    "owner": "a.belyakov@cloud.gcm"
+    "severity": 2
+    "startDate": 1729064520000
+    stats:
+  "objectId": "~88678416456"
+  "base": true
+  "objectType": "case"
+  "operation": "update"
+  "organisation": "GCM"
+  "organisationId": "~4192"
+observables:
+  1.
+    "ioc": false
+    "message": "efefe"
+    "sighted": false
+    "tlp": 2
+    "_createdAt": 1732530100076
+    "_type": "Observable"
+    "data": "THEHIVE-SESSION=eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7ImF1dGhDb250ZXh0Ijoie1widXNlcklkXCI6XCJhLmJlbHlha292QGNsb3VkLmdjbVwiLFwidXNlck5hbWVcIjpcIkJlbHlha292ICpJUkUgQXJ0ZW1peVwiLFwib3JnYW5pc2F0aW9uXCI6XCJ-NDE5MlwiLFwicGVybWlzc2lvbnNcIjpbXCJtYW5hZ2VTaGFyZVwiLFwibWFuYWdlQW5hbHlzZVwiLFwibWFuYWdlVGFza1wiLFwibWFuYWdlQ2FzZVRlbXBsYXRlXCIsXCJtYW5hZ2VDYXNlXCIsXCJtYW5hZ2VVc2VyXCIsXCJtYW5hZ2VQcm9jZWR1cmVcIixcIm1hbmFnZVBhZ2VcIixcIm1hbmFnZU9ic2VydmFibGVcIixcIm1hbmFnZVRhZ1wiLFwibWFuYWdlQ29uZmlnXCIsXCJtYW5hZ2VBbGVydFwiLFwiYWNjZXNzVGhlSGl2ZUZTXCIsXCJtYW5hZ2VBY3Rpb25cIl19IiwiZXhwaXJlIjoiMTczMjUzMzYwOTI4NiIsIndhcm5pbmciOiIxNzMyNTMzMzA5Mjg2In0sIm5iZiI6MTczMjUzMDAwOSwiaWF0IjoxNzMyNTMwMDA5fQ.N_ZvqUAw0wt3AeSQmovk6NlFJ_UZkilxGvlh_UGnCX4"
+    "ignoreSimilarity": false
+    "_createdBy": "a.belyakov@cloud.gcm"
+    "_id": "~90607099992"
+    extraData:
+    reports:
+    "startDate": 1732530100076
+    tags:
+      1. "false-positive:risk="medium""
+    "dataType": "cookie"
+  2.
+    "dataType": "hostname"
+    "message": "description"
+    "tlp": 2
+    "_createdAt": 1729075243799
+    "_createdBy": "a.belyakov@cloud.gcm"
+    "ioc": false
+    "sighted": false
+    "_type": "Observable"
+    extraData:
+    "ignoreSimilarity": false
+    reports:
+    "_id": "~88678801480"
+    "data": "domain.name.org"
+    "startDate": 1729075243799
+    tags:
+  3.
+    "ignoreSimilarity": false
+    reports:
+    "startDate": 1729076104054
+    "_createdAt": 1729076104054
+    "_type": "Observable"
+    "data": "45.3.6.66"
+    extraData:
+    tags:
+    "tlp": 2
+    "_createdBy": "a.belyakov@cloud.gcm"
+    "dataType": "ip"
+    "ioc": false
+    "message": "simple ip address"
+    "sighted": false
+    "_id": "~88679125064"
+  4.
+    "_type": "Observable"
+    tags:
+      1. "file-type:type="jpeg""
+    "tlp": 2
+    "_id": "~89858891776"
+    attachment:
+      "contentType": "image/jpeg"
+      hashes:
+        1. "a3de0370ae105aab10fd5740488684dd85e02b1a10ab8a3146c52f7bad29583e"
+        2. "077b4cdb4cfd27c720e7deacf41e13f0aa9e9854"
+        3. "a2a9aa3919556ad3994f3e50f7a7d375"
+      "id": "a3de0370ae105aab10fd5740488684dd85e02b1a10ab8a3146c52f7bad29583e"
+      "name": "26cc7bd4983311efa052ae6fcfc9d80e_1.jpeg"
+      "size": 993726
+    "ioc": false
+    "message": "картинка с тюленем"
+    extraData:
+    "sighted": false
+    "startDate": 1734000134415
+    "_createdAt": 1734000134415
+    "dataType": "file"
+    "ignoreSimilarity": false
+    reports:
+    "_createdBy": "a.belyakov@cloud.gcm"
+ttp:
+  1.
+    "patternId": "T1592.001"
+    "tactic": "reconnaissance"
+    "_createdAt": 1732520119333
+    "_createdBy": "a.belyakov@cloud.gcm"
+    "_id": "~90419777568"
+    extraData:
+      pattern:
+        "patternType": "attack-pattern"
+        "_id": "~837341224"
+        "_type": "Pattern"
+        "description": "Adversaries may gather information about the victim's host hardware that can be used during targeting. Information about hardware infrastructure may include a variety of details such as types and versions on specific hosts, as well as the presence of additional components that might be indicative of added defensive protections (ex: card/biometric readers, dedicated encryption hardware, etc.).Adversaries may gather this information in various ways, such as direct collection actions via [Active Scanning](https://attack.mitre.org/techniques/T1595) (ex: hostnames, server banners, user agent strings) or [Phishing for Information](https://attack.mitre.org/techniques/T1598). Adversaries may also compromise sites then include malicious content designed to collect host information from visitors.(Citation: ATT ScanBox) Information about the hardware infrastructure may also be exposed to adversaries via online or other accessible data sets (ex: job postings, network maps, assessment reports, resumes, or purchase invoices). Gathering this information may reveal opportunities for other forms of reconnaissance (ex: [Search Open Websites/Domains](https://attack.mitre.org/techniques/T1593) or [Search Open Technical Databases](https://attack.mitre.org/techniques/T1596)), establishing operational resources (ex: [Develop Capabilities](https://attack.mitre.org/techniques/T1587) or [Obtain Capabilities](https://attack.mitre.org/techniques/T1588)), and/or initial access (ex: [Compromise Hardware Supply Chain](https://attack.mitre.org/techniques/T1195/003) or [Hardware Additions](https://attack.mitre.org/techniques/T1200))."
+        platforms:
+          1. "PRE"
+        tactics:
+          1. "reconnaissance"
+        "version": "1.1"
+        "revoked": false
+        defenseBypassed:
+        "name": "Hardware"
+        permissionsRequired:
+        "remoteSupport": false
+        systemRequirements:
+        "url": "https://attack.mitre.org/techniques/T1592/001"
+        "_createdAt": 1616761474197
+        "_createdBy": "architector@33c.rcm"
+        dataSources:
+          1. "Internet Scan: Response Content"
+        "detection": "Internet scanners may be used to look for patterns associated with malicious content designed to collect host hardware information from visitors.(Citation: ThreatConnect Infrastructure Dec 2020)(Citation: ATT ScanBox)
+
+Much of this activity may have a very high occurrence and associated false positive rate, as well as potentially taking place outside the visibility of the target organization, making detection difficult for defenders. Detection efforts may be focused on related stages of the adversary lifecycle, such as during Initial Access."
+        extraData:
+        "patternId": "T1592.001"
+      patternParent:
+        "description": "Adversaries may gather information about the victim's hosts that can be used during targeting. Information about hosts may include a variety of details, including administrative data (ex: name, assigned IP, functionality, etc.) as well as specifics regarding its configuration (ex: operating system, language, etc.).Adversaries may gather this information in various ways, such as direct collection actions via [Active Scanning](https://attack.mitre.org/techniques/T1595) or [Phishing for Information](https://attack.mitre.org/techniques/T1598). Adversaries may also compromise sites then include malicious content designed to collect host information from visitors.(Citation: ATT ScanBox) Information about hosts may also be exposed to adversaries via online or other accessible data sets (ex: [Social Media](https://attack.mitre.org/techniques/T1593/001) or [Search Victim-Owned Websites](https://attack.mitre.org/techniques/T1594)). Gathering this information may reveal opportunities for other forms of reconnaissance (ex: [Search Open Websites/Domains](https://attack.mitre.org/techniques/T1593) or [Search Open Technical Databases](https://attack.mitre.org/techniques/T1596)), establishing operational resources (ex: [Develop Capabilities](https://attack.mitre.org/techniques/T1587) or [Obtain Capabilities](https://attack.mitre.org/techniques/T1588)), and/or initial access (ex: [Supply Chain Compromise](https://attack.mitre.org/techniques/T1195) or [External Remote Services](https://attack.mitre.org/techniques/T1133))."
+        "_createdAt": 1616761466190
+        "_id": "~632381640"
+        defenseBypassed:
+        extraData:
+        "patternType": "attack-pattern"
+        permissionsRequired:
+        "remoteSupport": false
+        systemRequirements:
+        "_createdBy": "architector@33c.rcm"
+        "_type": "Pattern"
+        "detection": "Internet scanners may be used to look for patterns associated with malicious content designed to collect host information from visitors.(Citation: ThreatConnect Infrastructure Dec 2020)(Citation: ATT ScanBox)
+
+Much of this activity may have a very high occurrence and associated false positive rate, as well as potentially taking place outside the visibility of the target organization, making detection difficult for defenders. Detection efforts may be focused on related stages of the adversary lifecycle, such as during Initial Access."
+        "version": "1.1"
+        dataSources:
+          1. "Internet Scan: Response Content"
+        "name": "Gather Victim Host Information"
+        "patternId": "T1592"
+        platforms:
+          1. "PRE"
+        "revoked": false
+        tactics:
+          1. "reconnaissance"
+        "url": "https://attack.mitre.org/techniques/T1592"
+    "occurDate": 1732519320000
+  2.
+    "_id": "~92081926344"
+    extraData:
+      pattern:
+        defenseBypassed:
+        "name": "/etc/passwd and /etc/shadow"
+        "revoked": false
+        systemRequirements:
+        "_createdAt": 1616761469598
+        "_id": "~468394016"
+        "detection": "The AuditD monitoring tool, which ships stock in many Linux distributions, can be used to watch for hostile processes attempting to access <code>/etc/passwd</code> and <code>/etc/shadow</code>, alerting on the pid, process name, and arguments of such programs."
+        "patternId": "T1003.008"
+        tactics:
+          1. "credential-access"
+        "url": "https://attack.mitre.org/techniques/T1003/008"
+        "_type": "Pattern"
+        dataSources:
+          1. "Command: Command Execution"
+          2. "File: File Access"
+        "description": "Adversaries may attempt to dump the contents of <code>/etc/passwd</code> and <code>/etc/shadow</code> to enable offline password cracking. Most modern Linux operating systems use a combination of <code>/etc/passwd</code> and <code>/etc/shadow</code> to store user account information including password hashes in <code>/etc/shadow</code>. By default, <code>/etc/shadow</code> is only readable by the root user.(Citation: Linux Password and Shadow File Formats)The Linux utility, unshadow, can be used to combine the two files in a format suited for password cracking utilities such as John the Ripper:(Citation: nixCraft - John the Ripper) <code># /usr/bin/unshadow /etc/passwd /etc/shadow > /tmp/crack.password.db</code>"
+        "remoteSupport": false
+        "version": "1.0"
+        platforms:
+          1. "Linux"
+        "_createdBy": "architector@33c.rcm"
+        extraData:
+        "patternType": "attack-pattern"
+        permissionsRequired:
+          1. "root"
+      patternParent:
+        "version": "2.1"
+        "_createdBy": "architector@33c.rcm"
+        dataSources:
+          1. "Network Traffic: Network Traffic Flow"
+          2. "Windows Registry: Windows Registry Key Access"
+          3. "Network Traffic: Network Traffic Content"
+          4. "Process: Process Access"
+          5. "Command: Command Execution"
+          6. "Process: OS API Execution"
+          7. "Active Directory: Active Directory Object Access"
+          8. "Process: Process Creation"
+          9. "File: File Access"
+        "name": "OS Credential Dumping"
+        "patternId": "T1003"
+        permissionsRequired:
+          1. "Administrator"
+          2. "SYSTEM"
+          3. "root"
+        systemRequirements:
+        "_id": "~468291584"
+        defenseBypassed:
+        "description": "Adversaries may attempt to dump credentials to obtain account login and credential material, normally in the form of a hash or a clear text password, from the operating system and software. Credentials can then be used to perform [Lateral Movement](https://attack.mitre.org/tactics/TA0008) and access restricted information.Several of the tools mentioned in associated sub-techniques may be used by both adversaries and professional security testers. Additional custom tools likely exist as well."
+        "detection": "### Windows
+Monitor for unexpected processes interacting with lsass.exe.(Citation: Medium Detecting Attempts to Steal Passwords from Memory) Common credential dumpers such as [Mimikatz](https://attack.mitre.org/software/S0002) access the LSA Subsystem Service (LSASS) process by opening the process, locating the LSA secrets key, and decrypting the sections in memory where credential details are stored. Credential dumpers may also use methods for reflective [Process Injection](https://attack.mitre.org/techniques/T1055) to reduce potential indicators of malicious activity.
+
+Hash dumpers open the Security Accounts Manager (SAM) on the local file system (%SystemRoot%/system32/config/SAM) or create a dump of the Registry SAM key to access stored account password hashes. Some hash dumpers will open the local file system as a device and parse to the SAM table to avoid file access defenses. Others will make an in-memory copy of the SAM table before reading hashes. Detection of compromised [Valid Accounts](https://attack.mitre.org/techniques/T1078) in-use by adversaries may help as well. 
+
+On Windows 8.1 and Windows Server 2012 R2, monitor Windows Logs for LSASS.exe creation to verify that LSASS started as a protected process.
+
+Monitor processes and command-line arguments for program execution that may be indicative of credential dumping. Remote access tools may contain built-in features or incorporate existing tools like [Mimikatz](https://attack.mitre.org/software/S0002). [PowerShell](https://attack.mitre.org/techniques/T1059/001) scripts also exist that contain credential dumping functionality, such as PowerSploit's Invoke-Mimikatz module, (Citation: Powersploit) which may require additional logging features to be configured in the operating system to collect necessary information for analysis.
+
+Monitor domain controller logs for replication requests and other unscheduled activity possibly associated with DCSync. (Citation: Microsoft DRSR Dec 2017) (Citation: Microsoft GetNCCChanges) (Citation: Samba DRSUAPI) Note: Domain controllers may not log replication requests originating from the default domain controller account. (Citation: Harmj0y DCSync Sept 2015). Also monitor for network protocols  (Citation: Microsoft DRSR Dec 2017) (Citation: Microsoft NRPC Dec 2017) and other replication requests (Citation: Microsoft SAMR) from IPs not associated with known domain controllers. (Citation: AdSecurity DCSync Sept 2015)
+
+### Linux
+To obtain the passwords and hashes stored in memory, processes must open a maps file in the /proc filesystem for the process being analyzed. This file is stored under the path <code>/proc/<pid>/maps</code>, where the <code><pid></code> directory is the unique pid of the program being interrogated for such authentication data. The AuditD monitoring tool, which ships stock in many Linux distributions, can be used to watch for hostile processes opening this file in the proc file system, alerting on the pid, process name, and arguments of such programs."
+        "patternType": "attack-pattern"
+        "remoteSupport": false
+        "revoked": false
+        "url": "https://attack.mitre.org/techniques/T1003"
+        "_createdAt": 1616761467238
+        extraData:
+        platforms:
+          1. "Windows"
+          2. "Linux"
+          3. "macOS"
+        tactics:
+          1. "credential-access"
+        "_type": "Pattern"
+    "occurDate": 1732528380000
+    "patternId": "T1003.008"
+    "tactic": "credential-access"
+    "_createdAt": 1732529135141
+    "_createdBy": "a.belyakov@cloud.gcm"

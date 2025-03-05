@@ -166,8 +166,9 @@ func CreateObjectsFormatMISP(
 		}
 
 		//получаем rootId
-		if msg.FieldBranch == "event.object.rootId" {
-			if rid, ok := newValue.(string); ok {
+		if msg.FieldBranch == "event.rootId" || msg.FieldBranch == "event.object.rootId" {
+			rid, ok := newValue.(string)
+			if ok && rootId == "" {
 				rootId = rid
 			}
 		}
@@ -270,7 +271,6 @@ func CreateObjectsFormatMISP(
 		mispFormat.Reports = reports
 
 		fmt.Println("func 'CreateObjectsFormatMISP', mispFormat:", *mispFormat)
-		fmt.Println("func 'CreateObjectsFormatMISP', send to MISP")
 
 		//тут отправляем сформированные по формату MISP пользовательские структуры
 		mispModule.SendDataInput(mispapi.InputSettings{
@@ -287,7 +287,6 @@ func CreateObjectsFormatMISP(
 	//очищаем события, список аттрибутов и текущий email пользователя
 	userEmail, caseSource = "", ""
 	leot.CleanListTags()
-	eventsMisp.CleanEventsMispFormat()
 	listObjectsMisp.CleanList()
 	listAttributeTmp.CleanAttribute()
 	listAttributesMisp.CleanList()
