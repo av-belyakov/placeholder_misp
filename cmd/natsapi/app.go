@@ -73,32 +73,17 @@ func (api *ApiNatsModule) Start(ctx context.Context) error {
 
 	//приём кейсов
 	nc.Subscribe(api.subscriptions.listenerCase, func(m *nats.Msg) {
-		fmt.Println("func 'NewClientNATS', reseived new case")
-
-		// ***********************************
-		// Это логирование только для теста!!!
-		// ***********************************
-		api.logger.Send("testing", "------------|||||| TEST_INFO func 'NewClientNATS', reseived new object ||||||------------")
-		//
-		//
-
-		fmt.Println("func 'NewClientNATS', reseived new case 11111")
+		api.logger.Send("info", "a new case has been accepted")
 
 		api.SendingDataOutput(OutputSettings{
 			MsgId: uuid.NewString(),
 			Data:  m.Data,
 		})
 
-		fmt.Println("func 'NewClientNATS', reseived new case 222222")
-
 		//счетчик принятых кейсов
 		api.counting.SendMessage("update accepted events", 1)
 
-		fmt.Println("func 'NewClientNATS', reseived new case 333333")
-
 	})
-
-	//nc.Flush()
 
 	lisSub := fmt.Sprintf("%v, listening to a subscription:%v'%s'%v", constants.Ansi_Bright_Green, constants.Ansi_Dark_Gray, api.subscriptions.listenerCase, constants.Ansi_Reset)
 	log.Printf("%vconnect to NATS with address %v%s:%d%v%s\n", constants.Ansi_Bright_Green, constants.Ansi_Dark_Gray, api.host, api.port, constants.Ansi_Reset, lisSub)

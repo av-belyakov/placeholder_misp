@@ -56,8 +56,6 @@ func (settings *CoreHandlerSettings) Start(
 			return
 
 		case data := <-chanNatsReception:
-			fmt.Println("func 'CoreHandlerSettings.Start', reseived new case")
-
 			//нужно только для хранения событий в RedisDB для последующей обработки
 			//объектов которые не были добавлены в MISP из-за отсутствия доступа
 			//к MISP (пока эта часть не реализована)
@@ -71,15 +69,6 @@ func (settings *CoreHandlerSettings) Start(
 			//для записи необработанных событий в лог-файл events
 			go func() {
 				str, err := supportingfunctions.NewReadReflectJSONSprint(data.Data)
-				if err != nil {
-					// ***********************************
-					// Это логирование только для теста!!!
-					// ***********************************
-					settings.logger.Send("testing", "TEST_INFO func 'CoreHandler', reseived new data")
-					//
-					//
-				}
-
 				if err == nil {
 					settings.logger.Send("events", fmt.Sprintf("\t---------------\n\tEVENTS:\n%s\n", str))
 				}
@@ -97,14 +86,6 @@ func (settings *CoreHandlerSettings) Start(
 			switch data.Command {
 			//отправка eventId в NATS
 			case "send event id":
-
-				// ***********************************
-				// Это логирование только для теста!!!
-				// ***********************************
-				settings.logger.Send("testing", "TEST_INFO func 'CoreHandler', send EventId to ----> NATS")
-				//
-				//
-
 				natsModule.SendingDataInput(natsapi.InputSettings{
 					Command: data.Command,
 					EventId: data.EventId,

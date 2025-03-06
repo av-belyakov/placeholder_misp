@@ -64,13 +64,6 @@ func (r *ModuleRedis) Start(ctx context.Context) error {
 					}
 
 				case "set case id":
-					// ***********************************
-					// Это логирование только для теста!!!
-					// ***********************************
-					r.logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerRedis', обрабатываем добавление CaseID и EventId '%s' to REDIS DB", msg.Data))
-					//
-					//
-
 					tmp := strings.Split(msg.Data, ":")
 					if len(tmp) == 0 {
 						r.logger.Send("warning", fmt.Sprintf("it is not possible to split a string '%s' to add case and event information to the Redis DB", msg.Data))
@@ -82,12 +75,7 @@ func (r *ModuleRedis) Start(ctx context.Context) error {
 					strCmd := r.client.Get(ctx, tmp[0])
 					eventId, err := strCmd.Result()
 					if err == nil {
-						// ***********************************
-						// Это логирование только для теста!!!
-						// ***********************************
-						r.logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerRedis', НАЙДЕНО СТАРОЕ значение CaseID '%s' отправляем в ядро найденное событие с event id '%s'", tmp[0], eventId))
-						//
-						//
+						r.logger.Send("info", fmt.Sprintf("the old value of the case id:'%s' was found, sending the found event with the event id:'%s' to the kernel", tmp[0], eventId))
 
 						//отправляем eventId для удаления события в MISP
 						r.SendDataOutput(SettingsOutput{
@@ -104,12 +92,7 @@ func (r *ModuleRedis) Start(ctx context.Context) error {
 						continue
 					}
 
-					// ***********************************
-					// Это логирование только для теста!!!
-					// ***********************************
-					r.logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerRedis', выполнили замену старого значения event id: %s новым значением event id: %s, для case id: %s", eventId, tmp[1], tmp[0]))
-					//
-					//
+					r.logger.Send("info", fmt.Sprintf("we replaced the old event id:%s value for the case id:'%s' with the new event id:'%s' value", eventId, tmp[0], tmp[1]))
 				}
 			}
 		}

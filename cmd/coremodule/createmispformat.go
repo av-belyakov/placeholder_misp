@@ -30,8 +30,6 @@ func CreateObjectsFormatMISP(
 		patterIsNum         *regexp.Regexp = regexp.MustCompile(`^\d+$`)
 	)
 
-	fmt.Println("func 'CreateObjectsFormatMISP', START...")
-
 	//формируем шаблоны для заполнения
 	eventsMisp := objectsmispformat.NewEventMisp()
 	listObjectsMisp := objectsmispformat.NewListObjectsMispFormat()
@@ -225,15 +223,6 @@ func CreateObjectsFormatMISP(
 	listRule.CleanStatementExpressionRulePass()
 
 	if !isAllowed {
-		// ***********************************
-		// Это логирование только для теста!!!
-		// ***********************************
-		logger.Send("testing", fmt.Sprintf("TEST_INFO func 'NewMispFormat', case with id '%d' does not comply with the rules", int(caseId)))
-		//
-		//
-
-		fmt.Printf("func 'CreateObjectsFormatMISP', the message with case id %v was not sent to MISP because it does not comply with the rules\n", caseId)
-
 		logger.Send("warning", fmt.Sprintf("the message with case id %d was not sent to MISP because it does not comply with the rules", int(caseId)))
 	} else {
 		//добавляем case id в поле Info
@@ -252,13 +241,6 @@ func CreateObjectsFormatMISP(
 			}
 		}
 
-		// ***********************************
-		// Это логирование только для теста!!!
-		// ***********************************
-		logger.Send("testing", fmt.Sprintf("TEST_INFO func 'NewMispFormat', case with id '%d' equal rules, send data to MISP module", int(caseId)))
-		//
-		//
-
 		mispFormat := objectsmispformat.NewListFormatsMISP()
 		mispFormat.ID = rootId
 		mispFormat.Event = eventsMisp
@@ -271,7 +253,7 @@ func CreateObjectsFormatMISP(
 		reports.SetDistribution("1")
 		mispFormat.Reports = reports
 
-		fmt.Println("func 'CreateObjectsFormatMISP', mispFormat:", *mispFormat)
+		logger.Send("info", fmt.Sprintf("the case with id:'%d' complies with the specified rules and has been submitted for further processing", int(caseId)))
 
 		//тут отправляем сформированные по формату MISP пользовательские структуры
 		mispModule.SendDataInput(mispapi.InputSettings{

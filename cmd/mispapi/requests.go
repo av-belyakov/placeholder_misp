@@ -141,7 +141,7 @@ func (rmisp *requestMISP) sendAttribytes(ctx context.Context, eventId string, da
 		data[k].EventId = eventId
 
 		if data[k].Value == "" {
-			warning.WriteString(fmt.Sprintf("'attributes' for event id:'%s' is not added, the 'Value' type property should not be empty\n", eventId))
+			warning.WriteString(fmt.Sprintf("'attributes' for event id:'%s' is not added, the 'Value' type property should not be empty", eventId))
 
 			continue
 		}
@@ -251,7 +251,7 @@ func (rmisp *requestMISP) SendRequestPublishEvent_ForTest(ctx context.Context, e
 func (rmisp *requestMISP) sendRequestPublishEvent(ctx context.Context, eventId string) (string, error) {
 	var resultMsg string
 
-	c, err := NewClientMISP(rmisp.host, rmisp.userAuthKey, false)
+	c, err := NewClientMISP(rmisp.host, rmisp.masterAuthKey, false)
 	if err != nil {
 		return resultMsg, supportingfunctions.CustomError(fmt.Errorf("event publish add, %w", err))
 	}

@@ -60,14 +60,6 @@ func (s *HandlerJsonMessageSettings) Start(b []byte, taskId string) chan ChanInp
 		// сетчик обработанных кейсов
 		s.counting.SendMessage("update processed events", 1)
 
-		// ***********************************
-		// Это логирование только для теста!!!
-		// ***********************************
-		s.logger.Send("testing", "TEST_INFO func 'HandlerJsonMessage', handling json message")
-		//
-		//
-
-		fmt.Println("HandlerJsonMessageSettings.Start, close channel")
 		close(chanInput)
 	}()
 

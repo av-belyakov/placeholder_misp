@@ -12,16 +12,10 @@ import (
 )
 
 func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data InputSettings) {
-	fmt.Println("func 'ModuleMISP.addNewObject', START...")
-	fmt.Printf("func 'ModuleMISP.addNewObject', DATA: %+v\n", data)
-
 	specialObject := NewCacheSpecialObject[*objectsmispformat.ListFormatsMISP]()
 	specialObject.SetID(data.RootId)
 	specialObject.SetObject(&data.Data)
 	specialObject.SetFunc(func(i int) bool {
-
-		fmt.Println("func 'specialObject.SetFunc', START... |||")
-
 		rmisp, err := NewMispRequest(
 			WithHost(m.host),
 			WithUserAuthKey(userAuthKey),
@@ -32,14 +26,7 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 			return false
 		}
 
-		// ***********************************
-		// Это логирование только для теста!!!
-		// ***********************************
-		m.logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerMISP', send EVENTS to ----> MISP	USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId))
-		//
-		//
-
-		fmt.Println("func 'specialObject.SetFunc', send event --->")
+		m.logger.Send("info", fmt.Sprintf("starting adding the case id:'%d'", int(data.CaseId)))
 
 		//отправляет в API MISP событие в виде типа Event и возвращает результат который содержит
 		//id события в MISP, у MISP свой уникальный id для событий
@@ -48,12 +35,8 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 		if err != nil {
 			m.logger.Send("error", supportingfunctions.CustomError(err).Error())
 
-			fmt.Println("func 'specialObject.SetFunc', EVENT ERROR:", err)
-
 			return false
 		}
-
-		fmt.Println("func 'specialObject.SetFunc', get event response <---")
 
 		//Все ошибки которые могут возникнуть при дальнейшем взаимодействии с MISP
 		//будут попрежнему логироватся.
@@ -69,8 +52,6 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 			return true
 		}
 
-		fmt.Println("func 'specialObject.SetFunc', MISP response:", resMisp)
-
 		//получаем уникальный id MISP
 		var eventId string
 		for key, value := range resMisp.Event {
@@ -83,20 +64,13 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 			}
 		}
 
-		fmt.Println("func 'specialObject.SetFunc', MISP eventId:", eventId)
-
 		if eventId == "" {
 			m.logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("the formation of events of the 'Attributes' type was not performed because the EventID is empty")).Error())
 
 			return true
 		}
 
-		// ***********************************
-		// Это логирование только для теста!!!
-		// ***********************************
-		m.logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerMISP', send EVENTS REPORTS to ----> MISP	USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId))
-		//
-		//
+		m.logger.Send("info", fmt.Sprintf("new element 'event' with id:'%s' successfully created (case id:'%d')", eventId, int(data.CaseId)))
 
 		// добавляем event_reports
 		if err := rmisp.sendEventReports(ctx, eventId, data.Data.GetReports()); err != nil {
@@ -105,12 +79,7 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 			return true
 		}
 
-		// ***********************************
-		// Это логирование только для теста!!!
-		// ***********************************
-		m.logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerMISP', send data to ----> RedisDB USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId))
-		//
-		//
+		m.logger.Send("info", fmt.Sprintf("element 'event_reports' successfully added to event with id:'%s' (case id:'%d')", eventId, int(data.CaseId)))
 
 		//отправляем запрос для добавления в БД Redis, id кейса и нового события
 		m.SendDataOutput(OutputSetting{
@@ -118,13 +87,6 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 			CaseId:  fmt.Sprint(data.CaseId),
 			EventId: eventId,
 		})
-
-		// ***********************************
-		// Это логирование только для теста!!!
-		// ***********************************
-		m.logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerMISP', send ATTRIBYTES to ----> MISP	USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId))
-		//
-		//
 
 		//добавляем атрибуты
 		_, _, warning, err := rmisp.sendAttribytes(ctx, eventId, data.Data.GetAttributes())
@@ -141,12 +103,7 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 			m.logger.Send("warning", warning)
 		}
 
-		// ***********************************
-		// Это логирование только для теста!!!
-		// ***********************************
-		m.logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerMISP', send OBJECTS to ----> MISP	USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId))
-		//
-		//
+		m.logger.Send("info", fmt.Sprintf("some elements 'attribytes' successfully added to event with id:'%s' (case id:'%d')", eventId, int(data.CaseId)))
 
 		// добавляем объекты
 		if _, _, err = rmisp.sendObjects(ctx, eventId, data.Data.GetObjects()); err != nil {
@@ -154,30 +111,22 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 			m.logger.Send("error", supportingfunctions.CustomError(err).Error())
 		}
 
+		m.logger.Send("info", fmt.Sprintf("elements 'objects' successfully added to event with id:'%s' (case id:'%d')", eventId, int(data.CaseId)))
+
 		// берем небольшой таймаут, нужен для того что бы MISP успел обработать и добавить в БД
 		// всё ранее ему переданное, если обработка переданных объектов не была завершена
 		// возможны накладки или сбои при добавлении данных
 		// это недостаток MISP, с этим я ничего не могу поделать
 		time.Sleep(4 * time.Second)
 
-		// ***********************************
-		// Это логирование только для теста!!!
-		// ***********************************
-		m.logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerMISP', send EVENT_TAGS to ----> MISP	USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId))
-		//
-		//
-
 		// добавляем event_tags
 		if err := rmisp.sendEventTags(ctx, eventId, data.Data.GetObjectTags()); err != nil {
 			m.logger.Send("error", supportingfunctions.CustomError(err).Error())
 		}
 
-		// ***********************************
-		// Это логирование только для теста!!!
-		// ***********************************
-		m.logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerMISP', send PUBLISH to ----> MISP	USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId))
-		//
-		//
+		m.logger.Send("info", fmt.Sprintf("elements 'tags' successfully added to event with id:'%s' (case id:'%d')", eventId, int(data.CaseId)))
+
+		time.Sleep(1 * time.Second)
 
 		//публикуем добавленное событие
 		//masterKey нужен для публикации события так как пользователь
@@ -188,14 +137,20 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 			m.logger.Send("error", supportingfunctions.CustomError(err).Error())
 		}
 		if resMsg != "" {
-			m.logger.Send("warning", resMsg)
+			m.logger.Send("info", fmt.Sprintf("event with id:'%s' (case id:'%d') %s", eventId, int(data.CaseId), resMsg))
 		}
 
-		// ***********************************
-		// Это логирование только для теста!!!
-		// ***********************************
-		m.logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerMISP', send EventId to ----> CORE	USER EMAIL: %s, CaseId: %v", data.UserEmail, data.CaseId))
 		//
+		// !!!!!!!!!!!!!!!!!!!!!!
+		//
+		// надо разобратся что за ошибка:
+		//2025/03/06 17:49:47 methods.go:67: error processing command 'send event id' for
+		// caseId '39100' (rootId '~88678416456') 'nats: no responders available for
+		// request' /home/artemij/go/src/placeholder_misp/cmd/natsapi/handlers.go:18
+		// /home/artemij/go/src/placeholder_misp/cmd/natsapi/app.go:114
+		//
+		//
+		// !!!!!!!!!!!!!!!!!!!!!!
 		//
 
 		// отправляем в ядро информацию по event Id
@@ -211,46 +166,14 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 		return true
 	})
 
-	fmt.Println("func 'ModuleMISP.addNewObject', add to queue (m.cache.PushObjectToQueue(specialObject))")
-	fmt.Println("specialObject.GetID():", specialObject.GetID())
-	fmt.Println("specialObject.GetObject():", specialObject.GetObject())
-
 	//добавляем вспомогательный тип specialObject в очередь хранилища
 	m.cache.PushObjectToQueue(specialObject)
 }
 
+// delEventById удаляет событие типа event
 func delEventById(ctx context.Context, host, authKey, eventId string, logger commoninterfaces.Logger) {
-	// ***********************************
-	// Это логирование только для теста!!!
-	// ***********************************
-	logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerMISP', удаление события типа event, где event id: %s", eventId))
-	//
-	//
-
-	// удаление события типа event
 	_, err := delEventsMispFormat(ctx, host, authKey, eventId)
 	if err != nil {
 		logger.Send("error", supportingfunctions.CustomError(err).Error())
 	}
-
-	// ***********************************
-	// Это логирование только для теста!!!
-	// ***********************************
-	logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerMISP', должно было быть успешно выполненно удаление события event id: %s", eventId))
-	//
-	//
-
-	// ***********************************
-	// Это логирование только для теста!!!
-	// ***********************************
-	logger.Send("testing", "TEST_INFO STOP")
-	//
-	//
-
-	//
-	//только для теста, для ОСТАНОВА
-	//
-	//mmisp.SendingDataOutput(SettingChanOutputMISP{
-	//	Command: "TEST STOP",
-	//})
 }

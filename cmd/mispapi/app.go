@@ -102,14 +102,6 @@ func (m *ModuleMISP) Start(ctx context.Context) error {
 				return
 
 			case msg := <-m.GetInputChannel():
-
-				// ***********************************
-				// Это логирование только для теста!!!
-				// ***********************************
-				m.logger.Send("testing", fmt.Sprintf("TEST_INFO func 'HandlerMISP', reseived command '%s', case Id '%d'", msg.Command, int(msg.CaseId)))
-				//
-				//
-
 				go func(data InputSettings) {
 					userAuthKey := m.authKey
 
