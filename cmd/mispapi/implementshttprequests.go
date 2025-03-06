@@ -4,14 +4,12 @@ import (
 	"bytes"
 	"context"
 	"crypto/tls"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"time"
 
-	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
@@ -90,20 +88,7 @@ func (client *ClientMISP) Do(ctx context.Context, method, path string, data []by
 	}
 
 	if res.StatusCode != http.StatusOK {
-		mferr := datamodels.MispFormatError{Errors: map[string]interface{}{}}
-		if err := json.Unmarshal(resBodyByte, &mferr); err != nil {
-			lerr := []interface{}{}
-			if err := json.Unmarshal(resBodyByte, &lerr); err == nil {
-				return res, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("message from MISP: status '%s', error - %s", res.Status, lerr))
-			}
-
-			var serr string
-			if err := json.Unmarshal(resBodyByte, &serr); err == nil {
-				return res, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("message from MISP: status '%s' error - %s", res.Status, serr))
-			}
-		}
-
-		return res, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("message from MISP: staus '%s', message '%s', url '%s', error - %s", res.Status, mferr.Message, mferr.URL, mferr.Errors))
+		return res, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("message from MISP: status '%s', error - %v", res.Status, string(resBodyByte)))
 	}
 
 	return res, resBodyByte, err

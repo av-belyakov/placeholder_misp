@@ -238,11 +238,12 @@ func CreateObjectsFormatMISP(
 	} else {
 		//добавляем case id в поле Info
 		//		eventsMisp.Info += fmt.Sprintf(" :::TheHive case id '%d':::", int(caseId))
-		eventsMisp.Info += fmt.Sprintf(" $$$_TheHive case id '%d'_$$$", int(caseId))
+		eventsMisp.Info += fmt.Sprintf(" TesT:_TheHive case id '%d'_:TesT", int(caseId))
 
 		//добавляем в datemodels.ListObjectEventTags дополнительные теги
 		//ответственные за формирование галактик в MISP
-		joinEventTags(leot, createGalaxyTags(listGalaxyTags))
+		galaxyTags := createGalaxyTags(listGalaxyTags)
+		joinEventTags(leot, galaxyTags)
 
 		for k := range listAttributesMisp.GetList() {
 			if supportiveListExcludeRule.CheckRuleTrue(k) {

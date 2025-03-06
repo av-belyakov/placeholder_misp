@@ -207,8 +207,8 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 			TaskId:  data.TaskId,
 		})
 
-		//по умолчанию 'не успешно'
-		return false
+		//выполнено 'успешно'
+		return true
 	})
 
 	fmt.Println("func 'ModuleMISP.addNewObject', add to queue (m.cache.PushObjectToQueue(specialObject))")

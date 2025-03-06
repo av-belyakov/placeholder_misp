@@ -55,6 +55,9 @@ func (api *ApiNatsModule) Start(ctx context.Context) error {
 		nats.MaxReconnects(-1),
 		//время ожидания до следующей попытки переподключения (по умолчанию 2 сек.)
 		nats.ReconnectWait(3*time.Second),
+		//максимальное количество запросов ping, которые могут остаться без ответа от сервера,
+		// прежде чем закрыть соединение
+		nats.MaxPingsOutstanding(3),
 		//обработка разрыва соединения с NATS
 		nats.DisconnectErrHandler(func(c *nats.Conn, err error) {
 			api.logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("the connection with NATS has been disconnected (%w)", err)).Error())

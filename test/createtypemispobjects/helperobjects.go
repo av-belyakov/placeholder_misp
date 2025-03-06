@@ -138,7 +138,7 @@ func AddNewObject(ctx context.Context, data mispapi.InputSettings, opts OptionsA
 		log.Println(err)
 	}
 	if resMsg != "" {
-		log.Panicln("warning", resMsg)
+		log.Println("warning", resMsg)
 	}
 
 	// отправляем в ядро информацию по event Id

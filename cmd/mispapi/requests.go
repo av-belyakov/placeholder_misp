@@ -91,12 +91,6 @@ func (rmisp *requestMISP) sendEvent(ctx context.Context, data *objectsmispformat
 		return nil, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("events add, %w", err))
 	}
 
-	//по логике здесь это отрабатывать не надо, так как метод ClientMISP.Do уже
-	// обрабатывает подобные статусы и генерирует ошибку с подробным описанием
-	//if res.StatusCode != http.StatusOK {
-	//	return nil, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("events add, status '%s'", res.Status))
-	//}
-
 	return res, resBodyByte, nil
 }
 
@@ -121,12 +115,6 @@ func (rmisp *requestMISP) sendEventReports(ctx context.Context, eventId string, 
 		return supportingfunctions.CustomError(fmt.Errorf("event report add, %w", err))
 	}
 
-	//по логике здесь это отрабатывать не надо, так как метод ClientMISP.Do уже
-	// обрабатывает подобные статусы и генерирует ошибку с подробным описанием
-	//if res.StatusCode != http.StatusOK {
-	//	return supportingfunctions.CustomError(fmt.Errorf("event report add, status '%s'", res.Status))
-	//}
-
 	return nil
 }
 
@@ -137,17 +125,14 @@ func (rmisp *requestMISP) SendAttribytes_ForTest(ctx context.Context, eventId st
 // sendAttribytes отправляет в MISP список атрибутов в виде среза объектов типа 'attribytes'
 func (rmisp *requestMISP) sendAttribytes(ctx context.Context, eventId string, data []*objectsmispformat.AttributesMispFormat) (*http.Response, []byte, string, error) {
 	var (
-		c           *ClientMISP
 		res         *http.Response
 		resBodyByte = make([]byte, 0)
-
-		err error
 	)
 
 	warning := strings.Builder{}
 	defer warning.Reset()
 
-	c, err = NewClientMISP(rmisp.host, rmisp.userAuthKey, false)
+	c, err := NewClientMISP(rmisp.host, rmisp.userAuthKey, false)
 	if err != nil {
 		return nil, resBodyByte, warning.String(), supportingfunctions.CustomError(fmt.Errorf("'attributes' for event id:'%s' add, %w", eventId, err))
 	}
@@ -181,12 +166,6 @@ func (rmisp *requestMISP) sendAttribytes(ctx context.Context, eventId string, da
 
 			continue
 		}
-
-		//по логике здесь это отрабатывать не надо, так как метод ClientMISP.Do уже
-		// обрабатывает подобные статусы и генерирует ошибку с подробным описанием
-		//if res.StatusCode != http.StatusOK {
-		//	err = errors.Join(err, supportingfunctions.CustomError(fmt.Errorf("'attributes' with id:'%s' add, status '%s'", eventId, res.Status)))
-		//}
 	}
 
 	return res, resBodyByte, warning.String(), err
@@ -200,14 +179,11 @@ func (rmisp *requestMISP) SendObjects_ForTest(ctx context.Context, eventId strin
 // (как правило это описание вложеного файла)
 func (rmisp *requestMISP) sendObjects(ctx context.Context, eventId string, data map[int]*objectsmispformat.ObjectsMispFormat) (*http.Response, []byte, error) {
 	var (
-		c           *ClientMISP
 		res         *http.Response
 		resBodyByte = make([]byte, 0)
-
-		err error
 	)
 
-	c, err = NewClientMISP(rmisp.host, rmisp.userAuthKey, false)
+	c, err := NewClientMISP(rmisp.host, rmisp.userAuthKey, false)
 	if err != nil {
 		return nil, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("objects for event id:'%s' add, %w", eventId, err))
 	}
@@ -228,12 +204,6 @@ func (rmisp *requestMISP) sendObjects(ctx context.Context, eventId string, data 
 
 			continue
 		}
-
-		//по логике здесь это отрабатывать не надо, так как метод ClientMISP.Do уже
-		// обрабатывает подобные статусы и генерирует ошибку с подробным описанием
-		//if res.StatusCode != http.StatusOK {
-		//	logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("objects with id:'%s' add, status '%s'", eventId, res.Status)).Error())
-		//}
 	}
 
 	return res, resBodyByte, err
@@ -245,13 +215,7 @@ func (rmisp *requestMISP) SendEventTags_ForTest(ctx context.Context, eventId str
 
 // sendEventTags отправляет в MISP объекты типа 'tags'
 func (rmisp *requestMISP) sendEventTags(ctx context.Context, eventId string, data *objectsmispformat.ListEventObjectTags) error {
-	var (
-		c *ClientMISP
-
-		err error
-	)
-
-	c, err = NewClientMISP(rmisp.host, rmisp.userAuthKey, false)
+	c, err := NewClientMISP(rmisp.host, rmisp.userAuthKey, false)
 	if err != nil {
 		return supportingfunctions.CustomError(fmt.Errorf("event tags add, %w", err))
 	}
@@ -274,14 +238,6 @@ func (rmisp *requestMISP) sendEventTags(ctx context.Context, eventId string, dat
 
 			continue
 		}
-
-		//
-		//resData := decodeResponseMIspMessage(b)
-		//resultMsg := fmt.Sprintf("tag: '%s' %s '%s' %s errors:'%s'", v, resData.name, resData.message, resData.success, resData.errors)
-		//logger.Send("warning", fmt.Sprintf("event tags with id:'%s' the result of executing the POST query - '%s'", eventId, resultMsg))
-		//if res.StatusCode != http.StatusOK {
-		//	logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("'event tags with id:'%s' add, status '%s'", eventId, res.Status)).Error())
-		//}
 	}
 
 	return nil

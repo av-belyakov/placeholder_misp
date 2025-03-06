@@ -8,6 +8,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/av-belyakov/placeholder_misp/cmd/coremodule"
@@ -69,6 +70,10 @@ func (m *ModuleMISPForTest) GetInputChannel() <-chan mispapi.InputSettings {
 }
 
 func TestMain(m *testing.M) {
+	if err := godotenv.Load("../../.env"); err != nil {
+		log.Panicln(err)
+	}
+
 	chZabbix = make(chan commoninterfaces.Messager)
 	counting = countermessage.New(chZabbix)
 
@@ -138,15 +143,68 @@ func TestCreateMispObjects(t *testing.T) {
 	go coremodule.CreateObjectsFormatMISP(chDecode, Task_Id, moduleMisp, listRules, counting, logging)
 
 	t.Run("Формирование документов в формате MISP", func(t *testing.T) {
+		//var eventId string
 		msg := <-moduleMisp.GetInputChannel()
 
-		/*
-			!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		/*rmisp, err := mispapi.NewMispRequest(
+			mispapi.WithHost("misp-center.cloud.gcm"),
+			mispapi.WithUserAuthKey("GO_PHMISP_MAUTH"),
+			mispapi.WithMasterAuthKey("GO_PHMISP_UAUTH"))
+		assert.NoError(t, err)
 
-			выполнить этот тест через debug
+		t.Run("Добавление event", func(t *testing.T) {
+			_, resBodyByte, err := rmisp.SendEvent_ForTest(ctx, msg.Data.GetEvent())
+			assert.NoError(t, err)
 
-			!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		*/
+			resMisp := mispapi.MispResponse{}
+			err = json.Unmarshal(resBodyByte, &resMisp)
+			assert.NoError(t, err)
+
+			log.Println("func 'specialObject.SetFunc', MISP response:", resMisp)
+
+			//получаем уникальный id MISP
+			for key, value := range resMisp.Event {
+				if key == "id" {
+					if str, ok := value.(string); ok {
+						eventId = str
+
+						break
+					}
+				}
+			}
+
+			log.Println("func 'specialObject.SetFunc', MISP eventId:", eventId)
+			assert.NotEmpty(t, eventId)
+		})
+
+		t.Run("Добавление event_reports", func(t *testing.T) {
+			err := rmisp.SendEventReports_ForTest(ctx, eventId, msg.Data.GetReports())
+			assert.NoError(t, err)
+		})
+
+		t.Run("Добавление attribytes", func(t *testing.T) {
+			_, _, warning, err := rmisp.SendAttribytes_ForTest(ctx, eventId, msg.Data.GetAttributes())
+			assert.NoError(t, err)
+			t.Log("warning:", warning)
+		})
+
+		t.Run("Добавление objects", func(t *testing.T) {
+			_, _, err := rmisp.SendObjects_ForTest(ctx, eventId, msg.Data.GetObjects())
+			assert.NoError(t, err)
+		})
+
+		t.Run("Добавление event_tags", func(t *testing.T) {
+			err := rmisp.SendEventTags_ForTest(ctx, eventId, msg.Data.GetObjectTags())
+			assert.NoError(t, err)
+		})
+
+		t.Run("Публикация события", func(t *testing.T) {
+			resMsg, err := rmisp.SendRequestPublishEvent_ForTest(ctx, eventId)
+			assert.NoError(t, err)
+
+			t.Log("response:", resMsg)
+			assert.NotEmpty(t, resMsg)
+		})*/
 
 		createtypemispobjects.AddNewObject(
 			context.Background(),
@@ -154,7 +212,7 @@ func TestCreateMispObjects(t *testing.T) {
 			createtypemispobjects.OptionsAddNewObject{
 				Host:        "misp-center.cloud.gcm",
 				AuthKey:     os.Getenv("GO_PHMISP_MAUTH"),
-				UserAuthKey: os.Getenv("GO_PHMISP_MAUTH"),
+				UserAuthKey: os.Getenv("GO_PHMISP_UAUTH"),
 			})
 
 		b, err = json.MarshalIndent(msg, "", " ")
