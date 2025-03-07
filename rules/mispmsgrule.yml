@@ -107,12 +107,12 @@ RULES:
   REPLACE:
   PASS:
     - listAnd:
-        #        - searchField: "event.object.impactStatus"
-        #          searchValue: "WithImpact"
-        #        - searchField: "event.object.resolutionStatus"
-        #          searchValue: "TruePositive"
-        - searchField: "event.object.tlp"
-          searchValue: "not:3"
+        - searchField: "event.object.impactStatus"
+          searchValue: "WithImpact"
+        - searchField: "event.object.resolutionStatus"
+          searchValue: "TruePositive"
+    #      - searchField: "event.object.tlp"
+    #        searchValue: "not:3"
     - listAnd:
   EXCLUDE:
     - listAnd:

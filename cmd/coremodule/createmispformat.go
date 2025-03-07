@@ -33,14 +33,21 @@ func CreateObjectsFormatMISP(
 	//формируем шаблоны для заполнения
 	eventsMisp := objectsmispformat.NewEventMisp()
 	listObjectsMisp := objectsmispformat.NewListObjectsMispFormat()
+	defer listObjectsMisp.CleanList()
+
 	listAttributeTmp := objectsmispformat.NewListAttributeTmp()
+	defer listAttributeTmp.CleanAttribute()
+
 	listAttributesMisp := objectsmispformat.NewListAttributesMispFormat()
+	defer listAttributesMisp.CleanList()
+
 	leot := objectsmispformat.NewListEventObjectTags()
+	defer leot.CleanListTags()
 
 	supportiveListExcludeRule := NewSupportiveListExcludeRuleTmp(listRule.GetRuleExclude())
 
 	//это основной обработчик параметров входящего объекта
-	listHandlerMisp := map[string][]func(interface{}, int){
+	listHandlerMisp := map[string][]func(any, int){
 		//event -> events
 		"event.object.title":     {eventsMisp.SetAnyInfo},
 		"event.object.startDate": {eventsMisp.SetAnyTimestamp},
@@ -50,7 +57,7 @@ func CreateObjectsFormatMISP(
 		"event.organisationId":   {eventsMisp.SetAnyOrgId},
 		"event.object.updatedAt": {eventsMisp.SetAnySightingTimestamp},
 		"event.object.owner":     {eventsMisp.SetAnyEventCreatorEmail},
-		"event.object.customFields.class-attack.string": {func(i interface{}, num int) {
+		"event.object.customFields.class-attack.string": {func(i any, num int) {
 			leot.SetTag(fmt.Sprintf("class-attack=\"%v\"", i))
 		}},
 		//observables -> attributes
@@ -224,53 +231,54 @@ func CreateObjectsFormatMISP(
 
 	if !isAllowed {
 		logger.Send("warning", fmt.Sprintf("the message with case id %d was not sent to MISP because it does not comply with the rules", int(caseId)))
-	} else {
-		//добавляем case id в поле Info
-		//		eventsMisp.Info += fmt.Sprintf(" :::TheHive case id '%d':::", int(caseId))
-		eventsMisp.Info += fmt.Sprintf(" TesT:_TheHive case id '%d'_:TesT", int(caseId))
 
-		//добавляем в datemodels.ListObjectEventTags дополнительные теги
-		//ответственные за формирование галактик в MISP
-		galaxyTags := createGalaxyTags(listGalaxyTags)
-		joinEventTags(leot, galaxyTags)
-
-		for k := range listAttributesMisp.GetList() {
-			if supportiveListExcludeRule.CheckRuleTrue(k) {
-				//удаляем элементы подходящие под правила группы EXCLUDE
-				listAttributesMisp.DelElementList(k)
-			}
-		}
-
-		mispFormat := objectsmispformat.NewListFormatsMISP()
-		mispFormat.ID = rootId
-		mispFormat.Event = eventsMisp
-		mispFormat.Objects = getNewListObjects(listObjectsMisp.GetList(), listAttributeTmp.GetListAttribute())
-		tmpListTags := leot.GetListTags()
-		mispFormat.ObjectTags = &tmpListTags
-		mispFormat.Attributes = getNewListAttributes(listAttributesMisp.GetList(), listTags)
-		reports := objectsmispformat.NewEventReports()
-		reports.SetName(fmt.Sprint(caseId))
-		reports.SetDistribution("1")
-		mispFormat.Reports = reports
-
-		logger.Send("info", fmt.Sprintf("the case with id:'%d' complies with the specified rules and has been submitted for further processing", int(caseId)))
-
-		//тут отправляем сформированные по формату MISP пользовательские структуры
-		mispModule.SendDataInput(mispapi.InputSettings{
-			Command:    "add event",
-			TaskId:     taskId,
-			CaseId:     caseId,
-			RootId:     rootId,
-			CaseSource: caseSource,
-			UserEmail:  userEmail,
-			Data:       *mispFormat,
-		})
+		return
 	}
 
-	//очищаем события, список аттрибутов и текущий email пользователя
-	userEmail, caseSource = "", ""
-	leot.CleanListTags()
-	listObjectsMisp.CleanList()
-	listAttributeTmp.CleanAttribute()
-	listAttributesMisp.CleanList()
+	if caseId == 0 {
+		logger.Send("error", fmt.Sprintf("the caseId in the event cannot be equal to 0 (event creator email '%s')", eventsMisp.EventCreatorEmail))
+
+		return
+	}
+
+	//добавляем case id в поле Info
+	//		eventsMisp.Info += fmt.Sprintf(" :::TheHive case id '%d':::", int(caseId))
+	eventsMisp.Info += fmt.Sprintf(" TesT:_TheHive case id '%d'_:TesT", int(caseId))
+
+	//добавляем в datemodels.ListObjectEventTags дополнительные теги
+	//ответственные за формирование галактик в MISP
+	galaxyTags := createGalaxyTags(listGalaxyTags)
+	joinEventTags(leot, galaxyTags)
+
+	for k := range listAttributesMisp.GetList() {
+		if supportiveListExcludeRule.CheckRuleTrue(k) {
+			//удаляем элементы подходящие под правила группы EXCLUDE
+			listAttributesMisp.DelElementList(k)
+		}
+	}
+
+	mispFormat := objectsmispformat.NewListFormatsMISP()
+	mispFormat.ID = rootId
+	mispFormat.Event = eventsMisp
+	mispFormat.Objects = getNewListObjects(listObjectsMisp.GetList(), listAttributeTmp.GetListAttribute())
+	tmpListTags := leot.GetListTags()
+	mispFormat.ObjectTags = &tmpListTags
+	mispFormat.Attributes = getNewListAttributes(listAttributesMisp.GetList(), listTags)
+	reports := objectsmispformat.NewEventReports()
+	reports.SetName(fmt.Sprint(caseId))
+	reports.SetDistribution("1")
+	mispFormat.Reports = reports
+
+	logger.Send("info", fmt.Sprintf("the case with id:'%d' complies with the specified rules and has been submitted for further processing", int(caseId)))
+
+	//тут отправляем сформированные по формату MISP пользовательские структуры
+	mispModule.SendDataInput(mispapi.InputSettings{
+		Command:    "add event",
+		TaskId:     taskId,
+		CaseId:     caseId,
+		RootId:     rootId,
+		CaseSource: caseSource,
+		UserEmail:  userEmail,
+		Data:       *mispFormat,
+	})
 }

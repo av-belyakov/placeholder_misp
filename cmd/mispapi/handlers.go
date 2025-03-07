@@ -150,6 +150,8 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 		// /home/artemij/go/src/placeholder_misp/cmd/natsapi/app.go:114
 		//
 		//
+		// 	и ещё, такое ощущение что неработают правила!!!
+		//
 		// !!!!!!!!!!!!!!!!!!!!!!
 		//
 
