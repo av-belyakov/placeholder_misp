@@ -15,13 +15,15 @@ import (
 )
 
 //для запуска docker image с redis
-//docker run -d -p 6379:6379 --volume /home/artemij/go/src/placeholder_misp/test/redis_file/dump.rdb:/data/dump.rdb --name redisdb redis:latest
+//docker run -d -p 6379:6379 --volume /home/artemij/go/src/placeholder_misp/internal/backupdb/redis_dump.rdb:/data/dump.rdb --name redisdb redis:latest
 
 const (
-	HostRDb string = "127.0.0.1"
-	PortRDb int    = 6379
+	//HostRDb string = "127.0.0.1"
+	//PortRDb int    = 6379
+	HostRDb string = "192.168.9.208"
+	PortRDb int    = 26379
 
-	pathSqlite3 string = "../sqlite3_file/sqlite3.db"
+	pathSqlite3 string = "../../backupdb/sqlite3_backup.db"
 )
 
 var (
@@ -142,7 +144,7 @@ func TestGetDumpdb(t *testing.T) {
 	})
 
 	t.Run("Тест 4. Создаем новую таблицу", func(t *testing.T) {
-		/*queryRes*/ _, err := sqlite3Client.client.ExecContext(ctx, "CREATE TABLE IF NOT EXISTS placeholder_misp(caseId INT, eventId INT)")
+		/*queryRes*/ _, err := sqlite3Client.client.ExecContext(ctx, "CREATE TABLE IF NOT EXISTS placeholder_misp(caseId INT UNIQUE, eventId INT)")
 		assert.NoError(t, err)
 	})
 

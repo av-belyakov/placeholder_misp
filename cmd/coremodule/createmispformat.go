@@ -7,6 +7,7 @@ import (
 
 	"github.com/av-belyakov/objectsmispformat"
 	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
+	"github.com/av-belyakov/placeholder_misp/cmd/sqlite3api"
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
 	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
@@ -17,6 +18,7 @@ func CreateObjectsFormatMISP(
 	chDecodeJSON <-chan ChanInputCreateMispFormat,
 	taskId string,
 	mispModule mispapi.ModuleMispHandler,
+	sqlite3Module *sqlite3api.ApiSqlite3Module,
 	listRule *rules.ListRule,
 	counting *countermessage.CounterMessage,
 	logger commoninterfaces.Logger) {
@@ -271,11 +273,22 @@ func CreateObjectsFormatMISP(
 
 	logger.Send("info", fmt.Sprintf("the case with id:'%d' complies with the specified rules and has been submitted for further processing", int(caseId)))
 
+	//получаем старый eventId объекта, если о нем есть запись в БД
+	chRes := make(chan sqlite3api.Response)
+	sqlite3Module.SendDataToModule(sqlite3api.Request{
+		Command:    "search caseId",
+		ChResponse: chRes,
+		Payload:    fmt.Append(nil, caseId),
+	})
+	res := <-chRes
+	eventId := string(res.Payload)
+
 	//тут отправляем сформированные по формату MISP пользовательские структуры
 	mispModule.SendDataInput(mispapi.InputSettings{
 		Command:    "add event",
 		TaskId:     taskId,
 		CaseId:     caseId,
+		EventId:    eventId,
 		RootId:     rootId,
 		CaseSource: caseSource,
 		UserEmail:  userEmail,

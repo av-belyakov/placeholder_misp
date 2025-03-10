@@ -129,9 +129,6 @@ func (m *ModuleMISP) Start(ctx context.Context) error {
 					case "add event":
 						m.addNewObject(ctx, userAuthKey, data)
 
-					case "del event by id":
-						delEventById(ctx, m.host, m.authKey, data.EventId, m.logger)
-
 					}
 				}(msg)
 			}

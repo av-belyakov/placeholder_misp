@@ -14,6 +14,7 @@ import (
 
 	"github.com/av-belyakov/placeholder_misp/cmd/coremodule"
 	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
+	"github.com/av-belyakov/placeholder_misp/cmd/sqlite3api"
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/constants"
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
@@ -26,13 +27,15 @@ import (
 
 var _ = Describe("Addneweventandattributes", Ordered, func() {
 	var (
-		logging                        *logginghandler.LoggingChan
-		counting                       *countermessage.CounterMessage
-		confApp                        confighandler.ConfigApp
-		listRules                      *rules.ListRule
-		mispModule                     *mispapi.ModuleMISP
-		exampleByte                    []byte
-		errReadFile, errMisp, errRules error
+		logging       *logginghandler.LoggingChan
+		counting      *countermessage.CounterMessage
+		confApp       confighandler.ConfigApp
+		listRules     *rules.ListRule
+		mispModule    *mispapi.ModuleMISP
+		sqlite3Module *sqlite3api.ApiSqlite3Module
+		exampleByte   []byte
+
+		errReadFile, errMisp, errRules, errSqlite3Conn error
 	)
 
 	readFileJson := func(fpath, fname string) ([]byte, error) {
@@ -107,6 +110,9 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		//"example_caseId_33807.json" НЕ совпадает с правилами
 		exampleByte, errReadFile = readFileJson("test/test_json", "examplenew.json")
 
+		// инициализация модуля взаимодействия с Sqlite3
+		sqlite3Module, errSqlite3Conn = sqlite3api.New(context.Background(), confApp.AppConfigSqlite3.PathFileDb, logging)
+
 		//инициалиация модуля для взаимодействия с MISP
 		mispModule, errMisp = mispapi.NewModuleMISP(confApp.GetAppMISP().Host, confApp.GetAppMISP().Auth, confApp.GetListOrganization(), logging)
 
@@ -114,7 +120,7 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		// обработчик JSON документа
 		chanOutputDecodeJson := hjson.Start(exampleByte, taskId)
 		//формирование итоговых документов в формате MISP
-		go coremodule.CreateObjectsFormatMISP(chanOutputDecodeJson, taskId, mispModule, listRules, counting, logging)
+		go coremodule.CreateObjectsFormatMISP(chanOutputDecodeJson, taskId, mispModule, sqlite3Module, listRules, counting, logging)
 	})
 
 	Context("Тест 1. Проверка инициализации модулей", func() {
@@ -124,6 +130,10 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 
 		It("При инициализации модуля чтения файла примера не должно быть ошибки", func() {
 			Expect(errReadFile).ShouldNot(HaveOccurred())
+		})
+
+		It("При инициализации модуля взаимодействия с Sqlit3 не должно быть ошибки", func() {
+			Expect(errSqlite3Conn).ShouldNot(HaveOccurred())
 		})
 
 		It("При инициализации модуля обработки MISP не должно быть ошибки", func() {

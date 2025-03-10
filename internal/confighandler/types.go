@@ -4,7 +4,7 @@ type ConfigApp struct {
 	CommonAppConfig
 	AppConfigNATS
 	AppConfigMISP
-	AppConfigRedis
+	AppConfigSqlite3
 	AppConfigTheHive
 	RulesProcMSGMISP
 }
@@ -64,7 +64,7 @@ type AppConfigNATS struct {
 	Subscriptions SubscriptionsNATS `yaml:"subscriptions"`
 	Host          string            `validate:"required" yaml:"host"`
 	Port          int               `validate:"gt=0,lte=65535" yaml:"port"`
-	CacheTTL      int               `validate:"gt=10,lte=86400" yaml:"cacheTtl"`
+	CacheTTL      int               `validate:"gt=10,lte=86400" yaml:"cache_ttl"`
 }
 
 type SubscriptionsNATS struct {
@@ -77,9 +77,8 @@ type AppConfigMISP struct {
 	Auth string `validate:"required" yaml:"auth"`
 }
 
-type AppConfigRedis struct {
-	Host string `yaml:"host"`
-	Port int    `validate:"gt=0,lte=65535" yaml:"port"`
+type AppConfigSqlite3 struct {
+	PathFileDb string `validate:"required" yaml:"path_file_db"`
 }
 
 type AppConfigTheHive struct {

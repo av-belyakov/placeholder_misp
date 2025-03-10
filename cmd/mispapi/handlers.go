@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/av-belyakov/objectsmispformat"
-	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
@@ -37,6 +36,9 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 
 			return false
 		}
+
+		//удаляем старое событие типа Event
+		m.deleteEvent(ctx, data.EventId)
 
 		//Все ошибки которые могут возникнуть при дальнейшем взаимодействии с MISP
 		//будут попрежнему логироватся.
@@ -81,12 +83,16 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 
 		m.logger.Send("info", fmt.Sprintf("element 'event_reports' successfully added to event with id:'%s' (case id:'%d')", eventId, int(data.CaseId)))
 
+		//
+		// эту же функцию выполняет запрос "send event id" который находится в самом
+		//низу этой функции
+		//
 		//отправляем запрос для добавления в БД Redis, id кейса и нового события
-		m.SendDataOutput(OutputSetting{
-			Command: "set new event id",
-			CaseId:  fmt.Sprint(data.CaseId),
-			EventId: eventId,
-		})
+		//m.SendDataOutput(OutputSetting{
+		//	Command: "set new event id",
+		//	CaseId:  fmt.Sprint(data.CaseId),
+		//	EventId: eventId,
+		//})
 
 		//добавляем атрибуты
 		_, _, warning, err := rmisp.sendAttribytes(ctx, eventId, data.Data.GetAttributes())
@@ -140,21 +146,6 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 			m.logger.Send("info", fmt.Sprintf("event with id:'%s' (case id:'%d') %s", eventId, int(data.CaseId), resMsg))
 		}
 
-		//
-		// !!!!!!!!!!!!!!!!!!!!!!
-		//
-		// надо разобратся что за ошибка:
-		//2025/03/06 17:49:47 methods.go:67: error processing command 'send event id' for
-		// caseId '39100' (rootId '~88678416456') 'nats: no responders available for
-		// request' /home/artemij/go/src/placeholder_misp/cmd/natsapi/handlers.go:18
-		// /home/artemij/go/src/placeholder_misp/cmd/natsapi/app.go:114
-		//
-		//
-		// 	и ещё, такое ощущение что неработают правила!!!
-		//
-		// !!!!!!!!!!!!!!!!!!!!!!
-		//
-
 		// отправляем в ядро информацию по event Id
 		m.SendDataOutput(OutputSetting{
 			Command: "send event id",
@@ -172,10 +163,15 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 	m.cache.PushObjectToQueue(specialObject)
 }
 
-// delEventById удаляет событие типа event
-func delEventById(ctx context.Context, host, authKey, eventId string, logger commoninterfaces.Logger) {
-	_, err := delEventsMispFormat(ctx, host, authKey, eventId)
+func (m *ModuleMISP) deleteEvent(ctx context.Context, eventId string) {
+	if eventId == "" {
+		m.logger.Send("warning", "deleting an old event is not possible because the EventID contains an empty value")
+
+		return
+	}
+
+	_, err := delEventsMispFormat(ctx, m.host, m.authKey, eventId)
 	if err != nil {
-		logger.Send("error", supportingfunctions.CustomError(err).Error())
+		m.logger.Send("error", supportingfunctions.CustomError(err).Error())
 	}
 }

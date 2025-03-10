@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/joho/godotenv"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
@@ -36,6 +37,10 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 		rootPath, err = supportingfunctions.GetRootPath(constants.Root_Dir)
 		if err != nil {
 			log.Fatalf("error, it is impossible to form root path (%s)", err.Error())
+		}
+
+		if err = godotenv.Load("../../.env"); err != nil {
+			log.Fatalln(err)
 		}
 	})
 
@@ -67,7 +72,7 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 			Expect(commonApp.Zabbix.EventTypes[0].Handshake.Message).Should(Equal(""))
 
 			Expect(err).ShouldNot(HaveOccurred())
-			Expect(len(conf.GetListLogs())).Should(Equal(6))
+			Expect(len(conf.GetListLogs())).Should(Equal(5))
 			Expect(len(conf.GetListOrganization())).Should(Equal(12))
 			Expect(conf.LogList[0].PathDirectory).Should(Equal("logs"))
 			Expect(conf.LogList[0].MsgTypeName).Should(Equal("error"))
@@ -82,13 +87,15 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 			Expect(err).ShouldNot(HaveOccurred())
 
 			confNats := conf.GetAppNATS()
-			Expect(confNats.Host).Should(Equal("nats.cloud.gcm"))
+			Expect(confNats.Host).Should(Equal("192.168.9.208"))
 			Expect(confNats.Port).Should(Equal(4222))
 			Expect(confNats.CacheTTL).Should(Equal(3600))
-			Expect(confNats.Subscriptions.ListenerCase).Should(Equal("object.casetype"))
+			Expect(confNats.Subscriptions.ListenerCase).Should(Equal("object.casetype.local"))
 			Expect(confNats.Subscriptions.SenderCommand).Should(Equal("object.commandstype"))
 
 			Expect(conf.GetAppMISP().Host).Should(Equal("misp-center.cloud.gcm"))
+
+			Expect(conf.GetAppSqlite3().PathFileDb).Should(Equal("../sqlite3/sqlite3.db"))
 		})
 
 		It("Должно быть получено содержимое файла 'config_dev.yml' при значении переменной GO_PHMISP_MAIN=development", func() {
@@ -115,6 +122,7 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 			os.Setenv("GO_PHMISP_NCACHETTL", "4500")
 			os.Setenv("GO_PHMISP_NSUBLISTENERCASE", "object.casetype.test")
 			os.Setenv("GO_PHMISP_NSUBSENDERCOMMAND", "object.commandstype.test")
+			os.Setenv("GO_PHMISP_SQLITE3PATH", "somepath/path/file_db")
 
 			conf, err := confighandler.New(rootPath)
 			Expect(err).ShouldNot(HaveOccurred())
@@ -125,6 +133,8 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 			Expect(confNats.CacheTTL).Should(Equal(4500))
 			Expect(confNats.Subscriptions.ListenerCase).Should(Equal("object.casetype.test"))
 			Expect(confNats.Subscriptions.SenderCommand).Should(Equal("object.commandstype.test"))
+
+			Expect(conf.AppConfigSqlite3.PathFileDb).Should(Equal("somepath/path/file_db"))
 		})
 	})
 

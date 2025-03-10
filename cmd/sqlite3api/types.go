@@ -6,35 +6,22 @@ import (
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 )
 
-// SqliteApiModule модуль взаимодействия с БД Sqlite3
-type SqliteApiModule struct {
-	db             *sql.DB                 //дескриптор соединения с БД
-	logger         commoninterfaces.Logger //логгер
-	majorFilePath  string                  //основной файл с базой
-	backupFilePath string                  //файл с базой, используется как сонова для основного
+// ApiSqlite3Module модуль взаимодействия с БД
+type ApiSqlite3Module struct {
+	db            *sql.DB                 //дескриптор соединения с БД
+	logger        commoninterfaces.Logger //логирование событий
+	pathSqlite3Db string                  //путь к файлу с БД
+	chRequest     chan Request            //канал для запросов к БД
 }
 
-// routeSettings настройки маршрутизатора
-type routeSettings struct {
-	data         []byte
-	command      string
-	taskId       string
-	service      string
-	chanResponse chan<- ChanOutputApiSqlite
+// Request запрос к модулю
+type Request struct {
+	Payload    []byte
+	Command    string
+	ChResponse chan Response
 }
 
-// ChanApiSqlite канал для взаимодействия с API SQLite
-type ChanApiSqlite struct {
-	Data         []byte                     //данные передаваемые в API SQLite
-	Command      string                     //команда которую должен выполнить API SQLite
-	TaskID       string                     //id задачи
-	Service      string                     //имя сервиса, за пределами NATS, от имени которого происходит запрос (например MISP, ES)
-	ChanResponse chan<- ChanOutputApiSqlite //канал для ответа
-}
-
-// ChanOutputApiSqlite
-type ChanOutputApiSqlite struct {
-	Data   []byte //передаваемые данные
-	TaskID string //id задачи
-	Status bool   //статус выполнения
+// Response ответ от модуля
+type Response struct {
+	Payload []byte
 }

@@ -13,6 +13,7 @@ import (
 
 	"github.com/av-belyakov/placeholder_misp/cmd/coremodule"
 	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
+	"github.com/av-belyakov/placeholder_misp/cmd/sqlite3api"
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
 	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
@@ -22,11 +23,12 @@ import (
 )
 
 const (
-	Root_Dir     string = "placeholder_misp"
-	Rules_Dir    string = "rules"
-	Rules_File   string = "mispmsgrule.yml"
-	Example_File string = "../test_json/event_39100.json"
-	Task_Id      string = "7s7qeytyyy2e27tr73213143a"
+	Root_Dir      string = "placeholder_misp"
+	Rules_Dir     string = "rules"
+	Rules_File    string = "mispmsgrule.yml"
+	Example_File  string = "../test_json/event_39100.json"
+	Task_Id       string = "7s7qeytyyy2e27tr73213143a"
+	sqlite3FileDb string = "../../backupdb/sqlite3_backup.db"
 )
 
 var (
@@ -132,6 +134,10 @@ func TestCreateMispObjects(t *testing.T) {
 	}(ctx, chZabbix)
 	counting.SendMessage("test_countiong_message", 100)
 
+	// инициализация модуля взаимодействия с Sqlite3
+	sqlite3Module, err := sqlite3api.New(ctx, sqlite3FileDb, logging)
+	assert.NoError(t, err)
+
 	//чтение файла с примером
 	b, err := os.ReadFile(Example_File)
 	assert.NoError(t, err)
@@ -140,7 +146,16 @@ func TestCreateMispObjects(t *testing.T) {
 	chDecode := handler.Start(b, Task_Id)
 
 	moduleMisp := NewModuleMISPForTest()
-	go coremodule.CreateObjectsFormatMISP(chDecode, Task_Id, moduleMisp, listRules, counting, logging)
+	go coremodule.CreateObjectsFormatMISP(chDecode, Task_Id, moduleMisp, sqlite3Module, listRules, counting, logging)
+
+	/*
+		!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+			наде потестировать добавление события в MISP с учётом взаимодействия
+			с Sqlite3 database
+
+		!!!!!!!!!!!!!!!!!!!!!!!!!!
+	*/
 
 	t.Run("Формирование документов в формате MISP", func(t *testing.T) {
 		//var eventId string

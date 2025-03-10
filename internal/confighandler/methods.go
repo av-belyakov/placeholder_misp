@@ -14,8 +14,8 @@ func (conf *ConfigApp) GetListOrganization() []Organization {
 	return conf.Organizations
 }
 
-func (conf *ConfigApp) GetAppRedis() *AppConfigRedis {
-	return &conf.AppConfigRedis
+func (conf *ConfigApp) GetAppSqlite3() *AppConfigSqlite3 {
+	return &conf.AppConfigSqlite3
 }
 
 func (conf *ConfigApp) GetAppNATS() *AppConfigNATS {

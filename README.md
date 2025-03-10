@@ -29,10 +29,9 @@
 - GO_PHMISP_NSUBLISTENERCASE - канал для приема из него информации по case
 - GO_PHMISP_NSUBSENDERCOMMAND - канал для передачи команд которые нужно выполнить на TheHive
 
-3. Подключение к СУБД Redis:
+3. Подключение к Sqlite3:
 
-- GO_PHMISP_REDISHOST
-- GO_PHMISP_REDISPORT
+- GO_PHMISP_SQLITE3PATH
 
 4. Место расположения и наименования файла правил:
 

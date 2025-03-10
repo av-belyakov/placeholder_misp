@@ -5,79 +5,115 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"runtime"
+	"strconv"
+	"strings"
+
+	_ "github.com/mattn/go-sqlite3"
 
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
-// New инициализирует новый модуль взаимодействия с API TheHive
-func New(majorFilePath string, logging commoninterfaces.Logger) (*SqliteApiModule, error) {
-	options := SqliteApiModule{
-		logger:         logging,
-		backupFilePath: "",
+// New инициализирует новый модуль взаимодействия с Sqlite3 API
+func New(ctx context.Context, pathDb string, logging commoninterfaces.Logger) (*ApiSqlite3Module, error) {
+	module := &ApiSqlite3Module{
+		logger:    logging,
+		chRequest: make(chan Request)}
+
+	if pathDb == "" {
+		return module, supportingfunctions.CustomError(errors.New("the pathDb parameter must not be empty"))
 	}
 
-	if majorFilePath == "" {
-		return &options, errors.New("the path to the database major file database should not be empty")
+	sqlite3Client, err := sql.Open("sqlite3", pathDb)
+	if err != nil {
+		return module, supportingfunctions.CustomError(fmt.Errorf("module Sqlite3 API, %w", err))
 	}
 
-	options.majorFilePath = majorFilePath
+	module.pathSqlite3Db = pathDb
+	module.db = sqlite3Client
 
-	return &options, nil
+	if err = module.Ping(ctx); err != nil {
+		return module, err
+	}
+
+	module.route(ctx)
+
+	go func(ctx context.Context, m *ApiSqlite3Module) {
+		<-ctx.Done()
+		m.ConnectionClose()
+	}(ctx, module)
+
+	return module, nil
 }
 
-func (opts *SqliteApiModule) Start(ctx context.Context) (chan<- ChanApiSqlite, error) {
-	chanListene := make(chan ChanApiSqlite)
-
-	sqldb, err := sql.Open("sqlite3", opts.majorFilePath)
-	if err != nil {
-		return chanListene, err
-	}
-
-	if sqldb.Ping() != nil {
-		return chanListene, err
-	}
-
-	opts.db = sqldb
-
+func (module *ApiSqlite3Module) route(ctx context.Context) {
 	go func() {
 		for {
 			select {
 			case <-ctx.Done():
 				return
 
-			case msg := <-chanListene:
-				opts.route(routeSettings{
-					command:      msg.Command,
-					taskId:       msg.TaskID,
-					service:      msg.Service,
-					data:         msg.Data,
-					chanResponse: msg.ChanResponse,
-				})
+			case data := <-module.GetChRequest():
+				switch data.Command {
+				case "search caseId":
+					str := string(data.Payload)
+					caseId, err := strconv.Atoi(str)
+					if err != nil {
+						module.logger.Send("error", supportingfunctions.CustomError(err).Error())
+
+						continue
+					}
+
+					res, err := module.SearchCaseId(ctx, caseId)
+					if err != nil {
+						module.logger.Send("error", supportingfunctions.CustomError(err).Error())
+
+						continue
+					}
+
+					data.ChResponse <- Response{Payload: fmt.Append(nil, res)}
+
+				case "set case id":
+					tmp := strings.Split(string(data.Payload), ":")
+					if len(tmp) == 0 {
+						module.logger.Send("warning", supportingfunctions.CustomError(errors.New("it is not possible to split a string")).Error())
+
+						continue
+					}
+
+					caseId, err := strconv.Atoi(tmp[0])
+					if err != nil {
+						module.logger.Send("warning", supportingfunctions.CustomError(err).Error())
+
+						continue
+					}
+
+					eventId, err := strconv.Atoi(tmp[1])
+					if err != nil {
+						module.logger.Send("warning", supportingfunctions.CustomError(err).Error())
+
+						continue
+					}
+
+					if err = module.UpdateCaseId(ctx, caseId, eventId); err != nil {
+						module.logger.Send("warning", supportingfunctions.CustomError(err).Error())
+					}
+
+				case "delete case id":
+					str := string(data.Payload)
+					caseId, err := strconv.Atoi(str)
+					if err != nil {
+						module.logger.Send("error", supportingfunctions.CustomError(err).Error())
+
+						continue
+					}
+
+					if err := module.DeleteCaseId(ctx, caseId); err != nil {
+						module.logger.Send("error", supportingfunctions.CustomError(err).Error())
+					}
+
+				}
 			}
 		}
 	}()
-
-	return chanListene, nil
-}
-
-// Route маршрутизатор обработки запросов
-func (opts *SqliteApiModule) route(settings routeSettings) {
-	if settings.taskId == "" || settings.command == "" {
-		_, f, l, _ := runtime.Caller(0)
-		opts.logger.Send("error", fmt.Sprintf(" 'the sql query cannot be processed, the command and the task ID must not be empty' %s:%d", f, l-1))
-
-		return
-	}
-
-	switch settings.command {
-	case "insert section tags":
-		go opts.handlerSectionInsertTags(settings.taskId, settings.service, settings.data, settings.chanResponse)
-	case "insert section creater":
-		go opts.handlerSectionInsertCreater(settings.taskId, settings.service, settings.data, settings.chanResponse)
-	case "select section tags":
-		go opts.handlerSectionSelectTags(settings.taskId, settings.service, settings.data, settings.chanResponse)
-	case "select section creater":
-		go opts.handlerSectionSelectCreater(settings.taskId, settings.service, settings.data, settings.chanResponse)
-	}
 }

@@ -12,7 +12,7 @@ import (
 	"github.com/av-belyakov/placeholder_misp/cmd/coremodule"
 	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
 	"github.com/av-belyakov/placeholder_misp/cmd/natsapi"
-	"github.com/av-belyakov/placeholder_misp/cmd/redisapi"
+	"github.com/av-belyakov/placeholder_misp/cmd/sqlite3api"
 	"github.com/av-belyakov/placeholder_misp/cmd/wrappers"
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/constants"
@@ -37,6 +37,12 @@ func server(ctx context.Context) {
 	}
 
 	// ****************************************************************************
+	// ****************** инициализируем файл базы данных sqlite3 *****************
+	if err := checkSqlite3DbFileExist(conf.AppConfigSqlite3.PathFileDb); err != nil {
+		log.Fatalf("error file sqlite3 database: %v", err)
+	}
+
+	// ****************************************************************************
 	// ********************* инициализация модуля логирования *********************
 	var listLog []simplelogger.OptionsManager
 	for _, v := range conf.GetListLogs() {
@@ -50,7 +56,8 @@ func server(ctx context.Context) {
 
 	/*
 
-		здесь надо, думаю, сделать настройку логирования для передачи информации в БД
+		здесь надо, думаю, сделать настройку логирования для
+		передачи информации в Elasticsearch DB
 
 	*/
 
@@ -131,12 +138,12 @@ func server(ctx context.Context) {
 	}
 
 	// ***************************************************************************
-	// *********** инициализация модуля для взаимодействия с СУБД Redis **********
-	redisModule := redisapi.NewModuleRedis(conf.AppConfigRedis.Host, conf.AppConfigRedis.Port, logging)
-	if err = redisModule.Start(ctx); err != nil {
+	// ************ инициализация модуля для взаимодействия с Sqlite3 ************
+	sqlite3Module, err := sqlite3api.New(ctx, conf.AppConfigSqlite3.PathFileDb, logging)
+	if err != nil {
 		_ = simpleLogger.Write("error", supportingfunctions.CustomError(err).Error())
 
-		log.Fatalln(err)
+		log.Fatal(err)
 	}
 
 	// ***************************************************************************
@@ -168,5 +175,5 @@ func server(ctx context.Context) {
 	// *****************************************************************
 	// *************** инициализируем ядро приложения ******************
 	core := coremodule.NewCoreHandler(counting, listRules, logging)
-	core.Start(ctx, apiNats, mispModule, redisModule)
+	core.Start(ctx, apiNats, mispModule, sqlite3Module)
 }

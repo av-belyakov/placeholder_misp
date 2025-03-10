@@ -33,9 +33,8 @@ func New(rootDir string) (*ConfigApp, error) {
 			"GO_PHMISP_NSUBLISTENERCASE":  "",
 			"GO_PHMISP_NSUBSENDERCOMMAND": "",
 
-			//Подключение к Redis DB
-			"GO_PHMISP_REDISHOST": "",
-			"GO_PHMISP_REDISPORT": "",
+			//Подключение к Sqlite3
+			"GO_PHMISP_SQLITE3PATH": "",
 
 			//Правила обработки событий
 			"GO_PHMISP_RULES_DIR":  "",
@@ -114,8 +113,8 @@ func New(rootDir string) (*ConfigApp, error) {
 		if viper.IsSet("NATS.port") {
 			conf.AppConfigNATS.Port = viper.GetInt("NATS.port")
 		}
-		if viper.IsSet("NATS.cacheTtl") {
-			conf.AppConfigNATS.CacheTTL = viper.GetInt("NATS.cacheTtl")
+		if viper.IsSet("NATS.cache_ttl") {
+			conf.AppConfigNATS.CacheTTL = viper.GetInt("NATS.cache_ttl")
 		}
 		if viper.IsSet("NATS.subscriptions.listener_case") {
 			conf.AppConfigNATS.Subscriptions.ListenerCase = viper.GetString("NATS.subscriptions.listener_case")
@@ -129,12 +128,9 @@ func New(rootDir string) (*ConfigApp, error) {
 			conf.AppConfigMISP.Host = viper.GetString("MISP.host")
 		}
 
-		//Настройки для модуля подключения к СУБД Redis
-		if viper.IsSet("REDIS.host") {
-			conf.AppConfigRedis.Host = viper.GetString("REDIS.host")
-		}
-		if viper.IsSet("REDIS.port") {
-			conf.AppConfigRedis.Port = viper.GetInt("REDIS.port")
+		//Настройки для модуля подключения к Sqlite3
+		if viper.IsSet("SQLITE3.path_file_db") {
+			conf.AppConfigSqlite3.PathFileDb = viper.GetString("SQLITE3.path_file_db")
 		}
 
 		//Настройки для взаимодействия с TheHive
@@ -255,14 +251,9 @@ func New(rootDir string) (*ConfigApp, error) {
 		conf.AppConfigMISP.Auth = envList["GO_PHMISP_MAUTH"]
 	}
 
-	//Настройки для модуля подключения к СУБД Redis
-	if envList["GO_PHMISP_REDISHOST"] != "" {
-		conf.AppConfigRedis.Host = envList["GO_PHMISP_REDISHOST"]
-	}
-	if envList["GO_PHMISP_REDISPORT"] != "" {
-		if p, err := strconv.Atoi(envList["GO_PHMISP_REDISPORT"]); err == nil {
-			conf.AppConfigRedis.Port = p
-		}
+	//Настройки для модуля подключения к Sqlite3
+	if envList["GO_PHMISP_SQLITE3PATH"] != "" {
+		conf.AppConfigSqlite3.PathFileDb = envList["GO_PHMISP_SQLITE3PATH"]
 	}
 
 	//Настройки для модуля правил обработки сообщений
