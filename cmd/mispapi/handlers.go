@@ -38,7 +38,9 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 		}
 
 		//удаляем старое событие типа Event
-		m.deleteEvent(ctx, data.EventId)
+		if err = rmisp.deleteEvent(ctx, data.EventId); err != nil {
+			m.logger.Send("error", supportingfunctions.CustomError(err).Error())
+		}
 
 		//Все ошибки которые могут возникнуть при дальнейшем взаимодействии с MISP
 		//будут попрежнему логироватся.
@@ -82,17 +84,6 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 		}
 
 		m.logger.Send("info", fmt.Sprintf("element 'event_reports' successfully added to event with id:'%s' (case id:'%d')", eventId, int(data.CaseId)))
-
-		//
-		// эту же функцию выполняет запрос "send event id" который находится в самом
-		//низу этой функции
-		//
-		//отправляем запрос для добавления в БД Redis, id кейса и нового события
-		//m.SendDataOutput(OutputSetting{
-		//	Command: "set new event id",
-		//	CaseId:  fmt.Sprint(data.CaseId),
-		//	EventId: eventId,
-		//})
 
 		//добавляем атрибуты
 		_, _, warning, err := rmisp.sendAttribytes(ctx, eventId, data.Data.GetAttributes())
@@ -146,7 +137,9 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 			m.logger.Send("info", fmt.Sprintf("event with id:'%s' (case id:'%d') %s", eventId, int(data.CaseId), resMsg))
 		}
 
-		// отправляем в ядро информацию по event Id
+		// отправляем в ядро информацию по event Id, при этом новый eventId
+		//передаётся для отправки в NATSб а так же передается в Sqlite3 для
+		//обнавления или создания новой связки caseId - eventId
 		m.SendDataOutput(OutputSetting{
 			Command: "send event id",
 			EventId: eventId,
@@ -161,17 +154,4 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 
 	//добавляем вспомогательный тип specialObject в очередь хранилища
 	m.cache.PushObjectToQueue(specialObject)
-}
-
-func (m *ModuleMISP) deleteEvent(ctx context.Context, eventId string) {
-	if eventId == "" {
-		m.logger.Send("warning", "deleting an old event is not possible because the EventID contains an empty value")
-
-		return
-	}
-
-	_, err := delEventsMispFormat(ctx, m.host, m.authKey, eventId)
-	if err != nil {
-		m.logger.Send("error", supportingfunctions.CustomError(err).Error())
-	}
 }

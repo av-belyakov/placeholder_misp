@@ -2,11 +2,11 @@ package createtypemispobjects_test
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
@@ -151,7 +151,7 @@ func TestCreateMispObjects(t *testing.T) {
 	/*
 		!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-			наде потестировать добавление события в MISP с учётом взаимодействия
+			надо потестировать добавление события в MISP с учётом взаимодействия
 			с Sqlite3 database
 
 		!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -224,15 +224,29 @@ func TestCreateMispObjects(t *testing.T) {
 		createtypemispobjects.AddNewObject(
 			context.Background(),
 			msg,
+			sqlite3Module,
 			createtypemispobjects.OptionsAddNewObject{
 				Host:        "misp-center.cloud.gcm",
 				AuthKey:     os.Getenv("GO_PHMISP_MAUTH"),
 				UserAuthKey: os.Getenv("GO_PHMISP_UAUTH"),
 			})
 
-		b, err = json.MarshalIndent(msg, "", " ")
-		assert.NoError(t, err)
+		time.Sleep(3 * time.Second)
+		//b, err = json.MarshalIndent(msg, "", " ")
+		//assert.NoError(t, err)
 
-		fmt.Println("MSG:", string(b))
+		chRes := make(chan sqlite3api.Response)
+		sqlite3Module.SendDataToModule(sqlite3api.Request{
+			Command:    "search caseId",
+			ChResponse: chRes,
+			Payload:    fmt.Append(nil, 39100),
+		})
+
+		res := <-chRes
+		eventId := string(res.Payload)
+		t.Log("EventId:", eventId)
+		assert.NotEmpty(t, eventId)
+
+		//fmt.Println("MSG:", string(b))
 	})
 }

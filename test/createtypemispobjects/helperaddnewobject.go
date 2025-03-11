@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
+	"github.com/av-belyakov/placeholder_misp/cmd/sqlite3api"
 )
 
 type OptionsAddNewObject struct {
@@ -16,7 +17,12 @@ type OptionsAddNewObject struct {
 	UserAuthKey string
 }
 
-func AddNewObject(ctx context.Context, data mispapi.InputSettings, opts OptionsAddNewObject) {
+func AddNewObject(
+	ctx context.Context,
+	data mispapi.InputSettings,
+	sqlite3Client *sqlite3api.ApiSqlite3Module,
+	opts OptionsAddNewObject) {
+
 	fmt.Println("func 'specialObject.SetFunc', START... |||")
 
 	rmisp, err := mispapi.NewMispRequest(
@@ -42,6 +48,11 @@ func AddNewObject(ctx context.Context, data mispapi.InputSettings, opts OptionsA
 	}
 
 	fmt.Println("func 'specialObject.SetFunc', get event response <---")
+
+	//удаляем старое событие типа Event
+	if err := rmisp.DeleteEvent_ForTest(ctx, data.EventId); err != nil {
+		log.Println("func 'specialObject.SetFunc', EVENT ERROR:", err)
+	}
 
 	//Все ошибки которые могут возникнуть при дальнейшем взаимодействии с MISP
 	//будут попрежнему логироватся.
@@ -85,17 +96,6 @@ func AddNewObject(ctx context.Context, data mispapi.InputSettings, opts OptionsA
 
 		return
 	}
-
-	//
-	// в тесте это пока придётся исключить!!!!
-	//
-	//отправляем запрос для добавления в БД Redis, id кейса и нового события
-	//m.SendDataOutput(OutputSetting{
-	//	Command: "set new event id",
-	//	CaseId:  fmt.Sprint(data.CaseId),
-	//	EventId: eventId,
-	//})
-	//
 
 	//добавляем атрибуты
 	_, _, warning, err := rmisp.SendAttribytes_ForTest(ctx, eventId, data.Data.GetAttributes())
@@ -141,7 +141,9 @@ func AddNewObject(ctx context.Context, data mispapi.InputSettings, opts OptionsA
 		log.Println("warning", resMsg)
 	}
 
-	// отправляем в ядро информацию по event Id
+	// отправляем в ядро информацию по event Id, при этом новый eventId
+	//передаётся для отправки в NATSб а так же передается в Sqlite3 для
+	//обнавления или создания новой связки caseId - eventId
 	//m.SendDataOutput(OutputSetting{
 	//	Command: "send event id",
 	//	EventId: eventId,
@@ -149,6 +151,13 @@ func AddNewObject(ctx context.Context, data mispapi.InputSettings, opts OptionsA
 	//	RootId:  data.RootId,
 	//	TaskId:  data.TaskId,
 	//})
+
+	//вместо этого, в тестах, отправляем информацию напрямую в
+	// модуль взаимодействия с sqlite3
+	sqlite3Client.SendDataToModule(sqlite3api.Request{
+		Command: "set case id",
+		Payload: fmt.Append(nil, fmt.Sprintf("%v:%s", data.CaseId, eventId)),
+	})
 
 	fmt.Println("func 'specialObject.SetFunc', STOP |||")
 }

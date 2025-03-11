@@ -106,16 +106,6 @@ func (settings *CoreHandlerSettings) Start(
 					Payload: fmt.Append(nil, fmt.Sprintf("%s:%s", data.CaseId, data.EventId)),
 				})
 
-				//
-				// фактически эту функцию выполняет "send event id" который выше
-				//
-				//отправка данных в Sqlite3
-				//case "set new event id":
-				//обработка запроса на добавления новой связки caseId:eventId
-				//	sqlite3Module.SendDataToModule(sqlite3api.Request{
-				//		Command: "set case id",
-				//		Payload: fmt.Append(nil, fmt.Sprintf("%s:%s", data.CaseId, data.EventId)),
-				//	})
 			}
 		}
 	}

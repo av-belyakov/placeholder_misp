@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/av-belyakov/objectsmispformat"
 	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
@@ -265,4 +266,26 @@ func (rmisp *requestMISP) sendRequestPublishEvent(ctx context.Context, eventId s
 	resultMsg = fmt.Sprintf("result published event with id '%s' - %s '%s' %s", eventId, resData.name, resData.message, resData.success)
 
 	return resultMsg, nil
+}
+
+func (rmisp *requestMISP) DeleteEvent_ForTest(ctx context.Context, eventId string) error {
+	return rmisp.deleteEvent(ctx, eventId)
+}
+
+// deleteEvent удаляет событие по его eventId
+func (rmisp *requestMISP) deleteEvent(ctx context.Context, eventId string) error {
+	ctxTimeout, CancelFunc := context.WithTimeout(ctx, time.Second*15)
+	defer CancelFunc()
+
+	c, err := NewClientMISP(rmisp.host, rmisp.masterAuthKey, false)
+	if err != nil {
+		return supportingfunctions.CustomError(fmt.Errorf("events delete, %w", err))
+	}
+
+	_, _, err = c.Delete(ctxTimeout, "/events/delete/"+eventId)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

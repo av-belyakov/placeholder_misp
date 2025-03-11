@@ -1,32 +1,9 @@
 package mispapi
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
-	"net/http"
-	"time"
-
-	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
-
-// удаляем дублирующиеся события из MISP
-func delEventsMispFormat(ctx context.Context, host, authKey, eventId string) (*http.Response, error) {
-	ctxTimeout, CancelFunc := context.WithTimeout(ctx, time.Second*15)
-	defer CancelFunc()
-
-	c, err := NewClientMISP(host, authKey, false)
-	if err != nil {
-		return nil, supportingfunctions.CustomError(fmt.Errorf("events delete, %w", err))
-	}
-
-	res, _, err := c.Delete(ctxTimeout, "/events/delete/"+eventId)
-	if err != nil {
-		return nil, err
-	}
-
-	return res, nil
-}
 
 func decodeResponseMIspMessage(b []byte) struct {
 	name    string

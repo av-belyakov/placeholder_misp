@@ -28,7 +28,7 @@ func TestMain(m *testing.M) {
 	chZabbix := make(chan commoninterfaces.Messager)
 	logging := logginghandler.New(simpleLogger, chZabbix)
 
-	module, err = sqlite3api.New(context.Background(), "../../internal/backupdb/sqlite3_backup.db", logging)
+	module, err = sqlite3api.New(context.Background(), "../../backupdb/sqlite3_backup.db", logging)
 	if err != nil {
 		log.Fatalln(err)
 	}

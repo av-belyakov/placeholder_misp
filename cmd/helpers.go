@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/av-belyakov/placeholder_misp/constants"
 	"github.com/av-belyakov/placeholder_misp/internal/appname"
@@ -14,39 +15,46 @@ import (
 
 // checkSqlite3DbFileExist проверяет наличие файла базф данных Sqlite3
 // и при необходимости создает его из резервного файла
-func checkSqlite3DbFileExist(pathFileDb string) error {
-	backupFile := "../internal/backupdb/sqlite3_backup.db"
+func checkSqlite3DbFileExist(rootPath, pathFileDb string) (newPathToDb string, err error) {
+	var (
+		fr, fw *os.File
+	)
+
+	backupFile := filepath.Join(rootPath, "/backupdb/sqlite3_backup.db")
+	pathFileDb = filepath.Join(rootPath, pathFileDb)
+
+	newPathToDb = pathFileDb
 
 	// наличие файла backup
-	if _, err := os.Stat(backupFile); err != nil {
-		return err
+	if _, err = os.Stat(backupFile); err != nil {
+		return
 	}
 
 	//файл с основной БД
-	_, err := os.Stat(pathFileDb)
+	_, err = os.Stat(pathFileDb)
 	if err != nil {
 		if !os.IsNotExist(err) {
-			return err
+			return
 		}
 
-		fr, err := os.OpenFile(backupFile, os.O_RDONLY, 0666)
+		fr, err = os.OpenFile(backupFile, os.O_RDONLY, 0666)
 		if err != nil {
-			return err
+			return
 		}
 		defer fr.Close()
 
-		fw, err := os.OpenFile(pathFileDb, os.O_WRONLY|os.O_CREATE, 0666)
+		fw, err = os.OpenFile(pathFileDb, os.O_WRONLY|os.O_CREATE, 0666)
 		if err != nil {
-			return err
+			return
 		}
 		defer fw.Close()
 
-		if _, err := io.Copy(fw, fr); err != nil {
-			return err
+		if _, err = io.Copy(fw, fr); err != nil {
+			return
 		}
 	}
 
-	return nil
+	return
 }
 
 func checkListRule(listRule *rules.ListRule, warnings []string) (msgWarning string, err error) {

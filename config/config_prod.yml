@@ -2,7 +2,7 @@ RULES_PROC_MSG_FOR_MISP:
   directory: rules
   file: mispmsgrule.yml
 SQLITE3:
-  path_file_db: "../sqlite3/sqlite3.db"
+  path_file_db: "/sqlite3/sqlite3.db"
 NATS:
   host: "192.168.9.208"
   port: 4222

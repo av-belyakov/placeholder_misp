@@ -38,7 +38,8 @@ func server(ctx context.Context) {
 
 	// ****************************************************************************
 	// ****************** инициализируем файл базы данных sqlite3 *****************
-	if err := checkSqlite3DbFileExist(conf.AppConfigSqlite3.PathFileDb); err != nil {
+	newPathSqlite3Db, err := checkSqlite3DbFileExist(rootPath, conf.AppConfigSqlite3.PathFileDb)
+	if err != nil {
 		log.Fatalf("error file sqlite3 database: %v", err)
 	}
 
@@ -139,7 +140,7 @@ func server(ctx context.Context) {
 
 	// ***************************************************************************
 	// ************ инициализация модуля для взаимодействия с Sqlite3 ************
-	sqlite3Module, err := sqlite3api.New(ctx, conf.AppConfigSqlite3.PathFileDb, logging)
+	sqlite3Module, err := sqlite3api.New(ctx, newPathSqlite3Db, logging)
 	if err != nil {
 		_ = simpleLogger.Write("error", supportingfunctions.CustomError(err).Error())
 
