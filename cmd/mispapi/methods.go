@@ -384,7 +384,10 @@ func (o *CacheSpecialObject[T]) MatchingAndReplacement(objFromCache T) T {
 		MatchingAndReplacementListEventObjectTags(v objectsmispformat.ListEventObjectTags) objectsmispformat.ListEventObjectTags
 	*/
 	objFromCache.SetEvent(o.object.MatchingAndReplacementEvents(*objFromCache.GetEvent()))
-	//и так далее...
+	objFromCache.SetReports(o.object.MatchingAndReplacementReport(*objFromCache.GetReports()))
+	objFromCache.SetAttributes(o.object.MatchingAndReplacementAttributes(objFromCache.GetAttributes()))
+	objFromCache.SetObjects(o.object.MatchingAndReplacementObjects(objFromCache.GetObjects()))
+	objFromCache.SetObjectTags(o.object.MatchingAndReplacementListEventObjectTags(*objFromCache.GetObjectTags()))
 
 	return objFromCache
 }
