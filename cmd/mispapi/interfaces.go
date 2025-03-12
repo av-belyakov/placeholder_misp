@@ -29,14 +29,28 @@ type SetterAuthData interface {
 	GetAuthData() string
 }
 
+type SpecialObject interface {
+	SpecialObjectComparator
+	SpecialObjectMatchingAndReplacement
+}
+
 type SpecialObjectComparator interface {
+	SpecialObjectGetter
 	ComparisonID(string) bool
 	ComparisonEvent(*objectsmispformat.EventsMispFormat) bool
 	ComparisonReports(*objectsmispformat.EventReports) bool
 	ComparisonAttributes([]*objectsmispformat.AttributesMispFormat) bool
 	ComparisonObjects(map[int]*objectsmispformat.ObjectsMispFormat) bool
 	ComparisonObjectTags(*objectsmispformat.ListEventObjectTags) bool
+}
+
+type SpecialObjectMatchingAndReplacement interface {
 	SpecialObjectGetter
+	MatchingAndReplacementEvents(v objectsmispformat.EventsMispFormat) objectsmispformat.EventsMispFormat
+	MatchingAndReplacementReport(v objectsmispformat.EventReports) objectsmispformat.EventReports
+	MatchingAndReplacementAttributes(v []*objectsmispformat.AttributesMispFormat) []*objectsmispformat.AttributesMispFormat
+	MatchingAndReplacementObjects(v map[int]*objectsmispformat.ObjectsMispFormat) map[int]*objectsmispformat.ObjectsMispFormat
+	MatchingAndReplacementListEventObjectTags(v objectsmispformat.ListEventObjectTags) objectsmispformat.ListEventObjectTags
 }
 
 type SpecialObjectGetter interface {
