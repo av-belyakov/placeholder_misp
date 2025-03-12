@@ -373,3 +373,15 @@ func (o *CacheSpecialObject[T]) Comparison(objFromCache T) bool {
 
 	return true
 }
+
+func (o *CacheSpecialObject[T]) MatchingAndReplacement(objFromCache T) T {
+	/*
+		MatchingAndReplacementEvents(v objectsmispformat.EventsMispFormat) objectsmispformat.EventsMispFormat
+		MatchingAndReplacementReport(v objectsmispformat.EventReports) objectsmispformat.EventReports
+		MatchingAndReplacementAttributes(v []*objectsmispformat.AttributesMispFormat) []*objectsmispformat.AttributesMispFormat
+		MatchingAndReplacementObjects(v map[int]*objectsmispformat.ObjectsMispFormat) map[int]*objectsmispformat.ObjectsMispFormat
+		MatchingAndReplacementListEventObjectTags(v objectsmispformat.ListEventObjectTags) objectsmispformat.ListEventObjectTags
+	*/
+
+	return objFromCache
+}
