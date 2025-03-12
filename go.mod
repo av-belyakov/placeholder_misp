@@ -4,7 +4,7 @@ go 1.23.7
 
 require (
 	github.com/av-belyakov/cachingstoragewithqueue v0.0.0-20250311135213-982f17b26512
-	github.com/av-belyakov/objectsmispformat v0.0.0-20250312122633-9a3bf59f9dcc
+	github.com/av-belyakov/objectsmispformat v0.0.0-20250312144929-efae92fe92e7
 	github.com/av-belyakov/simplelogger v0.0.0-20250221120631-077109604215
 	github.com/av-belyakov/zabbixapicommunicator v0.0.0-20241225064839-9c19184470aa
 	github.com/elastic/go-elasticsearch/v8 v8.17.0
