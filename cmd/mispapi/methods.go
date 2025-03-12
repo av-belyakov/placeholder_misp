@@ -317,7 +317,7 @@ func (ad *AuthorizationDataMISP) CreateNewUser(ctx context.Context, email, sourc
 //******* методы вспомогательного типа, используемого для кэша ********
 
 // NewCacheSpecialObject конструктор вспомогательного типа реализующий интерфейс CacheStorageFuncHandler[T any]
-func NewCacheSpecialObject[T SpecialObjectComparator]() *CacheSpecialObject[T] {
+func NewCacheSpecialObject[T SpecialObject]() *CacheSpecialObject[T] {
 	return &CacheSpecialObject[T]{}
 }
 
@@ -375,6 +375,7 @@ func (o *CacheSpecialObject[T]) Comparison(objFromCache T) bool {
 }
 
 func (o *CacheSpecialObject[T]) MatchingAndReplacement(objFromCache T) T {
+
 	/*
 		MatchingAndReplacementEvents(v objectsmispformat.EventsMispFormat) objectsmispformat.EventsMispFormat
 		MatchingAndReplacementReport(v objectsmispformat.EventReports) objectsmispformat.EventReports
@@ -382,6 +383,8 @@ func (o *CacheSpecialObject[T]) MatchingAndReplacement(objFromCache T) T {
 		MatchingAndReplacementObjects(v map[int]*objectsmispformat.ObjectsMispFormat) map[int]*objectsmispformat.ObjectsMispFormat
 		MatchingAndReplacementListEventObjectTags(v objectsmispformat.ListEventObjectTags) objectsmispformat.ListEventObjectTags
 	*/
+	objFromCache.SetEvent(o.object.MatchingAndReplacementEvents(*objFromCache.GetEvent()))
+	//и так далее...
 
 	return objFromCache
 }

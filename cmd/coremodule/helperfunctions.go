@@ -39,7 +39,7 @@ func handlerObservablesTags(v interface{},
 			return listTags
 		}
 		//добавляем значение из tags в поле object_relation
-		listAttributesMisp.SetValueObjectRelation(result, seqNumObservable)
+		listAttributesMisp.SetAnyObjectRelation(result, seqNumObservable)
 
 		//Добавляем в свойство Category соответствующее значение
 		//если наименование похоже на наименование типа хеширования

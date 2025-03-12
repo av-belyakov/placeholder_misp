@@ -4,6 +4,10 @@ github.com/av-belyakov/objectsmispformat v0.0.0-20250306102322-1aaa15b1f4f1 h1:j
 github.com/av-belyakov/objectsmispformat v0.0.0-20250306102322-1aaa15b1f4f1/go.mod h1:WJPWAhA0MCqMLf2awNurOwMBRQhPT963g9tV7sejh4E=
 github.com/av-belyakov/objectsmispformat v0.0.0-20250312122633-9a3bf59f9dcc h1:R5T6AfKw/j4uDK5T1KiUIaoiYdCEoPTplYdslQkZAbQ=
 github.com/av-belyakov/objectsmispformat v0.0.0-20250312122633-9a3bf59f9dcc/go.mod h1:S/t7N5r3A13LAUJxyDzIELw9csyBlZWOYs2aJXqY1yY=
+github.com/av-belyakov/objectsmispformat v0.0.0-20250312144929-efae92fe92e7 h1:zBS3I/ahlnOZPRz4z+r5lU7Ua6nxIhM5i662hTzJ5hM=
+github.com/av-belyakov/objectsmispformat v0.0.0-20250312144929-efae92fe92e7/go.mod h1:S/t7N5r3A13LAUJxyDzIELw9csyBlZWOYs2aJXqY1yY=
+github.com/av-belyakov/objectsmispformat v0.0.0-20250312185619-dbad0d2e925d h1:f7myHVnL89UkTNixVFObN45EPRxJO5vjEgkWPbwR2o0=
+github.com/av-belyakov/objectsmispformat v0.0.0-20250312185619-dbad0d2e925d/go.mod h1:S/t7N5r3A13LAUJxyDzIELw9csyBlZWOYs2aJXqY1yY=
 github.com/av-belyakov/simplelogger v0.0.0-20250221120631-077109604215 h1:Hk1RwRSURz+xb63AfuHHIqjPKvX6uJssQpJsBaP7GAk=
 github.com/av-belyakov/simplelogger v0.0.0-20250221120631-077109604215/go.mod h1:yW2ev3nXPP3WY8svBWJpg4PQRl67MTGIaaiXJ0ULRZ8=
 github.com/av-belyakov/zabbixapicommunicator v0.0.0-20241225064839-9c19184470aa h1:ivXQuTb7UxYUy568EOIOvRDExKLU3tDnw634d+WTGto=

@@ -64,10 +64,10 @@ func CreateObjectsFormatMISP(
 		}},
 		//observables -> attributes
 		"observables._id": {
-			listAttributesMisp.SetValueObjectId,
+			listAttributesMisp.SetAnyObjectId,
 			listObjectsMisp.SetValueId,
 		},
-		"observables.data": {listAttributesMisp.SetValueValue},
+		"observables.data": {listAttributesMisp.SetAnyValue},
 		"observables.dataType": {
 			listObjectsMisp.SetValueName,
 			//здесь выполняем автоподстановку значений для полей Type и Category
@@ -76,12 +76,12 @@ func CreateObjectsFormatMISP(
 			//отдельно и хранятся в listTags, а после закрытия канала совмещаются с
 			//объектами AttributesMisp и следовательно перезаписывают значения выполненные
 			//через автоподстановку
-			listAttributesMisp.HandlingValueDataType,
+			listAttributesMisp.HandlingAnyDataType,
 		},
-		"observables._createdAt": {listAttributesMisp.SetValueTimestamp},
-		"observables.message":    {listAttributesMisp.SetValueComment},
+		"observables._createdAt": {listAttributesMisp.SetAnyTimestamp},
+		"observables.message":    {listAttributesMisp.SetAnyComment},
 		"observables.startDate": {
-			listAttributesMisp.SetValueFirstSeen,
+			listAttributesMisp.SetAnyFirstSeen,
 			listObjectsMisp.SetValueFirstSeen,
 			listObjectsMisp.SetValueTimestamp,
 		},

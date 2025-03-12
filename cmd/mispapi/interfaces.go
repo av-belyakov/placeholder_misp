@@ -46,6 +46,7 @@ type SpecialObjectComparator interface {
 
 type SpecialObjectMatchingAndReplacement interface {
 	SpecialObjectGetter
+	SpecialObjectSetter
 	MatchingAndReplacementEvents(v objectsmispformat.EventsMispFormat) objectsmispformat.EventsMispFormat
 	MatchingAndReplacementReport(v objectsmispformat.EventReports) objectsmispformat.EventReports
 	MatchingAndReplacementAttributes(v []*objectsmispformat.AttributesMispFormat) []*objectsmispformat.AttributesMispFormat
@@ -60,4 +61,13 @@ type SpecialObjectGetter interface {
 	GetAttributes() []*objectsmispformat.AttributesMispFormat
 	GetObjects() map[int]*objectsmispformat.ObjectsMispFormat
 	GetObjectTags() *objectsmispformat.ListEventObjectTags
+}
+
+type SpecialObjectSetter interface {
+	SetID(v string)
+	SetEvent(v objectsmispformat.EventsMispFormat)
+	SetReports(v objectsmispformat.EventReports)
+	SetAttributes(v []*objectsmispformat.AttributesMispFormat)
+	SetObjects(v map[int]*objectsmispformat.ObjectsMispFormat)
+	SetObjectTags(v objectsmispformat.ListEventObjectTags)
 }

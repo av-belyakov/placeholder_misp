@@ -85,7 +85,7 @@ type requestMISP struct {
 type RequestMISPOptions func(*requestMISP) error
 
 // CacheSpecialObject специальный объект соответствующий интерфейсу cachingstoragewithqueue.CacheStorageHandler
-type CacheSpecialObject[T SpecialObjectComparator] struct {
+type CacheSpecialObject[T SpecialObject] struct {
 	object      T
 	handlerFunc func(int) bool
 	id          string
