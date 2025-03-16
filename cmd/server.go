@@ -7,6 +7,7 @@ import (
 	_ "net/http/pprof"
 	"strings"
 
+	"github.com/av-belyakov/placeholder_misp/cmd/elasticsearchapi"
 	"github.com/av-belyakov/simplelogger"
 
 	"github.com/av-belyakov/placeholder_misp/cmd/coremodule"
@@ -55,10 +56,30 @@ func server(ctx context.Context) {
 		log.Fatalf("error module 'simplelogger': %v", err)
 	}
 
+	//*********************************************************************************
+	//********** инициализация модуля взаимодействия с БД для передачи логов **********
+	confDB := conf.GetApplicationWriteLogDB()
+	if esc, err := elasticsearchapi.NewElasticsearchConnect(elasticsearchapi.Settings{
+		Port:               confDB.Port,
+		Host:               confDB.Host,
+		User:               confDB.User,
+		Passwd:             confDB.Passwd,
+		IndexDB:            confDB.StorageNameDB,
+		NameRegionalObject: "gcm",
+	}); err != nil {
+		_ = simpleLogger.Write("error", supportingfunctions.CustomError(err).Error())
+	} else {
+		//подключение логирования в БД
+		simpleLogger.SetDataBaseInteraction(esc)
+	}
+
 	/*
 
-		здесь надо, думаю, сделать настройку логирования для
-		передачи информации в Elasticsearch DB
+		Добавил настройки взаимодействия с БД которая будет использоватся для логирования
+		событий и ошибок. Так же добавил параметры настройки в конфигурационные файлы и
+		новые функции в обработчик файлов конфигурации.
+		Сделал тесты для изменившегося обработчика файлов конфигурации, однако протестировать
+		не смог так как на mac нет ginkgo
 
 	*/
 

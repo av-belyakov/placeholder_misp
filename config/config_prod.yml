@@ -14,3 +14,9 @@ MISP:
   host: misp-center.cloud.gcm
 THEHIVE:
   send: true
+DATABASEWRITELOG:
+  host: "datahook.cloud.gcm"
+  port: 9200
+  namedb: ""
+  storage_name_db: "placeholder_misp"
+  user: "log_writer"

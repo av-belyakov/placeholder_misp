@@ -55,16 +55,6 @@ func (settings *CoreHandlerSettings) Start(
 			return
 
 		case data := <-chanNatsReception:
-			//нужно только для хранения событий в RedisDB для последующей обработки
-			//объектов которые не были добавлены в MISP из-за отсутствия доступа
-			//к MISP (пока эта часть не реализована)
-			//settings.storageApp.SetRawDataHiveFormatMessage(data.MsgId, data.Data)
-			//добавляем raw данные по кейсу из thehive в Redis
-			//redisModule.SendingDataInput(redisinteractions.SettingsChanInputRedis{
-			//	Command: "set raw case",
-			//	RawData: data.Data,
-			//})
-
 			//для записи необработанных событий в лог-файл events
 			go func() {
 				str, err := supportingfunctions.NewReadReflectJSONSprint(data.Data)

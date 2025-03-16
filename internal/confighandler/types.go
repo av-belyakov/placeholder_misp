@@ -7,6 +7,7 @@ type ConfigApp struct {
 	AppConfigSqlite3
 	AppConfigTheHive
 	RulesProcMSGMISP
+	AppConfigWriteLogDB
 }
 
 type CommonAppConfig struct {
@@ -87,4 +88,13 @@ type AppConfigTheHive struct {
 
 type RulesProcMSGMISP struct {
 	Directory, File string
+}
+
+type AppConfigWriteLogDB struct {
+	Host          string `yaml:"host"`
+	User          string `yaml:"user"`
+	Passwd        string `yaml:"passwd"`
+	NameDB        string `yaml:"namedb"`
+	StorageNameDB string `yaml:"storage_name_db"`
+	Port          int    `validate:"gt=0,lte=65535" yaml:"port"`
 }

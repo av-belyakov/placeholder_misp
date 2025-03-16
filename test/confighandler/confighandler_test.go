@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/joho/godotenv"
@@ -17,7 +18,6 @@ import (
 )
 
 var _ = Describe("MainConfigHandler", Ordered, func() {
-	const ROOT_DIR = "placeholder_misp"
 	var (
 		rootPath string
 
@@ -25,14 +25,24 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 	)
 
 	BeforeAll(func() {
+		//настройки MISP
 		os.Unsetenv("GO_PHMISP_MAIN")
 		os.Unsetenv("GO_PHMISP_MHOST")
 		os.Unsetenv("GO_PHMISP_MPORT")
+
+		//настройки NATS
 		os.Unsetenv("GO_PHMISP_NHOST")
 		os.Unsetenv("GO_PHMISP_NPORT")
 		os.Unsetenv("GO_PHMISP_NCACHETTL")
 		os.Unsetenv("GO_PHMISP_NSUBLISTENERCASE")
 		os.Unsetenv("GO_PHMISP_NSUBSENDERCOMMAND")
+
+		//настройки доступа к БД в которую будут записыватся логи
+		os.Unsetenv("GO_PHMISP_DBWLOGHOST")
+		os.Unsetenv("GO_PHMISP_DBWLOGPORT")
+		os.Unsetenv("GO_PHMISP_DBWLOGNAME")
+		os.Unsetenv("GO_PHMISP_DBWLOGUSER")
+		os.Unsetenv("GO_PHMISP_DBWLOGSTORAGENAME")
 
 		rootPath, err = supportingfunctions.GetRootPath(constants.Root_Dir)
 		if err != nil {
@@ -42,6 +52,11 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 		if err = godotenv.Load("../../.env"); err != nil {
 			log.Fatalln(err)
 		}
+	})
+
+	AfterAll(func() {
+		os.Unsetenv("GO_PHMISP_MAUTH")
+		os.Unsetenv("GO_PHMISP_DBWLOGPASSWD")
 	})
 
 	Context("Тест 1. Проверяем работу функции NewConfig с разными значениями переменной окружения GO_PHMISP_MAIN", func() {
@@ -93,9 +108,20 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 			Expect(confNats.Subscriptions.ListenerCase).Should(Equal("object.casetype.local"))
 			Expect(confNats.Subscriptions.SenderCommand).Should(Equal("object.commandstype"))
 
+			//параметры подключения к MISP
 			Expect(conf.GetAppMISP().Host).Should(Equal("misp-center.cloud.gcm"))
 
+			//параметры подключения к Sqlite3
 			Expect(conf.GetAppSqlite3().PathFileDb).Should(Equal("../sqlite3/sqlite3.db"))
+
+			//параметры БД для логирования
+			confLoggingDB := conf.GetApplicationWriteLogDB()
+			Expect(confLoggingDB.Host).Should(Equal("datahook.cloud.gcm"))
+			Expect(confLoggingDB.Port).Should(Equal(9200))
+			Expect(confLoggingDB.NameDB).Should(Equal(""))
+			Expect(confLoggingDB.StorageNameDB).Should(Equal("thehivehook_go_package"))
+			Expect(confLoggingDB.User).Should(Equal("log_writer"))
+			Expect(len(confLoggingDB.Passwd)).ShouldNot(Equal(0))
 		})
 
 		It("Должно быть получено содержимое файла 'config_dev.yml' при значении переменной GO_PHMISP_MAIN=development", func() {
@@ -111,7 +137,20 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 			Expect(confNats.Subscriptions.ListenerCase).Should(Equal("object.casetype.local"))
 			Expect(confNats.Subscriptions.SenderCommand).Should(Equal("object.commandstype"))
 
+			//параметры подключения к MISP
 			Expect(conf.GetAppMISP().Host).Should(Equal("misp-world.cloud.gcm"))
+
+			//параметры подключения к Sqlite3
+			Expect(conf.GetAppSqlite3().PathFileDb).Should(Equal("../sqlite3/sqlite3.db"))
+
+			//параметры БД для логирования
+			confLoggingDB := conf.GetApplicationWriteLogDB()
+			Expect(confLoggingDB.Host).Should(Equal("datahook.cloud.gcm"))
+			Expect(confLoggingDB.Port).Should(Equal(9200))
+			Expect(confLoggingDB.NameDB).Should(Equal(""))
+			Expect(confLoggingDB.StorageNameDB).Should(Equal("thehivehook_go_package"))
+			Expect(confLoggingDB.User).Should(Equal("log_writer"))
+			Expect(len(confLoggingDB.Passwd)).ShouldNot(Equal(0))
 		})
 
 		It("Должно быть перезаписанно содержимое некоторых полей полученных с переменных окружения GO_PHMISP_*", func() {
@@ -138,7 +177,42 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 		})
 	})
 
-	Context("Тест 2. Тестируем функцию возвращающую путь до текущего приложения", func() {
+	Context("Тест 2. Проверяем установленные для DATABASEWRITELOG значения переменных окружения", func() {
+		const (
+			PHMISP_DBWLOGHOST        = "45.10.32.1"
+			PHMISP_DBWLOGPORT        = 11123
+			PHMISP_DBWLOGNAME        = "log_db"
+			PHMISP_DBWLOGUSER        = "nreuser"
+			PHMISP_DBWLOGPASSWD      = "pass123wd"
+			PHMISP_DBWLOGSTORAGENAME = "thehivehookgolog"
+		)
+
+		BeforeAll(func() {
+			os.Setenv("GO_PHMISP_DBWLOGHOST", PHMISP_DBWLOGHOST)
+			os.Setenv("GO_PHMISP_DBWLOGPORT", strconv.Itoa(PHMISP_DBWLOGPORT))
+			os.Setenv("GO_PHMISP_DBWLOGNAME", PHMISP_DBWLOGNAME)
+			os.Setenv("GO_PHMISP_DBWLOGUSER", PHMISP_DBWLOGUSER)
+			os.Setenv("GO_PHMISP_DBWLOGPASSWD", PHMISP_DBWLOGPASSWD)
+			os.Setenv("GO_PHMISP_DBWLOGSTORAGENAME", PHMISP_DBWLOGSTORAGENAME)
+
+		})
+
+		It("Все параметры конфигурации для WEBHOOKSERVER должны быть успешно установлены через соответствующие переменные окружения", func() {
+			conf, err := confighandler.New(rootPath)
+			Expect(err).ShouldNot(HaveOccurred())
+
+			wldb := conf.GetApplicationWriteLogDB()
+
+			Expect(wldb.Host).Should(Equal(PHMISP_DBWLOGHOST))
+			Expect(wldb.Port).Should(Equal(PHMISP_DBWLOGPORT))
+			Expect(wldb.NameDB).Should(Equal(PHMISP_DBWLOGNAME))
+			Expect(wldb.User).Should(Equal(PHMISP_DBWLOGUSER))
+			Expect(wldb.Passwd).Should(Equal(PHMISP_DBWLOGPASSWD))
+			Expect(wldb.StorageNameDB).Should(Equal(PHMISP_DBWLOGSTORAGENAME))
+		})
+	})
+
+	Context("Тест 3. Тестируем функцию возвращающую путь до текущего приложения", func() {
 		It("Должен построен определенный путь до текущего приложения", func() {
 			getRootPath := func(rootDir string) (string, error) {
 				currentDir, err := filepath.Abs(filepath.Dir(os.Args[0]))

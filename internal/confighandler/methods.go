@@ -30,6 +30,11 @@ func (conf *ConfigApp) GetAppTheHive() *AppConfigTheHive {
 	return &conf.AppConfigTheHive
 }
 
+// GetApplicationWriteLogDB настройки доступа к БД для логирования данных
+func (conf *ConfigApp) GetApplicationWriteLogDB() *AppConfigWriteLogDB {
+	return &conf.AppConfigWriteLogDB
+}
+
 func (conf *ConfigApp) Clean() {
 	conf = &ConfigApp{}
 }

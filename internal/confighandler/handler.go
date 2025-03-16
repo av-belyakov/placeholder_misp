@@ -39,6 +39,14 @@ func New(rootDir string) (*ConfigApp, error) {
 			//Правила обработки событий
 			"GO_PHMISP_RULES_DIR":  "",
 			"GO_PHMISP_RULES_FILE": "",
+
+			//Настройки доступа к БД в которую будут записыватся логи
+			"GO_PHMISP_DBWLOGHOST":        "",
+			"GO_PHMISP_DBWLOGPORT":        "",
+			"GO_PHMISP_DBWLOGNAME":        "",
+			"GO_PHMISP_DBWLOGUSER":        "",
+			"GO_PHMISP_DBWLOGPASSWD":      "",
+			"GO_PHMISP_DBWLOGSTORAGENAME": "",
 		}
 	)
 
@@ -144,6 +152,23 @@ func New(rootDir string) (*ConfigApp, error) {
 		}
 		if viper.IsSet("RULES_PROC_MSG_FOR_MISP.file") {
 			conf.RulesProcMSGMISP.File = viper.GetString("RULES_PROC_MSG_FOR_MISP.file")
+		}
+
+		// Настройки доступа к БД в которую будут записыватся логи
+		if viper.IsSet("DATABASEWRITELOG.host") {
+			conf.AppConfigWriteLogDB.Host = viper.GetString("DATABASEWRITELOG.host")
+		}
+		if viper.IsSet("DATABASEWRITELOG.port") {
+			conf.AppConfigWriteLogDB.Port = viper.GetInt("DATABASEWRITELOG.port")
+		}
+		if viper.IsSet("DATABASEWRITELOG.user") {
+			conf.AppConfigWriteLogDB.User = viper.GetString("DATABASEWRITELOG.user")
+		}
+		if viper.IsSet("DATABASEWRITELOG.namedb") {
+			conf.AppConfigWriteLogDB.NameDB = viper.GetString("DATABASEWRITELOG.namedb")
+		}
+		if viper.IsSet("DATABASEWRITELOG.storage_name_db") {
+			conf.AppConfigWriteLogDB.StorageNameDB = viper.GetString("DATABASEWRITELOG.storage_name_db")
 		}
 
 		return nil
@@ -262,6 +287,28 @@ func New(rootDir string) (*ConfigApp, error) {
 	}
 	if envList["GO_PHMISP_RULES_FILE"] != "" {
 		conf.RulesProcMSGMISP.File = envList["GO_PHMISP_RULES_FILE"]
+	}
+
+	//Настройки доступа к БД в которую будут записыватся логи
+	if envList["GO_PHMISP_DBWLOGHOST"] != "" {
+		conf.AppConfigWriteLogDB.Host = envList["GO_PHMISP_DBWLOGHOST"]
+	}
+	if envList["GO_PHMISP_DBWLOGPORT"] != "" {
+		if p, err := strconv.Atoi(envList["GO_PHMISP_DBWLOGPORT"]); err == nil {
+			conf.AppConfigWriteLogDB.Port = p
+		}
+	}
+	if envList["GO_PHMISP_DBWLOGNAME"] != "" {
+		conf.AppConfigWriteLogDB.NameDB = envList["GO_PHMISP_DBWLOGNAME"]
+	}
+	if envList["GO_PHMISP_DBWLOGUSER"] != "" {
+		conf.AppConfigWriteLogDB.User = envList["GO_PHMISP_DBWLOGUSER"]
+	}
+	if envList["GO_PHMISP_DBWLOGPASSWD"] != "" {
+		conf.AppConfigWriteLogDB.Passwd = envList["GO_PHMISP_DBWLOGPASSWD"]
+	}
+	if envList["GO_PHMISP_DBWLOGSTORAGENAME"] != "" {
+		conf.AppConfigWriteLogDB.StorageNameDB = envList["GO_PHMISP_DBWLOGSTORAGENAME"]
 	}
 
 	//выполняем проверку заполненой структуры

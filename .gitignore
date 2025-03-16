@@ -1,5 +1,5 @@
-logs/
-placeholder_misp
 .env
+placeholder_misp
 misp_module
 app
+logs/
