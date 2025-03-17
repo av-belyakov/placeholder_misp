@@ -49,6 +49,15 @@ func (settings *CoreHandlerSettings) Start(
 
 	hjson := NewHandlerJSON(settings.counting, settings.logger)
 
+	generatorFormatMISP := NewGenerateObjectsFormatMISP(
+		SettingsGenerateObjectsFormatMISP{
+			MispModule:    mispModule,
+			Sqlite3Module: sqlite3Module,
+			ListRule:      settings.listRules,
+			Counter:       settings.counting,
+			Logger:        settings.logger,
+		})
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -68,14 +77,7 @@ func (settings *CoreHandlerSettings) Start(
 				chanOutputDecodeJson := hjson.Start(data.Data, data.MsgId)
 
 				//формирование итоговых документов в формате MISP
-				go CreateObjectsFormatMISP(
-					chanOutputDecodeJson,
-					data.MsgId,
-					mispModule,
-					sqlite3Module,
-					settings.listRules,
-					settings.counting,
-					settings.logger)
+				generatorFormatMISP.Start(chanOutputDecodeJson, data.MsgId)
 			}()
 
 		case data := <-chanMispReception:

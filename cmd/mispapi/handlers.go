@@ -85,13 +85,15 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 
 		m.logger.Send("info", fmt.Sprintf("element 'event_reports' successfully added to event with id:'%s' (case id:'%d')", eventId, int(data.CaseId)))
 
+		time.Sleep(2 * time.Second)
+
 		//добавляем атрибуты
 		_, _, warning, err := rmisp.sendAttribytes(ctx, eventId, data.Data.GetAttributes())
 		if err != nil {
-			// тут ошибка может быть при добавлении только одного из многих объектов
-			// соответственно тормозить весь процесс только из-за того что была ошибка
-			// при добавлении одного или нескольких объектов не стоит
-			// если же не был добавлен ни один из объектов, то это возможно глабальная
+			// Тут ошибка может быть при добавлении только одного из многих объектов,
+			// соответственно тормозить весь процесс, только из-за того, что была ошибка
+			// при добавлении одного или нескольких объектов не стоит.
+			// Если же не был добавлен ни один из объектов, то это возможно глабальная
 			// ошибка доступа, следовательно, при добавлении следующих объектов она также
 			// может вылезти, тогда там и будет выполнен останов всей цепочки
 			m.logger.Send("error", supportingfunctions.CustomError(err).Error())
@@ -101,6 +103,8 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 		}
 
 		m.logger.Send("info", fmt.Sprintf("some elements 'attribytes' successfully added to event with id:'%s' (case id:'%d')", eventId, int(data.CaseId)))
+
+		time.Sleep(2 * time.Second)
 
 		// добавляем объекты
 		if _, _, err = rmisp.sendObjects(ctx, eventId, data.Data.GetObjects()); err != nil {
@@ -114,7 +118,7 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 		// всё ранее ему переданное, если обработка переданных объектов не была завершена
 		// возможны накладки или сбои при добавлении данных
 		// это недостаток MISP, с этим я ничего не могу поделать
-		time.Sleep(4 * time.Second)
+		time.Sleep(2 * time.Second)
 
 		// добавляем event_tags
 		if err := rmisp.sendEventTags(ctx, eventId, data.Data.GetObjectTags()); err != nil {
@@ -123,7 +127,7 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 
 		m.logger.Send("info", fmt.Sprintf("elements 'tags' successfully added to event with id:'%s' (case id:'%d')", eventId, int(data.CaseId)))
 
-		time.Sleep(1 * time.Second)
+		time.Sleep(3 * time.Second)
 
 		//публикуем добавленное событие
 		//masterKey нужен для публикации события так как пользователь

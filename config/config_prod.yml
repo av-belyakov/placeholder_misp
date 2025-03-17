@@ -8,7 +8,7 @@ NATS:
   port: 4222
   cache_ttl: 3600
   subscriptions:
-    listener_case: "object.casetype.local"
+    listener_case: "object.casetype"
     sender_command: "object.commandstype"
 MISP:
   host: misp-center.cloud.gcm

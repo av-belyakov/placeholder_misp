@@ -112,14 +112,14 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 			Expect(conf.GetAppMISP().Host).Should(Equal("misp-center.cloud.gcm"))
 
 			//параметры подключения к Sqlite3
-			Expect(conf.GetAppSqlite3().PathFileDb).Should(Equal("../sqlite3/sqlite3.db"))
+			Expect(conf.GetAppSqlite3().PathFileDb).Should(Equal("/sqlite3/sqlite3.db"))
 
 			//параметры БД для логирования
 			confLoggingDB := conf.GetApplicationWriteLogDB()
 			Expect(confLoggingDB.Host).Should(Equal("datahook.cloud.gcm"))
 			Expect(confLoggingDB.Port).Should(Equal(9200))
 			Expect(confLoggingDB.NameDB).Should(Equal(""))
-			Expect(confLoggingDB.StorageNameDB).Should(Equal("thehivehook_go_package"))
+			Expect(confLoggingDB.StorageNameDB).Should(Equal("placeholder_misp"))
 			Expect(confLoggingDB.User).Should(Equal("log_writer"))
 			Expect(len(confLoggingDB.Passwd)).ShouldNot(Equal(0))
 		})
@@ -141,14 +141,14 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 			Expect(conf.GetAppMISP().Host).Should(Equal("misp-world.cloud.gcm"))
 
 			//параметры подключения к Sqlite3
-			Expect(conf.GetAppSqlite3().PathFileDb).Should(Equal("../sqlite3/sqlite3.db"))
+			Expect(conf.GetAppSqlite3().PathFileDb).Should(Equal("/test/sqlite3_file/sqlite3.db"))
 
 			//параметры БД для логирования
 			confLoggingDB := conf.GetApplicationWriteLogDB()
 			Expect(confLoggingDB.Host).Should(Equal("datahook.cloud.gcm"))
 			Expect(confLoggingDB.Port).Should(Equal(9200))
 			Expect(confLoggingDB.NameDB).Should(Equal(""))
-			Expect(confLoggingDB.StorageNameDB).Should(Equal("thehivehook_go_package"))
+			Expect(confLoggingDB.StorageNameDB).Should(Equal("placeholder_misp"))
 			Expect(confLoggingDB.User).Should(Equal("log_writer"))
 			Expect(len(confLoggingDB.Passwd)).ShouldNot(Equal(0))
 		})

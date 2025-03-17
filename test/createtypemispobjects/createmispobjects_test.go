@@ -146,7 +146,17 @@ func TestCreateMispObjects(t *testing.T) {
 	chDecode := handler.Start(b, Task_Id)
 
 	moduleMisp := NewModuleMISPForTest()
-	go coremodule.CreateObjectsFormatMISP(chDecode, Task_Id, moduleMisp, sqlite3Module, listRules, counting, logging)
+
+	generatorFormatMISP := coremodule.NewGenerateObjectsFormatMISP(
+		coremodule.SettingsGenerateObjectsFormatMISP{
+			MispModule:    moduleMisp,
+			Sqlite3Module: sqlite3Module,
+			ListRule:      listRules,
+			Counter:       counting,
+			Logger:        logging,
+		})
+
+	generatorFormatMISP.Start(chDecode, Task_Id)
 
 	/*
 		!!!!!!!!!!!!!!!!!!!!!!!!!!

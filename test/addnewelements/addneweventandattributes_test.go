@@ -120,7 +120,17 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		// обработчик JSON документа
 		chanOutputDecodeJson := hjson.Start(exampleByte, taskId)
 		//формирование итоговых документов в формате MISP
-		go coremodule.CreateObjectsFormatMISP(chanOutputDecodeJson, taskId, mispModule, sqlite3Module, listRules, counting, logging)
+
+		generatorFormatMISP := coremodule.NewGenerateObjectsFormatMISP(
+			coremodule.SettingsGenerateObjectsFormatMISP{
+				MispModule:    mispModule,
+				Sqlite3Module: sqlite3Module,
+				ListRule:      listRules,
+				Counter:       counting,
+				Logger:        logging,
+			})
+
+		generatorFormatMISP.Start(chanOutputDecodeJson, taskId)
 	})
 
 	Context("Тест 1. Проверка инициализации модулей", func() {

@@ -17,6 +17,7 @@ import (
 	"github.com/av-belyakov/placeholder_misp/cmd/wrappers"
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/constants"
+	"github.com/av-belyakov/placeholder_misp/internal/appversion"
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
 	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
 	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
@@ -25,6 +26,11 @@ import (
 )
 
 func server(ctx context.Context) {
+	version, err := appversion.GetAppVersion()
+	if err != nil {
+		log.Println(err)
+	}
+
 	rootPath, err := supportingfunctions.GetRootPath(constants.Root_Dir)
 	if err != nil {
 		log.Fatalf("error, it is impossible to form root path (%s)", err.Error())
@@ -72,16 +78,6 @@ func server(ctx context.Context) {
 		//подключение логирования в БД
 		simpleLogger.SetDataBaseInteraction(esc)
 	}
-
-	/*
-
-		Добавил настройки взаимодействия с БД которая будет использоватся для логирования
-		событий и ошибок. Так же добавил параметры настройки в конфигурационные файлы и
-		новые функции в обработчик файлов конфигурации.
-		Сделал тесты для изменившегося обработчика файлов конфигурации, однако протестировать
-		не смог так как на mac нет ginkgo
-
-	*/
 
 	// ****************************************************************************
 	// ******* инициализируем модуль чтения правил обработки MISP сообщений *******
@@ -181,7 +177,7 @@ func server(ctx context.Context) {
 	}
 
 	// вывод информационного сообщения при старте приложения
-	msg := getInformationMessage()
+	msg := getInformationMessage(version)
 	_ = simpleLogger.Write("info", strings.ToLower(msg))
 
 	//для отладки через pprof

@@ -3,6 +3,7 @@ package natsapi
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"time"
@@ -46,6 +47,15 @@ func (api *ApiNatsModule) Start(ctx context.Context) error {
 		return ctx.Err()
 	}
 
+	//event.object.caseId
+	eventStruct := struct {
+		Event struct {
+			Object struct {
+				CaseId int `json:"caseId"`
+			} `json:"object"`
+		} `json:"event"`
+	}{}
+
 	nc, err := nats.Connect(
 		fmt.Sprintf("%s:%d", api.host, api.port),
 		//nats.RetryOnFailedConnect(true),
@@ -73,7 +83,12 @@ func (api *ApiNatsModule) Start(ctx context.Context) error {
 
 	//приём кейсов
 	nc.Subscribe(api.subscriptions.listenerCase, func(m *nats.Msg) {
-		api.logger.Send("info", "a new case has been accepted")
+		err := json.Unmarshal(m.Data, &eventStruct)
+		if err != nil {
+			fmt.Println("Error:", err)
+		}
+
+		api.logger.Send("info", fmt.Sprintf("a new case with id '%d' has been accepted", eventStruct.Event.Object.CaseId))
 
 		api.SendingDataOutput(OutputSettings{
 			MsgId: uuid.NewString(),
@@ -108,16 +123,14 @@ func (api *ApiNatsModule) Start(ctx context.Context) error {
 				}
 
 				//отправляем команды на установку тега и значения поля customFields
-				go func() {
-					info, err := SendRequestCommandExecute(nc, api.subscriptions.senderCommand, incomingData)
-					if err != nil {
-						api.logger.Send("error", supportingfunctions.CustomError(err).Error())
+				err := SendRequestCommandExecute(nc, api.subscriptions.senderCommand, incomingData)
+				if err != nil {
+					api.logger.Send("error", supportingfunctions.CustomError(err).Error())
 
-						return
-					}
+					continue
+				}
 
-					api.logger.Send("info", info)
-				}()
+				api.logger.Send("info", fmt.Sprintf("comand:'%s' for case id:'%s' (root id:'%s') was successfully sent", incomingData.Command, incomingData.CaseId, incomingData.RootId))
 
 			}
 		}
