@@ -57,12 +57,11 @@ func TestSendCase(t *testing.T) {
 	})
 
 	t.Run("Отправка данных", func(t *testing.T) {
+		t.Log("GO_PHMISP_MAIN =", os.Getenv("GO_PHMISP_MAIN"))
 		t.Log("conf.Subscriptions.ListenerCase:", conf.Subscriptions.ListenerCase)
 
 		err = nc.Publish(conf.Subscriptions.ListenerCase, b)
 		assert.NoError(t, err)
-
-		//nc.Flush()
 
 		nc.Close()
 	})

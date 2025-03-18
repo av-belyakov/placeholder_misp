@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	_ "net/http/pprof"
+	"os"
 	"strings"
 
 	"github.com/av-belyakov/placeholder_misp/cmd/elasticsearchapi"
@@ -185,9 +186,11 @@ func server(ctx context.Context) {
 	//go tool pprof http://localhost:6161/debug/pprof/heap
 	//go tool pprof http://localhost:6161/debug/pprof/goroutine
 	//go tool pprof http://localhost:6161/debug/pprof/allocs
-	go func() {
-		log.Println(http.ListenAndServe("localhost:6161", nil))
-	}()
+	if os.Getenv("GO_HIVEHOOK_MAIN") == "development" {
+		go func() {
+			log.Println(http.ListenAndServe("localhost:6161", nil))
+		}()
+	}
 	//------------------------
 
 	// *****************************************************************

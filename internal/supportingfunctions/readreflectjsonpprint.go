@@ -16,7 +16,7 @@ func NewReadReflectJSONSprint(b []byte) (string, error) {
 	str := strings.Builder{}
 	defer str.Reset()
 
-	listMap := map[string]interface{}{}
+	listMap := map[string]any{}
 	if err := json.Unmarshal(b, &listMap); err == nil {
 		if len(listMap) == 0 {
 			return "", errors.New(errSrc)
@@ -27,7 +27,7 @@ func NewReadReflectJSONSprint(b []byte) (string, error) {
 		return str.String(), err
 	}
 
-	listSlice := []interface{}{}
+	listSlice := []any{}
 	if err := json.Unmarshal(b, &listSlice); err == nil {
 		if len(listSlice) == 0 {
 			return "", errors.New(errSrc)

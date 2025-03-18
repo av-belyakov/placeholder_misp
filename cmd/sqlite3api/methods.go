@@ -31,6 +31,7 @@ func (module *ApiSqlite3Module) SearchCaseId(ctx context.Context, caseId int) (r
 	if err != nil {
 		return result, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		if err := rows.Scan(&result); err != nil {
@@ -56,16 +57,13 @@ func (module *ApiSqlite3Module) UpdateCaseId(ctx context.Context, caseId, eventI
 		fmt.Println("func 'ApiSqlite3Module.UpdateCaseId' INSERT")
 
 		if _, err := module.db.ExecContext(ctx, "INSERT INTO placeholder_misp (caseId, eventId) VALUES (?,?)", caseId, eventId); err != nil {
-			fmt.Println("func 'ApiSqlite3Module.UpdateCaseId' Insert ERROR:", err)
-
 			return err
 		}
+
 	} else {
 		fmt.Println("func 'ApiSqlite3Module.UpdateCaseId' UPDATE")
 
 		if _, err := module.db.ExecContext(ctx, "UPDATE placeholder_misp SET eventId=? WHERE caseId=?", eventId, caseId); err != nil {
-			fmt.Println("func 'ApiSqlite3Module.UpdateCaseId' Update ERROR:", err)
-
 			return err
 		}
 	}

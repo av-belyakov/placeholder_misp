@@ -10,6 +10,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/nats-io/nats.go"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/constants"
@@ -122,9 +123,66 @@ func (api *ApiNatsModule) Start(ctx context.Context) error {
 					continue
 				}
 
-				//отправляем команды на установку тега и значения поля customFields
-				err := SendRequestCommandExecute(nc, api.subscriptions.senderCommand, incomingData)
-				if err != nil {
+				/*
+										!!!!!
+
+										incomingData.Data не содержит ничего что бы было похоже на команду
+										для отправки запроса на добавления нового eventId
+
+					Пример команды для добавления тега:
+					{
+					  "service": "MISP",
+					  "command": "add_case_tag",
+					  "root_id": "~74395656",
+					  "case_id": "13435",
+					  "value": "Webhook: send=\"MISP\""
+					}
+
+					Пример команды для добавления поля custom field:
+					{
+					  "service": "MISP",
+					  "command": "set_case_custom_field",
+					  "root_id": "~74395656",
+					  "field_name": "misp-event-id.string",
+					  "value": "3221"
+					}
+										!!!!!
+				*/
+				g := errgroup.Group{}
+
+				g.Go(func() error {
+					//команда на установку тега
+					if err := nc.Publish(api.subscriptions.senderCommand,
+						fmt.Appendf(nil, `{
+					      "service": "MISP",
+					      "command": "add_case_tag",
+					      "root_id": "%s",
+					      "case_id": "%s",
+					      "value": "%s"
+					}`, incomingData.RootId, incomingData.CaseId, "Webhook: send=\"MISP\"")); err != nil {
+						return err
+					}
+
+					return nil
+				})
+
+				g.Go(func() error {
+					//команда на добавление значения поля customFields
+					if err := nc.Publish(api.subscriptions.senderCommand,
+						fmt.Appendf(nil, `{
+						  "service": "MISP",
+					      "command": "set_case_custom_field",
+					      "root_id": "%s",
+					      "field_name": "misp-event-id.string",
+					      "value": "%s"
+						}`, incomingData.RootId, incomingData.EventId)); err != nil {
+						return err
+					}
+
+					return nil
+				})
+
+				if err := g.Wait(); err != nil {
 					api.logger.Send("error", supportingfunctions.CustomError(err).Error())
 
 					continue
