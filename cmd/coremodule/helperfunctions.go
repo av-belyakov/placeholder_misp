@@ -3,6 +3,8 @@ package coremodule
 import (
 	"fmt"
 
+	"slices"
+
 	"github.com/av-belyakov/objectsmispformat"
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
@@ -279,7 +281,7 @@ func getNewListAttributes(al map[int]objectsmispformat.AttributesMispFormat, lat
 			v.Type = elem[1]
 
 			//очищаем данное свойство, являющееся вспомогательным, так как оно может
-			//быть заполненно ранее, а приоритетным являются значения в Category и Type
+			//быть заполненно ранее, а приоритетными являются значения в Category и Type
 			v.ObjectRelation = ""
 		}
 
@@ -384,11 +386,5 @@ func checkHashName(name string) bool {
 		"ja3",
 	}
 
-	for _, v := range list {
-		if name == v {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(list, name)
 }

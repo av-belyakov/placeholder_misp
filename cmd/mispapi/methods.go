@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"runtime"
+	"slices"
 
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
 	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
@@ -346,32 +347,51 @@ func (o *CacheSpecialObject[T]) GetFunc() func(int) bool {
 }
 
 func (o *CacheSpecialObject[T]) Comparison(objFromCache T) bool {
-	if !o.object.ComparisonID(objFromCache.GetID()) {
-		return false
+	var (
+		eventId  string
+		elements []bool = make([]bool, 0, 5)
+	)
+
+	//для того что бы сравнение было верным необходимо добавить eventId во вновь пришедший
+	//объект так как в объекте который находится в кеше уже содержит eventId необходимый для
+	//добавления объектов типа Attributes и Objects
+	if len(objFromCache.GetAttributes()) > 0 {
+		eventId = objFromCache.GetAttributes()[0].GetEventId()
+	}
+	attributes := o.object.GetAttributes()
+	for i := 0; i < len(attributes); i++ {
+		attributes[i].SetEventId(eventId)
+	}
+	objects := o.object.GetObjects()
+	for k := range objects {
+		objects[k].SetEventId(eventId)
 	}
 
-	if !o.object.ComparisonEvent(objFromCache.GetEvent()) {
-		return false
-	}
+	fmt.Printf("func 'CacheSpecialObject.Comparison' o.object.Id:%s == %s: cache.object.Id\n", o.object.GetID(), objFromCache.GetID())
 
-	if !o.object.ComparisonReports(objFromCache.GetReports()) {
-		return false
-	}
+	fmt.Printf("func 'CacheSpecialObject.Comparison', Event, isEqual '%t'\n", o.object.ComparisonEvent(objFromCache.GetEvent()))
+	elements = append(elements, o.object.ComparisonEvent(objFromCache.GetEvent()))
 
-	if !o.object.ComparisonAttributes(objFromCache.GetAttributes()) {
-		return false
+	fmt.Printf("func 'CacheSpecialObject.Comparison', Reports, isEqual '%t'\n", o.object.ComparisonReports(objFromCache.GetReports()))
+	elements = append(elements, o.object.ComparisonReports(objFromCache.GetReports()))
 
-	}
+	fmt.Printf("func 'CacheSpecialObject.Comparison', Attributes, isEqual '%t'\n", o.object.ComparisonAttributes(objFromCache.GetAttributes()))
+	/*for _, attOne := range o.object.GetAttributes() {
+		for _, attTwo := range objFromCache.GetAttributes() {
+			if attOne.GetObjectId() == attTwo.ObjectId {
+				fmt.Printf("attOne:'%+v'\nattTwo:'%+v'\n", attOne, attTwo)
+			}
+		}
+	}*/
+	elements = append(elements, o.object.ComparisonAttributes(objFromCache.GetAttributes()))
 
-	if !o.object.ComparisonObjects(objFromCache.GetObjects()) {
-		return false
-	}
+	fmt.Printf("func 'CacheSpecialObject.Comparison', Objects, isEqual '%t'\n", o.object.ComparisonObjects(objFromCache.GetObjects()))
+	elements = append(elements, o.object.ComparisonObjects(objFromCache.GetObjects()))
 
-	if !o.object.ComparisonObjectTags(objFromCache.GetObjectTags()) {
-		return false
-	}
+	fmt.Printf("func 'CacheSpecialObject.Comparison', Tags, isEqual '%t'\n", o.object.ComparisonObjectTags(objFromCache.GetObjectTags()))
+	elements = append(elements, o.object.ComparisonObjectTags(objFromCache.GetObjectTags()))
 
-	return true
+	return !slices.Contains(elements, false)
 }
 
 func (o *CacheSpecialObject[T]) MatchingAndReplacement(objFromCache T) T {

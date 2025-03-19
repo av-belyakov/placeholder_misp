@@ -82,6 +82,13 @@ func (settings *CoreHandlerSettings) Start(
 
 		case data := <-chanMispReception:
 			switch data.Command {
+			case "get event id":
+				//отправка eventId в Sqlite3
+				sqlite3Module.SendDataToModule(sqlite3api.Request{
+					Command: "set case id",
+					Payload: fmt.Append(nil, fmt.Sprintf("%s:%s", data.CaseId, data.EventId)),
+				})
+
 			case "send event id":
 				//отправка eventId в NATS
 				natsModule.SendingDataInput(natsapi.InputSettings{
@@ -92,12 +99,31 @@ func (settings *CoreHandlerSettings) Start(
 					CaseId:  data.CaseId,
 				})
 
-				//отправка eventId в Sqlite3
-				sqlite3Module.SendDataToModule(sqlite3api.Request{
-					Command: "set case id",
-					Payload: fmt.Append(nil, fmt.Sprintf("%s:%s", data.CaseId, data.EventId)),
-				})
+				go func() {
+					//поиск старого eventId в Sqlite3
+					chRes := make(chan sqlite3api.Response)
+					sqlite3Module.SendDataToModule(sqlite3api.Request{
+						Command:    "search caseId",
+						ChResponse: chRes,
+						Payload:    fmt.Append(nil, data.CaseId),
+					})
+					res := <-chRes
+					oldEeventId := string(res.Payload)
 
+					if res.Error == nil && oldEeventId != "" {
+						//запрос на удаление старого event в MISP
+						mispModule.SendDataInput(mispapi.InputSettings{
+							Command: "del event",
+							EventId: oldEeventId,
+						})
+					}
+
+					//передача нового eventId в Sqlite3
+					sqlite3Module.SendDataToModule(sqlite3api.Request{
+						Command: "set case id",
+						Payload: fmt.Append(nil, fmt.Sprintf("%s:%s", data.CaseId, data.EventId)),
+					})
+				}()
 			}
 		}
 	}

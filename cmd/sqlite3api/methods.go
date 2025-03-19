@@ -46,8 +46,6 @@ func (module *ApiSqlite3Module) SearchCaseId(ctx context.Context, caseId int) (r
 func (module *ApiSqlite3Module) UpdateCaseId(ctx context.Context, caseId, eventId int) error {
 	id, err := module.SearchCaseId(ctx, caseId)
 	if err != nil {
-		fmt.Println("func 'ApiSqlite3Module.UpdateCaseId' Search ERROR:", err)
-
 		return err
 	}
 

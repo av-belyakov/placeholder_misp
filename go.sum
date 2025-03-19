@@ -2,6 +2,10 @@ github.com/av-belyakov/cachingstoragewithqueue v0.0.0-20250311135213-982f17b2651
 github.com/av-belyakov/cachingstoragewithqueue v0.0.0-20250311135213-982f17b26512/go.mod h1:KWRLxhLhcltDkzJUBrbHeH454lhscBuh1TrjwEYYBhg=
 github.com/av-belyakov/objectsmispformat v0.0.0-20250312185619-dbad0d2e925d h1:f7myHVnL89UkTNixVFObN45EPRxJO5vjEgkWPbwR2o0=
 github.com/av-belyakov/objectsmispformat v0.0.0-20250312185619-dbad0d2e925d/go.mod h1:S/t7N5r3A13LAUJxyDzIELw9csyBlZWOYs2aJXqY1yY=
+github.com/av-belyakov/objectsmispformat v0.0.0-20250319125533-dec43aa3aba1 h1:W14OckzMV3QV6wQgZufXOhxKux/oVxNCviN6tU9t6io=
+github.com/av-belyakov/objectsmispformat v0.0.0-20250319125533-dec43aa3aba1/go.mod h1:S/t7N5r3A13LAUJxyDzIELw9csyBlZWOYs2aJXqY1yY=
+github.com/av-belyakov/objectsmispformat v0.0.0-20250319135213-feaf9062c3f6 h1:RDehRt8/vH2t9azo96QOBglgFeTMe5qu2r12cSy+GNw=
+github.com/av-belyakov/objectsmispformat v0.0.0-20250319135213-feaf9062c3f6/go.mod h1:S/t7N5r3A13LAUJxyDzIELw9csyBlZWOYs2aJXqY1yY=
 github.com/av-belyakov/simplelogger v0.0.0-20250221120631-077109604215 h1:Hk1RwRSURz+xb63AfuHHIqjPKvX6uJssQpJsBaP7GAk=
 github.com/av-belyakov/simplelogger v0.0.0-20250221120631-077109604215/go.mod h1:yW2ev3nXPP3WY8svBWJpg4PQRl67MTGIaaiXJ0ULRZ8=
 github.com/av-belyakov/zabbixapicommunicator v0.0.0-20241225064839-9c19184470aa h1:ivXQuTb7UxYUy568EOIOvRDExKLU3tDnw634d+WTGto=

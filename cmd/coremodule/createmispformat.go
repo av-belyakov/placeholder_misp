@@ -7,7 +7,6 @@ import (
 
 	"github.com/av-belyakov/objectsmispformat"
 	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
-	"github.com/av-belyakov/placeholder_misp/cmd/sqlite3api"
 )
 
 // Start создаёт набор объектов в формате MISP
@@ -22,8 +21,6 @@ func (gen *GenerateObjectsFormatMISP) Start(chDecodeJSON <-chan ChanInputCreateM
 			caseSource          string
 			patterIsNum         *regexp.Regexp = regexp.MustCompile(`^\d+$`)
 		)
-
-		fmt.Println("func 'GenerateObjectsFormatMISP.Start', START")
 
 		//формируем шаблоны для заполнения
 		eventsMisp := objectsmispformat.NewEventMisp()
@@ -216,12 +213,6 @@ func (gen *GenerateObjectsFormatMISP) Start(chDecodeJSON <-chan ChanInputCreateM
 		//удаляем те объекты Attributes которые соответствуют правилам EXCLUDE
 		delElementAttributes(exclusionRules, listAttributesMisp, gen.logger)
 
-		//выполняет очистку значения StatementExpression что равно отсутствию совпадений в правилах Pass
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		// ВРЕМЕННО КОМЕНТИРУЕТСЯ для проведения тестов
-		//
-		// в production не забывать убирать коментарий
-		//
 		gen.listRule.CleanStatementExpressionRulePass()
 
 		if !isAllowed {
@@ -266,24 +257,11 @@ func (gen *GenerateObjectsFormatMISP) Start(chDecodeJSON <-chan ChanInputCreateM
 
 		gen.logger.Send("info", fmt.Sprintf("the case with id:'%d' complies with the specified rules and has been submitted for further processing", int(caseId)))
 
-		//получаем старый eventId объекта, если о нем есть запись в БД
-		chRes := make(chan sqlite3api.Response)
-		gen.sqlite3Module.SendDataToModule(sqlite3api.Request{
-			Command:    "search caseId",
-			ChResponse: chRes,
-			Payload:    fmt.Append(nil, caseId),
-		})
-		res := <-chRes
-		eventId := string(res.Payload)
-
-		fmt.Println("func 'GenerateObjectsFormatMISP.Start', STOP")
-
 		//тут отправляем сформированные по формату MISP пользовательские структуры
 		gen.mispModule.SendDataInput(mispapi.InputSettings{
 			Command:    "add event",
 			TaskId:     taskId,
 			CaseId:     caseId,
-			EventId:    eventId,
 			RootId:     rootId,
 			CaseSource: caseSource,
 			UserEmail:  userEmail,

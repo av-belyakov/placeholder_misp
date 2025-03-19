@@ -1,6 +1,7 @@
 package nats_test
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"testing"
@@ -51,19 +52,30 @@ func TestMain(m *testing.M) {
 }
 
 func TestSendCase(t *testing.T) {
-	t.Run("Чтение файла", func(t *testing.T) {
-		b, err = os.ReadFile("../test_json/event_39100.json")
-		assert.NoError(t, err)
-	})
+	chDone := make(chan struct{})
 
-	t.Run("Отправка данных", func(t *testing.T) {
-		t.Log("GO_PHMISP_MAIN =", os.Getenv("GO_PHMISP_MAIN"))
-		t.Log("conf.Subscriptions.ListenerCase:", conf.Subscriptions.ListenerCase)
+	go func(nc *nats.Conn) {
+		nc.Subscribe(conf.Subscriptions.SenderCommand, func(msg *nats.Msg) {
+			fmt.Printf("Received command: %s\n", string(msg.Data))
 
-		err = nc.Publish(conf.Subscriptions.ListenerCase, b)
-		assert.NoError(t, err)
+			chDone <- struct{}{}
+		})
+	}(nc)
 
-		nc.Close()
-	})
+	b, err = os.ReadFile("../test_json/event_39100.json")
+	assert.NoError(t, err)
 
+	t.Log("GO_PHMISP_MAIN =", os.Getenv("GO_PHMISP_MAIN"))
+	t.Log("conf.Subscriptions.ListenerCase:", conf.Subscriptions.ListenerCase)
+
+	err = nc.Publish(conf.Subscriptions.ListenerCase, b)
+	assert.NoError(t, err)
+
+	fmt.Println("Before")
+
+	<-chDone
+
+	fmt.Println("After")
+
+	nc.Close()
 }

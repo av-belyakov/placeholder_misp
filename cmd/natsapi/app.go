@@ -158,8 +158,8 @@ func (api *ApiNatsModule) Start(ctx context.Context) error {
 					      "command": "add_case_tag",
 					      "root_id": "%s",
 					      "case_id": "%s",
-					      "value": "%s"
-					}`, incomingData.RootId, incomingData.CaseId, "Webhook: send=\"MISP\"")); err != nil {
+					      "value": "Webhook: send=\"MISP_TEST\""
+					}`, incomingData.RootId, incomingData.CaseId)); err != nil {
 						return err
 					}
 

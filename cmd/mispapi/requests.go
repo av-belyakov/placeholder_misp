@@ -277,13 +277,19 @@ func (rmisp *requestMISP) deleteEvent(ctx context.Context, eventId string) error
 	ctxTimeout, CancelFunc := context.WithTimeout(ctx, time.Second*15)
 	defer CancelFunc()
 
+	fmt.Printf("func 'requestMISP.deleteEvent' удаляет событие по его eventId:'%s'\n", eventId)
+
 	c, err := NewClientMISP(rmisp.host, rmisp.masterAuthKey, false)
 	if err != nil {
+		fmt.Println("func 'requestMISP.deleteEvent', ERROR", err)
+
 		return supportingfunctions.CustomError(fmt.Errorf("events delete, %w", err))
 	}
 
 	_, _, err = c.Delete(ctxTimeout, "/events/delete/"+eventId)
 	if err != nil {
+		fmt.Println("func 'requestMISP.deleteEvent', ERROR", err)
+
 		return err
 	}
 

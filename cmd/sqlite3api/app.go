@@ -59,6 +59,7 @@ func (module *ApiSqlite3Module) route(ctx context.Context) {
 					str := string(data.Payload)
 					caseId, err := strconv.Atoi(str)
 					if err != nil {
+						data.ChResponse <- Response{Error: err}
 						module.logger.Send("error", supportingfunctions.CustomError(err).Error())
 
 						continue
@@ -66,6 +67,7 @@ func (module *ApiSqlite3Module) route(ctx context.Context) {
 
 					res, err := module.SearchCaseId(ctx, caseId)
 					if err != nil {
+						data.ChResponse <- Response{Error: err}
 						module.logger.Send("error", supportingfunctions.CustomError(err).Error())
 
 						continue

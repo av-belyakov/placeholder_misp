@@ -37,11 +37,6 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 			return false
 		}
 
-		//удаляем старое событие типа Event
-		if err = rmisp.deleteEvent(ctx, data.EventId); err != nil {
-			m.logger.Send("error", supportingfunctions.CustomError(err).Error())
-		}
-
 		//Все ошибки которые могут возникнуть при дальнейшем взаимодействии с MISP
 		//будут попрежнему логироватся.
 		//Однако, статус выполнения для функции будет ставится в TRUE, что бы не досить
@@ -142,8 +137,8 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 		}
 
 		// отправляем в ядро информацию по event Id, при этом новый eventId
-		//передаётся для отправки в NATSб а так же передается в Sqlite3 для
-		//обнавления или создания новой связки caseId - eventId
+		//передаётся для отправки в NATS, а так же передается в Sqlite3 для
+		//обновления или создания новой связки caseId - eventId
 		m.SendDataOutput(OutputSetting{
 			Command: "send event id",
 			EventId: eventId,
@@ -158,4 +153,22 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 
 	//добавляем вспомогательный тип specialObject в очередь хранилища
 	m.cache.PushObjectToQueue(specialObject)
+}
+
+// delObject удаляет старое событие типа Event и все связанные с ним объекты
+func (m *ModuleMISP) delObject(ctx context.Context, eventId string) {
+	fmt.Printf("______ func 'ModuleMISP.delObject', eventId:'%s', START...", eventId)
+
+	rmisp, err := NewMispRequest(
+		WithHost(m.host),
+		WithMasterAuthKey(m.authKey))
+	if err != nil {
+		m.logger.Send("error", supportingfunctions.CustomError(err).Error())
+
+		return
+	}
+
+	if err = rmisp.deleteEvent(ctx, eventId); err != nil {
+		m.logger.Send("error", supportingfunctions.CustomError(err).Error())
+	}
 }

@@ -24,4 +24,5 @@ type Request struct {
 // Response ответ от модуля
 type Response struct {
 	Payload []byte
+	Error   error
 }
