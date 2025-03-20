@@ -9,12 +9,13 @@ FROM golang:1.23.7-alpine AS pmisp_build_image
 LABEL temporary=''
 ARG BRANCH
 ARG VERSION
+ENV CGO_ENABLED=1
 WORKDIR /go/
 COPY --from=pmisp_packages_image /go ./
 RUN echo -e "pmisp_build_image" && \
     rm -r ./src && \
     apk update && \
-    apk add --no-cache git && \
+    apk add --no-cache git gcc g++ && \
     git clone -b ${BRANCH} https://github.com/av-belyakov/placeholder_misp.git  ./src/${VERSION}/ && \
     go build -C ./src/${VERSION}/cmd/ -o ../app
 
