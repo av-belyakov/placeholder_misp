@@ -9,6 +9,9 @@ FROM golang:1.23.7-alpine AS pmisp_build_image
 LABEL temporary=''
 ARG BRANCH
 ARG VERSION
+# эта переменная окружения нужна для сборки приложения go с поддержкой cgo
+# то есть с использованием кода C при сборке
+# это требование библиотеки go для взаимодействия с sqlite3
 ENV CGO_ENABLED=1
 WORKDIR /go/
 COPY --from=pmisp_packages_image /go ./
