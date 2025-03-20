@@ -9,6 +9,8 @@ NATS:
   cache_ttl: 3600
   subscriptions:
     listener_case: object.casetype.test
+    #что бы не отправлялись команды на обнавление данных в thehive
+    #так как это уже делает продуктовый модуль
     sender_command: object.commandstype.local
 MISP:
   host: misp-world.cloud.gcm
