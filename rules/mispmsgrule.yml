@@ -115,10 +115,9 @@ RULES:
     #        searchValue: "not:3"
     - listAnd:
   EXCLUDE:
-    - listAnd:
-        - searchField: "observables.tlp"
-          searchValue: "3"
-          accurateComparison: true
+    #    - searchField: "observables.tlp"
+    #      searchValue: "3"
+    #      accurateComparison: true
     - listAnd:
         - searchField: "observables.dataType"
           searchValue: "url_pcap"
@@ -127,21 +126,21 @@ RULES:
         - searchField: "observables.data"
           searchValue: "anisimova.cloud.gcm"
           accurateComparison: false
-    - listAnd:
-        - searchField: "observables.ioc"
-          searchValue: "true"
-          accurateComparison: true
-        - searchField: "observables.data"
-          searchValue: "192.168.23.44"
-          accurateComparison: true
-    - listAnd:
-        - searchField: "observables.sighted"
-          searchValue: "false"
-          accurateComparison: true
-        - searchField: "observables._createdBy"
-          searchValue: "belyakov"
-          accurateComparison: false
-        - searchField: "observables.data"
-          searchValue: "letin@mail"
-          accurateComparison: false
+  #    - listAnd:
+  #        - searchField: "observables.ioc"
+  #          searchValue: "true"
+  #          accurateComparison: true
+  #        - searchField: "observables.data"
+  #          searchValue: "192.168.23.44"
+  #          accurateComparison: true
+  #    - listAnd:
+  #        - searchField: "observables.sighted"
+  #          searchValue: "false"
+  #          accurateComparison: true
+  #        - searchField: "observables._createdBy"
+  #          searchValue: "belyakov"
+  #          accurateComparison: false
+  #        - searchField: "observables.data"
+  #          searchValue: "letin@mail"
+  #          accurateComparison: false
   PASSANY: false

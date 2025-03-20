@@ -8,10 +8,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// checkSqlite3DbFileExist проверяет наличие файла базф данных Sqlite3
+// checkSqlite3DbFileExist проверяет наличие файла БД Sqlite3
 // и при необходимости создает его из резервного файла
 func checkSqlite3DbFileExist(pathFileDb string) error {
-	backupFile := "../../internal/backupdb/sqlite3_backup.db"
+	backupFile := "../../backupdb/sqlite3_backup.db"
 
 	// наличие файла backup
 	if _, err := os.Stat(backupFile); err != nil {
