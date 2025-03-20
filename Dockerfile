@@ -9,6 +9,7 @@ FROM golang:1.23.7-alpine AS pmisp_build_image
 LABEL temporary=''
 ARG BRANCH
 ARG VERSION
+ENV CGO_ENABLED=1
 WORKDIR /go/
 COPY --from=pmisp_packages_image /go ./
 RUN echo -e "pmisp_build_image" && \
