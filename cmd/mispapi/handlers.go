@@ -122,7 +122,7 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 
 		m.logger.Send("info", fmt.Sprintf("elements 'tags' successfully added to event with id:'%s' (case id:'%d')", eventId, int(data.CaseId)))
 
-		time.Sleep(3 * time.Second)
+		time.Sleep(5 * time.Second)
 
 		//публикуем добавленное событие
 		//masterKey нужен для публикации события так как пользователь

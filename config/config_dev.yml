@@ -9,7 +9,7 @@ NATS:
   cache_ttl: 3600
   subscriptions:
     listener_case: object.casetype.test
-    sender_command: object.commandstype
+    sender_command: object.commandstype.local
 MISP:
   host: misp-world.cloud.gcm
 THEHIVE:
