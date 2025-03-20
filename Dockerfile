@@ -1,4 +1,3 @@
-
 FROM golang:1.23.7-alpine AS pmisp_packages_image
 ENV PATH /usr/local/go/bin:$PATH
 WORKDIR /go/src
@@ -37,6 +36,7 @@ RUN mkdir ./logs
 COPY --from=pmisp_build_image /go/src/${VERSION}/app ./
 COPY --from=pmisp_build_image /go/src/${VERSION}/README.md ./ 
 COPY --from=pmisp_build_image /go/src/${VERSION}/version ./
+COPY --from=pmisp_build_image /go/src/${VERSION}/backupdb/sqlite3_backup.db ./backupdb/
 COPY config/* ./config/
 
 ENTRYPOINT [ "./app" ]
