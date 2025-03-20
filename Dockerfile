@@ -32,7 +32,7 @@ RUN addgroup --g 1500 groupcontainer && \
     adduser -u 1500 -G groupcontainer -D ${USERNAME} --home ${US_DIR}
 USER ${USERNAME}
 WORKDIR ${US_DIR}
-RUN mkdir ./logs
+RUN mkdir ./logs ./sqlite3
 COPY --from=pmisp_build_image /go/src/${VERSION}/app ./
 COPY README.md ./ 
 COPY version ./
