@@ -39,5 +39,6 @@ COPY README.md ./
 COPY version ./
 COPY backupdb/*.db ./backupdb/
 COPY config/* ./config/
+COPY rules/* ./rules/
 
 ENTRYPOINT [ "./app" ]
