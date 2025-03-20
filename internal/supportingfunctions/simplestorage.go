@@ -3,9 +3,6 @@ package supportingfunctions
 import (
 	"sync"
 	"time"
-
-	"github.com/google/uuid"
-	"github.com/nats-io/nats.go"
 )
 
 var (
@@ -20,7 +17,6 @@ type natsStorage struct {
 
 type messageDescriptors struct {
 	timeCreate int64
-	msgNats    *nats.Msg
 }
 
 // NewStorageNATS конструктор storageNATS
@@ -47,28 +43,6 @@ func checkLiveTime(ns *natsStorage) {
 			}
 		}()
 	}
-}
-
-func (ns *natsStorage) setElement(m *nats.Msg) string {
-	id := uuid.New().String()
-
-	ns.mutex.Lock()
-	defer ns.mutex.Unlock()
-
-	ns.storage[id] = messageDescriptors{
-		timeCreate: time.Now().Unix(),
-		msgNats:    m,
-	}
-
-	return id
-}
-
-func (ns *natsStorage) getElement(id string) (*nats.Msg, bool) {
-	if elem, ok := ns.storage[id]; ok {
-		return elem.msgNats, ok
-	}
-
-	return nil, false
 }
 
 func (ns *natsStorage) deleteElement(id string) {

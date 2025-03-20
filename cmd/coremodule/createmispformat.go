@@ -228,8 +228,8 @@ func (gen *GenerateObjectsFormatMISP) Start(chDecodeJSON <-chan ChanInputCreateM
 		}
 
 		//добавляем case id в поле Info
-		//		eventsMisp.Info += fmt.Sprintf(" :::TheHive case id '%d':::", int(caseId))
-		eventsMisp.Info += fmt.Sprintf(" TesT:_TheHive case id '%d'_:TesT", int(caseId))
+		eventsMisp.Info += fmt.Sprintf(" :::TheHive caseId:'%d':::", int(caseId))
+		//eventsMisp.Info += fmt.Sprintf(" TesT:_TheHive case id '%d'_:TesT", int(caseId))
 
 		//добавляем в datemodels.ListObjectEventTags дополнительные теги
 		//ответственные за формирование галактик в MISP
