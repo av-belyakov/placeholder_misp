@@ -215,14 +215,14 @@ func (gen *GenerateObjectsFormatMISP) Start(chDecodeJSON <-chan ChanInputCreateM
 
 		gen.listRule.CleanStatementExpressionRulePass()
 
-		if !isAllowed {
-			gen.logger.Send("warning", fmt.Sprintf("the message with case id %d was not sent to MISP because it does not comply with the rules", int(caseId)))
+		if caseId == 0 {
+			gen.logger.Send("error", fmt.Sprintf("the caseId in the event cannot be equal to 0 (event creator email '%s')", eventsMisp.EventCreatorEmail))
 
 			return
 		}
 
-		if caseId == 0 {
-			gen.logger.Send("error", fmt.Sprintf("the caseId in the event cannot be equal to 0 (event creator email '%s')", eventsMisp.EventCreatorEmail))
+		if !isAllowed {
+			gen.logger.Send("warning", fmt.Sprintf("the message with case id %d was not sent to MISP because it does not comply with the rules", int(caseId)))
 
 			return
 		}
