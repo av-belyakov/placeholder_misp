@@ -34,6 +34,7 @@ LOGGING:
       pathDirectory: "logs",
       writingStdout: false,
       maxFileSize: 10000000,
+      writingDB: true,
     }
   - {
       msgTypeName: "warning",
@@ -41,6 +42,7 @@ LOGGING:
       pathDirectory: "logs",
       writingStdout: false,
       maxFileSize: 10000000,
+      writingDB: true,
     }
   - {
       msgTypeName: "info",
@@ -48,6 +50,7 @@ LOGGING:
       pathDirectory: "logs",
       writingStdout: true,
       maxFileSize: 10000000,
+      writingDB: true,
     }
   - {
       msgTypeName: "debug",

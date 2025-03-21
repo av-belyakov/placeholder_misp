@@ -17,7 +17,7 @@ stages:
     - placeholder_misp_gcm
 
 .docker-login-script: &docker-login
-  - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
+  - $CI_JOB_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
 
 .docker-image-prune: &docker-image-pure
   - docker image prune -a --force --filter="label=temporary"
