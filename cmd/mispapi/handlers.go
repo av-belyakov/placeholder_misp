@@ -80,8 +80,6 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 
 		m.logger.Send("info", fmt.Sprintf("element 'event_reports' successfully added to event with id:'%s' (case id:'%d')", eventId, int(data.CaseId)))
 
-		time.Sleep(2 * time.Second)
-
 		//добавляем атрибуты
 		_, _, warning, err := rmisp.sendAttribytes(ctx, eventId, data.Data.GetAttributes())
 		if err != nil {
@@ -99,8 +97,6 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 
 		m.logger.Send("info", fmt.Sprintf("some elements 'attribytes' successfully added to event with id:'%s' (case id:'%d')", eventId, int(data.CaseId)))
 
-		time.Sleep(2 * time.Second)
-
 		// добавляем объекты
 		if _, _, err = rmisp.sendObjects(ctx, eventId, data.Data.GetObjects()); err != nil {
 			//тут такая же ситуация что и с ошибками при выполнении метода rmisp.sendAttribytes
@@ -113,7 +109,7 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 		// всё ранее ему переданное, если обработка переданных объектов не была завершена
 		// возможны накладки или сбои при добавлении данных
 		// это недостаток MISP, с этим я ничего не могу поделать
-		time.Sleep(2 * time.Second)
+		time.Sleep(5 * time.Second)
 
 		// добавляем event_tags
 		if err := rmisp.sendEventTags(ctx, eventId, data.Data.GetObjectTags()); err != nil {
