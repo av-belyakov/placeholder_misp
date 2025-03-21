@@ -6,15 +6,20 @@ stages:
   - build
   - deploy
 
+# сборка, это на моем ПК (используется для сборки)
 .build-runner-tags: &build-tags
   tags:
-    # это на моем ПК (используется для сборки)
-    - placeholder_misp
+    - placeholder_misp_build
 
-.deploy-runner-tags: &deploy-tags
+# разворачиваем тестовую сборку
+.deploy-test-runner-tags: &deploy-test-tags
   tags:
-    # разварачиваем на ВМ в облаке
-    - placeholder_misp_gcm
+    - placeholder_misp_test
+
+# разворачиваем продуктовую сборку
+.deploy-prod-runner-tags: &deploy-prod-tags
+  tags:
+    - placeholder_misp_prod
 
 .docker-login-script: &docker-login
   - echo $CI_JOB_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
@@ -31,7 +36,8 @@ stages:
 #выводим версию приложения
 get_version:
   stage: .pre
-  <<: *deploy-tags
+  <<: *deploy-test-tags
+  <<: *deploy-prod-tags
   script:
     - 'V=`awk ''/[0-9].[0-9].[0-9]/; {print $2}'' $CI_PROJECT_DIR/version`; echo "version $V"'
 
@@ -77,7 +83,7 @@ build-prod:
 #развёртывание тестовой сборки (GCM.test)
 deploy-test:
   stage: deploy
-  <<: *deploy-tags
+  <<: *deploy-test-tags
   rules:
     - *dev-test-commit
   before_script:
@@ -91,7 +97,7 @@ deploy-test:
 #развёртывание основной сборки (GCM)
 deploy-prod-gcm:
   stage: deploy
-  <<: *deploy-tags
+  <<: *deploy-prod-tags
   rules:
     - if: $CI_COMMIT_BRANCH == $BRANCH_MAJOR || $CI_COMMIT_REF_NAME == $BRANCH_MAJOR
       when: manual
