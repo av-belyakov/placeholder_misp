@@ -2,9 +2,9 @@ version: "3.4"
 
 services:
   app:
-    container_name: placeholder_misp
+    container_name: placeholder_misp.prod
     environment:
-      - GO_PHMISP_MAUTH=$PHMISP_MAUTH
+      - GO_PHMISP_MAUTH=$PHMISP_MAUTH_FOR_PROD
       - GO_PHMISP_DBWLOGPASSWD=$PHMISP_DBWLOGPASSWD
     image: gitlab.cloud.gcm:5050/a.belyakov/placeholder_misp:latest
     restart: unless-stopped
@@ -13,7 +13,7 @@ services:
     command: chmod 777 /opt/placeholder_misp/logs && \
              chown 1500:1500 /opt/placeholder_misp/logs
     volumes:
-      - /var/log/placeholder_misp:/opt/placeholder_misp/logs:rw
+      - /var/log/placeholder_misp.prod:/opt/placeholder_misp/logs:rw
       - ./config:/opt/placeholder_misp/config:rw
       - ./sqlite3:/opt/placeholder_misp/sqlite3.db:ro
       #выполняем для корректного отображения даты с учетом временной зоны
