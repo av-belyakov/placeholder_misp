@@ -27,6 +27,11 @@ import (
 )
 
 func server(ctx context.Context) {
+	var nameRegionalObject = "gcm"
+	if os.Getenv("GO_PHMISP_MAIN") == "development" {
+		nameRegionalObject = "gcm.test"
+	}
+
 	version, err := appversion.GetAppVersion()
 	if err != nil {
 		log.Println(err)
@@ -72,7 +77,7 @@ func server(ctx context.Context) {
 		User:               confDB.User,
 		Passwd:             confDB.Passwd,
 		IndexDB:            confDB.StorageNameDB,
-		NameRegionalObject: "gcm",
+		NameRegionalObject: nameRegionalObject,
 	}); err != nil {
 		_ = simpleLogger.Write("error", supportingfunctions.CustomError(err).Error())
 	} else {
