@@ -4,7 +4,7 @@ services:
   app:
     container_name: placeholder_misp.test
     environment:
-      - GO_PHMISP_MAUTH=$PHMISP_MAUTH
+      - GO_PHMISP_MAUTH=$PHMISP_MAUTH_FOR_TEST
       - GO_PHMISP_DBWLOGPASSWD=$PHMISP_DBWLOGPASSWD
     image: gitlab.cloud.gcm:5050/a.belyakov/placeholder_misp:test
     restart: unless-stopped

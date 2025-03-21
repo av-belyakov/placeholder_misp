@@ -9,17 +9,17 @@ stages:
 # сборка, это на моем ПК (используется для сборки)
 .build-runner-tags: &build-tags
   tags:
-    - placeholder_misp_build
+    - placeholder_misp.build
 
 # разворачиваем тестовую сборку
 .deploy-test-runner-tags: &deploy-test-tags
   tags:
-    - placeholder_misp_test
+    - placeholder_misp.test
 
 # разворачиваем продуктовую сборку
 .deploy-prod-runner-tags: &deploy-prod-tags
   tags:
-    - placeholder_misp_prod
+    - placeholder_misp.prod
 
 .docker-login-script: &docker-login
   - echo $CI_JOB_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
