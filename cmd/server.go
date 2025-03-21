@@ -29,7 +29,7 @@ import (
 func server(ctx context.Context) {
 	var nameRegionalObject = "gcm"
 	if os.Getenv("GO_PHMISP_MAIN") == "development" {
-		nameRegionalObject = "gcm.test"
+		nameRegionalObject = "gcm-test"
 	}
 
 	version, err := appversion.GetAppVersion()

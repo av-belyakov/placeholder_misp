@@ -153,8 +153,6 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 
 // delObject удаляет старое событие типа Event и все связанные с ним объекты
 func (m *ModuleMISP) delObject(ctx context.Context, eventId string) {
-	fmt.Printf("______ func 'ModuleMISP.delObject', eventId:'%s', START...", eventId)
-
 	rmisp, err := NewMispRequest(
 		WithHost(m.host),
 		WithMasterAuthKey(m.authKey))

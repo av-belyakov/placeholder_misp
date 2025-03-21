@@ -97,11 +97,7 @@ func (module *ApiSqlite3Module) route(ctx context.Context) {
 						continue
 					}
 
-					fmt.Printf("func 'ApiSqlite3Module.route' data.Command:'%s' updates information about case, caseId:%d, new eventId:%d\n", data.Command, caseId, eventId)
-
 					if err = module.UpdateCaseId(ctx, caseId, eventId); err != nil {
-						fmt.Println("func 'ApiSqlite3Module.route' ERROR:", err)
-
 						module.logger.Send("warning", supportingfunctions.CustomError(err).Error())
 					}
 

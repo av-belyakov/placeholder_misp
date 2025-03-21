@@ -367,28 +367,10 @@ func (o *CacheSpecialObject[T]) Comparison(objFromCache T) bool {
 		objects[k].SetEventId(eventId)
 	}
 
-	fmt.Printf("func 'CacheSpecialObject.Comparison' o.object.Id:%s == %s: cache.object.Id\n", o.object.GetID(), objFromCache.GetID())
-
-	fmt.Printf("func 'CacheSpecialObject.Comparison', Event, isEqual '%t'\n", o.object.ComparisonEvent(objFromCache.GetEvent()))
 	elements = append(elements, o.object.ComparisonEvent(objFromCache.GetEvent()))
-
-	fmt.Printf("func 'CacheSpecialObject.Comparison', Reports, isEqual '%t'\n", o.object.ComparisonReports(objFromCache.GetReports()))
 	elements = append(elements, o.object.ComparisonReports(objFromCache.GetReports()))
-
-	fmt.Printf("func 'CacheSpecialObject.Comparison', Attributes, isEqual '%t'\n", o.object.ComparisonAttributes(objFromCache.GetAttributes()))
-	/*for _, attOne := range o.object.GetAttributes() {
-		for _, attTwo := range objFromCache.GetAttributes() {
-			if attOne.GetObjectId() == attTwo.ObjectId {
-				fmt.Printf("attOne:'%+v'\nattTwo:'%+v'\n", attOne, attTwo)
-			}
-		}
-	}*/
 	elements = append(elements, o.object.ComparisonAttributes(objFromCache.GetAttributes()))
-
-	fmt.Printf("func 'CacheSpecialObject.Comparison', Objects, isEqual '%t'\n", o.object.ComparisonObjects(objFromCache.GetObjects()))
 	elements = append(elements, o.object.ComparisonObjects(objFromCache.GetObjects()))
-
-	fmt.Printf("func 'CacheSpecialObject.Comparison', Tags, isEqual '%t'\n", o.object.ComparisonObjectTags(objFromCache.GetObjectTags()))
 	elements = append(elements, o.object.ComparisonObjectTags(objFromCache.GetObjectTags()))
 
 	return !slices.Contains(elements, false)
