@@ -4,7 +4,8 @@ services:
   app:
     container_name: placeholder_misp
     environment:
-      - GO_PHMISP_MAUTH=$ #тут переменная в gillab
+      - GO_PHMISP_MAUTH=$PHMISP_MAUTH
+      - GO_PHMISP_DBWLOGPASSWD=$PHMISP_DBWLOGPASSWD
     image: gitlab.cloud.gcm:5050/a.belyakov/placeholder_misp:latest
     restart: unless-stopped
     #пробрасываем user ID для корректной записи в логов
