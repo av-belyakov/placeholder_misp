@@ -1,0 +1,146 @@
+#     Общее описание правил.
+#
+#   Все используемые правила делятся на типы: REPLACE, EXCLUDE, PASSANY и PASS. Правила
+# типа REPLACE, EXCLUDE и PASS реализованы в виде списка объектов с параметрами.
+#
+#   Правило типа PASSANY имеет только один единственный параметр 'true' или 'false'.
+#
+#   Правила из раздела REPLACE должны содержать список объектов состоящих из определенных
+# свойств и отвечают за замену значений определенных полей, либо просто совпадающих полей,
+# если наименование искомого поле не заполняется.
+# Правило данного типа выполняется ВСЕГДА. Для данного типа правил обязательными являются
+# поля 'searchValue' и 'replaceValue'. Свойство 'searchField' может быть пустым или
+# отсутствовать, тогда поиск будет осуществлятся только по значению из свойства 'searchValue'.
+# Одно из свойств 'searchField' или 'searchValue' должно быть заполнено. Если свойство
+# 'searchValue' пустое, а свойство 'searchField' заполнено то выполняется поиск поля с
+# именем из 'searchField' и пустым значением. Если свойство 'replaceValue' пустое, то
+# найденное значение будет заменено пустым.
+# ЛОГИКА обработки списка объектов данного правила "ИЛИ".
+#
+#   Правила из раздела PASS должны содержать список из вложенных объектов, состоящих
+# из определенных свойств. Они отвечают за пропуск сообщения, при совпадении полей и
+# значений в обрабатываемом сообщении. Для данного типа правил обязательными являются
+# свойства 'searchField' и 'searchValue'. Свойство 'searchField' должно содержать 'путь',
+# через '.', до искомого поля, как при обращении к определенному полю JSON объекта.
+# Свойство 'searchValue' может быть пустым, тогда поиск будет выполнятся по наименаванию
+# поля из свойства 'searchField' и пустому значению. Так же свойство 'searchValue' первым
+# символом в стоке может содержать конструкцию 'not:', что для обработчика будет означать
+# логическое отрицание. Кроме того, данное поле может содержать только конструкцию 'not:'
+# что будет означать - поле не должно быть пустым.
+# ЛОГИКА обработки списка объектов "ИЛИ" для первого уровня вложения и логика "И" для
+# второго уровня вложения.
+#
+#   Правила из раздела EXCLUDE должны содержать список из вложенных объектов, состоящих
+# из определенных свойств. Они отвечают за исключение сообщения из списка передаваемых
+# в MISP. Эти правила применяются только для свойств содержащих массив объектов.
+# Пока это только такие 'глобальные' объекты JSON TheHive как 'observables' (в MISP это
+# Attribute) и 'ttp'. Поля searchField и searchValue являются обязательными. При этом поле
+# searchField должно содержать значение начинающееся с имени свойства содержащего массив объектов,
+# а следом, через '.' должно идти имя свойства или последовательность свойств
+# в которых нужно найти определенное значение. Поле searchValue может быть пустым,
+# тогда будет выполнен поиск пустого свойства из поля searchField. Поле accurateComparison
+# содержит тригер, определяющий тип поиска значения из поля searchValue.
+# При значении поля accurateComparison 'false' поиск осуществляется
+# по наличию содержимого. Например, если searchValue содержит значение
+# 'example', то в указанном из поля searchField свойстве будет выполнятся поиск
+# наличия значения 'example' в любом тексте, если оно есть то правило применяется.
+# В противоположность, значение 'true' поля accurateComparison требует осуществлять
+# 'строгое' сравнение, то есть содержимое в искомом свойстве должно содержать
+# только значение 'example' и ничего больше.
+# ЛОГИКА обработки списка объектов "ИЛИ" для групп listAnd и "И" для значений внутри listAnd.
+#
+#
+#   Список параметров правил:
+# - searchField - поле поиска (обязательно для правил типа PASS, EXCLUDE)
+# - searchValue - значение поиска (обязательно для правил типа PASS, EXCLUDE)
+# - replaceValue - значение для замены (обязательно для правила REPLACE)
+#
+# Пример правил:
+#
+# RULES:
+#  REPLACE:
+#    - searchField: "capecId"
+#      searchValue: "CAPEC-49"
+#      replaceValue: ""
+#    - searchField: "_createdBy"
+#      searchValue: "admin@thehive.local"
+#      replaceValue: "Admin@TheHivE.local"
+#    - searchField: "caseId"
+#      searchValue: "831"
+#      replaceValue: "9451"
+#    - searchField: "revoked"
+#      searchValue: "false"
+#      replaceValue: "true"
+#  PASS:
+#    - listAnd:
+#      - searchField: "event.object.impactStatus"
+#        searchValue: "WithImpact"
+#      - searchField: "event.object.resolutionStatus"
+#        searchValue: "TruePositive"
+#      - searchField: "event.object.tlp"
+#        searchValue: "not:1"
+#    - listAnd:
+#      - searchField: "event.details.status"
+#        searchValue: "Resolved"
+#      - searchField: "event.object.base"
+#        searchValue: "not:"
+#    - listAnd:
+#  EXCLUDE:
+#    - listAnd:
+#      - searchField: "observables.tlp"
+#        searchValue: "3"
+#        accurateComparison: true
+#    - listAnd:
+#      - searchField: "observables.dataType"
+#        searchValue: "url_pcap"
+#        accurateComparison: false
+#    - listAnd:
+#      - searchField: "observables.data"
+#        searchValue: "anisimova.cloud.gcm"
+#        accurateComparison: false
+#  PASSANY: true
+#
+
+# Правила из раздела PASS и EXCLUDE. Логика, первый вложенный список "ИЛИ", второй в listAnd "И"
+
+RULES:
+  REPLACE:
+  PASS:
+    - listAnd:
+        - searchField: "event.object.impactStatus"
+          searchValue: "WithImpact"
+        - searchField: "event.object.resolutionStatus"
+          searchValue: "TruePositive"
+    #      - searchField: "event.object.tlp"
+    #        searchValue: "not:3"
+    - listAnd:
+  EXCLUDE:
+    #    - searchField: "observables.tlp"
+    #      searchValue: "3"
+    #      accurateComparison: true
+    - listAnd:
+        - searchField: "observables.dataType"
+          searchValue: "url_pcap"
+          accurateComparison: false
+    - listAnd:
+        - searchField: "observables.data"
+          searchValue: "anisimova.cloud.gcm"
+          accurateComparison: false
+  #    - listAnd:
+  #        - searchField: "observables.ioc"
+  #          searchValue: "true"
+  #          accurateComparison: true
+  #        - searchField: "observables.data"
+  #          searchValue: "192.168.23.44"
+  #          accurateComparison: true
+  #    - listAnd:
+  #        - searchField: "observables.sighted"
+  #          searchValue: "false"
+  #          accurateComparison: true
+  #        - searchField: "observables._createdBy"
+  #          searchValue: "belyakov"
+  #          accurateComparison: false
+  #        - searchField: "observables.data"
+  #          searchValue: "letin@mail"
+  #          accurateComparison: false
+  PASSANY: false

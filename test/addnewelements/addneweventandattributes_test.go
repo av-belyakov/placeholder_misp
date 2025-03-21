@@ -2,34 +2,40 @@ package testaddnewelements_test
 
 import (
 	"bufio"
+	"context"
 	"fmt"
+	"log"
 	"os"
 	"path"
-	"time"
 
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"placeholder_misp/confighandler"
-	"placeholder_misp/coremodule"
-	"placeholder_misp/datamodels"
-	"placeholder_misp/memorytemporarystorage"
-	"placeholder_misp/mispinteractions"
-	rules "placeholder_misp/rulesinteraction"
-	"placeholder_misp/supportingfunctions"
+	"github.com/av-belyakov/placeholder_misp/cmd/coremodule"
+	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
+	"github.com/av-belyakov/placeholder_misp/cmd/sqlite3api"
+	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/constants"
+	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
+	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
+	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
+	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
+	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
+	"github.com/av-belyakov/simplelogger"
 )
 
 var _ = Describe("Addneweventandattributes", Ordered, func() {
 	var (
-		logging                        chan datamodels.MessageLogging
-		counting                       chan datamodels.DataCounterSettings
-		confApp                        confighandler.ConfigApp
-		listRules                      *rules.ListRule
-		mispModule                     *mispinteractions.ModuleMISP
-		storageApp                     *memorytemporarystorage.CommonStorageTemporary
-		exampleByte                    []byte
-		errReadFile, errMisp, errRules error
+		logging       *logginghandler.LoggingChan
+		counting      *countermessage.CounterMessage
+		confApp       confighandler.ConfigApp
+		listRules     *rules.ListRule
+		mispModule    *mispapi.ModuleMISP
+		sqlite3Module *sqlite3api.ApiSqlite3Module
+		exampleByte   []byte
+
+		errReadFile, errMisp, errRules, errSqlite3Conn error
 	)
 
 	readFileJson := func(fpath, fname string) ([]byte, error) {
@@ -57,8 +63,14 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 	}
 
 	BeforeAll(func() {
-		logging = make(chan datamodels.MessageLogging)
-		counting = make(chan datamodels.DataCounterSettings)
+		simpleLogger, err := simplelogger.NewSimpleLogger(context.Background(), constants.Root_Dir, []simplelogger.Options{})
+		if err != nil {
+			log.Fatalf("error module 'simplelogger': %v", err)
+		}
+
+		chZabbix := make(chan commoninterfaces.Messager)
+		counting = countermessage.New(chZabbix)
+		logging = logginghandler.New(simpleLogger, chZabbix)
 
 		// NATS
 		confApp.AppConfigNATS.Host = "nats.cloud.gcm"
@@ -76,41 +88,19 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 			fmt.Println("___ Logging START")
 			defer fmt.Println("___ Logging STOP")
 
-			for log := range logging {
+			for log := range logging.GetChan() {
 				fmt.Println("----", log, "----")
 			}
 		}()
 
-		//вывод данных счетчика
+		//вывод данных для Zabbix
 		go func() {
-			dc := storageApp.GetDataCounter()
-			d, h, m, s := supportingfunctions.GetDifference(dc.StartTime, time.Now())
-
-			fmt.Printf("\tСОБЫТИЙ принятых/обработанных: %d/%d, соответствие/не соответствие правилам: %d/%d, время со старта приложения: дней %d, часов %d, минут %d, секунд %d\n", dc.AcceptedEvents, dc.ProcessedEvents, dc.EventsMeetRules, dc.EventsDoNotMeetRules, d, h, m, s)
-
-			for d := range counting {
-				switch d.DataType {
-				case "update accepted events":
-					storageApp.SetAcceptedEventsDataCounter(d.Count)
-				case "update processed events":
-					storageApp.SetProcessedEventsDataCounter(d.Count)
-				case "update events meet rules":
-					storageApp.SetEventsMeetRulesDataCounter(d.Count)
-				case "events do not meet rules":
-					storageApp.SetEventsDoNotMeetRulesDataCounter(d.Count)
-				}
-
-				dc := storageApp.GetDataCounter()
-				d, h, m, s := supportingfunctions.GetDifference(dc.StartTime, time.Now())
-
-				fmt.Printf("\tСОБЫТИЙ принятых/обработанных: %d/%d, соответствие/не соответствие правилам: %d/%d, время со старта приложения: дней %d, часов %d, минут %d, секунд %d\n", dc.AcceptedEvents, dc.ProcessedEvents, dc.EventsMeetRules, dc.EventsDoNotMeetRules, d, h, m, s)
+			for msg := range chZabbix {
+				fmt.Println("message for Zabbix:", msg)
 			}
 		}()
 
 		taskId := uuid.New().String()
-
-		//инициализируем модуль временного хранения информации
-		storageApp = memorytemporarystorage.NewTemporaryStorage()
 
 		//инициализация списка правил
 		listRules, _, errRules = rules.NewListRule("placeholder_misp", "rules", "mispmsgrule.yaml")
@@ -120,14 +110,27 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		//"example_caseId_33807.json" НЕ совпадает с правилами
 		exampleByte, errReadFile = readFileJson("test/test_json", "examplenew.json")
 
-		//инициалиация модуля для взаимодействия с MISP
-		mispModule, errMisp = mispinteractions.HandlerMISP(*confApp.GetAppMISP(), confApp.Organizations, logging)
+		// инициализация модуля взаимодействия с Sqlite3
+		sqlite3Module, errSqlite3Conn = sqlite3api.New(context.Background(), confApp.AppConfigSqlite3.PathFileDb, logging)
 
-		hjm := coremodule.NewHandlerJsonMessage(storageApp, logging, counting)
+		//инициалиация модуля для взаимодействия с MISP
+		mispModule, errMisp = mispapi.NewModuleMISP(confApp.GetAppMISP().Host, confApp.GetAppMISP().Auth, confApp.GetListOrganization(), logging)
+
+		hjson := coremodule.NewHandlerJSON(counting, logging)
 		// обработчик JSON документа
-		chanOutputDecodeJson := hjm.HandlerJsonMessage(exampleByte, taskId)
+		chanOutputDecodeJson := hjson.Start(exampleByte, taskId)
 		//формирование итоговых документов в формате MISP
-		go coremodule.NewMispFormat(chanOutputDecodeJson, taskId, mispModule, listRules, logging, counting)
+
+		generatorFormatMISP := coremodule.NewGenerateObjectsFormatMISP(
+			coremodule.SettingsGenerateObjectsFormatMISP{
+				MispModule:    mispModule,
+				Sqlite3Module: sqlite3Module,
+				ListRule:      listRules,
+				Counter:       counting,
+				Logger:        logging,
+			})
+
+		generatorFormatMISP.Start(chanOutputDecodeJson, taskId)
 	})
 
 	Context("Тест 1. Проверка инициализации модулей", func() {
@@ -139,6 +142,10 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 			Expect(errReadFile).ShouldNot(HaveOccurred())
 		})
 
+		It("При инициализации модуля взаимодействия с Sqlit3 не должно быть ошибки", func() {
+			Expect(errSqlite3Conn).ShouldNot(HaveOccurred())
+		})
+
 		It("При инициализации модуля обработки MISP не должно быть ошибки", func() {
 			Expect(errMisp).ShouldNot(HaveOccurred())
 		})
@@ -146,7 +153,7 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 
 	Context("Тест 2. Проверяем обработчик кейсов", func() {
 		It("Должны прийти два события от модуля misp", func() {
-			mispOutput := mispModule.GetDataReceptionChannel()
+			mispOutput := mispModule.GetReceptionChannel()
 
 			var err error
 

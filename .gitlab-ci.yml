@@ -1,0 +1,105 @@
+variables:
+  BRANCH_MAJOR: master
+  BRANCH_TEST: development
+
+stages:
+  - build
+  - deploy
+
+.build-runner-tags: &build-tags
+  tags:
+    # это на моем ПК (используется для сборки)
+    - placeholder_misp
+
+.deploy-runner-tags: &deploy-tags
+  tags:
+    # разварачиваем на ВМ в облаке
+    - placeholder_misp_gcm
+
+.docker-login-script: &docker-login
+  - echo $CI_JOB_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+
+.docker-image-prune: &docker-image-pure
+  - docker image prune -a --force --filter="label=temporary"
+
+.is-branch-dev-test-commit: &dev-test-commit
+  - if: $CI_COMMIT_BRANCH == $BRANCH_TEST || $CI_COMMIT_REF_NAME == $BRANCH_TEST
+
+.is-branch-master-commit: &master-commit
+  - if: $CI_COMMIT_BRANCH == $BRANCH_MAJOR || $CI_COMMIT_REF_NAME == $BRANCH_MAJOR
+
+#выводим версию приложения
+get_version:
+  stage: .pre
+  <<: *deploy-tags
+  script:
+    - 'V=`awk ''/[0-9].[0-9].[0-9]/; {print $2}'' $CI_PROJECT_DIR/version`; echo "version $V"'
+
+#сборка тестового образа
+build-test:
+  stage: build
+  <<: *build-tags
+  rules:
+    - *dev-test-commit
+  script:
+    # удаляем старый образ
+    - docker rmi $CI_REGISTRY_IMAGE:test || true
+    - >
+      docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA \
+       --build-arg VERSION=$CI_COMMIT_SHORT_SHA \
+       --build-arg BRANCH=$BRANCH_TEST \
+       --build-arg STATUS=development .
+    # удаляем промежуточный образ с меткой temporary
+    - *docker-image-pure
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA $CI_REGISTRY_IMAGE:test
+    - *docker-login
+    - docker push $CI_REGISTRY_IMAGE:test
+    - docker rmi $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA || true
+
+#сборка основного образа
+build-prod:
+  stage: build
+  <<: *build-tags
+  rules:
+    - *master-commit
+  script:
+    - docker rmi $CI_REGISTRY_IMAGE:latest || true
+    - >
+      docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA \
+       --build-arg VERSION=$CI_COMMIT_SHORT_SHA \
+       --build-arg BRANCH=$BRANCH_MAJOR .
+    - *docker-image-pure
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA $CI_REGISTRY_IMAGE:latest
+    - *docker-login
+    - docker push $CI_REGISTRY_IMAGE:latest
+    - docker rmi $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA || true
+
+#развёртывание тестовой сборки (GCM.test)
+deploy-test:
+  stage: deploy
+  <<: *deploy-tags
+  rules:
+    - *dev-test-commit
+  before_script:
+    - echo "Start deploy placeholder_misp application for GCM.test"
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker-compose -f $CI_PROJECT_DIR/docker-compose.test.yml down
+    - docker rmi gitlab.cloud.gcm:5050/a.belyakov/placeholder_misp:test || true
+    - docker-compose -f $CI_PROJECT_DIR/docker-compose.test.yml up -d --force-recreate --build
+
+#развёртывание основной сборки (GCM)
+deploy-prod-gcm:
+  stage: deploy
+  <<: *deploy-tags
+  rules:
+    - if: $CI_COMMIT_BRANCH == $BRANCH_MAJOR || $CI_COMMIT_REF_NAME == $BRANCH_MAJOR
+      when: manual
+      allow_failure: true
+  before_script:
+    - echo "Start deploy placeholder_misp application for GCM"
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker-compose -f $CI_PROJECT_DIR/docker-compose.yml down
+    - docker rmi gitlab.cloud.gcm:5050/a.belyakov/placeholder_misp:latest || true
+    - docker-compose -f $CI_PROJECT_DIR/docker-compose.yml up -d --force-recreate --build

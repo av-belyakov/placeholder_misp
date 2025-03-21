@@ -2,17 +2,21 @@ package testcreategalaxy_test
 
 import (
 	"bufio"
+	"context"
 	"fmt"
+	"log"
 	"os"
 	"path"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"placeholder_misp/coremodule"
-	"placeholder_misp/datamodels"
-	rules "placeholder_misp/rulesinteraction"
-	"placeholder_misp/supportingfunctions"
+	"github.com/av-belyakov/placeholder_misp/cmd/coremodule"
+	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
+	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
+	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
+	"github.com/av-belyakov/simplelogger"
 )
 
 func addListGalaxyTags(lgt *coremodule.MispGalaxyTags) func(string, any) {
@@ -80,7 +84,6 @@ var _ = Describe("Createlistgalaxytags", Ordered, func() {
 		exampleByte    []byte
 		errReadFile    error
 		errRules       error
-		logging        chan datamodels.MessageLogging
 		chanInput      chan ChanInputCreateMispFormat
 		chanDone       chan struct{}
 		stopped        chan bool
@@ -113,11 +116,18 @@ var _ = Describe("Createlistgalaxytags", Ordered, func() {
 	}
 
 	BeforeAll(func() {
-		logging = make(chan datamodels.MessageLogging)
 		chanInput = make(chan ChanInputCreateMispFormat)
 		chanDone = make(chan struct{})
 		stopped = make(chan bool)
 
+		chZabbix := make(chan commoninterfaces.Messager)
+
+		simpleLogger, err := simplelogger.NewSimpleLogger(context.Background(), "palceholder_misp", simplelogger.CreateOptions())
+		if err != nil {
+			log.Fatalf("error module 'simplelogger': %v", err)
+		}
+
+		logging := logginghandler.New(simpleLogger, chZabbix)
 		listGalaxyTags = coremodule.NewMispGalaxyTags()
 
 		exampleByte, errReadFile = readFileJson("testing/test_json", "example_caseId_33705.json")
@@ -125,11 +135,11 @@ var _ = Describe("Createlistgalaxytags", Ordered, func() {
 		//инициализация списка правил
 		listRules, _, errRules = rules.NewListRule("placeholder_misp", "rules", "mispmsgrule.yaml")
 
-		go func(logging <-chan datamodels.MessageLogging) {
+		go func(logging commoninterfaces.Logger) {
 			for {
 				select {
-				case msg := <-logging:
-					fmt.Println("LOG MSG:", msg.MsgData)
+				case msg := <-logging.GetChan():
+					fmt.Println("LOG MSG:", msg.GetMessage())
 				case <-chanDone:
 					fmt.Println("---=== STOPED DECODE JSON OBJECT ===---")
 

@@ -1,0 +1,24 @@
+RULES_PROC_MSG_FOR_MISP:
+  directory: rules
+  file: mispmsgrule.yml
+SQLITE3:
+  path_file_db: /sqlite3/sqlite3.db
+NATS:
+  host: 192.168.9.208
+  port: 4222
+  cache_ttl: 3600
+  subscriptions:
+    listener_case: object.casetype.test
+    #что бы не отправлялись команды на обнавление данных в thehive
+    #так как это уже делает продуктовый модуль
+    sender_command: object.commandstype.local
+MISP:
+  host: misp-world.cloud.gcm
+THEHIVE:
+  send: true
+DATABASEWRITELOG:
+  host: datahook.cloud.gcm
+  port: 9200
+  namedb: ""
+  storage_name_db: placeholder_misp
+  user: log_writer
