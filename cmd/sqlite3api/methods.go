@@ -2,7 +2,6 @@ package sqlite3api
 
 import (
 	"context"
-	"fmt"
 )
 
 // Ping проверка соединения с БД
@@ -49,18 +48,12 @@ func (module *ApiSqlite3Module) UpdateCaseId(ctx context.Context, caseId, eventI
 		return err
 	}
 
-	fmt.Printf("func 'ApiSqlite3Module.UpdateCaseId' found eventId:%d\n", id)
-
 	if id == 0 {
-		fmt.Println("func 'ApiSqlite3Module.UpdateCaseId' INSERT")
-
 		if _, err := module.db.ExecContext(ctx, "INSERT INTO placeholder_misp (caseId, eventId) VALUES (?,?)", caseId, eventId); err != nil {
 			return err
 		}
 
 	} else {
-		fmt.Println("func 'ApiSqlite3Module.UpdateCaseId' UPDATE")
-
 		if _, err := module.db.ExecContext(ctx, "UPDATE placeholder_misp SET eventId=? WHERE caseId=?", eventId, caseId); err != nil {
 			return err
 		}
