@@ -216,8 +216,6 @@ func New(rootDir string) (*ConfigApp, error) {
 
 	fileNameCommon, err := getFileName("config.yml", confPath, list)
 	if err != nil {
-		fmt.Println("ERRROR 1:", err)
-
 		return conf, err
 	}
 
@@ -230,15 +228,11 @@ func New(rootDir string) (*ConfigApp, error) {
 	if envList["GO_PHMISP_MAIN"] == "development" {
 		fn, err = getFileName("config_dev.yml", confPath, list)
 		if err != nil {
-			fmt.Println("ERRROR 2:", err)
-
 			return conf, err
 		}
 	} else {
 		fn, err = getFileName("config_prod.yml", confPath, list)
 		if err != nil {
-			fmt.Println("ERRROR 3:", err)
-
 			return conf, err
 		}
 	}
