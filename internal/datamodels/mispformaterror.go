@@ -1,5 +1,14 @@
 package datamodels
 
+// MispFormatError структура ошибки получаемой от MISP
+type MispFormatError struct {
+	Errors  map[string]interface{} `json:"errors"`
+	Name    string                 `json:"name"`
+	Message string                 `json:"message"`
+	URL     string                 `json:"url"`
+	Saved   bool                   `json:"saved"`
+}
+
 /*
 Пример ошибок от MISP
 {
@@ -21,12 +30,5 @@ package datamodels
             "Value not in the right type\/format. Please double check the value or select type \"other\"."
         ]
     }
-}*/
-
-type MispFormatError struct {
-	Errors  map[string]interface{} `json:"errors"`
-	Name    string                 `json:"name"`
-	Message string                 `json:"message"`
-	URL     string                 `json:"url"`
-	Saved   bool                   `json:"saved"`
 }
+*/

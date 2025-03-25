@@ -123,33 +123,7 @@ func (api *ApiNatsModule) Start(ctx context.Context) error {
 					continue
 				}
 
-				/*
-										!!!!!
-
-										incomingData.Data не содержит ничего что бы было похоже на команду
-										для отправки запроса на добавления нового eventId
-
-					Пример команды для добавления тега:
-					{
-					  "service": "MISP",
-					  "command": "add_case_tag",
-					  "root_id": "~74395656",
-					  "case_id": "13435",
-					  "value": "Webhook: send=\"MISP\""
-					}
-
-					Пример команды для добавления поля custom field:
-					{
-					  "service": "MISP",
-					  "command": "set_case_custom_field",
-					  "root_id": "~74395656",
-					  "field_name": "misp-event-id.string",
-					  "value": "3221"
-					}
-										!!!!!
-				*/
 				g := errgroup.Group{}
-
 				g.Go(func() error {
 					//команда на установку тега
 					if err := nc.Publish(api.subscriptions.senderCommand,
@@ -165,7 +139,6 @@ func (api *ApiNatsModule) Start(ctx context.Context) error {
 
 					return nil
 				})
-
 				g.Go(func() error {
 					//команда на добавление значения поля customFields
 					if err := nc.Publish(api.subscriptions.senderCommand,
