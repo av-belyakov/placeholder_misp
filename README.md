@@ -1,6 +1,6 @@
-# Placeholder_MISP
+# Readme
 
-Конфигурационные параметры для сервиса могут быть заданы как через конфигурационный файл так и методом установки переменных окружения.
+Сервис 'placeholder_MISP' выполняет формирование и загрузку в MISP объектов типа case и alert, полученных от TheHive v4 через брокер сообщений NATS.
 
 ### Типы конфигурационных файлов
 
@@ -10,9 +10,7 @@
 
 ### Переменные окружения
 
-Основная переменная окружения для данного приложения - GO_PHMISP_MAIN. На основании
-значения этой переменной принимается решение какой из конфигурационных файлов config_dev.yaml или config_prod.yaml использовать. При GO_PHMISP_MAIN=development
-будет использоваться config_dev.yaml, во всех остальных случаях, в том числе и при отсутствии переменной окружения GO_PHMISP_MAIN будет использоваться конфигурационный файл config_prod.yaml. Перечень переменных окружения которые можно использовать для настройки приложения:
+Основная переменная окружения для данного приложения - GO_PHMISP_MAIN. На основании значения этой переменной принимается решение какой из конфигурационных файлов config_dev.yaml или config_prod.yaml использовать. При GO_PHMISP_MAIN=development будет использоваться config_dev.yaml, во всех остальных случаях, в том числе и при отсутствии переменной окружения GO_PHMISP_MAIN будет использоваться конфигурационный файл config_prod.yaml. Перечень переменных окружения которые можно использовать для настройки приложения:
 
 1. Подключение к MISP:
 
@@ -65,14 +63,10 @@
 
 Тип Attributes формата MISP формируется по следующим условиям:
 
-- если, свойство observables.tags содержит значение вида misp:Attribution="whois-registrar", то осуществляется разбор данной строки, где
-  значение Attribution добавляется в AttributesMispFormat.Category, а значение
-  whois-registrar в AttributesMispFormat.Type,
-- если, свойство observables.dataType содержит одно из свойств определенного перечня значений, то свойства AttributesMispFormat.Category и AttributesMispFormat.Type будут заполненны на основании найденного значения в
-  observables.dataType,
+- если, свойство observables.tags содержит значение вида misp:Attribution="whois-registrar", то осуществляется разбор данной строки, где значение Attribution добавляется в AttributesMispFormat.Category, а значение whois-registrar в AttributesMispFormat.Type;
+- если, свойство observables.dataType содержит одно из свойств определенного перечня значений, то свойства AttributesMispFormat.Category и AttributesMispFormat.Type будут заполненны на основании найденного значения в observables.dataType:
 - если, observables.tags содержит значение отличное от знаяения вида misp:Attribution="whois-registrar", но которое совпадает со значением в коде
-  приложения, например, одно из подобных значений это type:<значение> которое может совпадать или быть схожем со содержимым в observables.dataType, то это
-  значение добавляется в AttributesMispFormat.ObjectRelation
+  приложения, например, одно из подобных значений это type:<значение> которое может совпадать или быть схожем со содержимым в observables.dataType, то это значение добавляется в AttributesMispFormat.ObjectRelation.
 
 6.  После успешной отправки в MISP сформированных сообщений в TheHive отправляется JSON сообщение формата:
 
