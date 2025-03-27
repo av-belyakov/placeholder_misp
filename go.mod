@@ -3,7 +3,7 @@ module github.com/av-belyakov/placeholder_misp
 go 1.23.7
 
 require (
-	github.com/av-belyakov/cachingstoragewithqueue v0.0.0-20250311135213-982f17b26512
+	github.com/av-belyakov/cachingstoragewithqueue v0.0.0-20250324142615-a6b53d43d4f1
 	github.com/av-belyakov/objectsmispformat v0.0.0-20250319135213-feaf9062c3f6
 	github.com/av-belyakov/simplelogger v0.0.0-20250221120631-077109604215
 	github.com/av-belyakov/zabbixapicommunicator v0.0.0-20241225064839-9c19184470aa
