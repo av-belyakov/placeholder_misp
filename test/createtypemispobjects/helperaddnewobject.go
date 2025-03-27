@@ -22,9 +22,6 @@ func AddNewObject(
 	data mispapi.InputSettings,
 	sqlite3Client *sqlite3api.ApiSqlite3Module,
 	opts OptionsAddNewObject) {
-
-	fmt.Println("func 'specialObject.SetFunc', START... |||")
-
 	rmisp, err := mispapi.NewMispRequest(
 		mispapi.WithHost(opts.Host),
 		mispapi.WithUserAuthKey(opts.UserAuthKey),

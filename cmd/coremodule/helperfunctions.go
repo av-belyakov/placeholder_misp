@@ -180,10 +180,6 @@ func (ser *SupportiveExcludeRule) Add(num int, fieldName, value string, isEqual 
 		ser.rules[num] = []SupportiveExcludeRuleOptions(nil)
 	}
 
-	if fieldName == "observables.data" {
-		fmt.Println("func 'Add' 333 value:", value)
-	}
-
 	ser.rules[num] = append(ser.rules[num], SupportiveExcludeRuleOptions{
 		fieldName: fieldName,
 		value:     value,
@@ -193,8 +189,6 @@ func (ser *SupportiveExcludeRule) Add(num int, fieldName, value string, isEqual 
 
 func (ser *SupportiveExcludeRule) CheckRuleTrue(num int) bool {
 	if _, ok := ser.rules[num]; !ok {
-		fmt.Println("func 'CheckRuleTrue', num =", num)
-
 		return false
 	}
 
@@ -208,23 +202,6 @@ func (ser *SupportiveExcludeRule) CheckRuleTrue(num int) bool {
 	}
 
 	return isTrue
-
-	/*	for k, v := range ser.rules {
-			var isTrue = true
-			for _, value := range v {
-				if !value.isEqual {
-					isTrue = false
-
-					break
-				}
-			}
-
-			if isTrue {
-				return k, true
-			}
-		}
-
-		return false*/
 }
 
 // searchEventSource выполняет поиск источника события

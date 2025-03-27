@@ -193,27 +193,6 @@ func New(rootDir string) (*ConfigApp, error) {
 		return conf, err
 	}
 
-	/*
-		validate = validator.New(validator.WithRequiredStructEnabled())
-
-		for v := range envList {
-			if env, ok := os.LookupEnv(v); ok {
-				envList[v] = env
-			}
-		}
-
-		rootPath, err := supportingfunctions.GetRootPath(rootDir)
-		if err != nil {
-			return conf, err
-		}
-
-		confPath := filepath.Join(rootPath, confDir)
-		list, err := os.ReadDir(confPath)
-		if err != nil {
-			return conf, err
-		}
-	*/
-
 	fileNameCommon, err := getFileName("config.yml", confPath, list)
 	if err != nil {
 		return conf, err
