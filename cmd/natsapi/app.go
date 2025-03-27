@@ -109,7 +109,7 @@ func (api *ApiNatsModule) Start(ctx context.Context) error {
 		nc.Drain()
 	}(ctx, nc)
 
-	// обработка данных приходящих в модуль от ядра приложения фактически это команды на добавления
+	//обработка данных приходящих в модуль от ядра приложения фактически это команды на добавления
 	//тега - 'add_case_tag' и команда на добавление MISP id в поле customField
 	go func() {
 		for {
@@ -132,7 +132,7 @@ func (api *ApiNatsModule) Start(ctx context.Context) error {
 					      "command": "add_case_tag",
 					      "root_id": "%s",
 					      "case_id": "%s",
-					      "value": "Webhook: send=\"MISP_TEST\""
+					      "value": "Webhook: send=\"MISP\""
 					}`, incomingData.RootId, incomingData.CaseId)); err != nil {
 						return err
 					}
