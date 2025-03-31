@@ -4,5 +4,9 @@ import "strings"
 
 // ReplaceCommaCharacter заменяет двойную кавычку одинарной
 func ReplaceCommaCharacter(v string) string {
-	return strings.ReplaceAll(v, "\"", "'")
+	v = strings.ReplaceAll(v, "\"", "'")
+	v = strings.ReplaceAll(v, "{", "\\{")
+	v = strings.ReplaceAll(v, "}", "\\}")
+
+	return v
 }
