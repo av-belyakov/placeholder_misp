@@ -273,6 +273,7 @@ func getNewListAttributes(al map[int]objectsmispformat.AttributesMispFormat, lat
 			if hashName, _, err := supportingfunctions.CheckStringHash(v.Value); err == nil {
 				v.Type = hashName
 				v.Category = "Payload delivery"
+				v.DisableCorrelation = false
 			}
 		}
 
