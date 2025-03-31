@@ -53,7 +53,7 @@ func (edb *ElasticsearchDB) Write(msgType, msg string) error {
 	msg = supportingfunctions.ReplaceCommaCharacter(msg)
 
 	tn := time.Now()
-	buf := bytes.NewReader([]byte(fmt.Sprintf(`{
+	buf := bytes.NewReader(fmt.Appendf(nil, `{
 		  "datetime": "%s",
 		  "type": "%s",
 		  "nameRegionalObject": "%s",
@@ -63,7 +63,7 @@ func (edb *ElasticsearchDB) Write(msgType, msg string) error {
 		msgType,
 		edb.settings.NameRegionalObject,
 		msg,
-	)))
+	))
 
 	res, err := edb.client.Index(fmt.Sprintf("logs.%s_%s_%d", edb.settings.IndexDB, strings.ToLower(tn.Month().String()), tn.Year()), buf)
 	defer responseClose(res)
@@ -75,7 +75,7 @@ func (edb *ElasticsearchDB) Write(msgType, msg string) error {
 		return nil
 	}
 
-	r := map[string]interface{}{}
+	r := map[string]any{}
 	if err = json.NewDecoder(res.Body).Decode(&r); err != nil {
 		return supportingfunctions.CustomError(err)
 	}
