@@ -26,7 +26,7 @@ const (
 	Root_Dir      string = "placeholder_misp"
 	Rules_Dir     string = "rules"
 	Rules_File    string = "mispmsgrule.yml"
-	Example_File  string = "../test_json/event_39100.json"
+	Example_File  string = "../test_json/event_44107.json" //"../test_json/event_39100.json"
 	Task_Id       string = "7s7qeytyyy2e27tr73213143a"
 	sqlite3FileDb string = "../../backupdb/sqlite3_backup.db"
 )
@@ -157,15 +157,6 @@ func TestCreateMispObjects(t *testing.T) {
 		})
 
 	generatorFormatMISP.Start(chDecode, Task_Id)
-
-	/*
-		!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-			надо потестировать добавление события в MISP с учётом взаимодействия
-			с Sqlite3 database
-
-		!!!!!!!!!!!!!!!!!!!!!!!!!!
-	*/
 
 	t.Run("Формирование документов в формате MISP", func(t *testing.T) {
 		//var eventId string

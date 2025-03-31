@@ -8,6 +8,7 @@ import (
 	"github.com/av-belyakov/objectsmispformat"
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
+	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
 // удаляет элемент из списка атрибутов
@@ -265,6 +266,14 @@ func getNewListAttributes(al map[int]objectsmispformat.AttributesMispFormat, lat
 		//выключаем автоматическую коореляцию с другими событиями для MISP
 		if (v.Type == "other" || v.Type == "snort") && (v.ObjectRelation == "" || v.ObjectRelation == "snort") {
 			v.DisableCorrelation = true
+		}
+
+		//возможно это хеш, попытаемся определить
+		if v.Type == "other" {
+			if hashName, _, err := supportingfunctions.CheckStringHash(v.Value); err == nil {
+				v.Type = hashName
+				v.Category = "Payload delivery"
+			}
 		}
 
 		nal = append(nal, &v)
