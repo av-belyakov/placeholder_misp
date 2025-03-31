@@ -60,8 +60,8 @@ func (gen *GenerateObjectsFormatMISP) Start(chDecodeJSON <-chan ChanInputCreateM
 			"observables.data": {listAttributesMisp.SetAnyValue},
 			"observables.dataType": {
 				listObjectsMisp.SetValueName,
-				//здесь выполняем автоподстановку значений для полей Type и Category
-				//объекта AttributesMisp на основе определенной логике и уже предустановленных
+				//здесь выполняем автоподстановку значений для полей Type и Category объекта
+				//AttributesMisp на основе некоторой логикиб а так же уже предустановленных
 				//значений, при этом значения, заданные пользователем для этих полей, обрабатываются
 				//отдельно и хранятся в listTags, а после закрытия канала совмещаются с
 				//объектами AttributesMisp и следовательно перезаписывают значения выполненные
@@ -216,7 +216,9 @@ func (gen *GenerateObjectsFormatMISP) Start(chDecodeJSON <-chan ChanInputCreateM
 		gen.listRule.CleanStatementExpressionRulePass()
 
 		if caseId == 0 {
-			gen.logger.Send("error", fmt.Sprintf("the caseId in the event cannot be equal to 0 (event creator email '%s')", eventsMisp.EventCreatorEmail))
+			if len(eventsMisp.EventCreatorEmail) != 0 {
+				gen.logger.Send("error", fmt.Sprintf("the caseId in the event cannot be equal to 0 (event creator email '%s')", eventsMisp.EventCreatorEmail))
+			}
 
 			return
 		}
@@ -229,7 +231,6 @@ func (gen *GenerateObjectsFormatMISP) Start(chDecodeJSON <-chan ChanInputCreateM
 
 		//добавляем case id в поле Info
 		eventsMisp.Info += fmt.Sprintf(" :::TheHive caseId:'%d':::", int(caseId))
-		//eventsMisp.Info += fmt.Sprintf(" TesT:_TheHive case id '%d'_:TesT", int(caseId))
 
 		//добавляем в datemodels.ListObjectEventTags дополнительные теги
 		//ответственные за формирование галактик в MISP

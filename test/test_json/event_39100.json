@@ -120,6 +120,40 @@
             "sighted": false
         },
         {
+            "_id": "~92301422744",
+            "_type": "Observable",
+            "extraData": {},
+            "tlp": 2,
+            "data": "e3447c2f80546765ca294674d3af296c64a6da657003426ee0f4a51d17b932e3",
+            "ignoreSimilarity": false,
+            "reports": {},
+            "startDate": 1743065001536,
+            "ioc": true,
+            "message": "cfvtouft.exe  - 197e1d6f6198ee726b6bc8c9e6ca95b0 skvgwkca.exe  - 120ab88aeaaab24222f1962f8f54a436 Users.lnk  - 22b2124a64b7ae92902b8bb6d1a1787a",
+            "sighted": false,
+            "_createdAt": 1743065001536,
+            "_createdBy": "v.kostrikin@cloud.gcm",
+            "dataType": "hash",
+            "tags": []
+        },
+        {
+            "_type": "Observable",
+            "tlp": 2,
+            "_createdAt": 1743065002072,
+            "extraData": {},
+            "ignoreSimilarity": false,
+            "message": "cfvtouft.exe  - 197e1d6f6198ee726b6bc8c9e6ca95b0 skvgwkca.exe  - 120ab88aeaaab24222f1962f8f54a436 Users.lnk  - 22b2124a64b7ae92902b8bb6d1a1787a",
+            "_createdBy": "v.kostrikin@cloud.gcm",
+            "_id": "~91335565456",
+            "reports": {},
+            "startDate": 1743065002072,
+            "tags": [],
+            "data": "6285814ef8073edf478ed7b90d015992459e0c96d546bf51dbe9c8eb56e585f8",
+            "dataType": "hash",
+            "ioc": true,
+            "sighted": false
+        },
+        {
             "_id": "~89858891776",
             "attachment": {
                 "size": 993726,
