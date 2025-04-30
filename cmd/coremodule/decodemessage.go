@@ -7,20 +7,19 @@ import (
 	"reflect"
 
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
-	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
 type HandlerJsonMessageSettings struct {
-	logger   commoninterfaces.Logger
-	counting *countermessage.CounterMessage
+	logger  commoninterfaces.Logger
+	counter commoninterfaces.Counter
 }
 
 // NewHandlerJSON конструктор нового обработчика JSON сообщения
-func NewHandlerJSON(counting *countermessage.CounterMessage, logger commoninterfaces.Logger) *HandlerJsonMessageSettings {
+func NewHandlerJSON(counter commoninterfaces.Counter, logger commoninterfaces.Logger) *HandlerJsonMessageSettings {
 	return &HandlerJsonMessageSettings{
-		logger:   logger,
-		counting: counting,
+		logger:  logger,
+		counter: counter,
 	}
 }
 
@@ -30,7 +29,7 @@ func (s *HandlerJsonMessageSettings) Start(b []byte, taskId string) chan ChanInp
 
 	go func() {
 		//для карт
-		listMap := map[string]interface{}{}
+		listMap := map[string]any{}
 		if err := json.Unmarshal(b, &listMap); err == nil {
 			if len(listMap) == 0 {
 				s.logger.Send("error", supportingfunctions.CustomError(errors.New("error decoding the json message, it may be empty")).Error())
@@ -41,7 +40,7 @@ func (s *HandlerJsonMessageSettings) Start(b []byte, taskId string) chan ChanInp
 			_ = processingReflectMap(chanInput, listMap, "")
 		} else {
 			// для срезов
-			listSlice := []interface{}{}
+			listSlice := []any{}
 			if err = json.Unmarshal(b, &listSlice); err != nil {
 				s.logger.Send("error", supportingfunctions.CustomError(err).Error())
 
@@ -58,7 +57,7 @@ func (s *HandlerJsonMessageSettings) Start(b []byte, taskId string) chan ChanInp
 		}
 
 		// сетчик обработанных кейсов
-		s.counting.SendMessage("update processed events", 1)
+		s.counter.SendMessage("update processed events", 1)
 
 		close(chanInput)
 	}()
@@ -68,9 +67,9 @@ func (s *HandlerJsonMessageSettings) Start(b []byte, taskId string) chan ChanInp
 
 func processingReflectAnySimpleType(
 	chanOutMispFormat chan<- ChanInputCreateMispFormat,
-	name interface{},
-	anyType interface{},
-	fieldBranch string) interface{} {
+	name any,
+	anyType any,
+	fieldBranch string) any {
 
 	var nameStr string
 	r := reflect.TypeOf(anyType)
@@ -147,21 +146,21 @@ func processingReflectAnySimpleType(
 
 func processingReflectMap(
 	chanOutMispFormat chan<- ChanInputCreateMispFormat,
-	l map[string]interface{},
-	fieldBranch string) map[string]interface{} {
-
+	list map[string]any,
+	fieldBranch string) map[string]any {
 	var (
-		newMap  map[string]interface{}
-		newList []interface{}
-	)
-	nl := map[string]interface{}{}
+		newMap  map[string]any
+		newList []any
 
-	for k, v := range l {
+		nl map[string]any = map[string]any{}
+	)
+
+	for k, v := range list {
 		var fbTmp string
 		r := reflect.TypeOf(v)
 
 		if r == nil {
-			return nl
+			continue
 		}
 
 		fbTmp = fieldBranch
@@ -173,13 +172,13 @@ func processingReflectMap(
 
 		switch r.Kind() {
 		case reflect.Map:
-			if v, ok := v.(map[string]interface{}); ok {
+			if v, ok := v.(map[string]any); ok {
 				newMap = processingReflectMap(chanOutMispFormat, v, fbTmp)
 				nl[k] = newMap
 			}
 
 		case reflect.Slice:
-			if v, ok := v.([]interface{}); ok {
+			if v, ok := v.([]any); ok {
 				newList = processingReflectSlice(chanOutMispFormat, v, fbTmp)
 				nl[k] = newList
 			}
@@ -194,32 +193,32 @@ func processingReflectMap(
 
 func processingReflectSlice(
 	chanOutMispFormat chan<- ChanInputCreateMispFormat,
-	l []interface{},
-	fieldBranch string) []interface{} {
-
+	list []any,
+	fieldBranch string) []any {
 	var (
-		newMap  map[string]interface{}
-		newList []interface{}
-	)
-	nl := make([]interface{}, 0, len(l))
+		newMap  map[string]any
+		newList []any
 
-	for k, v := range l {
+		nl []any = make([]any, 0, len(list))
+	)
+
+	for k, v := range list {
 		r := reflect.TypeOf(v)
 
 		if r == nil {
-			return nl
+			continue
 		}
 
 		switch r.Kind() {
 		case reflect.Map:
-			if v, ok := v.(map[string]interface{}); ok {
+			if v, ok := v.(map[string]any); ok {
 				newMap = processingReflectMap(chanOutMispFormat, v, fieldBranch)
 
 				nl = append(nl, newMap)
 			}
 
 		case reflect.Slice:
-			if v, ok := v.([]interface{}); ok {
+			if v, ok := v.([]any); ok {
 				newList = processingReflectSlice(chanOutMispFormat, v, fieldBranch)
 
 				nl = append(nl, newList...)

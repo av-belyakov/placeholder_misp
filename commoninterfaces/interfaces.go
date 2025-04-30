@@ -1,5 +1,9 @@
 package commoninterfaces
 
+type Counter interface {
+	SendMessage(string, int)
+}
+
 //************** логирование ***************
 
 // Logger интерфейс для передачи логов через вспомогательный модуль, при этом
