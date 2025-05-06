@@ -16,25 +16,24 @@ import (
 	"github.com/av-belyakov/placeholder_misp/cmd/natsapi"
 	"github.com/av-belyakov/placeholder_misp/cmd/sqlite3api"
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
-	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
 	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
 type CoreHandlerSettings struct {
 	logger    commoninterfaces.Logger
+	counter   commoninterfaces.Counter
 	listRules *rules.ListRule
-	counting  *countermessage.CounterMessage
 }
 
 func NewCoreHandler(
-	counting *countermessage.CounterMessage,
+	counter commoninterfaces.Counter,
 	listRules *rules.ListRule,
 	logger commoninterfaces.Logger) *CoreHandlerSettings {
 	return &CoreHandlerSettings{
 		logger:    logger,
 		listRules: listRules,
-		counting:  counting,
+		counter:   counter,
 	}
 }
 
@@ -47,14 +46,14 @@ func (settings *CoreHandlerSettings) Start(
 	chanNatsReception := natsModule.GetChannelFromModule()
 	chanMispReception := mispModule.GetReceptionChannel()
 
-	hjson := NewHandlerJSON(settings.counting, settings.logger)
+	hjson := NewHandlerJSON(settings.counter, settings.logger)
 
 	generatorFormatMISP := NewGenerateObjectsFormatMISP(
 		SettingsGenerateObjectsFormatMISP{
 			MispModule:    mispModule,
 			Sqlite3Module: sqlite3Module,
 			ListRule:      settings.listRules,
-			Counter:       settings.counting,
+			Counter:       settings.counter,
 			Logger:        settings.logger,
 		})
 

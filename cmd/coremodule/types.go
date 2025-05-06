@@ -4,7 +4,6 @@ import (
 	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
 	"github.com/av-belyakov/placeholder_misp/cmd/sqlite3api"
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
-	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
 	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
 )
 
@@ -46,7 +45,7 @@ type GenerateObjectsFormatMISP struct {
 	mispModule    mispapi.ModuleMispHandler
 	sqlite3Module *sqlite3api.ApiSqlite3Module
 	listRule      *rules.ListRule
-	counter       *countermessage.CounterMessage
+	counter       commoninterfaces.Counter
 	logger        commoninterfaces.Logger
 }
 
@@ -54,6 +53,6 @@ type SettingsGenerateObjectsFormatMISP struct {
 	MispModule    mispapi.ModuleMispHandler
 	Sqlite3Module *sqlite3api.ApiSqlite3Module
 	ListRule      *rules.ListRule
-	Counter       *countermessage.CounterMessage
+	Counter       commoninterfaces.Counter
 	Logger        commoninterfaces.Logger
 }
