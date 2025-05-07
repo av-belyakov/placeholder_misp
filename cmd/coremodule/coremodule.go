@@ -63,15 +63,16 @@ func (settings *CoreHandlerSettings) Start(
 			return
 
 		case data := <-chanNatsReception:
-			//для записи необработанных событий в лог-файл events
 			go func() {
+				//----------------------------------------------------------------
+				//----------- запись в файл необработанных объектов --------------
+				//----------------------------------------------------------------
 				str, err := supportingfunctions.NewReadReflectJSONSprint(data.Data)
 				if err == nil {
 					settings.logger.Send("events", fmt.Sprintf("\t---------------\n\tEVENTS:\n%s\n", str))
 				}
-			}()
+				//----------------------------------------------------------------
 
-			go func() {
 				// обработчик JSON документа
 				chanOutputDecodeJson := hjson.Start(data.Data, data.MsgId)
 
