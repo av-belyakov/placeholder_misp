@@ -50,7 +50,7 @@ func NewModuleMISP(
 
 	l := NewLogWrite(logger)
 	cache, err := cachingstoragewithqueue.NewCacheStorage(
-		cachingstoragewithqueue.WithMaxTtl[*objectsmispformat.ListFormatsMISP](180),
+		cachingstoragewithqueue.WithMaxTtl[*objectsmispformat.ListFormatsMISP](120),
 		cachingstoragewithqueue.WithMaxSize[*objectsmispformat.ListFormatsMISP](20),
 		cachingstoragewithqueue.WithLogging[*objectsmispformat.ListFormatsMISP](l),
 		cachingstoragewithqueue.WithTimeTick[*objectsmispformat.ListFormatsMISP](3),
