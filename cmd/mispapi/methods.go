@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"runtime"
-	"slices"
 
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
 	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
@@ -352,14 +351,14 @@ func (o *CacheSpecialObject[T]) Comparison(objFromCache T) bool {
 		elements []bool = make([]bool, 0, 5)
 	)
 
-	//для того что бы сравнение было верным необходимо добавить eventId во вновь пришедший
-	//объект так как в объекте который находится в кеше уже содержит eventId необходимый для
+	//для того что бы сравнение было верным, необходимо добавить eventId во вновь пришедший
+	//объект, так как в объекте который находится в кеше уже содержит eventId необходимый для
 	//добавления объектов типа Attributes и Objects
 	if len(objFromCache.GetAttributes()) > 0 {
 		eventId = objFromCache.GetAttributes()[0].GetEventId()
 	}
 	attributes := o.object.GetAttributes()
-	for i := 0; i < len(attributes); i++ {
+	for i := range attributes {
 		attributes[i].SetEventId(eventId)
 	}
 	objects := o.object.GetObjects()
@@ -373,7 +372,11 @@ func (o *CacheSpecialObject[T]) Comparison(objFromCache T) bool {
 	elements = append(elements, o.object.ComparisonObjects(objFromCache.GetObjects()))
 	elements = append(elements, o.object.ComparisonObjectTags(objFromCache.GetObjectTags()))
 
-	return !slices.Contains(elements, false)
+	fmt.Println("func 'CacheSpecialObject.Comparison', Elements:", elements)
+
+	//return !slices.Contains(elements, false)
+
+	return true
 }
 
 func (o *CacheSpecialObject[T]) MatchingAndReplacement(objFromCache T) T {

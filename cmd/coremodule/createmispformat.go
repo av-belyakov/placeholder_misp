@@ -264,8 +264,8 @@ func (gen *GenerateObjectsFormatMISP) Start(chDecodeJSON <-chan ChanInputCreateM
 			TaskId:     taskId,
 			CaseId:     caseId,
 			RootId:     rootId,
-			CaseSource: caseSource,
 			UserEmail:  userEmail,
+			CaseSource: caseSource,
 			Data:       *mispFormat,
 		})
 	}()
