@@ -58,7 +58,7 @@ func server(ctx context.Context) {
 
 	// ****************************************************************************
 	// ********************* инициализация модуля логирования *********************
-	var listLog []simplelogger.OptionsManager
+	listLog := make([]simplelogger.OptionsManager, 0, len(conf.GetListLogs()))
 	for _, v := range conf.GetListLogs() {
 		listLog = append(listLog, v)
 	}
@@ -109,14 +109,14 @@ func server(ctx context.Context) {
 	// ************************************************************************
 	// ************* инициализация модуля взаимодействия с Zabbix *************
 	chZabbix := make(chan commoninterfaces.Messager)
-	wzis := wrappers.WrappersZabbixInteractionSettings{
+	zabbixSettings := wrappers.WrappersZabbixInteractionSettings{
 		NetworkPort: conf.Zabbix.NetworkPort,
 		NetworkHost: conf.Zabbix.NetworkHost,
 		ZabbixHost:  conf.Zabbix.ZabbixHost,
+		EventTypes:  make([]wrappers.EventType, len(conf.Zabbix.EventTypes)),
 	}
-	eventTypes := []wrappers.EventType(nil)
 	for _, v := range conf.Zabbix.EventTypes {
-		eventTypes = append(eventTypes, wrappers.EventType{
+		zabbixSettings.EventTypes = append(zabbixSettings.EventTypes, wrappers.EventType{
 			IsTransmit: v.IsTransmit,
 			EventType:  v.EventType,
 			ZabbixKey:  v.ZabbixKey,
@@ -126,8 +126,7 @@ func server(ctx context.Context) {
 			},
 		})
 	}
-	wzis.EventTypes = eventTypes
-	wrappers.WrappersZabbixInteraction(ctx, wzis, simpleLogger, chZabbix)
+	wrappers.WrappersZabbixInteraction(ctx, zabbixSettings, simpleLogger, chZabbix)
 
 	//***************************************************************************
 	//************** инициализация обработчика логирования данных ***************
