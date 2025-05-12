@@ -58,7 +58,7 @@ func server(ctx context.Context) {
 
 	// ****************************************************************************
 	// ********************* инициализация модуля логирования *********************
-	listLog := make([]simplelogger.OptionsManager, len(conf.GetListLogs()))
+	listLog := make([]simplelogger.OptionsManager, 0, len(conf.GetListLogs()))
 	for _, v := range conf.GetListLogs() {
 		listLog = append(listLog, v)
 	}
