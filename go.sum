@@ -12,6 +12,12 @@ github.com/av-belyakov/simplelogger v0.0.0-20250221120631-077109604215 h1:Hk1RwR
 github.com/av-belyakov/simplelogger v0.0.0-20250221120631-077109604215/go.mod h1:yW2ev3nXPP3WY8svBWJpg4PQRl67MTGIaaiXJ0ULRZ8=
 github.com/av-belyakov/zabbixapicommunicator v0.0.0-20241225064839-9c19184470aa h1:ivXQuTb7UxYUy568EOIOvRDExKLU3tDnw634d+WTGto=
 github.com/av-belyakov/zabbixapicommunicator v0.0.0-20241225064839-9c19184470aa/go.mod h1:/9uIlkIPp366cZZt/m3skUb3zREYjWB034aw8+mshQA=
+github.com/av-belyakov/zabbixapicommunicator v0.0.0-20250512092242-adec6a960df0 h1:hnMbsWoE+aIRXuz4mC1leReAsN7RV0rX/8gOxXC8QQ8=
+github.com/av-belyakov/zabbixapicommunicator v0.0.0-20250512092242-adec6a960df0/go.mod h1:TjxN4Hwyrg3TwBIW0t9SwV1q1FVF6z5CWibJ+UY9hWg=
+github.com/av-belyakov/zabbixapicommunicator v0.0.0-20250512114204-09d4d074c6f8 h1:c7J9V1qWMzibubyir8XOfIKC7guUi6BTAwdjWd+ik8I=
+github.com/av-belyakov/zabbixapicommunicator v0.0.0-20250512114204-09d4d074c6f8/go.mod h1:PVChkORj00O8/xSQ0UrJihm/dU+9gvdRddi+DtwAnOs=
+github.com/av-belyakov/zabbixapicommunicator v0.0.0-20250512120600-9940a6578ff4 h1:N5if8Y1ogfUijqehXQQZAunqUtULi7OWlXedxeRgA58=
+github.com/av-belyakov/zabbixapicommunicator v0.0.0-20250512120600-9940a6578ff4/go.mod h1:PVChkORj00O8/xSQ0UrJihm/dU+9gvdRddi+DtwAnOs=
 github.com/bsm/ginkgo/v2 v2.12.0 h1:Ny8MWAHyOepLGlLKYmXG4IEkioBysk6GpaRTLC8zwWs=
 github.com/bsm/ginkgo/v2 v2.12.0/go.mod h1:SwYbGRRDovPVboqFv0tPTcG1sN61LM1Z4ARdbAV9g4c=
 github.com/bsm/gomega v1.27.10 h1:yeMWxP2pV2fG3FgAODIY8EiRE3dy0aeFYt4l7wh6yKA=
