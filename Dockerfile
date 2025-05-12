@@ -1,11 +1,11 @@
-FROM golang:1.23.7-alpine AS pmisp_packages_image
-ENV PATH /usr/local/go/bin:$PATH
+FROM golang:1.24.3-alpine AS pmisp_packages_image
+ENV PATH=/usr/local/go/bin:$PATH
 WORKDIR /go/src
 COPY go.mod go.sum ./
 RUN echo 'packages_image' && \
     go mod download
 
-FROM golang:1.23.7-alpine AS pmisp_build_image
+FROM golang:1.24.3-alpine AS pmisp_build_image
 LABEL temporary=''
 ARG BRANCH
 ARG VERSION
