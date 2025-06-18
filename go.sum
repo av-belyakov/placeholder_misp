@@ -18,6 +18,8 @@ github.com/av-belyakov/zabbixapicommunicator v0.0.0-20250512114204-09d4d074c6f8 
 github.com/av-belyakov/zabbixapicommunicator v0.0.0-20250512114204-09d4d074c6f8/go.mod h1:PVChkORj00O8/xSQ0UrJihm/dU+9gvdRddi+DtwAnOs=
 github.com/av-belyakov/zabbixapicommunicator v0.0.0-20250512120600-9940a6578ff4 h1:N5if8Y1ogfUijqehXQQZAunqUtULi7OWlXedxeRgA58=
 github.com/av-belyakov/zabbixapicommunicator v0.0.0-20250512120600-9940a6578ff4/go.mod h1:PVChkORj00O8/xSQ0UrJihm/dU+9gvdRddi+DtwAnOs=
+github.com/av-belyakov/zabbixapicommunicator v0.0.0-20250618124251-10a4a23cd7ca h1:10CiLYaxxDD9524HYACXxEIjQY/UzochnUi0vGiL3ao=
+github.com/av-belyakov/zabbixapicommunicator v0.0.0-20250618124251-10a4a23cd7ca/go.mod h1:PVChkORj00O8/xSQ0UrJihm/dU+9gvdRddi+DtwAnOs=
 github.com/bsm/ginkgo/v2 v2.12.0 h1:Ny8MWAHyOepLGlLKYmXG4IEkioBysk6GpaRTLC8zwWs=
 github.com/bsm/ginkgo/v2 v2.12.0/go.mod h1:SwYbGRRDovPVboqFv0tPTcG1sN61LM1Z4ARdbAV9g4c=
 github.com/bsm/gomega v1.27.10 h1:yeMWxP2pV2fG3FgAODIY8EiRE3dy0aeFYt4l7wh6yKA=
