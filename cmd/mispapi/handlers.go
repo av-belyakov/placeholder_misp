@@ -136,11 +136,12 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 		//передаётся для отправки в NATS, а так же передается в Sqlite3 для
 		//обновления или создания новой связки caseId - eventId
 		m.SendDataOutput(OutputSetting{
-			Command: "send event id",
-			EventId: eventId,
-			CaseId:  fmt.Sprint(data.CaseId),
-			RootId:  data.RootId,
-			TaskId:  data.TaskId,
+			Command:    "send event id",
+			EventId:    eventId,
+			CaseId:     fmt.Sprint(data.CaseId),
+			RootId:     data.RootId,
+			TaskId:     data.TaskId,
+			CaseSource: data.CaseSource,
 		})
 
 		//выполнено 'успешно'

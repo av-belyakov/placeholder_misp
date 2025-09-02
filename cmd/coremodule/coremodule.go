@@ -92,11 +92,12 @@ func (settings *CoreHandlerSettings) Start(
 			case "send event id":
 				//отправка eventId в NATS
 				natsModule.SendingDataInput(natsapi.InputSettings{
-					Command: data.Command,
-					EventId: data.EventId,
-					TaskId:  data.TaskId,
-					RootId:  data.RootId,
-					CaseId:  data.CaseId,
+					Command:    data.Command,
+					EventId:    data.EventId,
+					TaskId:     data.TaskId,
+					RootId:     data.RootId,
+					CaseId:     data.CaseId,
+					CaseSource: data.CaseSource,
 				})
 
 				go func() {

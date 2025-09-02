@@ -37,12 +37,13 @@ type OutputSettings struct {
 
 // InputSettings параметры для канала приема данных в модуль
 type InputSettings struct {
-	Data    []byte //данные
-	Command string //команда
-	TaskId  string //внутренний id задачи
-	EventId string //id события
-	CaseId  string //id кейса
-	RootId  string //rootId
+	Data       []byte //данные
+	Command    string //команда
+	TaskId     string //внутренний id задачи
+	EventId    string //id события
+	CaseId     string //id кейса
+	RootId     string //rootId
+	CaseSource string //источник кейса
 }
 
 type ResponseToCommand struct {

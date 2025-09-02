@@ -123,17 +123,26 @@ func (api *ApiNatsModule) Start(ctx context.Context) error {
 					continue
 				}
 
+				rootId := incomingData.RootId
+				regionalObject := incomingData.CaseSource
+
 				g := errgroup.Group{}
 				g.Go(func() error {
 					//команда на установку тега
 					if err := nc.Publish(api.subscriptions.senderCommand,
-						fmt.Appendf(nil, `{
-					      "service": "MISP",
-					      "command": "add_case_tag",
-					      "root_id": "%s",
-					      "case_id": "%s",
-					      "value": "Webhook: send=\"MISP\""
-					}`, incomingData.RootId, incomingData.CaseId)); err != nil {
+						fmt.Appendf(
+							nil,
+							`{
+					          "service": "MISP",
+					          "command": "add_case_tag",
+					  		  "for_regional_object": "%s",
+					          "root_id": "%s",
+					          "case_id": "%s",
+					          "value": "Webhook: send=\"MISP\""
+					        }`,
+							regionalObject,
+							rootId,
+							incomingData.CaseId)); err != nil {
 						return err
 					}
 
@@ -142,13 +151,19 @@ func (api *ApiNatsModule) Start(ctx context.Context) error {
 				g.Go(func() error {
 					//команда на добавление значения поля customFields
 					if err := nc.Publish(api.subscriptions.senderCommand,
-						fmt.Appendf(nil, `{
-						  "service": "MISP",
-					      "command": "set_case_custom_field",
-					      "root_id": "%s",
-					      "field_name": "misp-event-id.string",
-					      "value": "%s"
-						}`, incomingData.RootId, incomingData.EventId)); err != nil {
+						fmt.Appendf(
+							nil,
+							`{
+						      "service": "MISP",
+					          "command": "set_case_custom_field",
+     					  	  "for_regional_object": "%s", 
+							  "root_id": "%s",
+					          "field_name": "misp-event-id.string",
+					          "value": "%s"
+						    }`,
+							regionalObject,
+							rootId,
+							incomingData.EventId)); err != nil {
 						return err
 					}
 

@@ -35,7 +35,7 @@ type InputSettings struct {
 
 // SettingChanOutputMISP параметры канала для передачи данных из модуля
 type OutputSetting struct {
-	Command, CaseId, EventId, TaskId, RootId string
+	Command, CaseId, EventId, TaskId, RootId, CaseSource string
 }
 
 // StorageAuthorizationData хранилище с авторизационными настройками пользователя
