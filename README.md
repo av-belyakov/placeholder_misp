@@ -1,4 +1,7 @@
-# Readme
+# Placeholder_MISP
+
+[![Go Version](https://img.shields.io/badge/Go-1.24.3+-00ADD8?style=flat&logo=go)](https://golang.org/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat&logo=docker)](https://www.docker.com/)
 
 Сервис 'placeholder_MISP' выполняет формирование и загрузку в MISP объектов типа case и alert, полученных от TheHive v4 через брокер сообщений NATS.
 
