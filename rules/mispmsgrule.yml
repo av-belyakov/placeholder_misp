@@ -126,6 +126,10 @@ RULES:
         - searchField: "observables.data"
           searchValue: "anisimova.cloud.gcm"
           accurateComparison: false
+    - listAnd:
+        - searchField: "observables.data"
+          searchValue: "arkime"
+          accurateComparison: false
   #    - listAnd:
   #        - searchField: "observables.ioc"
   #          searchValue: "true"
