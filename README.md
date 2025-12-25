@@ -97,6 +97,7 @@ go tool pprof http://<ip>:<port>/debug/pprof/... (далее возможны в
 {
   "service": "MISP",
   "command": "add_case_tag",
+  "for_regional_object": "gcm",
   "root_id": "%s",
   "case_id": "%s",
   "value": "Webhook: send=\"MISP_TEST\""
@@ -109,6 +110,7 @@ go tool pprof http://<ip>:<port>/debug/pprof/... (далее возможны в
 {
   "service": "MISP",
   "command": "set_case_custom_field",
+  "for_regional_object": "gcm",
   "root_id": "<rootId обработанного кейса>",
   "field_name": "misp-event-id.string",
   "value": "<идентификатор события MISP>"
