@@ -61,7 +61,7 @@ func (gen *GenerateObjectsFormatMISP) Start(chDecodeJSON <-chan ChanInputCreateM
 			"observables.dataType": {
 				listObjectsMisp.SetValueName,
 				//здесь выполняем автоподстановку значений для полей Type и Category объекта
-				//AttributesMisp на основе некоторой логикиб а так же уже предустановленных
+				//AttributesMisp на основе некоторой логики, а так же уже предустановленных
 				//значений, при этом значения, заданные пользователем для этих полей, обрабатываются
 				//отдельно и хранятся в listTags, а после закрытия канала совмещаются с
 				//объектами AttributesMisp и следовательно перезаписывают значения выполненные
@@ -69,7 +69,10 @@ func (gen *GenerateObjectsFormatMISP) Start(chDecodeJSON <-chan ChanInputCreateM
 				listAttributesMisp.HandlingAnyDataType,
 			},
 			"observables._createdAt": {listAttributesMisp.SetAnyTimestamp},
-			"observables.message":    {listAttributesMisp.SetAnyComment},
+			"observables.message": {
+				listAttributesMisp.SetAnyComment,
+				listObjectsMisp.SetValueDescription,
+			},
 			"observables.startDate": {
 				listAttributesMisp.SetAnyFirstSeen,
 				listObjectsMisp.SetValueFirstSeen,

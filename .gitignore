@@ -1,4 +1,5 @@
 .env
+.vscode/
 placeholder_misp
 misp_module
 app
