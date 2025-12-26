@@ -275,6 +275,7 @@ type ObjectsMispFormat struct {
 	Timestamp       string        `json:"timestamp"`
 	Name            string        `json:"name"`
 	Description     string        `json:"description"`
+	Comment         string        `json:"comment"`
 	EventId         string        `json:"event_id"`
 	MetaCategory    string        `json:"meta-category"`
 	Distribution    string        `json:"distribution"`

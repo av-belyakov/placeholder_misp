@@ -8,6 +8,8 @@ github.com/av-belyakov/objectsmispformat v0.0.0-20250319125533-dec43aa3aba1 h1:W
 github.com/av-belyakov/objectsmispformat v0.0.0-20250319125533-dec43aa3aba1/go.mod h1:S/t7N5r3A13LAUJxyDzIELw9csyBlZWOYs2aJXqY1yY=
 github.com/av-belyakov/objectsmispformat v0.0.0-20250319135213-feaf9062c3f6 h1:RDehRt8/vH2t9azo96QOBglgFeTMe5qu2r12cSy+GNw=
 github.com/av-belyakov/objectsmispformat v0.0.0-20250319135213-feaf9062c3f6/go.mod h1:S/t7N5r3A13LAUJxyDzIELw9csyBlZWOYs2aJXqY1yY=
+github.com/av-belyakov/objectsmispformat v0.3.5 h1:lt2KWe9hYrCpQ5pZSoxBlsc6iodFRsL3GVvfufZ4WHw=
+github.com/av-belyakov/objectsmispformat v0.3.5/go.mod h1:S/t7N5r3A13LAUJxyDzIELw9csyBlZWOYs2aJXqY1yY=
 github.com/av-belyakov/simplelogger v0.0.0-20250221120631-077109604215 h1:Hk1RwRSURz+xb63AfuHHIqjPKvX6uJssQpJsBaP7GAk=
 github.com/av-belyakov/simplelogger v0.0.0-20250221120631-077109604215/go.mod h1:yW2ev3nXPP3WY8svBWJpg4PQRl67MTGIaaiXJ0ULRZ8=
 github.com/av-belyakov/zabbixapicommunicator v0.0.0-20241225064839-9c19184470aa h1:ivXQuTb7UxYUy568EOIOvRDExKLU3tDnw634d+WTGto=

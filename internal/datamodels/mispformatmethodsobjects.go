@@ -126,6 +126,16 @@ func (lomf *ListObjectsMispFormat) SetValueName(v interface{}, num int) {
 	lomf.objects[num] = tmp
 }
 
+// SetValueComment устанавливает значение Comment
+func (lomf *ListObjectsMispFormat) SetValueComment(v interface{}, num int) {
+	lomf.Lock()
+	defer lomf.Unlock()
+
+	tmp := lomf.getObjectMisp(num)
+	tmp.Comment = fmt.Sprint(v)
+	lomf.objects[num] = tmp
+}
+
 // SetValueDescription устанавливает значение Description
 func (lomf *ListObjectsMispFormat) SetValueDescription(v interface{}, num int) {
 	lomf.Lock()

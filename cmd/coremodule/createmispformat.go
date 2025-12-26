@@ -72,6 +72,7 @@ func (gen *GenerateObjectsFormatMISP) Start(chDecodeJSON <-chan ChanInputCreateM
 			"observables.message": {
 				listAttributesMisp.SetAnyComment,
 				listObjectsMisp.SetValueDescription,
+				listObjectsMisp.SetValueComment,
 			},
 			"observables.startDate": {
 				listAttributesMisp.SetAnyFirstSeen,
