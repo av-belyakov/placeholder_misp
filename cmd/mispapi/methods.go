@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
-	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
-	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
+	"github.com/av-belyakov/objectsmispformat"
 	"golang.org/x/net/context"
+
+	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
+	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
 //****** каналы *******
@@ -111,8 +112,8 @@ func (s *StorageAuthorizationData) GetOptionsAllOrganisations() map[string]Organ
 //****** управление авторизационными данными *******
 //
 
-func (ad *AuthorizationDataMISP) getListAllUsers(ctx context.Context) ([]datamodels.UsersSettingsMispFormat, error) {
-	usmispf := []datamodels.UsersSettingsMispFormat{}
+func (ad *AuthorizationDataMISP) getListAllUsers(ctx context.Context) ([]objectsmispformat.UsersSettingsMispFormat, error) {
+	usmispf := []objectsmispformat.UsersSettingsMispFormat{}
 	_, resByte, err := ad.Get(ctx, "/admin/users", nil)
 	if err != nil {
 		return usmispf, err
@@ -294,7 +295,7 @@ func (ad *AuthorizationDataMISP) CreateNewUser(ctx context.Context, email, sourc
 		return UserSettings{}, fmt.Errorf("'%s' %s:%d", err.Error(), f, l-2)
 	}
 
-	usmispf := datamodels.UsersSettingsMispFormat{}
+	usmispf := objectsmispformat.UsersSettingsMispFormat{}
 	if err := json.Unmarshal(resByte, &usmispf); err != nil {
 		_, f, l, _ := runtime.Caller(0)
 		return UserSettings{}, fmt.Errorf("'%s' %s:%d", err.Error(), f, l-2)

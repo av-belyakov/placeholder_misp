@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
+	"github.com/av-belyakov/objectsmispformat"
 )
 
 var _ = Describe("RegexpExample", Ordered, func() {
@@ -44,7 +44,7 @@ var _ = Describe("RegexpExample", Ordered, func() {
 
 	Context("Тест 1. Разбираем строку из observable.tags", func() {
 		It("Функция обработки списка тегов с помощью регулярного выражения должна отработать успешно", func() {
-			result := datamodels.HandlingListTags([]string{
+			result := objectsmispformat.HandlingListTags([]string{
 				"misp:Network activity=\"email-src\"",
 				"misp:Persistence mechanism=\"email-body\"",
 				"misp;Bjkfo-ffkkk=\"nvii fefeni\"",
@@ -57,7 +57,7 @@ var _ = Describe("RegexpExample", Ordered, func() {
 		})
 
 		It("Должно быть пустое значение при обработке ошибочных тегов", func() {
-			result := datamodels.HandlingListTags([]string{
+			result := objectsmispformat.HandlingListTags([]string{
 				"misp:Network activity-\"email-src\"",
 				"misp;Bjkfo-ffkkk=\"nvii fefeni\"",
 			})

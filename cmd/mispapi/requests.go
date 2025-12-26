@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/av-belyakov/objectsmispformat"
-	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
@@ -221,7 +220,7 @@ func (rmisp *requestMISP) sendEventTags(ctx context.Context, eventId string, dat
 		return supportingfunctions.CustomError(fmt.Errorf("event tags add, %w", err))
 	}
 
-	eotmf := datamodels.EventObjectTagsMispFormat{}
+	eotmf := objectsmispformat.EventObjectTagsMispFormat{}
 	for _, v := range *data {
 		eotmf.Event = eventId
 		eotmf.Tag = v

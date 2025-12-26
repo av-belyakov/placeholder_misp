@@ -6,8 +6,8 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	"github.com/av-belyakov/objectsmispformat"
 	"github.com/av-belyakov/placeholder_misp/cmd/coremodule"
-	"github.com/av-belyakov/placeholder_misp/internal/datamodels"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
@@ -67,7 +67,7 @@ var _ = Describe("Checkstringhase", func() {
 
 	Context("Тест 2. Проверяем обработку attachment", func() {
 		It("Attachment должно быть успешно обработанно", func() {
-			nla := datamodels.NewListAttributeTmp()
+			nla := objectsmispformat.NewListAttributeTmp()
 
 			for _, tmf := range testList {
 				nla.AddAttribute(tmf.FieldBranch, tmf.FieldName, 0)

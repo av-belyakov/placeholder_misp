@@ -1,7 +1,58 @@
 package datamodels
 
-import "sync"
+/*
+// описание формата MISP типа Users для данных приходящих из API MISP
+// на GET запрос типа /admin/users
+type UsersSettingsMispFormat struct {
+	User         UserSettingsMispFormat         `json:"User"`
+	Organisation OrganisationSettingsMispFormat `json:"Organisation"`
+	Role         RoleSettingsMispFormat         `json:"Role"`
+}
 
+// описание формата сообщения типа 'User' приходящего от MISP на запрос /admin/users
+// так как весь перечень информации о пользователе в настоящее время не нужен
+// 'лишние' свойства отключены
+type UserSettingsMispFormat struct {
+	Id           string `json:"id"`
+	OrgId        string `json:"org_id"`
+	ServerId     string `json:"server_id"`
+	Email        string `json:"email"`
+	Authkey      string `json:"authkey"`
+	RoleId       string `json:"role_id"`
+	CurrentLogin string `json:"current_login"`
+	//InvitedBy     string `json:"invited_by"`
+	//Gpgkey        string `json:"gpgkey"`
+	//CertifPublic  string `json:"certif_public"`
+	//NidsSid       string `json:"nids_sid"`
+	//Newsread      string `json:"newsread"`
+	//Expiration    string `json:"expiration"`
+	//LastLogin     string `json:"last_login"`
+	//LastApiAccess string `json:"last_api_access"`
+	//DateCreated   string `json:"date_created"`
+	//DateModified  string `json:"date_modified"`
+	//ChangePw      string `json:"change_pw"`
+	//Autoalert     bool   `json:"autoalert"`
+	//Termsaccepted bool   `json:"termsaccepted"`
+	//Contactalert  bool   `json:"contactalert"`
+	//Disabled      bool   `json:"disabled"`
+	//ForceLogout   bool   `json:"force_logout"`
+}
+
+// описание формата сообщения типа 'Role' приходящего от MISP на запрос /admin/users
+type RoleSettingsMispFormat struct {
+	Id           string `json:"id"`
+	Name         string `json:"name"`
+	PermAuth     bool   `json:"perm_auth"`
+	PermSiteAmin bool   `json:"perm_site_admin"`
+}
+
+// описание формата сообщения типа 'Organisation' приходящего от MISP на запрос /admin/users
+type OrganisationSettingsMispFormat struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+}
+
+/*
 // описание формата MISP типа Events для загрузки в API MISP
 type EventsMispFormat struct {
 	OrgId              string `json:"org_id"`
@@ -208,56 +259,7 @@ type EventObjectTagsMispFormat struct {
 	Tag   string `json:"tag"`
 }
 
-// описание формата MISP типа Users для данных приходящих из API MISP
-// на GET запрос типа /admin/users
-type UsersSettingsMispFormat struct {
-	User         UserSettingsMispFormat         `json:"User"`
-	Organisation OrganisationSettingsMispFormat `json:"Organisation"`
-	Role         RoleSettingsMispFormat         `json:"Role"`
-}
 
-// описание формата сообщения типа 'User' приходящего от MISP на запрос /admin/users
-// так как весь перечень информации о пользователе в настоящее время не нужен
-// 'лишние' свойства отключены
-type UserSettingsMispFormat struct {
-	Id           string `json:"id"`
-	OrgId        string `json:"org_id"`
-	ServerId     string `json:"server_id"`
-	Email        string `json:"email"`
-	Authkey      string `json:"authkey"`
-	RoleId       string `json:"role_id"`
-	CurrentLogin string `json:"current_login"`
-	//InvitedBy     string `json:"invited_by"`
-	//Gpgkey        string `json:"gpgkey"`
-	//CertifPublic  string `json:"certif_public"`
-	//NidsSid       string `json:"nids_sid"`
-	//Newsread      string `json:"newsread"`
-	//Expiration    string `json:"expiration"`
-	//LastLogin     string `json:"last_login"`
-	//LastApiAccess string `json:"last_api_access"`
-	//DateCreated   string `json:"date_created"`
-	//DateModified  string `json:"date_modified"`
-	//ChangePw      string `json:"change_pw"`
-	//Autoalert     bool   `json:"autoalert"`
-	//Termsaccepted bool   `json:"termsaccepted"`
-	//Contactalert  bool   `json:"contactalert"`
-	//Disabled      bool   `json:"disabled"`
-	//ForceLogout   bool   `json:"force_logout"`
-}
-
-// описание формата сообщения типа 'Role' приходящего от MISP на запрос /admin/users
-type RoleSettingsMispFormat struct {
-	Id           string `json:"id"`
-	Name         string `json:"name"`
-	PermAuth     bool   `json:"perm_auth"`
-	PermSiteAmin bool   `json:"perm_site_admin"`
-}
-
-// описание формата сообщения типа 'Organisation' приходящего от MISP на запрос /admin/users
-type OrganisationSettingsMispFormat struct {
-	Id   string `json:"id"`
-	Name string `json:"name"`
-}
 
 // описание формата сообщения типа 'Objects' (нет в спецификации API)
 // формируется на основе содержимого поля observables получаемого от TheHive
@@ -282,6 +284,7 @@ type ObjectsMispFormat struct {
 	Attribute       ListAttribute `json:"Attribute"`
 }
 
+
 type ListAttribute []AttributeMispFormat
 
 type AttributeMispFormat struct {
@@ -292,3 +295,4 @@ type AttributeMispFormat struct {
 	Distribution       string `json:"distribution"`
 	ObjectRelation     string `json:"object_relation"`
 }
+*/
