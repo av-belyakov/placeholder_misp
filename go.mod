@@ -1,6 +1,6 @@
 module github.com/av-belyakov/placeholder_misp
 
-go 1.24.3
+go 1.26.1
 
 require (
 	github.com/av-belyakov/cachingstoragewithqueue v0.0.0-20250324142615-a6b53d43d4f1

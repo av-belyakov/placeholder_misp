@@ -373,10 +373,6 @@ func (o *CacheSpecialObject[T]) Comparison(objFromCache T) bool {
 	elements = append(elements, o.object.ComparisonObjects(objFromCache.GetObjects()))
 	elements = append(elements, o.object.ComparisonObjectTags(objFromCache.GetObjectTags()))
 
-	fmt.Println("func 'CacheSpecialObject.Comparison', Elements:", elements)
-
-	//return !slices.Contains(elements, false)
-
 	return true
 }
 
