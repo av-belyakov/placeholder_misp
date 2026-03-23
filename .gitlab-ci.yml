@@ -27,10 +27,18 @@ stages:
 .docker-image-prune: &docker-image-pure
   - docker image prune -a --force --filter="label=temporary"
 
+# запретить выполнение если изменился README
 .change-readme-never-commit: &readme-no-commit
   - if: $CI_COMMIT_BRANCH == $BRANCH_MAJOR || $CI_COMMIT_BRANCH == $BRANCH_TEST
     changes:
       - README.md
+    when: never
+
+# запретить выполнение если изменился какой либо из файлов в директории test
+.change-test-files-never-commit: &test-files-no-commit
+  - if: $CI_COMMIT_BRANCH == $BRANCH_MAJOR || $CI_COMMIT_BRANCH == $BRANCH_TEST
+    changes:
+      - test/**/*
     when: never
 
 .change-docker-compose-never-commit: &docker-compose-no-commit
@@ -60,6 +68,7 @@ build-test:
   rules:
     - *readme-no-commit
     - *docker-compose-no-commit
+    - *test-files-no-commit
     - *dev-test-commit
   script:
     # удаляем старый образ
@@ -83,6 +92,7 @@ build-prod:
   rules:
     - *readme-no-commit
     - *docker-compose-no-commit
+    - *test-files-no-commit
     - *master-commit
   script:
     - docker rmi $CI_REGISTRY_IMAGE:latest || true
