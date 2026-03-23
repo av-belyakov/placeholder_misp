@@ -90,3 +90,23 @@ type CacheSpecialObject[T SpecialObject] struct {
 	handlerFunc func(int) bool
 	id          string
 }
+
+type ResponseTagsMISPFormat []ResponseTagMISPFormat
+
+type ResponseTagMISPFormat struct {
+	Tag TagSettings `json:"tag"`
+}
+
+type TagSettings struct {
+	ID             string `json:"id"`
+	Name           string `json:"name"`
+	Colour         string `json:"colour"`
+	OrgId          string `json:"org_id"`
+	UserId         string `json:"user_id"`
+	NumericalValue any    `json:"numerical_value"`
+	HideTag        bool   `json:"hide_tag"`
+	IsGalaxy       bool   `json:"is_galaxy"`
+	Exportable     bool   `json:"exportable"`
+	LocalOnly      bool   `json:"local_only"`
+	IsCustomGalaxy bool   `json:"is_custom_galaxy"`
+}

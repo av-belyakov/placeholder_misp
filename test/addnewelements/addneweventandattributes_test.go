@@ -11,6 +11,7 @@ import (
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/subosito/gotenv"
 
 	"github.com/av-belyakov/placeholder_misp/cmd/coremodule"
 	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
@@ -63,6 +64,10 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 	}
 
 	BeforeAll(func() {
+		if err := gotenv.Load("../../.env"); err != nil {
+			log.Fatal(err)
+		}
+
 		simpleLogger, err := simplelogger.NewSimpleLogger(context.Background(), constants.Root_Dir, []simplelogger.Options{})
 		if err != nil {
 			log.Fatalf("error module 'simplelogger': %v", err)
@@ -76,13 +81,8 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		confApp.AppConfigNATS.Host = "nats.cloud.gcm"
 		confApp.AppConfigNATS.Port = 4222
 
-		//misp-world
-		//confApp.AppConfigMISP.Host = "misp-world.cloud.gcm"
-		//confApp.AppConfigMISP.Auth = "TvHkjH8jVQEIdvAxjxnL4H6wDoKyV7jobDjndvAo"
-
-		//misp-center
-		confApp.AppConfigMISP.Host = "misp-center.cloud.gcm"
-		confApp.AppConfigMISP.Auth = "Z2PwRBdP5lFP7rdDJBzxmSahaLEwIvJoeOuwhRYQ"
+		confApp.AppConfigMISP.Host = os.Getenv("GO_PHMISP_MHOST")
+		confApp.AppConfigMISP.Auth = os.Getenv("GO_PHMISP_MAUTH")
 
 		go func() {
 			fmt.Println("___ Logging START")

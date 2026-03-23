@@ -252,6 +252,72 @@ func (rmisp *requestMISP) sendEventTags(ctx context.Context, eventId string, dat
 	return err
 }
 
+func (rmisp *requestMISP) AddTag_ForTest(ctx context.Context, tag, color string) (ResponseTagMISPFormat, error) {
+	return rmisp.addTag(ctx, tag, color)
+}
+
+// addTag добавляет в MISP новый тег
+func (rmisp *requestMISP) addTag(ctx context.Context, tag, color string) (ResponseTagMISPFormat, error) {
+	response := ResponseTagMISPFormat{}
+
+	c, err := NewClientMISP(rmisp.host, rmisp.masterAuthKey, false)
+	if err != nil {
+		return response, supportingfunctions.CustomError(fmt.Errorf("tag add, %w", err))
+	}
+
+	req, err := json.Marshal(struct {
+		Name       string `json:"name"`
+		Colour     string `json:"colour"`
+		Exportable bool   `json:"exportable"`
+	}{tag, color, true})
+	if err != nil {
+		return response, supportingfunctions.CustomError(fmt.Errorf("add tag, %w", err))
+	}
+
+	_, b, err := c.Post(ctx, "/tags/add/", req)
+	if err != nil {
+		return response, supportingfunctions.CustomError(fmt.Errorf("add tag, %w", err))
+	}
+
+	if err := json.Unmarshal(b, &response); err != nil {
+		return response, err
+	}
+
+	return response, nil
+}
+
+func (rmisp *requestMISP) SearchTag_ForTest(ctx context.Context, tag string) (ResponseTagsMISPFormat, error) {
+	return rmisp.searchTag(ctx, tag)
+}
+
+// searchTag поиск тегов
+func (rmisp *requestMISP) searchTag(ctx context.Context, tag string) (ResponseTagsMISPFormat, error) {
+	foundTags := ResponseTagsMISPFormat{}
+
+	c, err := NewClientMISP(rmisp.host, rmisp.masterAuthKey, false)
+	if err != nil {
+		return foundTags, supportingfunctions.CustomError(fmt.Errorf("event publish add, %w", err))
+	}
+
+	req, err := json.Marshal(struct {
+		Name string `json:"name"`
+	}{tag})
+	if err != nil {
+		return foundTags, supportingfunctions.CustomError(fmt.Errorf("search tag, %w", err))
+	}
+
+	_, b, err := c.Post(ctx, "/tags/search/"+tag, req)
+	if err != nil {
+		return foundTags, supportingfunctions.CustomError(fmt.Errorf("search tag, %w", err))
+	}
+
+	if err := json.Unmarshal(b, &foundTags); err != nil {
+		return foundTags, err
+	}
+
+	return foundTags, nil
+}
+
 func (rmisp *requestMISP) SendRequestPublishEvent_ForTest(ctx context.Context, eventId string) (string, error) {
 	return rmisp.sendRequestPublishEvent(ctx, eventId)
 }
@@ -270,7 +336,7 @@ func (rmisp *requestMISP) sendRequestPublishEvent(ctx context.Context, eventId s
 		return resultMsg, supportingfunctions.CustomError(fmt.Errorf("event publish add, %w", err))
 	}
 
-	resData := decodeResponseMIspMessage(b)
+	resData := decodeResponseMispMessage(b)
 	resultMsg = fmt.Sprintf("result published event with id '%s' - %s '%s' %s", eventId, resData.name, resData.message, resData.success)
 
 	return resultMsg, nil

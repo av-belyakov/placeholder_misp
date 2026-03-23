@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func decodeResponseMIspMessage(b []byte) struct {
+func decodeResponseMispMessage(b []byte) struct {
 	name    string
 	errors  string
 	message string
