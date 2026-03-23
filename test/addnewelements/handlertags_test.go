@@ -44,8 +44,15 @@ func TestHandlerTags(t *testing.T) {
 		fmt.Printf("Add tag response:'%+v'\n", res)
 	})
 
-	t.Run("Test 2. Search tag", func(t *testing.T) {
+	t.Run("Test 2. Search tag is success", func(t *testing.T) {
 		res, err := requestMisp.SearchTag_ForTest(ctx, anyTag)
+		assert.NoError(t, err)
+
+		fmt.Printf("Search tag response:'%+v'\n", res)
+	})
+
+	t.Run("Test 3. Search tag is failure", func(t *testing.T) {
+		res, err := requestMisp.SearchTag_ForTest(ctx, "Sensor:ID=\"00000\"")
 		assert.NoError(t, err)
 
 		fmt.Printf("Search tag response:'%+v'\n", res)
