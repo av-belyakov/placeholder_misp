@@ -230,6 +230,16 @@ func (rmisp *requestMISP) sendEventTags(ctx context.Context, eventId string, dat
 		eotmf.Event = eventId
 		eotmf.Tag = v
 
+		// проверка наличия тега который нужно добавить
+		res, errTmp := rmisp.searchTag(ctx, v)
+		if errTmp != nil {
+			err = errors.Join(err, supportingfunctions.CustomError(fmt.Errorf("'event tags with id:'%s' add, %w", eventId, errTmp)))
+		} else {
+			if res != nil || len(res) == 0 {
+				rmisp.addTag(ctx, v, "#98bb1a")
+			}
+		}
+
 		//fmt.Printf("method 'requestMISP.sendEventTags' %d. eotmf:'%+v'\n", k, eotmf)
 
 		b, errTmp := json.Marshal(eotmf)
