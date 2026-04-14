@@ -216,8 +216,10 @@ func (rmisp *requestMISP) SendEventTags_ForTest(ctx context.Context, eventId str
 // sendEventTags отправляет в MISP объекты типа 'tags'
 func (rmisp *requestMISP) sendEventTags(ctx context.Context, eventId string, data *objectsmispformat.ListEventObjectTags) error {
 	var (
-		client *ClientMISP
-		err    error
+		client   *ClientMISP
+		tagColor string = "#98bb1a"
+
+		err error
 	)
 
 	client, err = NewClientMISP(rmisp.host, rmisp.userAuthKey, false)
@@ -230,13 +232,25 @@ func (rmisp *requestMISP) sendEventTags(ctx context.Context, eventId string, dat
 		eotmf.Event = eventId
 		eotmf.Tag = v
 
+		if strings.Contains(strings.ToLower(v), "sensor:id") {
+			tagColor = "#a70a92"
+		}
+
+		if strings.Contains(strings.ToLower(v), "sensor:object") {
+			tagColor = "#c56415"
+		}
+
+		if strings.Contains(strings.ToLower(v), "class-attack") {
+			tagColor = "#1535c5"
+		}
+
 		// проверка наличия тега который нужно добавить
 		res, errTmp := rmisp.searchTag(ctx, v)
 		if errTmp != nil {
 			err = errors.Join(err, supportingfunctions.CustomError(fmt.Errorf("'event tags with id:'%s' add, %w", eventId, errTmp)))
 		} else {
 			if res != nil || len(res) == 0 {
-				rmisp.addTag(ctx, v, "#98bb1a")
+				rmisp.addTag(ctx, v, tagColor)
 			}
 		}
 
