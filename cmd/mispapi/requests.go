@@ -227,6 +227,7 @@ func (rmisp *requestMISP) sendEventTags(ctx context.Context, eventId string, dat
 
 	eotmf := objectsmispformat.EventObjectTagsMispFormat{}
 	for _, v := range *data {
+		var tagColor string = "#98bb1a"
 		eotmf.Event = eventId
 		eotmf.Tag = v
 
@@ -236,7 +237,23 @@ func (rmisp *requestMISP) sendEventTags(ctx context.Context, eventId string, dat
 			err = errors.Join(err, supportingfunctions.CustomError(fmt.Errorf("'event tags with id:'%s' add, %w", eventId, errTmp)))
 		} else {
 			if res != nil || len(res) == 0 {
-				rmisp.addTag(ctx, v, "#98bb1a")
+				if strings.Contains(strings.ToLower(v), "sensor:id") {
+					tagColor = "#a70a92"
+				}
+
+				if strings.Contains(strings.ToLower(v), "sensor:name") {
+					tagColor = "#229696"
+				}
+
+				if strings.Contains(strings.ToLower(v), "sensor:object") {
+					tagColor = "#c56415"
+				}
+
+				if strings.Contains(strings.ToLower(v), "class-attack") {
+					tagColor = "#1535c5"
+				}
+
+				rmisp.addTag(ctx, v, tagColor)
 			}
 		}
 
