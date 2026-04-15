@@ -74,7 +74,9 @@ build-test:
     # удаляем старый образ
     - docker rmi $CI_REGISTRY_IMAGE:test || true
     - >
-      docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA \
+      docker buildx build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA \
+       --provenance=false \
+       --platform linux/amd64 \
        --build-arg VERSION=$CI_COMMIT_SHORT_SHA \
        --build-arg BRANCH=$BRANCH_TEST \
        --build-arg STATUS=development .
@@ -97,7 +99,9 @@ build-prod:
   script:
     - docker rmi $CI_REGISTRY_IMAGE:latest || true
     - >
-      docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA \
+      docker buildx build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA \
+       --provenance=false \
+       --platform linux/amd64 \
        --build-arg VERSION=$CI_COMMIT_SHORT_SHA \
        --build-arg BRANCH=$BRANCH_MAJOR .
     - *docker-image-pure
