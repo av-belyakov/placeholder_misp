@@ -74,7 +74,7 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 			commonApp := conf.GetCommonApp()
 
 			fmt.Println("------------------------ application config NATS -------------------------")
-			fmt.Printf("%+v\n", conf.AppConfigNATS)
+			fmt.Printf("%+v\n", conf.CfgNATS)
 
 			Expect(commonApp.Zabbix.NetworkHost).Should(Equal("192.168.9.45"))
 			Expect(commonApp.Zabbix.NetworkPort).Should(Equal(10051))
@@ -91,7 +91,7 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 			Expect(len(conf.GetListOrganization())).Should(Equal(12))
 			Expect(conf.LogList[0].PathDirectory).Should(Equal("logs"))
 			Expect(conf.LogList[0].MsgTypeName).Should(Equal("error"))
-			Expect(conf.GetAppTheHive().Send).Should(BeTrue())
+			Expect(conf.GetTheHive().Send).Should(BeTrue())
 		})
 
 		It("Должно быть получено содержимое файла 'config_prod.yml' при пустом значении переменной GO_PHMISP_MAIN", func() {
@@ -101,7 +101,7 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 			conf, err := confighandler.New(rootPath)
 			Expect(err).ShouldNot(HaveOccurred())
 
-			confNats := conf.GetAppNATS()
+			confNats := conf.GetNATS()
 			Expect(confNats.Host).Should(Equal("192.168.9.208"))
 			Expect(confNats.Port).Should(Equal(4222))
 			Expect(confNats.CacheTTL).Should(Equal(3600))
@@ -109,10 +109,10 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 			Expect(confNats.Subscriptions.SenderCommand).Should(Equal("object.commandstype"))
 
 			//параметры подключения к MISP
-			Expect(conf.GetAppMISP().Host).Should(Equal("misp-center.cloud.gcm"))
+			Expect(conf.GetMISP().Host).Should(Equal("misp-center.cloud.gcm"))
 
 			//параметры подключения к Sqlite3
-			Expect(conf.GetAppSqlite3().PathFileDb).Should(Equal("/sqlite3/sqlite3.db"))
+			Expect(conf.GetSqlite3().PathFileDb).Should(Equal("/sqlite3/sqlite3.db"))
 
 			//параметры БД для логирования
 			confLoggingDB := conf.GetApplicationWriteLogDB()
@@ -130,7 +130,7 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 			conf, err := confighandler.New(rootPath)
 			Expect(err).ShouldNot(HaveOccurred())
 
-			confNats := conf.GetAppNATS()
+			confNats := conf.GetNATS()
 			Expect(confNats.Host).Should(Equal("nats.cloud.gcm"))
 			Expect(confNats.Port).Should(Equal(4222))
 			Expect(confNats.CacheTTL).Should(Equal(3600))
@@ -138,10 +138,10 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 			Expect(confNats.Subscriptions.SenderCommand).Should(Equal("object.commandstype"))
 
 			//параметры подключения к MISP
-			Expect(conf.GetAppMISP().Host).Should(Equal("misp-world.cloud.gcm"))
+			Expect(conf.GetMISP().Host).Should(Equal("misp-world.cloud.gcm"))
 
 			//параметры подключения к Sqlite3
-			Expect(conf.GetAppSqlite3().PathFileDb).Should(Equal("/test/sqlite3_file/sqlite3.db"))
+			Expect(conf.GetSqlite3().PathFileDb).Should(Equal("/test/sqlite3_file/sqlite3.db"))
 
 			//параметры БД для логирования
 			confLoggingDB := conf.GetApplicationWriteLogDB()
@@ -166,14 +166,14 @@ var _ = Describe("MainConfigHandler", Ordered, func() {
 			conf, err := confighandler.New(rootPath)
 			Expect(err).ShouldNot(HaveOccurred())
 
-			confNats := conf.GetAppNATS()
+			confNats := conf.GetNATS()
 			Expect(confNats.Host).Should(Equal("78.87.78.87"))
 			Expect(confNats.Port).Should(Equal(11111))
 			Expect(confNats.CacheTTL).Should(Equal(4500))
 			Expect(confNats.Subscriptions.ListenerCase).Should(Equal("object.casetype.test"))
 			Expect(confNats.Subscriptions.SenderCommand).Should(Equal("object.commandstype.test"))
 
-			Expect(conf.AppConfigSqlite3.PathFileDb).Should(Equal("somepath/path/file_db"))
+			Expect(conf.CfgSqlite3.PathFileDb).Should(Equal("somepath/path/file_db"))
 		})
 	})
 

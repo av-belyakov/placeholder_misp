@@ -4,20 +4,19 @@ import (
 	"github.com/nats-io/nats.go"
 
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
-	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
 )
 
 // ApiNatsModule настройки для API NATS
 type ApiNatsModule struct {
 	natsConn      *nats.Conn
-	logger        commoninterfaces.Logger
-	counting      *countermessage.CounterMessage
 	subscriptions subscription
 	host          string
-	chanOutput    chan OutputSettings //канал для отправки данных ИЗ модуля
-	chanInput     chan InputSettings  //канал для приема данных В модуль
 	cachettl      int
 	port          int
+	logger        commoninterfaces.Logger
+	counting      commoninterfaces.Counter
+	chanOutput    chan OutputSettings //канал для отправки данных ИЗ модуля
+	chanInput     chan InputSettings  //канал для приема данных В модуль
 	sendCommand   bool
 }
 

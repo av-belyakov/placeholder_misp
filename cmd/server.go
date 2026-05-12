@@ -51,7 +51,7 @@ func server(ctx context.Context) {
 
 	// ****************************************************************************
 	// ****************** инициализируем файл базы данных sqlite3 *****************
-	newPathSqlite3Db, err := checkSqlite3DbFileExist(rootPath, conf.AppConfigSqlite3.PathFileDb)
+	newPathSqlite3Db, err := checkSqlite3DbFileExist(rootPath, conf.CfgSqlite3.PathFileDb)
 	if err != nil {
 		log.Fatalf("error file sqlite3 database: %v", err)
 	}
@@ -140,7 +140,7 @@ func server(ctx context.Context) {
 
 	// ***************************************************************************
 	// ************** инициализация модуля для взаимодействия с NATS *************
-	confNats := conf.AppConfigNATS
+	confNats := conf.CfgNATS
 	apiNats, err := natsapi.New(
 		logging,
 		counting,
@@ -171,7 +171,7 @@ func server(ctx context.Context) {
 
 	// ***************************************************************************
 	// *************** инициалиация модуля для взаимодействия с MISP *************
-	mispModule, err := mispapi.NewModuleMISP(conf.GetAppMISP().Host, conf.GetAppMISP().Auth, conf.GetListOrganization(), logging)
+	mispModule, err := mispapi.NewModuleMISP(conf.GetMISP().Host, conf.GetMISP().Auth, conf.GetListOrganization(), logging)
 	if err != nil {
 		_ = simpleLogger.Write("error", supportingfunctions.CustomError(err).Error())
 	}

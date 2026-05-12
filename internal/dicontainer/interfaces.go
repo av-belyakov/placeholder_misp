@@ -1,0 +1,69 @@
+package dicontainer
+
+import (
+	"context"
+
+	"github.com/av-belyakov/simplelogger"
+
+	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
+	"github.com/av-belyakov/placeholder_misp/cmd/natsapi"
+	"github.com/av-belyakov/placeholder_misp/cmd/sqlite3api"
+	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
+)
+
+type Logger interface {
+	GetChan() <-chan commoninterfaces.Messager
+	Send(msgType, message string)
+	Close()
+}
+
+type Counter interface {
+	SendMessage(msgType string, count int)
+}
+
+type SimpleLogger interface {
+	SetDataBaseInteraction(dbi simplelogger.DataBaseInteractor)
+	GetCountFileDescription() int
+	GetListTypeFiles() []string
+	Write(typeLog, msg string) bool
+}
+
+type Configer interface {
+	GetCommonApp() *confighandler.CommonCfg
+	GetNATS() *confighandler.CfgNATS
+	GetMISP() *confighandler.CfgMISP
+	GetTheHive() *confighandler.CfgTheHive
+	GetSqlite3() *confighandler.CfgSqlite3
+	GetListLogs() []*confighandler.LogSet
+	GetListOrganization() []confighandler.Organization
+	GetApplicationWriteLogDB() *confighandler.CfgWriteLogDB
+}
+
+type NatsConnecter interface {
+	GetChannelFromModule() <-chan natsapi.OutputSettings
+	GetChannelToModule() chan natsapi.InputSettings
+	SendingDataInput(data natsapi.InputSettings)
+	SendingDataOutput(data natsapi.OutputSettings)
+}
+
+type DbLogger interface {
+	Write(msgType, msg string) error
+}
+
+type DB interface {
+	GetChRequest() <-chan sqlite3api.Request
+	SendDataToModule(req sqlite3api.Request)
+	SearchCaseId(ctx context.Context, caseId int) (int, error)
+	UpdateCaseId(ctx context.Context, caseId, eventId int) error
+	DeleteCaseId(ctx context.Context, caseId int) error
+	Ping(ctx context.Context) error
+	ConnectionClose()
+}
+
+type MispConnecter interface {
+	GetReceptionChannel() <-chan mispapi.OutputSetting
+	GetInputChannel() <-chan mispapi.InputSettings
+	SendDataOutput(data mispapi.OutputSetting)
+	SendDataInput(data mispapi.InputSettings)
+}

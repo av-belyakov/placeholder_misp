@@ -1,16 +1,16 @@
 package confighandler
 
 type ConfigApp struct {
-	CommonAppConfig
-	AppConfigNATS
-	AppConfigMISP
-	AppConfigSqlite3
-	AppConfigTheHive
+	CommonCfg
+	CfgNATS
+	CfgMISP
+	CfgSqlite3
+	CfgTheHive
+	CfgWriteLogDB
 	RulesProcMSGMISP
-	AppConfigWriteLogDB
 }
 
-type CommonAppConfig struct {
+type CommonCfg struct {
 	LogList       []*LogSet
 	Organizations []Organization
 	Zabbix        ZabbixOptions
@@ -61,7 +61,7 @@ type Handshake struct {
 	TimeInterval int    `yaml:"timeInterval"`
 }
 
-type AppConfigNATS struct {
+type CfgNATS struct {
 	Subscriptions SubscriptionsNATS `yaml:"subscriptions"`
 	Host          string            `validate:"required" yaml:"host"`
 	Port          int               `validate:"gt=0,lte=65535" yaml:"port"`
@@ -73,16 +73,16 @@ type SubscriptionsNATS struct {
 	SenderCommand string `validate:"required" yaml:"sender_command"`
 }
 
-type AppConfigMISP struct {
+type CfgMISP struct {
 	Host string `validate:"required" yaml:"host"`
 	Auth string `validate:"required" yaml:"auth"`
 }
 
-type AppConfigSqlite3 struct {
+type CfgSqlite3 struct {
 	PathFileDb string `validate:"required" yaml:"path_file_db"`
 }
 
-type AppConfigTheHive struct {
+type CfgTheHive struct {
 	Send bool `yaml:"send"`
 }
 
@@ -90,7 +90,7 @@ type RulesProcMSGMISP struct {
 	Directory, File string
 }
 
-type AppConfigWriteLogDB struct {
+type CfgWriteLogDB struct {
 	Host          string `yaml:"host"`
 	User          string `yaml:"user"`
 	Passwd        string `yaml:"passwd"`

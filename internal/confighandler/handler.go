@@ -73,7 +73,7 @@ func New(rootDir string) (*ConfigApp, error) {
 				return err
 			}
 
-			conf.CommonAppConfig.LogList = ls.Logging
+			conf.CommonCfg.LogList = ls.Logging
 		}
 
 		orgs := Orgs{}
@@ -82,7 +82,7 @@ func New(rootDir string) (*ConfigApp, error) {
 				return err
 			}
 
-			conf.CommonAppConfig.Organizations = orgs.Organizations
+			conf.CommonCfg.Organizations = orgs.Organizations
 		}
 
 		z := ZabbixSet{}
@@ -96,7 +96,7 @@ func New(rootDir string) (*ConfigApp, error) {
 				np = z.Zabbix.NetworkPort
 			}
 
-			conf.CommonAppConfig.Zabbix = ZabbixOptions{
+			conf.CommonCfg.Zabbix = ZabbixOptions{
 				NetworkPort: np,
 				NetworkHost: z.Zabbix.NetworkHost,
 				ZabbixHost:  z.Zabbix.ZabbixHost,
@@ -116,34 +116,34 @@ func New(rootDir string) (*ConfigApp, error) {
 
 		//Настройки для модуля подключения к NATS
 		if viper.IsSet("NATS.host") {
-			conf.AppConfigNATS.Host = viper.GetString("NATS.host")
+			conf.CfgNATS.Host = viper.GetString("NATS.host")
 		}
 		if viper.IsSet("NATS.port") {
-			conf.AppConfigNATS.Port = viper.GetInt("NATS.port")
+			conf.CfgNATS.Port = viper.GetInt("NATS.port")
 		}
 		if viper.IsSet("NATS.cache_ttl") {
-			conf.AppConfigNATS.CacheTTL = viper.GetInt("NATS.cache_ttl")
+			conf.CfgNATS.CacheTTL = viper.GetInt("NATS.cache_ttl")
 		}
 		if viper.IsSet("NATS.subscriptions.listener_case") {
-			conf.AppConfigNATS.Subscriptions.ListenerCase = viper.GetString("NATS.subscriptions.listener_case")
+			conf.CfgNATS.Subscriptions.ListenerCase = viper.GetString("NATS.subscriptions.listener_case")
 		}
 		if viper.IsSet("NATS.subscriptions.sender_command") {
-			conf.AppConfigNATS.Subscriptions.SenderCommand = viper.GetString("NATS.subscriptions.sender_command")
+			conf.CfgNATS.Subscriptions.SenderCommand = viper.GetString("NATS.subscriptions.sender_command")
 		}
 
 		//Настройки для модуля подключения к MISP
 		if viper.IsSet("MISP.host") {
-			conf.AppConfigMISP.Host = viper.GetString("MISP.host")
+			conf.CfgMISP.Host = viper.GetString("MISP.host")
 		}
 
 		//Настройки для модуля подключения к Sqlite3
 		if viper.IsSet("SQLITE3.path_file_db") {
-			conf.AppConfigSqlite3.PathFileDb = viper.GetString("SQLITE3.path_file_db")
+			conf.CfgSqlite3.PathFileDb = viper.GetString("SQLITE3.path_file_db")
 		}
 
 		//Настройки для взаимодействия с TheHive
 		if viper.IsSet("THEHIVE.send") {
-			conf.AppConfigTheHive.Send = viper.GetBool("THEHIVE.send")
+			conf.CfgTheHive.Send = viper.GetBool("THEHIVE.send")
 		}
 
 		//Настройки для модуля правил обработки сообщений
@@ -156,19 +156,19 @@ func New(rootDir string) (*ConfigApp, error) {
 
 		// Настройки доступа к БД в которую будут записыватся логи
 		if viper.IsSet("DATABASEWRITELOG.host") {
-			conf.AppConfigWriteLogDB.Host = viper.GetString("DATABASEWRITELOG.host")
+			conf.CfgWriteLogDB.Host = viper.GetString("DATABASEWRITELOG.host")
 		}
 		if viper.IsSet("DATABASEWRITELOG.port") {
-			conf.AppConfigWriteLogDB.Port = viper.GetInt("DATABASEWRITELOG.port")
+			conf.CfgWriteLogDB.Port = viper.GetInt("DATABASEWRITELOG.port")
 		}
 		if viper.IsSet("DATABASEWRITELOG.user") {
-			conf.AppConfigWriteLogDB.User = viper.GetString("DATABASEWRITELOG.user")
+			conf.CfgWriteLogDB.User = viper.GetString("DATABASEWRITELOG.user")
 		}
 		if viper.IsSet("DATABASEWRITELOG.namedb") {
-			conf.AppConfigWriteLogDB.NameDB = viper.GetString("DATABASEWRITELOG.namedb")
+			conf.CfgWriteLogDB.NameDB = viper.GetString("DATABASEWRITELOG.namedb")
 		}
 		if viper.IsSet("DATABASEWRITELOG.storage_name_db") {
-			conf.AppConfigWriteLogDB.StorageNameDB = viper.GetString("DATABASEWRITELOG.storage_name_db")
+			conf.CfgWriteLogDB.StorageNameDB = viper.GetString("DATABASEWRITELOG.storage_name_db")
 		}
 
 		return nil
@@ -222,36 +222,36 @@ func New(rootDir string) (*ConfigApp, error) {
 
 	//Настройки для модуля подключения к NATS
 	if envList["GO_PHMISP_NHOST"] != "" {
-		conf.AppConfigNATS.Host = envList["GO_PHMISP_NHOST"]
+		conf.CfgNATS.Host = envList["GO_PHMISP_NHOST"]
 	}
 	if envList["GO_PHMISP_NPORT"] != "" {
 		if p, err := strconv.Atoi(envList["GO_PHMISP_NPORT"]); err == nil {
-			conf.AppConfigNATS.Port = p
+			conf.CfgNATS.Port = p
 		}
 	}
 	if envList["GO_PHMISP_NCACHETTL"] != "" {
 		if ttl, err := strconv.Atoi(envList["GO_PHMISP_NCACHETTL"]); err == nil {
-			conf.AppConfigNATS.CacheTTL = ttl
+			conf.CfgNATS.CacheTTL = ttl
 		}
 	}
 	if envList["GO_PHMISP_NSUBLISTENERCASE"] != "" {
-		conf.AppConfigNATS.Subscriptions.ListenerCase = envList["GO_PHMISP_NSUBLISTENERCASE"]
+		conf.CfgNATS.Subscriptions.ListenerCase = envList["GO_PHMISP_NSUBLISTENERCASE"]
 	}
 	if envList["GO_PHMISP_NSUBSENDERCOMMAND"] != "" {
-		conf.AppConfigNATS.Subscriptions.SenderCommand = envList["GO_PHMISP_NSUBSENDERCOMMAND"]
+		conf.CfgNATS.Subscriptions.SenderCommand = envList["GO_PHMISP_NSUBSENDERCOMMAND"]
 	}
 
 	//Настройки для модуля подключения к MISP
 	if envList["GO_PHMISP_MHOST"] != "" {
-		conf.AppConfigMISP.Host = envList["GO_PHMISP_MHOST"]
+		conf.CfgMISP.Host = envList["GO_PHMISP_MHOST"]
 	}
 	if envList["GO_PHMISP_MAUTH"] != "" {
-		conf.AppConfigMISP.Auth = envList["GO_PHMISP_MAUTH"]
+		conf.CfgMISP.Auth = envList["GO_PHMISP_MAUTH"]
 	}
 
 	//Настройки для модуля подключения к Sqlite3
 	if envList["GO_PHMISP_SQLITE3PATH"] != "" {
-		conf.AppConfigSqlite3.PathFileDb = envList["GO_PHMISP_SQLITE3PATH"]
+		conf.CfgSqlite3.PathFileDb = envList["GO_PHMISP_SQLITE3PATH"]
 	}
 
 	//Настройки для модуля правил обработки сообщений
@@ -264,24 +264,24 @@ func New(rootDir string) (*ConfigApp, error) {
 
 	//Настройки доступа к БД в которую будут записыватся логи
 	if envList["GO_PHMISP_DBWLOGHOST"] != "" {
-		conf.AppConfigWriteLogDB.Host = envList["GO_PHMISP_DBWLOGHOST"]
+		conf.CfgWriteLogDB.Host = envList["GO_PHMISP_DBWLOGHOST"]
 	}
 	if envList["GO_PHMISP_DBWLOGPORT"] != "" {
 		if p, err := strconv.Atoi(envList["GO_PHMISP_DBWLOGPORT"]); err == nil {
-			conf.AppConfigWriteLogDB.Port = p
+			conf.CfgWriteLogDB.Port = p
 		}
 	}
 	if envList["GO_PHMISP_DBWLOGNAME"] != "" {
-		conf.AppConfigWriteLogDB.NameDB = envList["GO_PHMISP_DBWLOGNAME"]
+		conf.CfgWriteLogDB.NameDB = envList["GO_PHMISP_DBWLOGNAME"]
 	}
 	if envList["GO_PHMISP_DBWLOGUSER"] != "" {
-		conf.AppConfigWriteLogDB.User = envList["GO_PHMISP_DBWLOGUSER"]
+		conf.CfgWriteLogDB.User = envList["GO_PHMISP_DBWLOGUSER"]
 	}
 	if envList["GO_PHMISP_DBWLOGPASSWD"] != "" {
-		conf.AppConfigWriteLogDB.Passwd = envList["GO_PHMISP_DBWLOGPASSWD"]
+		conf.CfgWriteLogDB.Passwd = envList["GO_PHMISP_DBWLOGPASSWD"]
 	}
 	if envList["GO_PHMISP_DBWLOGSTORAGENAME"] != "" {
-		conf.AppConfigWriteLogDB.StorageNameDB = envList["GO_PHMISP_DBWLOGSTORAGENAME"]
+		conf.CfgWriteLogDB.StorageNameDB = envList["GO_PHMISP_DBWLOGSTORAGENAME"]
 	}
 
 	//выполняем проверку заполненой структуры

@@ -13,7 +13,7 @@ import (
 	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
 )
 
-// checkSqlite3DbFileExist проверяет наличие файла базф данных Sqlite3
+// checkSqlite3DbFileExist проверяет наличие файла базы данных Sqlite3
 // и при необходимости создает его из резервного файла
 func checkSqlite3DbFileExist(rootPath, pathFileDb string) (newPathToDb string, err error) {
 	var (

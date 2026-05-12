@@ -78,11 +78,11 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		logging = logginghandler.New(simpleLogger, chZabbix)
 
 		// NATS
-		confApp.AppConfigNATS.Host = "nats.cloud.gcm"
-		confApp.AppConfigNATS.Port = 4222
+		confApp.CfgNATS.Host = "nats.cloud.gcm"
+		confApp.CfgNATS.Port = 4222
 
-		confApp.AppConfigMISP.Host = os.Getenv("GO_PHMISP_MHOST")
-		confApp.AppConfigMISP.Auth = os.Getenv("GO_PHMISP_MAUTH")
+		confApp.CfgMISP.Host = os.Getenv("GO_PHMISP_MHOST")
+		confApp.CfgMISP.Auth = os.Getenv("GO_PHMISP_MAUTH")
 
 		go func() {
 			fmt.Println("___ Logging START")
@@ -111,10 +111,10 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		exampleByte, errReadFile = readFileJson("test/test_json", "examplenew.json")
 
 		// инициализация модуля взаимодействия с Sqlite3
-		sqlite3Module, errSqlite3Conn = sqlite3api.New(context.Background(), confApp.AppConfigSqlite3.PathFileDb, logging)
+		sqlite3Module, errSqlite3Conn = sqlite3api.New(context.Background(), confApp.CfgSqlite3.PathFileDb, logging)
 
 		//инициалиация модуля для взаимодействия с MISP
-		mispModule, errMisp = mispapi.NewModuleMISP(confApp.GetAppMISP().Host, confApp.GetAppMISP().Auth, confApp.GetListOrganization(), logging)
+		mispModule, errMisp = mispapi.NewModuleMISP(confApp.GetMISP().Host, confApp.GetMISP().Auth, confApp.GetListOrganization(), logging)
 
 		hjson := coremodule.NewHandlerJSON(counting, logging)
 		// обработчик JSON документа

@@ -2,8 +2,8 @@ package confighandler
 
 import "errors"
 
-func (conf *ConfigApp) GetCommonApp() *CommonAppConfig {
-	return &conf.CommonAppConfig
+func (conf *ConfigApp) GetCommonApp() *CommonCfg {
+	return &conf.CommonCfg
 }
 
 func (conf *ConfigApp) GetListLogs() []*LogSet {
@@ -14,32 +14,32 @@ func (conf *ConfigApp) GetListOrganization() []Organization {
 	return conf.Organizations
 }
 
-func (conf *ConfigApp) GetAppSqlite3() *AppConfigSqlite3 {
-	return &conf.AppConfigSqlite3
+func (conf *ConfigApp) GetSqlite3() *CfgSqlite3 {
+	return &conf.CfgSqlite3
 }
 
-func (conf *ConfigApp) GetAppNATS() *AppConfigNATS {
-	return &conf.AppConfigNATS
+func (conf *ConfigApp) GetNATS() *CfgNATS {
+	return &conf.CfgNATS
 }
 
-func (conf *ConfigApp) GetAppMISP() *AppConfigMISP {
-	return &conf.AppConfigMISP
+func (conf *ConfigApp) GetMISP() *CfgMISP {
+	return &conf.CfgMISP
 }
 
-func (conf *ConfigApp) GetAppTheHive() *AppConfigTheHive {
-	return &conf.AppConfigTheHive
+func (conf *ConfigApp) GetTheHive() *CfgTheHive {
+	return &conf.CfgTheHive
 }
 
 // GetApplicationWriteLogDB настройки доступа к БД для логирования данных
-func (conf *ConfigApp) GetApplicationWriteLogDB() *AppConfigWriteLogDB {
-	return &conf.AppConfigWriteLogDB
+func (conf *ConfigApp) GetApplicationWriteLogDB() *CfgWriteLogDB {
+	return &conf.CfgWriteLogDB
 }
 
 func (conf *ConfigApp) Clean() {
 	conf = &ConfigApp{}
 }
 
-// SetNameMessageType наименование тпа логирования
+// SetNameMessageType наименование типа логирования
 func (l *LogSet) SetNameMessageType(v string) error {
 	if v == "" {
 		return errors.New("the value 'MsgTypeName' must not be empty")

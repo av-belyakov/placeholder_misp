@@ -14,12 +14,11 @@ import (
 
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/constants"
-	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
 // New настраивает новый модуль взаимодействия с API NATS
-func New(logger commoninterfaces.Logger, counting *countermessage.CounterMessage, opts ...NatsApiOptions) (*ApiNatsModule, error) {
+func New(logger commoninterfaces.Logger, counting commoninterfaces.Counter, opts ...NatsApiOptions) (*ApiNatsModule, error) {
 	api := &ApiNatsModule{
 		cachettl:    60,
 		sendCommand: true,
