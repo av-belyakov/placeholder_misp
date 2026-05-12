@@ -16,32 +16,34 @@ import (
 	"github.com/av-belyakov/placeholder_misp/cmd/natsapi"
 	"github.com/av-belyakov/placeholder_misp/cmd/sqlite3api"
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
-	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
+	"github.com/av-belyakov/placeholder_misp/internal/dicontainer"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
-type CoreHandlerSettings struct {
-	logger    commoninterfaces.Logger
-	counter   commoninterfaces.Counter
-	listRules *rules.ListRule
+type CoreHandler struct {
+	logger  commoninterfaces.Logger
+	counter commoninterfaces.Counter
+	rules   dicontainer.RulesHandler
 }
 
 func NewCoreHandler(
+	logger commoninterfaces.Logger,
 	counter commoninterfaces.Counter,
-	listRules *rules.ListRule,
-	logger commoninterfaces.Logger) *CoreHandlerSettings {
-	return &CoreHandlerSettings{
-		logger:    logger,
-		listRules: listRules,
-		counter:   counter,
+	rules dicontainer.RulesHandler,
+) *CoreHandler {
+	return &CoreHandler{
+		rules:   rules,
+		logger:  logger,
+		counter: counter,
 	}
 }
 
-func (settings *CoreHandlerSettings) Start(
+func (settings *CoreHandler) Start(
 	ctx context.Context,
-	natsModule *natsapi.ApiNatsModule,
-	mispModule mispapi.ModuleMispHandler,
-	sqlite3Module *sqlite3api.ApiSqlite3Module) {
+	natsModule dicontainer.NatsConnecter,
+	mispModule dicontainer.MispConnecter,
+	sqlite3Module dicontainer.DB,
+) {
 
 	chanNatsReception := natsModule.GetChannelFromModule()
 	chanMispReception := mispModule.GetReceptionChannel()
@@ -52,9 +54,9 @@ func (settings *CoreHandlerSettings) Start(
 		SettingsGenerateObjectsFormatMISP{
 			MispModule:    mispModule,
 			Sqlite3Module: sqlite3Module,
-			ListRule:      settings.listRules,
-			Counter:       settings.counter,
+			ListRule:      settings.rules,
 			Logger:        settings.logger,
+			Counter:       settings.counter,
 		})
 
 	for {

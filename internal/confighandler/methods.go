@@ -30,6 +30,10 @@ func (conf *ConfigApp) GetTheHive() *CfgTheHive {
 	return &conf.CfgTheHive
 }
 
+func (conf *ConfigApp) GetRules() *CfgRules {
+	return &conf.CfgRules
+}
+
 // GetApplicationWriteLogDB настройки доступа к БД для логирования данных
 func (conf *ConfigApp) GetApplicationWriteLogDB() *CfgWriteLogDB {
 	return &conf.CfgWriteLogDB

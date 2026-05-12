@@ -4,11 +4,12 @@ import (
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 )
 
-type diContainer struct {
+type DiContainer struct {
 	logger       Logger
 	counter      Counter
 	configer     Configer
 	simpleLogger SimpleLogger
+	rules        RulesHandler
 
 	db       DB
 	dbLogger DbLogger

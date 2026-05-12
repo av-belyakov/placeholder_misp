@@ -148,10 +148,10 @@ func New(rootDir string) (*ConfigApp, error) {
 
 		//Настройки для модуля правил обработки сообщений
 		if viper.IsSet("RULES_PROC_MSG_FOR_MISP.directory") {
-			conf.RulesProcMSGMISP.Directory = viper.GetString("RULES_PROC_MSG_FOR_MISP.directory")
+			conf.CfgRules.Directory = viper.GetString("RULES_PROC_MSG_FOR_MISP.directory")
 		}
 		if viper.IsSet("RULES_PROC_MSG_FOR_MISP.file") {
-			conf.RulesProcMSGMISP.File = viper.GetString("RULES_PROC_MSG_FOR_MISP.file")
+			conf.CfgRules.File = viper.GetString("RULES_PROC_MSG_FOR_MISP.file")
 		}
 
 		// Настройки доступа к БД в которую будут записыватся логи
@@ -256,10 +256,10 @@ func New(rootDir string) (*ConfigApp, error) {
 
 	//Настройки для модуля правил обработки сообщений
 	if envList["GO_PHMISP_RULES_DIR"] != "" {
-		conf.RulesProcMSGMISP.Directory = envList["GO_PHMISP_RULES_DIR"]
+		conf.CfgRules.Directory = envList["GO_PHMISP_RULES_DIR"]
 	}
 	if envList["GO_PHMISP_RULES_FILE"] != "" {
-		conf.RulesProcMSGMISP.File = envList["GO_PHMISP_RULES_FILE"]
+		conf.CfgRules.File = envList["GO_PHMISP_RULES_FILE"]
 	}
 
 	//Настройки доступа к БД в которую будут записыватся логи

@@ -2,12 +2,12 @@ package confighandler
 
 type ConfigApp struct {
 	CommonCfg
+	CfgRules
 	CfgNATS
 	CfgMISP
 	CfgSqlite3
 	CfgTheHive
 	CfgWriteLogDB
-	RulesProcMSGMISP
 }
 
 type CommonCfg struct {
@@ -86,7 +86,7 @@ type CfgTheHive struct {
 	Send bool `yaml:"send"`
 }
 
-type RulesProcMSGMISP struct {
+type CfgRules struct {
 	Directory, File string
 }
 

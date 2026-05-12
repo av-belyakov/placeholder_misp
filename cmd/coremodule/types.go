@@ -2,9 +2,8 @@ package coremodule
 
 import (
 	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
-	"github.com/av-belyakov/placeholder_misp/cmd/sqlite3api"
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
-	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
+	"github.com/av-belyakov/placeholder_misp/internal/dicontainer"
 )
 
 // ChanInputCreateMispFormat входные данные для канала приёма информации используемого
@@ -43,16 +42,16 @@ type MispGalaxyOptions struct {
 // GenerateObjectsFormatMISP генерирует объекты в формате MISP
 type GenerateObjectsFormatMISP struct {
 	mispModule    mispapi.ModuleMispHandler
-	sqlite3Module *sqlite3api.ApiSqlite3Module
-	listRule      *rules.ListRule
+	sqlite3Module dicontainer.DB
+	listRule      dicontainer.RulesHandler
 	counter       commoninterfaces.Counter
 	logger        commoninterfaces.Logger
 }
 
 type SettingsGenerateObjectsFormatMISP struct {
 	MispModule    mispapi.ModuleMispHandler
-	Sqlite3Module *sqlite3api.ApiSqlite3Module
-	ListRule      *rules.ListRule
+	Sqlite3Module dicontainer.DB
+	ListRule      dicontainer.RulesHandler
 	Counter       commoninterfaces.Counter
 	Logger        commoninterfaces.Logger
 }

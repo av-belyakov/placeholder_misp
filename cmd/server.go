@@ -87,7 +87,7 @@ func server(ctx context.Context) {
 
 	// ****************************************************************************
 	// ******* инициализируем модуль чтения правил обработки MISP сообщений *******
-	listRules, warnings, err := rules.NewListRule(constants.Root_Dir, conf.RulesProcMSGMISP.Directory, conf.RulesProcMSGMISP.File)
+	listRules, warnings, err := rules.NewListRule(constants.Root_Dir, conf.CfgRules.Directory, conf.CfgRules.File)
 	if err != nil {
 		_ = simpleLogger.Write("error", supportingfunctions.CustomError(err).Error())
 
@@ -199,6 +199,6 @@ func server(ctx context.Context) {
 
 	// *****************************************************************
 	// *************** инициализируем ядро приложения ******************
-	core := coremodule.NewCoreHandler(counting, listRules, logging)
+	core := coremodule.NewCoreHandler(logging, counting, listRules)
 	core.Start(ctx, apiNats, mispModule, sqlite3Module)
 }

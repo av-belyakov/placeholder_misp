@@ -10,6 +10,7 @@ import (
 	"github.com/av-belyakov/placeholder_misp/cmd/sqlite3api"
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
+	"github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
 )
 
 type Logger interface {
@@ -35,6 +36,7 @@ type Configer interface {
 	GetMISP() *confighandler.CfgMISP
 	GetTheHive() *confighandler.CfgTheHive
 	GetSqlite3() *confighandler.CfgSqlite3
+	GetRules() *confighandler.CfgRules
 	GetListLogs() []*confighandler.LogSet
 	GetListOrganization() []confighandler.Organization
 	GetApplicationWriteLogDB() *confighandler.CfgWriteLogDB
@@ -47,8 +49,11 @@ type NatsConnecter interface {
 	SendingDataOutput(data natsapi.OutputSettings)
 }
 
-type DbLogger interface {
-	Write(msgType, msg string) error
+type MispConnecter interface {
+	GetReceptionChannel() <-chan mispapi.OutputSetting
+	GetInputChannel() <-chan mispapi.InputSettings
+	SendDataOutput(data mispapi.OutputSetting)
+	SendDataInput(data mispapi.InputSettings)
 }
 
 type DB interface {
@@ -61,9 +66,17 @@ type DB interface {
 	ConnectionClose()
 }
 
-type MispConnecter interface {
-	GetReceptionChannel() <-chan mispapi.OutputSetting
-	GetInputChannel() <-chan mispapi.InputSettings
-	SendDataOutput(data mispapi.OutputSetting)
-	SendDataInput(data mispapi.InputSettings)
+type DbLogger interface {
+	Write(msgType, msg string) error
+}
+
+type RulesHandler interface {
+	GetRulePass() []ruleshandler.PassListAnd
+	GetRuleExclude() []ruleshandler.ExcludeListAnd
+	GetRulePassany() bool
+	PassRuleHandler(string, any)
+	ReplacementRuleHandler(string, string, any) (any, int, error)
+	ExcludeRuleHandler(string, any) ([2]int, bool)
+	SomePassRuleIsTrue() bool
+	CleanStatementExpressionRulePass()
 }

@@ -11,14 +11,16 @@ import (
 	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
 	"github.com/av-belyakov/placeholder_misp/cmd/natsapi"
 	"github.com/av-belyakov/placeholder_misp/cmd/sqlite3api"
+	"github.com/av-belyakov/placeholder_misp/constants"
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
 	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
 	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
+	"github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
 // Configer чтения конфигурационного файла
-func (d *diContainer) Configer() Configer {
+func (d *DiContainer) Configer() Configer {
 	if d.configer == nil {
 		rootPath, err := supportingfunctions.GetRootPath(d.rootDir)
 		if err != nil {
@@ -37,7 +39,7 @@ func (d *diContainer) Configer() Configer {
 }
 
 // SimpleLogger простое логирование с помощью стороннего пакета
-func (d *diContainer) SimpleLogger(ctx context.Context) SimpleLogger {
+func (d *DiContainer) SimpleLogger(ctx context.Context) SimpleLogger {
 	if d.simpleLogger == nil {
 		listLog := make([]simplelogger.OptionsManager, 0, len(d.Configer().GetListLogs()))
 		for _, v := range d.Configer().GetListLogs() {
@@ -60,7 +62,7 @@ func (d *diContainer) SimpleLogger(ctx context.Context) SimpleLogger {
 }
 
 // Logger основное логирование
-func (d *diContainer) Logger(ctx context.Context) Logger {
+func (d *DiContainer) Logger(ctx context.Context) Logger {
 	if d.logger == nil {
 		logger := logginghandler.New(d.SimpleLogger(ctx), d.ch)
 		logger.Start(ctx)
@@ -72,7 +74,7 @@ func (d *diContainer) Logger(ctx context.Context) Logger {
 }
 
 // Counter счетчик сообщений
-func (d *diContainer) Counter(ctx context.Context) Counter {
+func (d *DiContainer) Counter(ctx context.Context) Counter {
 	if d.counter == nil {
 		counter := countermessage.New(d.ch)
 		counter.Start(ctx)
@@ -84,7 +86,7 @@ func (d *diContainer) Counter(ctx context.Context) Counter {
 }
 
 // DbLogger запись логов в БД
-func (d *diContainer) DbLogger() DbLogger {
+func (d *DiContainer) DbLogger() DbLogger {
 	if d.dbLogger == nil {
 		var nameRegionalObject = "gcm"
 		if os.Getenv("GO_PHMISP_MAIN") == "development" {
@@ -110,7 +112,7 @@ func (d *diContainer) DbLogger() DbLogger {
 }
 
 // DB подключение к БД
-func (d *diContainer) DB(ctx context.Context) DB {
+func (d *DiContainer) DB(ctx context.Context) DB {
 	if d.db == nil {
 		rootPath, err := supportingfunctions.GetRootPath(d.rootDir)
 		if err != nil {
@@ -135,7 +137,7 @@ func (d *diContainer) DB(ctx context.Context) DB {
 }
 
 // NatsConnecter подключение к NATS
-func (d *diContainer) NatsConnecter(ctx context.Context) NatsConnecter {
+func (d *DiContainer) NatsConnecter(ctx context.Context) NatsConnecter {
 	if d.nats == nil {
 		apiNats, err := natsapi.New(
 			d.Logger(ctx),
@@ -160,7 +162,7 @@ func (d *diContainer) NatsConnecter(ctx context.Context) NatsConnecter {
 }
 
 // MispConnecter подключение к MISP
-func (d *diContainer) MispConnecter(ctx context.Context) MispConnecter {
+func (d *DiContainer) MispConnecter(ctx context.Context) MispConnecter {
 	if d.misp == nil {
 		apiMisp, err := mispapi.NewModuleMISP(d.Configer().GetMISP().Host, d.Configer().GetMISP().Auth, d.Configer().GetListOrganization(), d.Logger(ctx))
 		if err != nil {
@@ -175,4 +177,29 @@ func (d *diContainer) MispConnecter(ctx context.Context) MispConnecter {
 	}
 
 	return d.misp
+}
+
+// RulesHandler обработчик правил
+func (d *DiContainer) Rules(ctx context.Context) RulesHandler {
+	if d.rules == nil {
+		listRules, warnings, err := ruleshandler.NewListRule(constants.Root_Dir, d.Configer().GetRules().Directory, d.Configer().GetRules().File)
+		if err != nil {
+			log.Fatal("error module 'ruleshandler':", err)
+		}
+
+		// проверяем наличие правил Pass или Passany которые являются обязательными, а также отсутсвие
+		// логических ошибок в файле с правилами
+		msgWarning, err := ruleshandler.CheckListRule(listRules, warnings)
+		if err != nil {
+			log.Fatal("error module 'ruleshandler':", err)
+		}
+
+		if msgWarning != "" {
+			d.SimpleLogger(ctx).Write("warning", msgWarning)
+		}
+
+		d.rules = listRules
+	}
+
+	return d.rules
 }

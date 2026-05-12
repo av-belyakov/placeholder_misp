@@ -11,8 +11,8 @@ import (
 // ReplacementRuleHandler выполняет замену значения, на значение, из поля replaceValue
 // файла правил, если свойство fieldName равно содержимому поля searchField правила, а
 // свойство currentValue совпадает со значением поля searchValue правила
-func (lr *ListRule) ReplacementRuleHandler(searchValueType, fieldName string, currentValue interface{}) (interface{}, int, error) {
-	getReplaceValue := func(svt, rv string) (interface{}, error) {
+func (lr *ListRule) ReplacementRuleHandler(searchValueType, fieldName string, currentValue any) (any, int, error) {
+	getReplaceValue := func(svt, rv string) (any, error) {
 		switch svt {
 		case "string":
 			return rv, nil
@@ -60,7 +60,7 @@ func (lr *ListRule) ReplacementRuleHandler(searchValueType, fieldName string, cu
 // а также значения свойства currentValue и поля searchValue правила Pass. При совпадении
 // этих значений изменяется состояние поля StatementExpression соответствующего правил
 // на true
-func (lr *ListRule) PassRuleHandler(fieldName string, currentValue interface{}) {
+func (lr *ListRule) PassRuleHandler(fieldName string, currentValue any) {
 	cvstr := fmt.Sprint(currentValue)
 
 	for key, value := range lr.Rules.Pass {
@@ -133,7 +133,7 @@ func (lr *ListRule) SomePassRuleIsTrue() bool {
 // сравнение, то есть содержимое currentValue должно в точности соответствовать содержимому
 // поля searchValue. А если состояние поля AccurateComparison 'false', то тогда currentValue
 // должно содержать в себе значение из поля searchValue вместе с любыми другими значениями.
-func (lr *ListRule) ExcludeRuleHandler(fieldName string, currentValue interface{}) ([2]int, bool) {
+func (lr *ListRule) ExcludeRuleHandler(fieldName string, currentValue any) ([2]int, bool) {
 	cvstr := fmt.Sprint(currentValue)
 	var address [2]int
 
