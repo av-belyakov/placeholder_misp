@@ -4,6 +4,7 @@ import (
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 )
 
+// DiContainer DI контейнер
 type DiContainer struct {
 	logger       Logger
 	counter      Counter

@@ -15,9 +15,8 @@ func main() {
 		<-ctx.Done()
 
 		fmt.Println("Placeholder_misp module is stop")
-
 		stop()
 	}()
 
-	server(ctx)
+	NewApp(ctx).Start()
 }

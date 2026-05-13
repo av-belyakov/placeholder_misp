@@ -13,7 +13,7 @@ func Sqlite3DbFileIsExist(rootPath, pathFileDb string) (newPathToDb string, err 
 		fr, fw *os.File
 	)
 
-	backupFile := filepath.Join(rootPath, "../../backupdb/sqlite3_backup.db")
+	backupFile := filepath.Join(rootPath, "/backupdb/sqlite3_backup.db")
 	pathFileDb = filepath.Join(rootPath, pathFileDb)
 
 	newPathToDb = pathFileDb
