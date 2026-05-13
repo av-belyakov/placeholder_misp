@@ -7,8 +7,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
-	"github.com/av-belyakov/placeholder_misp/cmd/sqlite3api"
+	"github.com/av-belyakov/placeholder_misp/internal/mispapi"
+	"github.com/av-belyakov/placeholder_misp/internal/sqlite3api"
 )
 
 type OptionsAddNewObject struct {

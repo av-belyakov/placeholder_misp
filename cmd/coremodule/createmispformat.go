@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/av-belyakov/objectsmispformat"
-	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
+	"github.com/av-belyakov/placeholder_misp/internal/mispapi"
 )
 
 // Start создаёт набор объектов в формате MISP

@@ -13,17 +13,18 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/subosito/gotenv"
 
+	"github.com/av-belyakov/simplelogger"
+
 	"github.com/av-belyakov/placeholder_misp/cmd/coremodule"
-	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
-	"github.com/av-belyakov/placeholder_misp/cmd/sqlite3api"
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/constants"
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
 	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
 	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
+	"github.com/av-belyakov/placeholder_misp/internal/mispapi"
 	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
+	"github.com/av-belyakov/placeholder_misp/internal/sqlite3api"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
-	"github.com/av-belyakov/simplelogger"
 )
 
 var _ = Describe("Addneweventandattributes", Ordered, func() {

@@ -7,7 +7,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/av-belyakov/placeholder_misp/cmd/elasticsearchapi"
+	"github.com/av-belyakov/placeholder_misp/internal/elasticsearchapi"
 )
 
 func TestInserMsgLog(t *testing.T) {

@@ -8,10 +8,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
-	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
+	"github.com/av-belyakov/placeholder_misp/internal/mispapi"
 )
 
 var (

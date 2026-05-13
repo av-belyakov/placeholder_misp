@@ -7,9 +7,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/av-belyakov/placeholder_misp/internal/mispapi"
 )
 
 func TestGetEventElementMISP(t *testing.T) {

@@ -7,15 +7,15 @@ import (
 
 	"github.com/av-belyakov/simplelogger"
 
-	"github.com/av-belyakov/placeholder_misp/cmd/elasticsearchapi"
-	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
-	"github.com/av-belyakov/placeholder_misp/cmd/natsapi"
-	"github.com/av-belyakov/placeholder_misp/cmd/sqlite3api"
 	"github.com/av-belyakov/placeholder_misp/constants"
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
 	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
+	"github.com/av-belyakov/placeholder_misp/internal/elasticsearchapi"
 	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
+	"github.com/av-belyakov/placeholder_misp/internal/mispapi"
+	"github.com/av-belyakov/placeholder_misp/internal/natsapi"
 	"github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
+	"github.com/av-belyakov/placeholder_misp/internal/sqlite3api"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 

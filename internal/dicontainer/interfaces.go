@@ -5,12 +5,12 @@ import (
 
 	"github.com/av-belyakov/simplelogger"
 
-	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
-	"github.com/av-belyakov/placeholder_misp/cmd/natsapi"
-	"github.com/av-belyakov/placeholder_misp/cmd/sqlite3api"
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
+	"github.com/av-belyakov/placeholder_misp/internal/mispapi"
+	"github.com/av-belyakov/placeholder_misp/internal/natsapi"
 	"github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
+	"github.com/av-belyakov/placeholder_misp/internal/sqlite3api"
 )
 
 type Logger interface {

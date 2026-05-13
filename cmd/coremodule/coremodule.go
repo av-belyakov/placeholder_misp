@@ -12,11 +12,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/av-belyakov/placeholder_misp/cmd/mispapi"
-	"github.com/av-belyakov/placeholder_misp/cmd/natsapi"
-	"github.com/av-belyakov/placeholder_misp/cmd/sqlite3api"
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/internal/dicontainer"
+	"github.com/av-belyakov/placeholder_misp/internal/mispapi"
+	"github.com/av-belyakov/placeholder_misp/internal/natsapi"
+	"github.com/av-belyakov/placeholder_misp/internal/sqlite3api"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 

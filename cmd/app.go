@@ -12,12 +12,12 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/av-belyakov/placeholder_misp/cmd/coremodule"
-	"github.com/av-belyakov/placeholder_misp/cmd/wrappers"
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/constants"
 	"github.com/av-belyakov/placeholder_misp/internal/appversion"
 	"github.com/av-belyakov/placeholder_misp/internal/dicontainer"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
+	"github.com/av-belyakov/placeholder_misp/internal/wrappers"
 )
 
 type App struct {
