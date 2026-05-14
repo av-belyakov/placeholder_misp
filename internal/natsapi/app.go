@@ -141,7 +141,8 @@ func (api *ApiNatsModule) Start(ctx context.Context) error {
 					        }`,
 							regionalObject,
 							rootId,
-							incomingData.CaseId)); err != nil {
+							incomingData.CaseId,
+						)); err != nil {
 						return err
 					}
 
@@ -157,12 +158,15 @@ func (api *ApiNatsModule) Start(ctx context.Context) error {
 					          "command": "set_case_custom_field",
      					  	  "for_regional_object": "%s", 
 							  "root_id": "%s",
+					          "case_id": "%s",
 					          "field_name": "misp-event-id.string",
 					          "value": "%s"
 						    }`,
 							regionalObject,
 							rootId,
-							incomingData.EventId)); err != nil {
+							incomingData.CaseId,
+							incomingData.EventId,
+						)); err != nil {
 						return err
 					}
 

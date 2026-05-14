@@ -5,12 +5,14 @@ import (
 	"log"
 	"testing"
 
-	"github.com/av-belyakov/placeholder_misp/cmd/sqlite3api"
+	"github.com/stretchr/testify/assert"
+
+	"github.com/av-belyakov/simplelogger"
+
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
 	"github.com/av-belyakov/placeholder_misp/constants"
 	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
-	"github.com/av-belyakov/simplelogger"
-	"github.com/stretchr/testify/assert"
+	"github.com/av-belyakov/placeholder_misp/internal/sqlite3api"
 )
 
 const Case_Id int = 711711
