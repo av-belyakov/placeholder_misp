@@ -112,6 +112,7 @@ go tool pprof http://<ip>:<port>/debug/pprof/... (далее возможны в
   "command": "set_case_custom_field",
   "for_regional_object": "gcm",
   "root_id": "<rootId обработанного кейса>",
+  "case_id": "%s",
   "field_name": "misp-event-id.string",
   "value": "<идентификатор события MISP>"
 }
