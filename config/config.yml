@@ -12,6 +12,7 @@ ORGANIZATIONS:
   - { orgName: "SKFO-RCM", sourceName: "rcmsta" }
   - { orgName: "CR-RCM", sourceName: "rcmsr" }
   - { orgName: "PFO-RCM", sourceName: "rcmniz" }
+  - { orgName: "PFO-RCM", sourceName: "rcmniz_new" }
   - { orgName: "UralFO-RCM", sourceName: "rcmsve" }
   - { orgName: "SZFO-RCM", sourceName: "rcmspb" }
   - { orgName: "KGD-RCM", sourceName: "rcmkgd" }
