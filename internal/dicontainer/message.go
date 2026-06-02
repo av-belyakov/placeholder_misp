@@ -145,8 +145,10 @@ func (d *DiContainer) NatsConnecter(ctx context.Context) NatsConnecter {
 			natsapi.WithHost(d.Configer().GetNATS().Host),
 			natsapi.WithPort(d.Configer().GetNATS().Port),
 			natsapi.WithCacheTTL(d.Configer().GetNATS().CacheTTL),
-			natsapi.WithListenerCase(d.Configer().GetNATS().Subscriptions.ListenerCase),
-			natsapi.WithSenderCommand(d.Configer().GetNATS().Subscriptions.SenderCommand))
+			natsapi.WithSubcriptionListenerCase(d.Configer().GetNATS().Subscriptions.ListenerCase),
+			natsapi.WithSubcriptionSenderCommand(d.Configer().GetNATS().Subscriptions.SenderCommand),
+			natsapi.WithSubcriptionGetSensorInfo(d.Configer().GetNATS().Subscriptions.GetSensorInfo),
+		)
 		if err != nil {
 			log.Fatal("error initialization module 'natsapi':", err)
 		}

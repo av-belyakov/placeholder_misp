@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/av-belyakov/placeholder_misp/constants"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
@@ -34,8 +35,9 @@ func (api *ApiNatsModule) subscriptionCaseHandler() {
 		api.logger.Send("info", fmt.Sprintf("a new case with id '%d' has been accepted", eventStruct.Event.Object.CaseId))
 
 		api.SendingDataOutput(OutputSettings{
-			MsgId: uuid.NewString(),
-			Data:  m.Data,
+			MsgType: "case",
+			MsgId:   uuid.NewString(),
+			Data:    m.Data,
 		})
 
 		//счетчик принятых кейсов
@@ -58,21 +60,53 @@ func (api *ApiNatsModule) incomingInformationHandler(ctx context.Context) {
 				return
 
 			case incomingData := <-api.GetChannelToModule():
-				//не отправляем eventId в TheHive
-				if !api.sendCommand {
-					continue
-				}
+				switch incomingData.Command {
+				case "get_sensor_info":
+					//
+					// получение информации о сенсоре
+					go func(ctx context.Context) {
+						ctxTimeout, cancel := context.WithTimeout(ctx, 30*time.Second)
+						defer cancel()
 
-				rootId := incomingData.RootId
-				regionalObject := incomingData.CaseSource
+						api.logger.Send("info", fmt.Sprintf("a request has been sent to get sensor information for an object with rootId:'%s'", incomingData.RootId))
 
-				g := errgroup.Group{}
-				g.Go(func() error {
-					//команда на установку тега
-					if err := api.natsConn.Publish(api.subscriptions.senderCommand,
-						fmt.Appendf(
-							nil,
-							`{
+						res, err := api.natsConn.RequestWithContext(ctxTimeout, api.subscriptions.getSensorInfo, incomingData.Data)
+						if err != nil {
+							api.logger.Send("error", supportingfunctions.CustomError(err).Error())
+						}
+
+						if res == nil {
+							return
+						}
+
+						api.logger.Send("info", fmt.Sprintf("a response was received to a request for sensor information for an object with rootId:'%s'", incomingData.RootId))
+
+						api.SendingDataOutput(OutputSettings{
+							MsgType: "sensor information",
+							MsgId:   incomingData.RootId,
+							Data:    res.Data,
+						})
+					}(ctx)
+
+				case "send event id":
+					//
+					// установка тегов и customFields в TheHive
+
+					//не отправляем eventId в TheHive
+					if !api.sendCommand {
+						continue
+					}
+
+					rootId := incomingData.RootId
+					regionalObject := incomingData.CaseSource
+
+					g := errgroup.Group{}
+					g.Go(func() error {
+						//команда на установку тега
+						if err := api.natsConn.Publish(api.subscriptions.senderCommand,
+							fmt.Appendf(
+								nil,
+								`{
 					          "service": "MISP",
 					          "command": "add_case_tag",
 					  		  "for_regional_object": "%s",
@@ -80,21 +114,21 @@ func (api *ApiNatsModule) incomingInformationHandler(ctx context.Context) {
 					          "case_id": "%s",
 					          "value": "Webhook: send=\"MISP\""
 					        }`,
-							regionalObject,
-							rootId,
-							incomingData.CaseId,
-						)); err != nil {
-						return err
-					}
+								regionalObject,
+								rootId,
+								incomingData.CaseId,
+							)); err != nil {
+							return err
+						}
 
-					return nil
-				})
-				g.Go(func() error {
-					//команда на добавление значения поля customFields
-					if err := api.natsConn.Publish(api.subscriptions.senderCommand,
-						fmt.Appendf(
-							nil,
-							`{
+						return nil
+					})
+					g.Go(func() error {
+						//команда на добавление значения поля customFields
+						if err := api.natsConn.Publish(api.subscriptions.senderCommand,
+							fmt.Appendf(
+								nil,
+								`{
 						      "service": "MISP",
 					          "command": "set_case_custom_field",
      					  	  "for_regional_object": "%s", 
@@ -103,24 +137,25 @@ func (api *ApiNatsModule) incomingInformationHandler(ctx context.Context) {
 					          "field_name": "misp-event-id.string",
 					          "value": "%s"
 						    }`,
-							regionalObject,
-							rootId,
-							incomingData.CaseId,
-							incomingData.EventId,
-						)); err != nil {
-						return err
+								regionalObject,
+								rootId,
+								incomingData.CaseId,
+								incomingData.EventId,
+							)); err != nil {
+							return err
+						}
+
+						return nil
+					})
+
+					if err := g.Wait(); err != nil {
+						api.logger.Send("error", supportingfunctions.CustomError(err).Error())
+
+						continue
 					}
 
-					return nil
-				})
-
-				if err := g.Wait(); err != nil {
-					api.logger.Send("error", supportingfunctions.CustomError(err).Error())
-
-					continue
+					api.logger.Send("info", fmt.Sprintf("comand:'%s' for case id:'%s' (root id:'%s') was successfully sent", incomingData.Command, incomingData.CaseId, incomingData.RootId))
 				}
-
-				api.logger.Send("info", fmt.Sprintf("comand:'%s' for case id:'%s' (root id:'%s') was successfully sent", incomingData.Command, incomingData.CaseId, incomingData.RootId))
 			}
 		}
 	}()

@@ -65,22 +65,42 @@ func (settings *CoreHandler) Start(
 			return
 
 		case data := <-chanNatsReception:
-			go func() {
-				//----------------------------------------------------------------
-				//----------- запись в файл необработанных объектов --------------
-				//----------------------------------------------------------------
-				str, err := supportingfunctions.NewReadReflectJSONSprint(data.Data)
-				if err == nil {
-					settings.logger.Send("events", fmt.Sprintf("\t---------------\n\tEVENTS:\n%s\n", str))
-				}
-				//----------------------------------------------------------------
+			switch data.MsgType {
+			case "case":
+				go func() {
+					//----------------------------------------------------------------
+					//----------- запись в файл необработанных объектов --------------
+					//----------------------------------------------------------------
+					str, err := supportingfunctions.NewReadReflectJSONSprint(data.Data)
+					if err == nil {
+						settings.logger.Send("events", fmt.Sprintf("\t---------------\n\tEVENTS:\n%s\n", str))
+					}
+					//----------------------------------------------------------------
 
-				// обработчик JSON документа
-				chanOutputDecodeJson := hjson.Start(data.Data, data.MsgId)
+					// обработчик JSON документа
+					chanOutputDecodeJson := hjson.Start(data.Data, data.MsgId)
 
-				//формирование итоговых документов в формате MISP
-				generatorFormatMISP.Start(chanOutputDecodeJson, data.MsgId)
-			}()
+					//формирование итоговых документов в формате MISP
+					generatorFormatMISP.Start(chanOutputDecodeJson, data.MsgId)
+
+					//
+					// вот здесь внутри generatorFormatMISP.Start должен формироватся
+					// запрос к natsapi на получения дополнитьльной информации о сенсорах
+				}()
+
+			case "sensor information":
+				//
+				// здесь надо описать обработку входящий информации о сенсорах
+				// будет получен rootId кейса по которому запрашивалась информация
+				// о сенсорах, по нему, видимо в БД Sqlite3, надо найти eventId,
+				// который надо будет передать в mispapi для установки тега типа
+				// 'misp-galaxy:Sector="наименование сектора промышленности"'
+				//
+				// кроме того нужно ещё написать раздел в mispapi который будет отвечать
+				// за формирование запроса на поиск доп. информации о сенсорах
+				//
+
+			}
 
 		case data := <-chanMispReception:
 			switch data.Command {
