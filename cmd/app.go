@@ -6,7 +6,6 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"os"
 	"strings"
 
 	"golang.org/x/sync/errgroup"
@@ -69,13 +68,13 @@ func NewApp(ctx context.Context) *App {
 
 func (a *App) Start() {
 	// сервер для отладки
-	if os.Getenv("GO_PHMISP_MAIN") == "test" || os.Getenv("GO_PHMISP_MAIN") == "development" {
+	if a.diContainer.Configer().GetDebugServer().Enable {
 		go func() {
-			debugServerHost := "localhost"
-			debugServerPort := 6161
+			host := a.diContainer.Configer().GetDebugServer().Host
+			port := a.diContainer.Configer().GetDebugServer().Port
 
 			httpServer := &http.Server{
-				Addr: fmt.Sprintf("%s:%d", debugServerHost, debugServerPort),
+				Addr: fmt.Sprintf("%s:%d", host, port),
 				BaseContext: func(_ net.Listener) context.Context {
 					return a.ctx
 				},
@@ -91,7 +90,7 @@ func (a *App) Start() {
 				return httpServer.Shutdown(context.Background())
 			})
 
-			log.Printf("%vdebug server %v%s:%d%v\n", constants.Ansi_Bright_Green, constants.Ansi_Dark_Gray, debugServerHost, debugServerPort, constants.Ansi_Reset)
+			log.Printf("%vdebug server %v%s:%d%v\n", constants.Ansi_Bright_Green, constants.Ansi_Dark_Gray, host, port, constants.Ansi_Reset)
 
 			if err := g.Wait(); err != nil {
 				log.Fatal("error debugging server:", err)

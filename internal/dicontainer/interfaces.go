@@ -40,6 +40,7 @@ type Configer interface {
 	GetListLogs() []*confighandler.LogSet
 	GetListOrganization() []confighandler.Organization
 	GetLogDB() confighandler.CfgWriteLogDB
+	GetDebugServer() confighandler.CfgDebugServer
 }
 
 type NatsConnecter interface {
