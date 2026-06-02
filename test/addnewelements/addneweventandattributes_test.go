@@ -59,6 +59,10 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		sc := bufio.NewScanner(f)
 		for sc.Scan() {
 			newResult = append(newResult, sc.Bytes()...)
+
+		}
+		if err := sc.Err(); err != nil {
+			fmt.Printf("Invalid input: %s", err)
 		}
 
 		return newResult, nil
@@ -79,11 +83,11 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		logging = logginghandler.New(simpleLogger, chZabbix)
 
 		// NATS
-		confApp.CfgNATS.Host = "nats.cloud.gcm"
-		confApp.CfgNATS.Port = 4222
+		confApp.NATS.Host = "nats.cloud.gcm"
+		confApp.NATS.Port = 4222
 
-		confApp.CfgMISP.Host = os.Getenv("GO_PHMISP_MHOST")
-		confApp.CfgMISP.Auth = os.Getenv("GO_PHMISP_MAUTH")
+		confApp.MISP.Host = os.Getenv("GO_PHMISP_MHOST")
+		confApp.MISP.Auth = os.Getenv("GO_PHMISP_MAUTH")
 
 		go func() {
 			fmt.Println("___ Logging START")
@@ -112,7 +116,7 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 		exampleByte, errReadFile = readFileJson("test/test_json", "examplenew.json")
 
 		// инициализация модуля взаимодействия с Sqlite3
-		sqlite3Module, errSqlite3Conn = sqlite3api.New(context.Background(), confApp.CfgSqlite3.PathFileDb, logging)
+		sqlite3Module, errSqlite3Conn = sqlite3api.New(context.Background(), confApp.GetSqlite3().PathFileDb, logging)
 
 		//инициалиация модуля для взаимодействия с MISP
 		mispModule, errMisp = mispapi.NewModuleMISP(confApp.GetMISP().Host, confApp.GetMISP().Auth, confApp.GetListOrganization(), logging)

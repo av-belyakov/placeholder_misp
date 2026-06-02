@@ -12,6 +12,7 @@ NATS:
     #чтобы не отправлялись команды на обновление данных в thehive
     #так как это уже делает продуктовый модуль
     sender_command: object.commandstype.local
+    get_sensor_info: object.sensor-info-request
 MISP:
   host: misp-world.cloud.gcm
 THEHIVE:
@@ -22,3 +23,7 @@ DATABASEWRITELOG:
   namedb: ""
   storage_name_db: placeholder_misp
   user: log_writer
+DebugServer:
+  enable: true
+  host: localhost
+  port: 6464

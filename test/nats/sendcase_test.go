@@ -7,10 +7,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
 	"github.com/joho/godotenv"
 	"github.com/nats-io/nats.go"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
 )
 
 var (
@@ -55,7 +56,7 @@ func TestSendCase(t *testing.T) {
 	chDone := make(chan struct{})
 
 	go func(nc *nats.Conn) {
-		nc.Subscribe(conf.Subscriptions.SenderCommand, func(msg *nats.Msg) {
+		nc.Subscribe(conf.GetNATS().Subscriptions.SenderCommand, func(msg *nats.Msg) {
 			fmt.Printf("Received command: %s\n", string(msg.Data))
 
 			chDone <- struct{}{}
@@ -66,9 +67,9 @@ func TestSendCase(t *testing.T) {
 	assert.NoError(t, err)
 
 	t.Log("GO_PHMISP_MAIN =", os.Getenv("GO_PHMISP_MAIN"))
-	t.Log("conf.Subscriptions.ListenerCase:", conf.Subscriptions.ListenerCase)
+	t.Log("conf.Subscriptions.ListenerCase:", conf.GetNATS().Subscriptions.ListenerCase)
 
-	err = nc.Publish(conf.Subscriptions.ListenerCase, b)
+	err = nc.Publish(conf.GetNATS().Subscriptions.ListenerCase, b)
 	assert.NoError(t, err)
 
 	fmt.Println("Before")

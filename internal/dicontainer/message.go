@@ -94,11 +94,11 @@ func (d *DiContainer) DbLogger() DbLogger {
 		}
 
 		conn, err := elasticsearchapi.NewElasticsearchConnect(elasticsearchapi.Settings{
-			Port:               d.Configer().GetApplicationWriteLogDB().Port,
-			Host:               d.Configer().GetApplicationWriteLogDB().Host,
-			User:               d.Configer().GetApplicationWriteLogDB().User,
-			Passwd:             d.Configer().GetApplicationWriteLogDB().Passwd,
-			IndexDB:            d.Configer().GetApplicationWriteLogDB().StorageNameDB,
+			Port:               d.Configer().GetLogDB().Port,
+			Host:               d.Configer().GetLogDB().Host,
+			User:               d.Configer().GetLogDB().User,
+			Passwd:             d.Configer().GetLogDB().Passwd,
+			IndexDB:            d.Configer().GetLogDB().StorageNameDB,
 			NameRegionalObject: nameRegionalObject,
 		})
 		if err != nil {

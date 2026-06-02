@@ -1,13 +1,14 @@
 package confighandler
 
 type ConfigApp struct {
-	CommonCfg
-	CfgRules
-	CfgNATS
-	CfgMISP
-	CfgSqlite3
-	CfgTheHive
-	CfgWriteLogDB
+	Common      CommonCfg
+	Rules       CfgRules
+	NATS        CfgNATS
+	MISP        CfgMISP
+	Sqlite3     CfgSqlite3
+	TheHive     CfgTheHive
+	WriteLogDB  CfgWriteLogDB
+	DebugServer CfgDebugServer
 }
 
 type CommonCfg struct {
@@ -71,6 +72,7 @@ type CfgNATS struct {
 type SubscriptionsNATS struct {
 	ListenerCase  string `validate:"required" yaml:"listener_case"`
 	SenderCommand string `validate:"required" yaml:"sender_command"`
+	GetSensorInfo string `validate:"required" yaml:"get_sensor_info"`
 }
 
 type CfgMISP struct {
@@ -97,4 +99,10 @@ type CfgWriteLogDB struct {
 	NameDB        string `yaml:"namedb"`
 	StorageNameDB string `yaml:"storage_name_db"`
 	Port          int    `validate:"gt=0,lte=65535" yaml:"port"`
+}
+
+type CfgDebugServer struct {
+	Host   string `yaml:"host"`
+	Port   int    `validate:"gt=0,lte=65535" yaml:"port"`
+	Enable bool   `yaml:"enabled"`
 }

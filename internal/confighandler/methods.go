@@ -2,45 +2,58 @@ package confighandler
 
 import "errors"
 
-func (conf *ConfigApp) GetCommonApp() *CommonCfg {
-	return &conf.CommonCfg
+// GetCommonApp общие настройки приложения
+func (cfg *ConfigApp) GetCommonApp() CommonCfg {
+	return cfg.Common
 }
 
-func (conf *ConfigApp) GetListLogs() []*LogSet {
-	return conf.LogList
+// GetListLogs список логов
+func (cfg *ConfigApp) GetListLogs() []*LogSet {
+	return cfg.Common.LogList
 }
 
-func (conf *ConfigApp) GetListOrganization() []Organization {
-	return conf.Organizations
+// GetListOrganization список организаций
+func (cfg *ConfigApp) GetListOrganization() []Organization {
+	return cfg.Common.Organizations
 }
 
-func (conf *ConfigApp) GetSqlite3() *CfgSqlite3 {
-	return &conf.CfgSqlite3
+// GetSqlite3 настройки доступа к БД
+func (cfg *ConfigApp) GetSqlite3() CfgSqlite3 {
+	return cfg.Sqlite3
 }
 
-func (conf *ConfigApp) GetNATS() *CfgNATS {
-	return &conf.CfgNATS
+// GetNATS настройки доступа к NATS
+func (cfg *ConfigApp) GetNATS() CfgNATS {
+	return cfg.NATS
 }
 
-func (conf *ConfigApp) GetMISP() *CfgMISP {
-	return &conf.CfgMISP
+// GetMISP настройки доступа к MISP
+func (cfg *ConfigApp) GetMISP() CfgMISP {
+	return cfg.MISP
 }
 
-func (conf *ConfigApp) GetTheHive() *CfgTheHive {
-	return &conf.CfgTheHive
+// GetTheHive настройки доступа к TheHive
+func (cfg *ConfigApp) GetTheHive() CfgTheHive {
+	return cfg.TheHive
 }
 
-func (conf *ConfigApp) GetRules() *CfgRules {
-	return &conf.CfgRules
+// GetRules настройки правил
+func (cfg *ConfigApp) GetRules() CfgRules {
+	return cfg.Rules
 }
 
-// GetApplicationWriteLogDB настройки доступа к БД для логирования данных
-func (conf *ConfigApp) GetApplicationWriteLogDB() *CfgWriteLogDB {
-	return &conf.CfgWriteLogDB
+// GetLogDB настройки доступа к БД для логирования данных
+func (cfg *ConfigApp) GetLogDB() CfgWriteLogDB {
+	return cfg.WriteLogDB
 }
 
-func (conf *ConfigApp) Clean() {
-	conf = &ConfigApp{}
+// GetDebugServer настройки доступа к БД для логирования данных
+func (cfg *ConfigApp) GetDebugServer() CfgDebugServer {
+	return cfg.DebugServer
+}
+
+func (cfg *ConfigApp) Clean() {
+	cfg = &ConfigApp{}
 }
 
 // SetNameMessageType наименование типа логирования

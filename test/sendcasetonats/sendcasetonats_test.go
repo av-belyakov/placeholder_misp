@@ -7,10 +7,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
 	"github.com/joho/godotenv"
 	"github.com/nats-io/nats.go"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
 )
 
 const (
@@ -57,18 +58,18 @@ func TestMain(m *testing.M) {
 }
 
 func TestSendToNats(t *testing.T) {
-	nc.Subscribe(conf.Subscriptions.ListenerCase, func(msg *nats.Msg) {
+	nc.Subscribe(conf.GetNATS().Subscriptions.ListenerCase, func(msg *nats.Msg) {
 		t.Log("received ", string(msg.Data))
 	})
 
 	fmt.Println("Sending 1 request with case ->")
-	err = nc.Publish(conf.Subscriptions.ListenerCase, rbyte)
+	err = nc.Publish(conf.GetNATS().Subscriptions.ListenerCase, rbyte)
 	assert.NoError(t, err)
 
 	time.Sleep(time.Second * 3)
 
 	fmt.Println("Sending 2 request with case ->")
-	err = nc.Publish(conf.Subscriptions.ListenerCase, rbyte)
+	err = nc.Publish(conf.GetNATS().Subscriptions.ListenerCase, rbyte)
 	assert.NoError(t, err)
 
 	nc.Close()

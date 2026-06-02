@@ -10,6 +10,7 @@ NATS:
   subscriptions:
     listener_case: object.casetype
     sender_command: object.commandstype
+    get_sensor_info: object.sensor-info-request
 MISP:
   host: misp-center.cloud.gcm
 THEHIVE:
@@ -20,3 +21,7 @@ DATABASEWRITELOG:
   namedb: ""
   storage_name_db: placeholder_misp
   user: log_writer
+DebugServer:
+  enable: false
+  host: localhost
+  port: 6464

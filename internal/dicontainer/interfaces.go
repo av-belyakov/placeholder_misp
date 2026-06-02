@@ -31,15 +31,15 @@ type SimpleLogger interface {
 }
 
 type Configer interface {
-	GetCommonApp() *confighandler.CommonCfg
-	GetNATS() *confighandler.CfgNATS
-	GetMISP() *confighandler.CfgMISP
-	GetTheHive() *confighandler.CfgTheHive
-	GetSqlite3() *confighandler.CfgSqlite3
-	GetRules() *confighandler.CfgRules
+	GetCommonApp() confighandler.CommonCfg
+	GetNATS() confighandler.CfgNATS
+	GetMISP() confighandler.CfgMISP
+	GetTheHive() confighandler.CfgTheHive
+	GetSqlite3() confighandler.CfgSqlite3
+	GetRules() confighandler.CfgRules
 	GetListLogs() []*confighandler.LogSet
 	GetListOrganization() []confighandler.Organization
-	GetApplicationWriteLogDB() *confighandler.CfgWriteLogDB
+	GetLogDB() confighandler.CfgWriteLogDB
 }
 
 type NatsConnecter interface {
