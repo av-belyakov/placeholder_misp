@@ -3,17 +3,12 @@ package natsapi
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"log"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/nats-io/nats.go"
-	"golang.org/x/sync/errgroup"
 
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
-	"github.com/av-belyakov/placeholder_misp/constants"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
@@ -39,22 +34,11 @@ func New(logger commoninterfaces.Logger, counting commoninterfaces.Counter, opts
 	return api, nil
 }
 
-// Start инициализирует новый модуль взаимодействия с API NATS при инициализации
-// возращается канал для взаимодействия с модулем, все запросы к модулю выполняются
-// через данный канал
+// Start инициализирует новый модуль взаимодействия с API NATS
 func (api *ApiNatsModule) Start(ctx context.Context) error {
 	if ctx.Err() != nil {
 		return ctx.Err()
 	}
-
-	//event.object.caseId
-	eventStruct := struct {
-		Event struct {
-			Object struct {
-				CaseId int `json:"caseId"`
-			} `json:"object"`
-		} `json:"event"`
-	}{}
 
 	nc, err := nats.Connect(
 		fmt.Sprintf("%s:%d", api.host, api.port),
@@ -81,109 +65,15 @@ func (api *ApiNatsModule) Start(ctx context.Context) error {
 	}
 	api.natsConn = nc
 
-	//приём кейсов
-	nc.Subscribe(api.subscriptions.listenerCase, func(m *nats.Msg) {
-		err := json.Unmarshal(m.Data, &eventStruct)
-		if err != nil {
-			fmt.Println("Error:", err)
-		}
+	// обработчик подписок для получения кейсов
+	go api.subscriptionCaseHandler()
 
-		api.logger.Send("info", fmt.Sprintf("a new case with id '%d' has been accepted", eventStruct.Event.Object.CaseId))
+	// обработчик информации полученной изнутри приложения
+	go api.incomingInformationHandler(ctx)
 
-		api.SendingDataOutput(OutputSettings{
-			MsgId: uuid.NewString(),
-			Data:  m.Data,
-		})
-
-		//счетчик принятых кейсов
-		api.counting.SendMessage("update accepted events", 1)
-
-	})
-
-	lisSub := fmt.Sprintf("%v, listening to a subscription:%v'%s'%v", constants.Ansi_Bright_Green, constants.Ansi_Dark_Gray, api.subscriptions.listenerCase, constants.Ansi_Reset)
-	log.Printf("%vconnect to NATS with address %v%s:%d%v%s\n", constants.Ansi_Bright_Green, constants.Ansi_Dark_Gray, api.host, api.port, constants.Ansi_Reset, lisSub)
-
-	go func(ctx context.Context, nc *nats.Conn) {
-		<-ctx.Done()
+	context.AfterFunc(ctx, func() {
 		nc.Drain()
-	}(ctx, nc)
-
-	//обработка данных приходящих в модуль от ядра приложения фактически это команды на добавления
-	//тега - 'add_case_tag' и команда на добавление MISP id в поле customField
-	go func() {
-		for {
-			select {
-			case <-ctx.Done():
-				return
-
-			case incomingData := <-api.GetChannelToModule():
-				//не отправляем eventId в TheHive
-				if !api.sendCommand {
-					continue
-				}
-
-				rootId := incomingData.RootId
-				regionalObject := incomingData.CaseSource
-
-				g := errgroup.Group{}
-				g.Go(func() error {
-					//команда на установку тега
-					if err := nc.Publish(api.subscriptions.senderCommand,
-						fmt.Appendf(
-							nil,
-							`{
-					          "service": "MISP",
-					          "command": "add_case_tag",
-					  		  "for_regional_object": "%s",
-					          "root_id": "%s",
-					          "case_id": "%s",
-					          "value": "Webhook: send=\"MISP\""
-					        }`,
-							regionalObject,
-							rootId,
-							incomingData.CaseId,
-						)); err != nil {
-						return err
-					}
-
-					return nil
-				})
-				g.Go(func() error {
-					//команда на добавление значения поля customFields
-					if err := nc.Publish(api.subscriptions.senderCommand,
-						fmt.Appendf(
-							nil,
-							`{
-						      "service": "MISP",
-					          "command": "set_case_custom_field",
-     					  	  "for_regional_object": "%s", 
-							  "root_id": "%s",
-					          "case_id": "%s",
-					          "field_name": "misp-event-id.string",
-					          "value": "%s"
-						    }`,
-							regionalObject,
-							rootId,
-							incomingData.CaseId,
-							incomingData.EventId,
-						)); err != nil {
-						return err
-					}
-
-					return nil
-				})
-
-				if err := g.Wait(); err != nil {
-					api.logger.Send("error", supportingfunctions.CustomError(err).Error())
-
-					continue
-				}
-
-				api.logger.Send("info", fmt.Sprintf("comand:'%s' for case id:'%s' (root id:'%s') was successfully sent", incomingData.Command, incomingData.CaseId, incomingData.RootId))
-
-			}
-		}
-	}()
+	})
 
 	return nil
 }
