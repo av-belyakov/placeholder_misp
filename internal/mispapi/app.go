@@ -117,7 +117,7 @@ func (m *ModuleMISP) Start(ctx context.Context) error {
 							m.logger.Send("error", supportingfunctions.CustomError(err).Error())
 
 							if us, err = connHandler.CreateNewUser(ctx, data.UserEmail, data.CaseSource); err != nil {
-								m.logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("%w, case id:'%d'", err, int(data.CaseId))).Error())
+								m.logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("%w, case id:'%s'", err, data.CaseId)).Error())
 							} else {
 								userAuthKey = us.AuthKey
 								m.logger.Send("info", fmt.Sprintf("a new user '%s' from %s has been successfully created", data.UserEmail, data.CaseSource))
@@ -132,6 +132,8 @@ func (m *ModuleMISP) Start(ctx context.Context) error {
 					case "del event":
 						m.delObject(ctx, data.EventId)
 
+					case "add sensor information":
+						m.addSensorInformation(ctx, userAuthKey, data.EventId, data.DataRaw)
 					}
 				}(msg)
 			}

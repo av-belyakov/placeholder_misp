@@ -82,24 +82,30 @@ func (settings *CoreHandler) Start(
 
 					//формирование итоговых документов в формате MISP
 					generatorFormatMISP.Start(chanOutputDecodeJson, data.MsgId)
-
-					//
-					// вот здесь внутри generatorFormatMISP.Start должен формироватся
-					// запрос к natsapi на получения дополнитьльной информации о сенсорах
 				}()
 
 			case "sensor information":
-				//
-				// здесь надо описать обработку входящий информации о сенсорах
-				// будет получен rootId кейса по которому запрашивалась информация
-				// о сенсорах, по нему, видимо в БД Sqlite3, надо найти eventId,
-				// который надо будет передать в mispapi для установки тега типа
-				// 'misp-galaxy:Sector="наименование сектора промышленности"'
-				//
-				// кроме того нужно ещё написать раздел в mispapi который будет отвечать
-				// за формирование запроса на поиск доп. информации о сенсорах
-				//
+				go func() {
+					settings.logger.Send("info", fmt.Sprintf("information about sensors for case id:'%s' has been received", data.MsgId))
 
+					//поиск eventId в Sqlite3
+					chRes := make(chan sqlite3api.Response)
+					sqlite3Module.SendDataToModule(sqlite3api.Request{
+						Command:    "search caseId",
+						ChResponse: chRes,
+						Payload:    fmt.Append(nil, data.MsgId), // data.MsgId == caseId для NATS
+					})
+					res := <-chRes
+					eventId := string(res.Payload)
+
+					if res.Error == nil && eventId != "" {
+						mispModule.SendDataInput(mispapi.InputSettings{
+							Command: "add sensor information",
+							EventId: eventId,
+							DataRaw: data.Data,
+						})
+					}
+				}()
 			}
 
 		case data := <-chanMispReception:
@@ -131,13 +137,13 @@ func (settings *CoreHandler) Start(
 						Payload:    fmt.Append(nil, data.CaseId),
 					})
 					res := <-chRes
-					oldEeventId := string(res.Payload)
+					oldEventId := string(res.Payload)
 
-					if res.Error == nil && oldEeventId != "" {
+					if res.Error == nil && oldEventId != "" {
 						//запрос на удаление старого event в MISP
 						mispModule.SendDataInput(mispapi.InputSettings{
 							Command: "del event",
-							EventId: oldEeventId,
+							EventId: oldEventId,
 						})
 					}
 
@@ -147,6 +153,14 @@ func (settings *CoreHandler) Start(
 						Payload: fmt.Append(nil, fmt.Sprintf("%s:%s", data.CaseId, data.EventId)),
 					})
 				}()
+
+			case "get sensor information":
+				natsModule.SendingDataInput(natsapi.InputSettings{
+					Data:    data.Data,
+					Command: data.Command,
+					CaseId:  data.CaseId,
+				})
+
 			}
 		}
 	}

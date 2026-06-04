@@ -61,14 +61,14 @@ func (api *ApiNatsModule) incomingInformationHandler(ctx context.Context) {
 
 			case incomingData := <-api.GetChannelToModule():
 				switch incomingData.Command {
-				case "get_sensor_info":
+				case "get sensor information":
 					//
 					// получение информации о сенсоре
 					go func(ctx context.Context) {
 						ctxTimeout, cancel := context.WithTimeout(ctx, 30*time.Second)
 						defer cancel()
 
-						api.logger.Send("info", fmt.Sprintf("a request has been sent to get sensor information for an object with rootId:'%s'", incomingData.RootId))
+						api.logger.Send("info", fmt.Sprintf("a request has been sent to get sensor information for an object with rootId:'%s', caseId:'%s'", incomingData.RootId, incomingData.CaseId))
 
 						res, err := api.natsConn.RequestWithContext(ctxTimeout, api.subscriptions.getSensorInfo, incomingData.Data)
 						if err != nil {
@@ -79,11 +79,11 @@ func (api *ApiNatsModule) incomingInformationHandler(ctx context.Context) {
 							return
 						}
 
-						api.logger.Send("info", fmt.Sprintf("a response was received to a request for sensor information for an object with rootId:'%s'", incomingData.RootId))
+						api.logger.Send("info", fmt.Sprintf("a response was received to a request for sensor information for an object with rootId:'%s', caseId:'%s'", incomingData.RootId, incomingData.CaseId))
 
 						api.SendingDataOutput(OutputSettings{
 							MsgType: "sensor information",
-							MsgId:   incomingData.RootId,
+							MsgId:   incomingData.CaseId,
 							Data:    res.Data,
 						})
 					}(ctx)

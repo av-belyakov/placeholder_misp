@@ -22,7 +22,7 @@ type ModuleMISP struct {
 
 // ChanInputSettings параметры канала для приема данных в модуль
 type InputSettings struct {
-	//MajorData  map[string]interface{}
+	DataRaw    []byte
 	Data       objectsmispformat.ListFormatsMISP
 	Command    string
 	TaskId     string
@@ -30,12 +30,18 @@ type InputSettings struct {
 	CaseSource string
 	EventId    string
 	UserEmail  string
-	CaseId     float64
+	CaseId     string
 }
 
 // SettingChanOutputMISP параметры канала для передачи данных из модуля
 type OutputSetting struct {
-	Command, CaseId, EventId, TaskId, RootId, CaseSource string
+	Data       []byte
+	Command    string
+	CaseId     string
+	TaskId     string
+	RootId     string
+	EventId    string
+	CaseSource string
 }
 
 // StorageAuthorizationData хранилище с авторизационными настройками пользователя
@@ -109,4 +115,12 @@ type TagSettings struct {
 	Exportable     bool   `json:"exportable"`
 	LocalOnly      bool   `json:"local_only"`
 	IsCustomGalaxy bool   `json:"is_custom_galaxy"`
+}
+
+// RequestSensorInformation запрос к модулю enricher_sensor_information для
+// получения информации по сенсорам
+type RequestSensorInformation struct {
+	Source      string   `json:"source"`
+	TaskId      string   `json:"task_id"`
+	ListSensors []string `json:"list_sensors"`
 }

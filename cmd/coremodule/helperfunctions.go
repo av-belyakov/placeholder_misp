@@ -328,7 +328,7 @@ func addListGalaxyTags(lgt *MispGalaxyTags) func(string, any) {
 }
 
 // создает список тегов которые MISP использует для формирования галактик,
-// теги меют подобную структуру:
+// теги имеют подобную структуру:
 // "misp-galaxy:mitre-attack-pattern=\"Match Legitimate Name or Location - T1036.005\""
 func createGalaxyTags(list *MispGalaxyTags) []string {
 	result := make([]string, 0, len(*list))

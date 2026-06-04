@@ -15,6 +15,7 @@ import (
 
 	"github.com/av-belyakov/placeholder_misp/cmd/coremodule"
 	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/constants"
 	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
 	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
 	"github.com/av-belyakov/placeholder_misp/internal/mispapi"
@@ -80,7 +81,11 @@ func TestMain(m *testing.M) {
 	chZabbix = make(chan commoninterfaces.Messager)
 	counting = countermessage.New(chZabbix)
 
-	simpleLogger, err := simplelogger.NewSimpleLogger(context.Background(), "palceholder_misp", simplelogger.CreateOptions())
+	simpleLogger, err := simplelogger.NewSimpleLogger(
+		context.Background(),
+		constants.Root_Dir,
+		simplelogger.CreateOptions(),
+	)
 	if err != nil {
 		log.Fatalf("error module 'simplelogger': %v", err)
 	}

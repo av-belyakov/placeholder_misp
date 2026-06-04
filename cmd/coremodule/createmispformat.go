@@ -33,8 +33,8 @@ func (gen *GenerateObjectsFormatMISP) Start(chDecodeJSON <-chan ChanInputCreateM
 		listAttributesMisp := objectsmispformat.NewListAttributesMispFormat()
 		defer listAttributesMisp.CleanList()
 
-		leot := objectsmispformat.NewListEventObjectTags()
-		defer leot.CleanListTags()
+		listEventObjectTags := objectsmispformat.NewListEventObjectTags()
+		defer listEventObjectTags.CleanListTags()
 
 		supportiveListExcludeRule := NewSupportiveListExcludeRuleTmp(gen.listRule.GetRuleExclude())
 
@@ -50,7 +50,7 @@ func (gen *GenerateObjectsFormatMISP) Start(chDecodeJSON <-chan ChanInputCreateM
 			"event.object.updatedAt": {eventsMisp.SetAnySightingTimestamp},
 			"event.object.owner":     {eventsMisp.SetAnyEventCreatorEmail},
 			"event.object.customFields.class-attack.string": {func(i any, num int) {
-				leot.SetTag(fmt.Sprintf("class-attack=\"%v\"", i))
+				listEventObjectTags.SetTag(fmt.Sprintf("class-attack=\"%v\"", i))
 			}},
 			//observables -> attributes
 			"observables._id": {
@@ -178,7 +178,7 @@ func (gen *GenerateObjectsFormatMISP) Start(chDecodeJSON <-chan ChanInputCreateM
 			//наполнение поля "Теги" MISP
 			if msg.FieldBranch == "event.object.tags" {
 				if tag, ok := newValue.(string); ok {
-					leot.SetTag(tag)
+					listEventObjectTags.SetTag(tag)
 				}
 			}
 
@@ -205,6 +205,8 @@ func (gen *GenerateObjectsFormatMISP) Start(chDecodeJSON <-chan ChanInputCreateM
 			}
 		}
 
+		caseIdStr := fmt.Sprint(caseId)
+
 		var isAllowed bool
 		//проверяем что бы хотя бы одно правило разрешало пропуск кейса
 		if gen.listRule.GetRulePassany() || gen.listRule.SomePassRuleIsTrue() {
@@ -228,18 +230,18 @@ func (gen *GenerateObjectsFormatMISP) Start(chDecodeJSON <-chan ChanInputCreateM
 		}
 
 		if !isAllowed {
-			gen.logger.Send("warning", fmt.Sprintf("the message with case id %d was not sent to MISP because it does not comply with the rules", int(caseId)))
+			gen.logger.Send("warning", fmt.Sprintf("the message with case id %s was not sent to MISP because it does not comply with the rules", caseIdStr))
 
 			return
 		}
 
 		//добавляем case id в поле Info
-		eventsMisp.Info += fmt.Sprintf(" :::TheHive caseId:'%d':::", int(caseId))
+		eventsMisp.Info += fmt.Sprintf(" :::TheHive caseId:'%s':::", caseIdStr)
 
 		//добавляем в datemodels.ListObjectEventTags дополнительные теги
 		//ответственные за формирование галактик в MISP
 		galaxyTags := createGalaxyTags(listGalaxyTags)
-		joinEventTags(leot, galaxyTags)
+		joinEventTags(listEventObjectTags, galaxyTags)
 
 		for k := range listAttributesMisp.GetList() {
 			if supportiveListExcludeRule.CheckRuleTrue(k) {
@@ -252,21 +254,21 @@ func (gen *GenerateObjectsFormatMISP) Start(chDecodeJSON <-chan ChanInputCreateM
 		mispFormat.ID = rootId
 		mispFormat.Event = eventsMisp
 		mispFormat.Objects = getNewListObjects(listObjectsMisp.GetList(), listAttributeTmp.GetListAttribute())
-		tmpListTags := leot.GetListTags()
+		tmpListTags := listEventObjectTags.GetListTags()
 		mispFormat.ObjectTags = &tmpListTags
 		mispFormat.Attributes = getNewListAttributes(listAttributesMisp.GetList(), listTags)
 		reports := objectsmispformat.NewEventReports()
-		reports.SetName(fmt.Sprint(caseId))
+		reports.SetName(caseIdStr)
 		reports.SetDistribution("1")
 		mispFormat.Reports = reports
 
-		gen.logger.Send("info", fmt.Sprintf("the case with id:'%d' complies with the specified rules and has been submitted for further processing", int(caseId)))
+		gen.logger.Send("info", fmt.Sprintf("the case with id:'%s' complies with the specified rules and has been submitted for further processing", caseIdStr))
 
 		//тут отправляем сформированные по формату MISP пользовательские структуры
 		gen.mispModule.SendDataInput(mispapi.InputSettings{
 			Command:    "add event",
 			TaskId:     taskId,
-			CaseId:     caseId,
+			CaseId:     caseIdStr,
 			RootId:     rootId,
 			UserEmail:  userEmail,
 			CaseSource: caseSource,

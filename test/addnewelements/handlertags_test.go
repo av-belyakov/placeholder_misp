@@ -35,10 +35,12 @@ func TestHandlerTags(t *testing.T) {
 	fmt.Println("Host:", os.Getenv("GO_PHMISP_MHOST"))
 	fmt.Println("Pass:", os.Getenv("GO_PHMISP_MAUTH"))
 
-	anyTag := "Sensor:ID=\"1200000\""
+	//anyTag := "Sensor:ID=\"1300000\""
+	//anyTag := "misp-galaxy:Sector=\"Оборонная промышленность\""
+	anyTag := "ATs:geoip=\"Бразилия\""
 
 	t.Run("Test 1. Add any tag", func(t *testing.T) {
-		res, err := requestMisp.AddTag_ForTest(ctx, anyTag, "#FF0000")
+		res, err := requestMisp.AddTagToListTags_ForTest(ctx, anyTag, "#FF0000")
 		assert.NoError(t, err)
 
 		fmt.Printf("Add tag response:'%+v'\n", res)
