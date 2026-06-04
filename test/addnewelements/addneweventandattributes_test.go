@@ -43,7 +43,7 @@ var _ = Describe("Addneweventandattributes", Ordered, func() {
 	readFileJson := func(fpath, fname string) ([]byte, error) {
 		var newResult []byte
 
-		rootPath, err := supportingfunctions.GetRootPath("placeholder_misp")
+		rootPath, err := supportingfunctions.GetRootPath(constants.Root_Dir)
 		if err != nil {
 			return newResult, err
 		}

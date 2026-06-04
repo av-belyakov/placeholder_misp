@@ -65,22 +65,48 @@ func (settings *CoreHandler) Start(
 			return
 
 		case data := <-chanNatsReception:
-			go func() {
-				//----------------------------------------------------------------
-				//----------- запись в файл необработанных объектов --------------
-				//----------------------------------------------------------------
-				str, err := supportingfunctions.NewReadReflectJSONSprint(data.Data)
-				if err == nil {
-					settings.logger.Send("events", fmt.Sprintf("\t---------------\n\tEVENTS:\n%s\n", str))
-				}
-				//----------------------------------------------------------------
+			switch data.MsgType {
+			case "case":
+				go func() {
+					//----------------------------------------------------------------
+					//----------- запись в файл необработанных объектов --------------
+					//----------------------------------------------------------------
+					str, err := supportingfunctions.NewReadReflectJSONSprint(data.Data)
+					if err == nil {
+						settings.logger.Send("events", fmt.Sprintf("\t---------------\n\tEVENTS:\n%s\n", str))
+					}
+					//----------------------------------------------------------------
 
-				// обработчик JSON документа
-				chanOutputDecodeJson := hjson.Start(data.Data, data.MsgId)
+					// обработчик JSON документа
+					chanOutputDecodeJson := hjson.Start(data.Data, data.MsgId)
 
-				//формирование итоговых документов в формате MISP
-				generatorFormatMISP.Start(chanOutputDecodeJson, data.MsgId)
-			}()
+					//формирование итоговых документов в формате MISP
+					generatorFormatMISP.Start(chanOutputDecodeJson, data.MsgId)
+				}()
+
+			case "sensor information":
+				go func() {
+					settings.logger.Send("info", fmt.Sprintf("information about sensors for case id:'%s' has been received", data.MsgId))
+
+					//поиск eventId в Sqlite3
+					chRes := make(chan sqlite3api.Response)
+					sqlite3Module.SendDataToModule(sqlite3api.Request{
+						Command:    "search caseId",
+						ChResponse: chRes,
+						Payload:    fmt.Append(nil, data.MsgId), // data.MsgId == caseId для NATS
+					})
+					res := <-chRes
+					eventId := string(res.Payload)
+
+					if res.Error == nil && eventId != "" {
+						mispModule.SendDataInput(mispapi.InputSettings{
+							Command: "add sensor information",
+							EventId: eventId,
+							DataRaw: data.Data,
+						})
+					}
+				}()
+			}
 
 		case data := <-chanMispReception:
 			switch data.Command {
@@ -111,13 +137,13 @@ func (settings *CoreHandler) Start(
 						Payload:    fmt.Append(nil, data.CaseId),
 					})
 					res := <-chRes
-					oldEeventId := string(res.Payload)
+					oldEventId := string(res.Payload)
 
-					if res.Error == nil && oldEeventId != "" {
+					if res.Error == nil && oldEventId != "" {
 						//запрос на удаление старого event в MISP
 						mispModule.SendDataInput(mispapi.InputSettings{
 							Command: "del event",
-							EventId: oldEeventId,
+							EventId: oldEventId,
 						})
 					}
 
@@ -127,6 +153,14 @@ func (settings *CoreHandler) Start(
 						Payload: fmt.Append(nil, fmt.Sprintf("%s:%s", data.CaseId, data.EventId)),
 					})
 				}()
+
+			case "get sensor information":
+				natsModule.SendingDataInput(natsapi.InputSettings{
+					Data:    data.Data,
+					Command: data.Command,
+					CaseId:  data.CaseId,
+				})
+
 			}
 		}
 	}

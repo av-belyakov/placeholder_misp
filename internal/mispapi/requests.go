@@ -76,19 +76,19 @@ func (rmisp *requestMISP) sendEvent(ctx context.Context, data *objectsmispformat
 		resBodyByte = make([]byte, 0)
 	)
 
-	c, err := NewClientMISP(rmisp.host, rmisp.userAuthKey, false)
+	client, err := NewClientMISP(rmisp.host, rmisp.userAuthKey, false)
 	if err != nil {
-		return nil, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("events add, %w", err))
+		return nil, resBodyByte, supportingfunctions.CustomError(err)
 	}
 
 	b, err := json.Marshal(data)
 	if err != nil {
-		return nil, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("events add, %w", err))
+		return nil, resBodyByte, supportingfunctions.CustomError(err)
 	}
 
-	res, resBodyByte, err = c.Post(ctx, "/events/add", b)
+	res, resBodyByte, err = client.Post(ctx, "/events/add", b)
 	if err != nil {
-		return nil, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("events add, %w", err))
+		return nil, resBodyByte, supportingfunctions.CustomError(err)
 	}
 
 	return res, resBodyByte, nil
@@ -100,19 +100,19 @@ func (rmisp *requestMISP) SendEventReports_ForTest(ctx context.Context, eventId 
 
 // sendEventReports добавляет в MISP объект типа 'event_reports'
 func (rmisp *requestMISP) sendEventReports(ctx context.Context, eventId string, data *objectsmispformat.EventReports) error {
-	c, err := NewClientMISP(rmisp.host, rmisp.userAuthKey, false)
+	client, err := NewClientMISP(rmisp.host, rmisp.userAuthKey, false)
 	if err != nil {
-		return supportingfunctions.CustomError(fmt.Errorf("event report add, %w", err))
+		return supportingfunctions.CustomError(err)
 	}
 
 	b, err := json.Marshal(data)
 	if err != nil {
-		return supportingfunctions.CustomError(fmt.Errorf("event report add, %w", err))
+		return supportingfunctions.CustomError(err)
 	}
 
-	_, _, err = c.Post(ctx, "/event_reports/add/"+eventId, b)
+	_, _, err = client.Post(ctx, "/event_reports/add/"+eventId, b)
 	if err != nil {
-		return supportingfunctions.CustomError(fmt.Errorf("event report add, %w", err))
+		return supportingfunctions.CustomError(err)
 	}
 
 	return nil
@@ -183,7 +183,7 @@ func (rmisp *requestMISP) sendObjects(ctx context.Context, eventId string, data 
 		resBodyByte = make([]byte, 0)
 	)
 
-	c, err := NewClientMISP(rmisp.host, rmisp.userAuthKey, false)
+	client, err := NewClientMISP(rmisp.host, rmisp.userAuthKey, false)
 	if err != nil {
 		return nil, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("objects for event id:'%s' add, %w", eventId, err))
 	}
@@ -198,7 +198,7 @@ func (rmisp *requestMISP) sendObjects(ctx context.Context, eventId string, data 
 			continue
 		}
 
-		res, resBodyByte, errTmp = c.Post(ctx, "/objects/add/"+eventId, b)
+		res, resBodyByte, errTmp = client.Post(ctx, "/objects/add/"+eventId, b)
 		if errTmp != nil {
 			err = errors.Join(err, supportingfunctions.CustomError(fmt.Errorf("objects with id:'%s' add, %w", eventId, errTmp)))
 
@@ -213,27 +213,35 @@ func (rmisp *requestMISP) SendEventTags_ForTest(ctx context.Context, eventId str
 	return rmisp.sendEventTags(ctx, eventId, data)
 }
 
-// sendEventTags отправляет в MISP объекты типа 'tags'
+// sendEventTags отправляет в MISP объекты типа 'tags', при этом проверяет наличие тега в MISP и если его
+// не существует, то добавляет его в список тегов через rmisp.addTag() после чего добавляет тег в событие
 func (rmisp *requestMISP) sendEventTags(ctx context.Context, eventId string, data *objectsmispformat.ListEventObjectTags) error {
 	var (
-		client *ClientMISP
-		err    error
+		err error
 	)
 
-	client, err = NewClientMISP(rmisp.host, rmisp.userAuthKey, false)
-	if err != nil {
-		return supportingfunctions.CustomError(fmt.Errorf("event tags add, %w", err))
-	}
+	/*
+		client, err = NewClientMISP(rmisp.host, rmisp.userAuthKey, false)
+		if err != nil {
+			return supportingfunctions.CustomError(err)
+		}
+	*/
 
-	eotmf := objectsmispformat.EventObjectTagsMispFormat{}
+	var objectTags objectsmispformat.EventObjectTagsMispFormat
 	for _, v := range *data {
+		fmt.Printf("method 'sendEventTags' TAG:'%+v'\n", v)
+
 		var tagColor string = "#98bb1a"
 
-		eotmf.Event = eventId
-		eotmf.Tag = v
+		objectTags.Event = eventId
+		objectTags.Tag = v
 
 		if strings.Contains(strings.ToLower(v), "sensor:id") {
 			tagColor = "#a70a92"
+		}
+
+		if strings.Contains(strings.ToLower(v), "sensor:name") {
+			tagColor = "#229696"
 		}
 
 		if strings.Contains(strings.ToLower(v), "sensor:object") {
@@ -244,65 +252,94 @@ func (rmisp *requestMISP) sendEventTags(ctx context.Context, eventId string, dat
 			tagColor = "#1535c5"
 		}
 
-		// проверка наличия тега который нужно добавить
+		if strings.Contains(strings.ToLower(v), "misp-galaxy:sector") {
+			tagColor = "#e21452"
+		}
+
+		// проверка наличия тега, который нужно добавить, в списке тегов MISP (если тега нет в списке
+		// MISP, то его нельзя добавить в событие)
 		res, errTmp := rmisp.searchTag(ctx, v)
 		if errTmp != nil {
-			err = errors.Join(err, supportingfunctions.CustomError(fmt.Errorf("'event tags with id:'%s' add, %w", eventId, errTmp)))
+			err = errors.Join(err, supportingfunctions.CustomError(fmt.Errorf("'event tags with event id:'%s' add, %w", eventId, errTmp)))
 		} else {
 			if res != nil || len(res) == 0 {
-				if strings.Contains(strings.ToLower(v), "sensor:id") {
-					tagColor = "#a70a92"
+				// добавляем тег в список существующих тегов MISP
+				if _, errTmp = rmisp.addTagToListTags(ctx, v, tagColor); errTmp != nil {
+					err = errors.Join(err, supportingfunctions.CustomError(errTmp))
 				}
-
-				if strings.Contains(strings.ToLower(v), "sensor:name") {
-					tagColor = "#229696"
-				}
-
-				if strings.Contains(strings.ToLower(v), "sensor:object") {
-					tagColor = "#c56415"
-				}
-
-				if strings.Contains(strings.ToLower(v), "class-attack") {
-					tagColor = "#1535c5"
-				}
-
-				rmisp.addTag(ctx, v, tagColor)
 			}
 		}
 
-		//fmt.Printf("method 'requestMISP.sendEventTags' %d. eotmf:'%+v'\n", k, eotmf)
-
-		b, errTmp := json.Marshal(eotmf)
-		if errTmp != nil {
-			err = errors.Join(err, supportingfunctions.CustomError(fmt.Errorf("'event tags with id:'%s' add, %w", eventId, errTmp)))
-
-			continue
-		}
-
-		_, _, errTmp = client.Post(ctx, "/events/addTag", b)
-		if errTmp != nil {
-			//fmt.Println("method 'requestMISP.sendEventTags', error:", errTmp)
-
+		if err = rmisp.addTagToEvent(ctx, objectTags); err != nil {
 			err = errors.Join(err, supportingfunctions.CustomError(fmt.Errorf("'event tags with id:'%s' add, %w", eventId, err)))
-
-			continue
 		}
+		/*
+			b, errTmp := json.Marshal(objectTags)
+			if errTmp != nil {
+				err = errors.Join(err, supportingfunctions.CustomError(fmt.Errorf("'event tags with event id:'%s' add, %w", eventId, errTmp)))
+
+				continue
+			}
+
+			// добавляем тег в событие
+			_, _, errTmp = client.Post(ctx, "/events/addTag", b)
+			if errTmp != nil {
+				err = errors.Join(err, supportingfunctions.CustomError(fmt.Errorf("'event tags with id:'%s' add, %w", eventId, err)))
+			}
+		*/
 	}
 
 	return err
 }
 
-func (rmisp *requestMISP) AddTag_ForTest(ctx context.Context, tag, color string) (ResponseTagMISPFormat, error) {
-	return rmisp.addTag(ctx, tag, color)
+func (rmisp *requestMISP) AddTagToEvent_ForTest(ctx context.Context, objectTags objectsmispformat.EventObjectTagsMispFormat) error {
+	return rmisp.addTagToEvent(ctx, objectTags)
 }
 
-// addTag добавляет в MISP новый тег
-func (rmisp *requestMISP) addTag(ctx context.Context, tag, color string) (ResponseTagMISPFormat, error) {
+// addTagToEvent просто добавляет тег в событие
+func (rmisp *requestMISP) addTagToEvent(ctx context.Context, objectTags objectsmispformat.EventObjectTagsMispFormat) error {
+	client, err := NewClientMISP(rmisp.host, rmisp.userAuthKey, false)
+	if err != nil {
+		return supportingfunctions.CustomError(err)
+	}
+
+	b, err := json.Marshal(objectTags)
+	if err != nil {
+		return supportingfunctions.CustomError(err)
+	}
+
+	// добавляем тег в событие
+	_, res, err := client.Post(ctx, "/events/addTag", b)
+	if err != nil {
+		return supportingfunctions.CustomError(err)
+	}
+
+	response := struct {
+		Saved  bool   `json:"saved"`
+		Errors string `json:"errors"`
+	}{}
+	if err := json.Unmarshal(res, &response); err != nil {
+		return supportingfunctions.CustomError(err)
+	}
+
+	if !response.Saved {
+		return supportingfunctions.CustomError(fmt.Errorf("response not saved: %s", response.Errors))
+	}
+
+	return nil
+}
+
+func (rmisp *requestMISP) AddTagToListTags_ForTest(ctx context.Context, tag, color string) (ResponseTagMISPFormat, error) {
+	return rmisp.addTagToListTags(ctx, tag, color)
+}
+
+// addTagToListTags добавляет в список тегов новый тег (не в событие)
+func (rmisp *requestMISP) addTagToListTags(ctx context.Context, tag, color string) (ResponseTagMISPFormat, error) {
 	response := ResponseTagMISPFormat{}
 
 	c, err := NewClientMISP(rmisp.host, rmisp.masterAuthKey, false)
 	if err != nil {
-		return response, supportingfunctions.CustomError(fmt.Errorf("tag add, %w", err))
+		return response, supportingfunctions.CustomError(err)
 	}
 
 	req, err := json.Marshal(struct {
@@ -311,12 +348,12 @@ func (rmisp *requestMISP) addTag(ctx context.Context, tag, color string) (Respon
 		Exportable bool   `json:"exportable"`
 	}{tag, color, true})
 	if err != nil {
-		return response, supportingfunctions.CustomError(fmt.Errorf("add tag, %w", err))
+		return response, supportingfunctions.CustomError(err)
 	}
 
 	_, b, err := c.Post(ctx, "/tags/add/", req)
 	if err != nil {
-		return response, supportingfunctions.CustomError(fmt.Errorf("add tag, %w", err))
+		return response, supportingfunctions.CustomError(err)
 	}
 
 	if err := json.Unmarshal(b, &response); err != nil {
@@ -336,19 +373,19 @@ func (rmisp *requestMISP) searchTag(ctx context.Context, tag string) (ResponseTa
 
 	c, err := NewClientMISP(rmisp.host, rmisp.masterAuthKey, false)
 	if err != nil {
-		return foundTags, supportingfunctions.CustomError(fmt.Errorf("event publish add, %w", err))
+		return foundTags, supportingfunctions.CustomError(err)
 	}
 
 	req, err := json.Marshal(struct {
 		Name string `json:"name"`
 	}{tag})
 	if err != nil {
-		return foundTags, supportingfunctions.CustomError(fmt.Errorf("search tag, %w", err))
+		return foundTags, supportingfunctions.CustomError(err)
 	}
 
 	_, b, err := c.Post(ctx, "/tags/search/"+tag, req)
 	if err != nil {
-		return foundTags, supportingfunctions.CustomError(fmt.Errorf("search tag, %w", err))
+		return foundTags, supportingfunctions.CustomError(err)
 	}
 
 	if err := json.Unmarshal(b, &foundTags); err != nil {
@@ -368,16 +405,40 @@ func (rmisp *requestMISP) sendRequestPublishEvent(ctx context.Context, eventId s
 
 	c, err := NewClientMISP(rmisp.host, rmisp.masterAuthKey, false)
 	if err != nil {
-		return resultMsg, supportingfunctions.CustomError(fmt.Errorf("event publish add, %w", err))
+		return resultMsg, supportingfunctions.CustomError(err)
 	}
 
 	_, b, err := c.Post(ctx, "/events/publish/"+eventId, []byte{})
 	if err != nil {
-		return resultMsg, supportingfunctions.CustomError(fmt.Errorf("event publish add, %w", err))
+		return resultMsg, supportingfunctions.CustomError(err)
 	}
 
 	resData := decodeResponseMispMessage(b)
 	resultMsg = fmt.Sprintf("result published event with id '%s' - %s '%s' %s", eventId, resData.name, resData.message, resData.success)
+
+	return resultMsg, nil
+}
+
+func (rmisp *requestMISP) SendRequestUnpublishEvent_ForTest(ctx context.Context, eventId string) (string, error) {
+	return rmisp.sendRequestUnpublishEvent(ctx, eventId)
+}
+
+// sendRequestUnpublishEvent запрос на отмену публикации события
+func (rmisp *requestMISP) sendRequestUnpublishEvent(ctx context.Context, eventId string) (string, error) {
+	var resultMsg string
+
+	c, err := NewClientMISP(rmisp.host, rmisp.masterAuthKey, false)
+	if err != nil {
+		return resultMsg, supportingfunctions.CustomError(err)
+	}
+
+	_, b, err := c.Post(ctx, "/events/unpublish/"+eventId, []byte{})
+	if err != nil {
+		return resultMsg, supportingfunctions.CustomError(err)
+	}
+
+	resData := decodeResponseMispMessage(b)
+	resultMsg = fmt.Sprintf("result unpublished event with id '%s' - %s '%s' %s", eventId, resData.name, resData.message, resData.success)
 
 	return resultMsg, nil
 }
@@ -393,7 +454,7 @@ func (rmisp *requestMISP) deleteEvent(ctx context.Context, eventId string) error
 
 	c, err := NewClientMISP(rmisp.host, rmisp.masterAuthKey, false)
 	if err != nil {
-		return supportingfunctions.CustomError(fmt.Errorf("events delete, %w", err))
+		return supportingfunctions.CustomError(err)
 	}
 
 	_, _, err = c.Delete(ctxTimeout, "/events/delete/"+eventId)

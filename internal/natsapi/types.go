@@ -23,6 +23,7 @@ type ApiNatsModule struct {
 type subscription struct {
 	listenerCase  string
 	senderCommand string
+	getSensorInfo string
 }
 
 // NatsApiOptions функциональные опции
@@ -30,8 +31,9 @@ type NatsApiOptions func(*ApiNatsModule) error
 
 // OutputSettings параметры для канала отправки данных из модуля
 type OutputSettings struct {
-	Data  []byte
-	MsgId string
+	Data    []byte
+	MsgId   string
+	MsgType string
 }
 
 // InputSettings параметры для канала приема данных в модуль

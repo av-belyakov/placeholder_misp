@@ -3,6 +3,8 @@ package mispapi
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
+	"strings"
 )
 
 func decodeResponseMispMessage(b []byte) struct {
@@ -38,4 +40,26 @@ func decodeResponseMispMessage(b []byte) struct {
 	}
 
 	return msg
+}
+
+// создает список сенсоров получаемых из тегов
+func createListSensors(listTags []string) []string {
+	list := []string{}
+
+	for _, v := range listTags {
+		if !strings.Contains(strings.ToLower(v), "sensor:id") {
+			continue
+		}
+
+		rgx := regexp.MustCompile(`(\w+):id=\"(\d+)\"`)
+		tmp := rgx.FindStringSubmatch(v)
+
+		if len(tmp) < 2 {
+			continue
+		}
+
+		list = append(list, tmp[2])
+	}
+
+	return list
 }
