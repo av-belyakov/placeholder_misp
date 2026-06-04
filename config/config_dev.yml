@@ -12,7 +12,7 @@ NATS:
     #чтобы не отправлялись команды на обновление данных в thehive
     #так как это уже делает продуктовый модуль
     sender_command: object.commandstype.local
-    get_sensor_info: object.sensor-info-request
+    get_sensor_info: object.sensor-info-request.test
 MISP:
   host: misp-world.cloud.gcm
 THEHIVE:

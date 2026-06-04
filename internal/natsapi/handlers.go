@@ -64,18 +64,20 @@ func (api *ApiNatsModule) incomingInformationHandler(ctx context.Context) {
 				case "get sensor information":
 					//
 					// получение информации о сенсоре
-					go func(ctx context.Context) {
-						ctxTimeout, cancel := context.WithTimeout(ctx, 30*time.Second)
+					go func() {
+						ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 						defer cancel()
 
 						api.logger.Send("info", fmt.Sprintf("a request has been sent to get sensor information for an object with rootId:'%s', caseId:'%s'", incomingData.RootId, incomingData.CaseId))
 
-						res, err := api.natsConn.RequestWithContext(ctxTimeout, api.subscriptions.getSensorInfo, incomingData.Data)
+						res, err := api.natsConn.RequestWithContext(ctx, api.subscriptions.getSensorInfo, incomingData.Data)
 						if err != nil {
 							api.logger.Send("error", supportingfunctions.CustomError(err).Error())
 						}
 
 						if res == nil {
+							api.logger.Send("warning", fmt.Sprintf("an empty response to a request for additional sensor information was returned for an object with rootId:'%s', caseId:'%s'", incomingData.RootId, incomingData.CaseId))
+
 							return
 						}
 
@@ -86,7 +88,7 @@ func (api *ApiNatsModule) incomingInformationHandler(ctx context.Context) {
 							MsgId:   incomingData.CaseId,
 							Data:    res.Data,
 						})
-					}(ctx)
+					}()
 
 				case "send event id":
 					//

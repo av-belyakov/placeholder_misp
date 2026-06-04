@@ -159,6 +159,7 @@ func (settings *CoreHandler) Start(
 					Data:    data.Data,
 					Command: data.Command,
 					CaseId:  data.CaseId,
+					RootId:  data.RootId,
 				})
 
 			}
