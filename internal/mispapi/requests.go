@@ -220,16 +220,8 @@ func (rmisp *requestMISP) sendEventTags(ctx context.Context, eventId string, dat
 		err error
 	)
 
-	/*
-		client, err = NewClientMISP(rmisp.host, rmisp.userAuthKey, false)
-		if err != nil {
-			return supportingfunctions.CustomError(err)
-		}
-	*/
-
 	var objectTags objectsmispformat.EventObjectTagsMispFormat
 	for _, v := range *data {
-		fmt.Printf("method 'sendEventTags' TAG:'%+v'\n", v)
 
 		var tagColor string = "#98bb1a"
 
@@ -273,20 +265,6 @@ func (rmisp *requestMISP) sendEventTags(ctx context.Context, eventId string, dat
 		if err = rmisp.addTagToEvent(ctx, objectTags); err != nil {
 			err = errors.Join(err, supportingfunctions.CustomError(fmt.Errorf("'event tags with id:'%s' add, %w", eventId, err)))
 		}
-		/*
-			b, errTmp := json.Marshal(objectTags)
-			if errTmp != nil {
-				err = errors.Join(err, supportingfunctions.CustomError(fmt.Errorf("'event tags with event id:'%s' add, %w", eventId, errTmp)))
-
-				continue
-			}
-
-			// добавляем тег в событие
-			_, _, errTmp = client.Post(ctx, "/events/addTag", b)
-			if errTmp != nil {
-				err = errors.Join(err, supportingfunctions.CustomError(fmt.Errorf("'event tags with id:'%s' add, %w", eventId, err)))
-			}
-		*/
 	}
 
 	return err
