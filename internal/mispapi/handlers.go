@@ -151,6 +151,8 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 
 		listSensors := createListSensors(*data.Data.ObjectTags)
 		if len(listSensors) == 0 {
+			m.logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("the sensor list  on object tags '%+v' for event with id:'%s' (case id:'%s') is empty", data.Data.ObjectTags, eventId, data.CaseId)).Error())
+
 			return true
 		}
 
@@ -169,6 +171,8 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 		outMsg.Command = "get sensor information"
 		outMsg.Data = reqSensorId
 		m.SendDataOutput(outMsg)
+
+		m.logger.Send("info", fmt.Sprintf("event with id:'%s' (case id:'%s') send request 'get sensor information' to core module", eventId, data.CaseId))
 
 		return true
 	})

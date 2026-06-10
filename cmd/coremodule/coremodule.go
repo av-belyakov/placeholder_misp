@@ -118,17 +118,17 @@ func (settings *CoreHandler) Start(
 				})
 
 			case "send event id":
-				//отправка eventId в NATS
-				natsModule.SendingDataInput(natsapi.InputSettings{
-					Command:    data.Command,
-					EventId:    data.EventId,
-					TaskId:     data.TaskId,
-					RootId:     data.RootId,
-					CaseId:     data.CaseId,
-					CaseSource: data.CaseSource,
-				})
-
 				go func() {
+					//отправка eventId в NATS
+					natsModule.SendingDataInput(natsapi.InputSettings{
+						Command:    data.Command,
+						EventId:    data.EventId,
+						TaskId:     data.TaskId,
+						RootId:     data.RootId,
+						CaseId:     data.CaseId,
+						CaseSource: data.CaseSource,
+					})
+
 					//поиск старого eventId в Sqlite3
 					chRes := make(chan sqlite3api.Response)
 					sqlite3Module.SendDataToModule(sqlite3api.Request{
@@ -155,6 +155,8 @@ func (settings *CoreHandler) Start(
 				}()
 
 			case "get sensor information":
+				settings.logger.Send("info", fmt.Sprintf("received request 'get sensor information' event with id:'%s' (case id:'%s') and passed on to natsapi module", data.EventId, data.CaseId))
+
 				natsModule.SendingDataInput(natsapi.InputSettings{
 					Data:    data.Data,
 					Command: data.Command,
