@@ -3,9 +3,12 @@ package updateeventsmisp
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"testing"
+	"time"
 
+	"github.com/brianvoe/gofakeit/v7"
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 
@@ -16,7 +19,40 @@ import (
 func TestEditElementMisp(t *testing.T) {
 	var (
 		eventId string = "43940" // = case id 39100
+		//attributeIds []string
 	)
+
+	oldEvents := struct {
+		Event struct {
+			UUID      string `json:"uuid"`
+			Attribute []struct {
+				Id string `json:"id"`
+			} `json:"Attribute"`
+			Object []struct {
+				Id string `json:"id"`
+			} `json:"Object"`
+			Tag []struct {
+				Id     string `json:"id"`
+				Name   string `json:"name"`
+				Colour string `json:"colour"`
+			} `json:"tag"`
+		} `json:"Event"`
+	}{}
+
+	/*
+			{
+				"id": "1542",
+				"name": "Sensor:id=\"8030129\"",
+				"colour": "#a70a92",
+				"exportable": true,
+				"user_id": "0",
+				"hide_tag": false,
+				"numerical_value": null,
+				"is_galaxy": false,
+				"is_custom_galaxy": false,
+				"local": 0
+		    }
+	*/
 
 	if err := godotenv.Load("../../.env"); err != nil {
 		t.Fatal(err)
@@ -49,34 +85,122 @@ func TestEditElementMisp(t *testing.T) {
 	*/
 
 	t.Run("Тест 1. Редактируем основной объект 'event' события case", func(t *testing.T) {
-		events := objectsmispformat.EventsMispFormat{
-			Info:              "Test Case for Belyakov AV (modified event!!!) :::TheHive caseId:'ANY-ID':::",
-			Uuid:              "cde5088d-4b30-4365-bdfd-82226d2fd30f", // обязательный параметр
-			Analysis:          "2",                                    // должно быть любое число из списка 0,1,2
-			Timestamp:         "1778428082",                           // обязательный параметр (10 символов), должно быть старше timestamp уже загруженного события
-			Date:              "2026-04-17",                           // обязательный параметр (YYYY-MM-DD)
-			Distribution:      "1",
-			ThreatLevelId:     "3",
-			OrgId:             "~4192222",
-			SightingTimestamp: "1776428092112",
-			EventCreatorEmail: "a.belyakov-modified-event@cloud.gcm",
-		}
+		var eventUUID string
 
-		// для того что бы получить ряд основных полей нужно сделать запрос на /events/view/eventId
-		// res, raw, err := client.Get(t.Context(), fmt.Sprintf("/events/view/%s", eventId), []byte{})
+		t.Run("Тест 1.1. Поиск UUID редактируемого события", func(tt *testing.T) {
 
-		b, err := json.Marshal(events)
-		assert.NoError(t, err)
+			res, raw, err := client.Get(t.Context(), fmt.Sprintf("/events/view/%s", eventId), []byte{})
+			assert.NoError(t, err)
+			assert.Equal(t, res.StatusCode, http.StatusOK)
 
-		res, b, err := client.Post(t.Context(), fmt.Sprintf("/events/edit/%s", eventId), b)
-		assert.NoError(t, err)
-		assert.Equal(t, res.StatusCode, 200)
+			assert.NoError(t, json.Unmarshal(raw, &oldEvents))
 
-		fmt.Println("Response:", string(b))
+			//fmt.Println("VIEW EVENT RAW:", string(raw))
+
+			eventUUID = oldEvents.Event.UUID
+
+			fmt.Printf("Events view: %+v", oldEvents)
+
+			//fmt.Println("Event UUID:", eventUUID)
+			//fmt.Println("Current data:", time.Now().Format("2006-01-02"), " current date unix time:", time.Now().Unix())
+		})
+
+		t.Run("Тест 1.2. Замена значения полей существующего события", func(tt *testing.T) {
+			events := objectsmispformat.EventsMispFormat{
+				Info:              fmt.Sprintf("Test Case for Belyakov AV (modified event!!!) :::TheHive caseId:'ANY-ID', time=%s:::", time.Now().String()),
+				Uuid:              eventUUID,                       // обязательный параметр
+				Analysis:          "2",                             // должно быть любое число из списка 0,1,2
+				Timestamp:         fmt.Sprint(time.Now().Unix()),   //"1778428082",                         // обязательный параметр (10 символов), должно быть старше timestamp уже загруженного события
+				Date:              time.Now().Format("2006-01-02"), //"2026-04-17", // обязательный параметр (YYYY-MM-DD)
+				Distribution:      "1",
+				ThreatLevelId:     "3",
+				OrgId:             "~4192222",
+				SightingTimestamp: fmt.Sprint(gofakeit.Date().UnixMicro()), //"1776428092112",
+				EventCreatorEmail: "a.belyakov-modified-event@cloud.gcm",
+			}
+
+			// для того что бы получить ряд основных полей нужно сделать запрос на /events/view/eventId
+			// res, raw, err := client.Get(t.Context(), fmt.Sprintf("/events/view/%s", eventId), []byte{})
+
+			b, err := json.Marshal(events)
+			assert.NoError(t, err)
+
+			res, b, err := client.Post(t.Context(), fmt.Sprintf("/events/edit/%s", eventId), b)
+			assert.NoError(t, err)
+			assert.Equal(t, res.StatusCode, 200)
+
+			//fmt.Println("Response:", string(b))
+		})
 	})
 
-	t.Run("Тест 2. Редактируем объект типа 'event_reports' события case", func(t *testing.T) {
+	t.Run("Тест 2. Удаляем список атрибутов", func(t *testing.T) {
+		for _, v := range oldEvents.Event.Attribute {
+			reqStruct := struct {
+				Id      string `json:"id"`
+				EventId string `json:"event_id"`
+			}{
+				Id:      fmt.Sprint(v.Id),
+				EventId: eventId,
+			}
 
+			fmt.Printf("||| req:'%+v'", reqStruct)
+
+			req, err := json.Marshal(reqStruct)
+			assert.NoError(t, err)
+
+			res, b, err := client.Post(t.Context(), fmt.Sprintf("/attributes/deleteSelected/%s", eventId), req)
+			assert.NoError(t, err)
+
+			fmt.Println("attributes deleteSelected response:", res, " byte response:", string(b))
+		}
+	})
+
+	t.Run("Тест 3. Удаляем список объектов", func(t *testing.T) {
+		for _, v := range oldEvents.Event.Object {
+			reqStruct := struct {
+				URL     string `json:"url"`
+				Name    string `json:"name"`
+				Message string `json:"message"`
+				Saved   bool   `json:"saved"`
+				Success bool   `json:"success"`
+			}{
+				Name:    v.Id, // это похоже не обязательно
+				Saved:   true,
+				Success: true,
+			}
+
+			fmt.Printf("||| req:'%+v'", reqStruct)
+
+			req, err := json.Marshal(reqStruct)
+			assert.NoError(t, err)
+
+			res, b, err := client.Post(t.Context(), fmt.Sprintf("/objects/delete/%s/1", v.Id), req)
+			assert.NoError(t, err)
+
+			fmt.Println("objects delete response:", res, " byte response:", string(b))
+		}
+	})
+
+	t.Run("Тест 4. Удаляем теги", func(t *testing.T) {
+		for _, v := range oldEvents.Event.Tag {
+			reqStruct := struct {
+				Tag   string `json:"tag"`
+				Event string `json:"event"`
+			}{
+				Tag:   v.Id,
+				Event: eventId,
+			}
+
+			fmt.Printf("||| req:'%+v'", reqStruct)
+
+			req, err := json.Marshal(reqStruct)
+			assert.NoError(t, err)
+
+			res, b, err := client.Post(t.Context(), "/events/removeTag", req)
+			assert.NoError(t, err)
+
+			fmt.Println("tags delete response:", res, " byte response:", string(b))
+		}
 	})
 
 	// перечень обновляемых или добавляемых объектов
