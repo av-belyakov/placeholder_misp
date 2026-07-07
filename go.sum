@@ -6,6 +6,8 @@ github.com/av-belyakov/simplelogger v0.0.0-20250221120631-077109604215 h1:Hk1RwR
 github.com/av-belyakov/simplelogger v0.0.0-20250221120631-077109604215/go.mod h1:yW2ev3nXPP3WY8svBWJpg4PQRl67MTGIaaiXJ0ULRZ8=
 github.com/av-belyakov/zabbixapicommunicator v0.0.0-20250618124251-10a4a23cd7ca h1:10CiLYaxxDD9524HYACXxEIjQY/UzochnUi0vGiL3ao=
 github.com/av-belyakov/zabbixapicommunicator v0.0.0-20250618124251-10a4a23cd7ca/go.mod h1:PVChkORj00O8/xSQ0UrJihm/dU+9gvdRddi+DtwAnOs=
+github.com/brianvoe/gofakeit/v7 v7.15.0 h1:kGLYAWN8tnmxq2PelKVK6zwpM7kMxdz9SGPH31mFkNs=
+github.com/brianvoe/gofakeit/v7 v7.15.0/go.mod h1:QXuPeBw164PJCzCUZVmgpgHJ3Llj49jSLVkKPMtxtxA=
 github.com/bsm/ginkgo/v2 v2.12.0 h1:Ny8MWAHyOepLGlLKYmXG4IEkioBysk6GpaRTLC8zwWs=
 github.com/bsm/ginkgo/v2 v2.12.0/go.mod h1:SwYbGRRDovPVboqFv0tPTcG1sN61LM1Z4ARdbAV9g4c=
 github.com/bsm/gomega v1.27.10 h1:yeMWxP2pV2fG3FgAODIY8EiRE3dy0aeFYt4l7wh6yKA=
