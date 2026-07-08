@@ -7,10 +7,11 @@ import (
 
 	"github.com/av-belyakov/objectsmispformat"
 	"github.com/av-belyakov/placeholder_misp/internal/mispapi"
+	"github.com/av-belyakov/placeholder_misp/internal/sqlite3api"
 )
 
 // Start создаёт набор объектов в формате MISP
-func (gen *GenerateObjectsFormatMISP) Start(chDecodeJSON <-chan ChanInputCreateMispFormat, taskId string) {
+func (g *GenerateObjectsFormatMISP) Start(chDecodeJSON <-chan ChanInputCreateMispFormat, taskId string) {
 	go func() {
 		var (
 			maxCountObservables int
@@ -36,7 +37,7 @@ func (gen *GenerateObjectsFormatMISP) Start(chDecodeJSON <-chan ChanInputCreateM
 		listEventObjectTags := objectsmispformat.NewListEventObjectTags()
 		defer listEventObjectTags.CleanListTags()
 
-		supportiveListExcludeRule := NewSupportiveListExcludeRuleTmp(gen.listRule.GetRuleExclude())
+		supportiveListExcludeRule := NewSupportiveListExcludeRuleTmp(g.listRule.GetRuleExclude())
 
 		//это основной обработчик параметров входящего объекта
 		listHandlerMisp := map[string][]func(any, int){
@@ -114,12 +115,12 @@ func (gen *GenerateObjectsFormatMISP) Start(chDecodeJSON <-chan ChanInputCreateM
 
 			//*************** Обработка правил ***************
 			//обработка правил REPLACEMENT (замена)
-			newValue, _, err := gen.listRule.ReplacementRuleHandler(msg.ValueType, msg.FieldBranch, msg.Value)
+			newValue, _, err := g.listRule.ReplacementRuleHandler(msg.ValueType, msg.FieldBranch, msg.Value)
 			if err != nil {
-				gen.logger.Send("warning", fmt.Sprintf("search value '%s' from rule of section 'REPLACE' is not fulfilled", msg.Value))
+				g.logger.Send("warning", fmt.Sprintf("search value '%s' from rule of section 'REPLACE' is not fulfilled", msg.Value))
 			}
 			//обработка правил PASS (пропуск)
-			gen.listRule.PassRuleHandler(msg.FieldBranch, newValue)
+			g.listRule.PassRuleHandler(msg.FieldBranch, newValue)
 			//**********************************************
 
 			//для observables которые содержат свойства, являющиеся картами,
@@ -156,7 +157,7 @@ func (gen *GenerateObjectsFormatMISP) Start(chDecodeJSON <-chan ChanInputCreateM
 				svn.SetValueName(newFieldName)
 
 				// ************* обработка правил EXCLUSION (исключения) *************
-				if addrRule, isEqual := gen.listRule.ExcludeRuleHandler(msg.FieldBranch, newValue); isEqual {
+				if addrRule, isEqual := g.listRule.ExcludeRuleHandler(msg.FieldBranch, newValue); isEqual {
 					supportiveListExcludeRule.Add(seqNumObservable, msg.FieldBranch, newValue, addrRule, isEqual)
 				}
 			}
@@ -209,28 +210,28 @@ func (gen *GenerateObjectsFormatMISP) Start(chDecodeJSON <-chan ChanInputCreateM
 
 		var isAllowed bool
 		//проверяем что бы хотя бы одно правило разрешало пропуск кейса
-		if gen.listRule.GetRulePassany() || gen.listRule.SomePassRuleIsTrue() {
+		if g.listRule.GetRulePassany() || g.listRule.SomePassRuleIsTrue() {
 			isAllowed = true
 
 			//сетчик кейсов соответствующих или не соответствующих правилам
-			gen.counter.SendMessage("update events meet rules", 1)
+			g.counter.SendMessage("update events meet rules", 1)
 		}
 
 		//удаляем те объекты Attributes которые соответствуют правилам EXCLUDE
-		delElementAttributes(exclusionRules, listAttributesMisp, gen.logger)
+		delElementAttributes(exclusionRules, listAttributesMisp, g.logger)
 
-		gen.listRule.CleanStatementExpressionRulePass()
+		g.listRule.CleanStatementExpressionRulePass()
 
 		if caseId == 0 {
 			if len(eventsMisp.EventCreatorEmail) != 0 {
-				gen.logger.Send("error", fmt.Sprintf("the caseId in the event cannot be equal to 0 (event creator email '%s')", eventsMisp.EventCreatorEmail))
+				g.logger.Send("error", fmt.Sprintf("the caseId in the event cannot be equal to 0 (event creator email '%s')", eventsMisp.EventCreatorEmail))
 			}
 
 			return
 		}
 
 		if !isAllowed {
-			gen.logger.Send("warning", fmt.Sprintf("the message with case id %s was not sent to MISP because it does not comply with the rules", caseIdStr))
+			g.logger.Send("warning", fmt.Sprintf("the message with case id %s was not sent to MISP because it does not comply with the rules", caseIdStr))
 
 			return
 		}
@@ -262,13 +263,24 @@ func (gen *GenerateObjectsFormatMISP) Start(chDecodeJSON <-chan ChanInputCreateM
 		reports.SetDistribution("1")
 		mispFormat.Reports = reports
 
-		gen.logger.Send("info", fmt.Sprintf("the case with id:'%s' complies with the specified rules and has been submitted for further processing", caseIdStr))
+		g.logger.Send("info", fmt.Sprintf("the case with id:'%s' complies with the specified rules and has been submitted for further processing", caseIdStr))
+
+		//выполняем поиск события MISP по caseId в СУБД Sqlite3
+		chRes := make(chan sqlite3api.Response)
+		g.sqlite3Module.SendDataToModule(sqlite3api.Request{
+			Command:    "search caseId",
+			ChResponse: chRes,
+			Payload:    fmt.Append(nil, caseIdStr),
+		})
+		res := <-chRes
+		eventId := string(res.Payload)
 
 		//тут отправляем сформированные по формату MISP пользовательские структуры
-		gen.mispModule.SendDataInput(mispapi.InputSettings{
-			Command:    "add event",
+		g.mispModule.SendDataInput(mispapi.InputSettings{
+			Command:    "process event",
 			TaskId:     taskId,
 			CaseId:     caseIdStr,
+			EventId:    eventId,
 			RootId:     rootId,
 			UserEmail:  userEmail,
 			CaseSource: caseSource,

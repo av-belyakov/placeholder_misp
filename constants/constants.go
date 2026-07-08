@@ -17,4 +17,6 @@ const (
 
 	Bold_Font   = "\033[1m"
 	Underlining = "\033[4m"
+
+	Default_Client_Timeout = 5
 )

@@ -18,7 +18,7 @@ import (
 
 func TestEditElementMisp(t *testing.T) {
 	var (
-		eventId string = "43940" // = case id 39100
+		eventId string = "44150" // = case id 39100
 		//attributeIds []string
 	)
 
@@ -58,9 +58,22 @@ func TestEditElementMisp(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	fmt.Printf("Host:'%s', auth token:'%s'", os.Getenv("GO_PHMISP_MHOST"), os.Getenv("GO_PHMISP_MAUTH"))
+	mispHost := os.Getenv("GO_PHMISP_MHOST")
+	mispUserAuthKey := os.Getenv("GO_PHMISP_MAUTH")
+	mispMasterAuthKey := os.Getenv("GO_PHMISP_MAUTH")
 
-	client, err := mispapi.NewClientMISP(os.Getenv("GO_PHMISP_MHOST"), os.Getenv("GO_PHMISP_MAUTH"), false)
+	fmt.Printf("Host:'%s'\nAuth token:'%s'\n", mispHost, mispUserAuthKey)
+
+	client, err := mispapi.NewClientMISP(mispHost, mispMasterAuthKey, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rmisp, err := mispapi.NewMispRequest(
+		mispapi.WithHost(mispHost),
+		mispapi.WithUserAuthKey(mispUserAuthKey),
+		mispapi.WithMasterAuthKey(mispMasterAuthKey),
+	)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -88,8 +101,8 @@ func TestEditElementMisp(t *testing.T) {
 		var eventUUID string
 
 		t.Run("Тест 1.1. Поиск UUID редактируемого события", func(tt *testing.T) {
-
-			res, raw, err := client.Get(t.Context(), fmt.Sprintf("/events/view/%s", eventId), []byte{})
+			res, raw, err := rmisp.GetEvent_ForTest(t.Context(), eventId)
+			//		res, raw, err := client.Get(t.Context(), fmt.Sprintf("/events/view/%s", eventId), []byte{})
 			assert.NoError(t, err)
 			assert.Equal(t, res.StatusCode, http.StatusOK)
 
@@ -101,11 +114,22 @@ func TestEditElementMisp(t *testing.T) {
 
 			fmt.Printf("Events view: %+v", oldEvents)
 
+			res, raw, err = client.Get(t.Context(), "/events/view/any_event", []byte{})
+			assert.Error(t, err)
+			assert.NotEqual(t, res.StatusCode, http.StatusOK)
+
+			fmt.Println("||||||| RAW:", string(raw))
+			fmt.Println("Error:", err)
+
 			//fmt.Println("Event UUID:", eventUUID)
 			//fmt.Println("Current data:", time.Now().Format("2006-01-02"), " current date unix time:", time.Now().Unix())
 		})
 
 		t.Run("Тест 1.2. Замена значения полей существующего события", func(tt *testing.T) {
+			//mispErr := struct {
+			//	Errors string `json:"errors"`
+			//}{}
+
 			events := objectsmispformat.EventsMispFormat{
 				Info:              fmt.Sprintf("Test Case for Belyakov AV (modified event!!!) :::TheHive caseId:'ANY-ID', time=%s:::", time.Now().String()),
 				Uuid:              eventUUID,                       // обязательный параметр
@@ -119,87 +143,34 @@ func TestEditElementMisp(t *testing.T) {
 				EventCreatorEmail: "a.belyakov-modified-event@cloud.gcm",
 			}
 
-			// для того что бы получить ряд основных полей нужно сделать запрос на /events/view/eventId
-			// res, raw, err := client.Get(t.Context(), fmt.Sprintf("/events/view/%s", eventId), []byte{})
-
-			b, err := json.Marshal(events)
+			res, raw, err := rmisp.EditEvent_ForTest(t.Context(), eventId, events)
 			assert.NoError(t, err)
+			if err != nil {
+				fmt.Println("---=== Error:", err)
 
-			res, b, err := client.Post(t.Context(), fmt.Sprintf("/events/edit/%s", eventId), b)
-			assert.NoError(t, err)
+				return
+			}
 			assert.Equal(t, res.StatusCode, 200)
 
-			//fmt.Println("Response:", string(b))
+			fmt.Println("RAW edit response:", string(raw))
 		})
 	})
 
 	t.Run("Тест 2. Удаляем список атрибутов", func(t *testing.T) {
 		for _, v := range oldEvents.Event.Attribute {
-			reqStruct := struct {
-				Id      string `json:"id"`
-				EventId string `json:"event_id"`
-			}{
-				Id:      fmt.Sprint(v.Id),
-				EventId: eventId,
-			}
-
-			fmt.Printf("||| req:'%+v'", reqStruct)
-
-			req, err := json.Marshal(reqStruct)
-			assert.NoError(t, err)
-
-			res, b, err := client.Post(t.Context(), fmt.Sprintf("/attributes/deleteSelected/%s", eventId), req)
-			assert.NoError(t, err)
-
-			fmt.Println("attributes deleteSelected response:", res, " byte response:", string(b))
+			assert.NoError(t, rmisp.DeleteAttributes_ForTest(t.Context(), v.Id, eventId))
 		}
 	})
 
 	t.Run("Тест 3. Удаляем список объектов", func(t *testing.T) {
 		for _, v := range oldEvents.Event.Object {
-			reqStruct := struct {
-				URL     string `json:"url"`
-				Name    string `json:"name"`
-				Message string `json:"message"`
-				Saved   bool   `json:"saved"`
-				Success bool   `json:"success"`
-			}{
-				Name:    v.Id, // это похоже не обязательно
-				Saved:   true,
-				Success: true,
-			}
-
-			fmt.Printf("||| req:'%+v'", reqStruct)
-
-			req, err := json.Marshal(reqStruct)
-			assert.NoError(t, err)
-
-			res, b, err := client.Post(t.Context(), fmt.Sprintf("/objects/delete/%s/1", v.Id), req)
-			assert.NoError(t, err)
-
-			fmt.Println("objects delete response:", res, " byte response:", string(b))
+			assert.NoError(t, rmisp.DeleteObject_ForTest(t.Context(), v.Id))
 		}
 	})
 
 	t.Run("Тест 4. Удаляем теги", func(t *testing.T) {
 		for _, v := range oldEvents.Event.Tag {
-			reqStruct := struct {
-				Tag   string `json:"tag"`
-				Event string `json:"event"`
-			}{
-				Tag:   v.Id,
-				Event: eventId,
-			}
-
-			fmt.Printf("||| req:'%+v'", reqStruct)
-
-			req, err := json.Marshal(reqStruct)
-			assert.NoError(t, err)
-
-			res, b, err := client.Post(t.Context(), "/events/removeTag", req)
-			assert.NoError(t, err)
-
-			fmt.Println("tags delete response:", res, " byte response:", string(b))
+			assert.NoError(t, rmisp.DeleteTag_ForTest(t.Context(), v.Id, eventId))
 		}
 	})
 

@@ -13,8 +13,8 @@ import (
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
-// AddNewObject добавляет новый объект в MISP
-func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data InputSettings) {
+// addNewEvent добавление нового события
+func (m *ModuleMISP) addNewEvent(ctx context.Context, userAuthKey string, data InputSettings) {
 	specialObject := NewCacheSpecialObject[*objectsmispformat.ListFormatsMISP]()
 	specialObject.SetID(data.RootId)
 	specialObject.SetObject(&data.Data)
@@ -173,6 +173,94 @@ func (m *ModuleMISP) addNewObject(ctx context.Context, userAuthKey string, data 
 		m.SendDataOutput(outMsg)
 
 		m.logger.Send("info", fmt.Sprintf("event with id:'%s' (case id:'%s') send request 'get sensor information' to core module", eventId, data.CaseId))
+
+		return true
+	})
+
+	// добавляем вспомогательный тип specialObject в очередь хранилища
+	m.cache.PushObjectToQueue(specialObject)
+}
+
+// editEvent редактирование существующего события
+func (m *ModuleMISP) editEvent(ctx context.Context, userAuthKey string, data InputSettings) {
+	specialObject := NewCacheSpecialObject[*objectsmispformat.ListFormatsMISP]()
+	specialObject.SetID(data.RootId)
+	specialObject.SetObject(&data.Data)
+	specialObject.SetFunc(func(i int) bool {
+		oldEvent := struct {
+			Event struct {
+				UUID      string `json:"uuid"`
+				Attribute []struct {
+					Id string `json:"id"`
+				} `json:"Attribute"`
+				Object []struct {
+					Id string `json:"id"`
+				} `json:"Object"`
+				Tag []struct {
+					Id     string `json:"id"`
+					Name   string `json:"name"`
+					Colour string `json:"colour"`
+				} `json:"tag"`
+			} `json:"Event"`
+		}{}
+
+		rmisp, err := NewMispRequest(
+			WithHost(m.host),
+			WithUserAuthKey(userAuthKey),
+			WithMasterAuthKey(m.authKey))
+		if err != nil {
+			m.logger.Send("error", supportingfunctions.CustomError(err).Error())
+
+			return false
+		}
+
+		m.logger.Send("info", fmt.Sprintf("starting editing the event id:'%s', case id:'%s'", data.EventId, data.CaseId))
+
+		// получаем событие по его event id
+		_, raw, err := rmisp.getEvent(ctx, data.EventId)
+		if err = json.Unmarshal(raw, &oldEvent); err != nil {
+			m.logger.Send("error", supportingfunctions.CustomError(err).Error())
+
+			return false
+		}
+
+		updateEvent := objectsmispformat.EventsMispFormat{
+			OrgId:              data.Data.Event.OrgId,
+			OrgcId:             data.Data.Event.OrgcId,
+			Info:               data.Data.Event.Info,
+			Uuid:               data.Data.Event.Uuid,
+			Date:               data.Data.Event.Date,
+			Analysis:           data.Data.Event.Analysis,
+			Distribution:       data.Data.Event.Distribution,
+			AttributeCount:     data.Data.Event.AttributeCount,
+			SharingGroupId:     data.Data.Event.SharingGroupId,
+			ThreatLevelId:      data.Data.Event.ThreatLevelId,
+			Timestamp:          data.Data.Event.Timestamp, // ВЫЖНЫЙ ПАРАМЕТР, если это значение меньше значения в MISP событие не будет обноавлено
+			PublishTimestamp:   data.Data.Event.PublishTimestamp,
+			SightingTimestamp:  data.Data.Event.SightingTimestamp,
+			ExtendsUuid:        data.Data.Event.ExtendsUuid,
+			EventCreatorEmail:  data.Data.Event.EventCreatorEmail,
+			Published:          data.Data.Event.Published,
+			ProposalEmailLock:  data.Data.Event.ProposalEmailLock,
+			Locked:             data.Data.Event.Locked,
+			DisableCorrelation: data.Data.Event.DisableCorrelation,
+		}
+
+		// обновляем существующее событие
+		_, _, err = rmisp.editEvent(ctx, data.EventId, updateEvent)
+		if err != nil {
+			m.logger.Send("error", supportingfunctions.CustomError(err).Error())
+
+			return false
+		}
+
+		// event_reports оставляем неизменным, этот объект не должен изменятся
+
+		// удаляем атрибуты и добавляем их заново
+
+		// удаляем прикрепленные к событию объекты и добавляем их заново
+
+		// удаляем теги и добавялем новые
 
 		return true
 	})
