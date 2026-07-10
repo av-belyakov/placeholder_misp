@@ -132,7 +132,7 @@ deploy-test:
     #удаление старого образа (версия 1)
     - docker rmi gitlab.cloud.gcm:5050/a.belyakov/placeholder_misp:test || true
     #удаление старого образа (версия 2)
-    - docker rmi gitlab.cloud.gcm:5050/a.belyakov/placeholder_misp:v2.0.test || true
+    - docker rmi gitlab.cloud.gcm:5050/a.belyakov/placeholder_misp:v2.test || true
     #запуск 2-ой версии приложения
     - docker-compose -f $CI_PROJECT_DIR/docker-compose.test.yml up -d --force-recreate --build
 
