@@ -36,11 +36,9 @@ func (m *ModuleMISP) processingEvent(ctx context.Context, userAuthKey string, da
 	res, raw, err := rmisp.getEvent(ctx, data.EventId)
 	if err != nil {
 		m.logger.Send("error", supportingfunctions.CustomError(err).Error())
-
-		return
 	}
 
-	if res.StatusCode == http.StatusNotFound {
+	if res != nil && res.StatusCode == http.StatusNotFound {
 		m.addNewEvent(ctx, userAuthKey, data)
 
 		return
