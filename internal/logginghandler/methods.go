@@ -1,7 +1,7 @@
 package logginghandler
 
 import (
-	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/v2/commoninterfaces"
 )
 
 func (l *LoggingChan) GetChan() <-chan commoninterfaces.Messager {

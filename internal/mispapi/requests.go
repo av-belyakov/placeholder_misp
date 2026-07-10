@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/av-belyakov/objectsmispformat"
-	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/supportingfunctions"
 )
 
 // NewMispRequest конструктор запроса к MISP

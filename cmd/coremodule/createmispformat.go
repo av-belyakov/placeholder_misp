@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/av-belyakov/objectsmispformat"
-	"github.com/av-belyakov/placeholder_misp/internal/mispapi"
-	"github.com/av-belyakov/placeholder_misp/internal/sqlite3api"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/mispapi"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/sqlite3api"
 )
 
 // Start создаёт набор объектов в формате MISP

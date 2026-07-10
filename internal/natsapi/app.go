@@ -9,8 +9,8 @@ import (
 
 	"github.com/nats-io/nats.go"
 
-	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
-	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
+	"github.com/av-belyakov/placeholder_misp/v2/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/supportingfunctions"
 )
 
 // New настраивает новый модуль взаимодействия с API NATS

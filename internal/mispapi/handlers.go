@@ -9,8 +9,8 @@ import (
 
 	"github.com/av-belyakov/objectsmispformat"
 
-	"github.com/av-belyakov/placeholder_misp/internal/responses"
-	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/responses"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/supportingfunctions"
 )
 
 // addNewEvent добавление нового события

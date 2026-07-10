@@ -10,8 +10,8 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 
-	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
-	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
+	"github.com/av-belyakov/placeholder_misp/v2/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/supportingfunctions"
 )
 
 // New инициализирует новый модуль взаимодействия с Sqlite3 API

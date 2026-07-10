@@ -7,16 +7,16 @@ import (
 
 	"github.com/av-belyakov/simplelogger"
 
-	"github.com/av-belyakov/placeholder_misp/constants"
-	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
-	"github.com/av-belyakov/placeholder_misp/internal/countermessage"
-	"github.com/av-belyakov/placeholder_misp/internal/elasticsearchapi"
-	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
-	"github.com/av-belyakov/placeholder_misp/internal/mispapi"
-	"github.com/av-belyakov/placeholder_misp/internal/natsapi"
-	"github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
-	"github.com/av-belyakov/placeholder_misp/internal/sqlite3api"
-	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
+	"github.com/av-belyakov/placeholder_misp/v2/constants"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/confighandler"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/countermessage"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/elasticsearchapi"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/logginghandler"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/mispapi"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/natsapi"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/ruleshandler"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/sqlite3api"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/supportingfunctions"
 )
 
 // Configer чтения конфигурационного файла

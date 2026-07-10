@@ -1,7 +1,7 @@
 package dicontainer
 
 import (
-	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/v2/commoninterfaces"
 )
 
 // DiContainer DI контейнер

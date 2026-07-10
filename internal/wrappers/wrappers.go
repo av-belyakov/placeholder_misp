@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
-	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 	zabbixapicommunicator "github.com/av-belyakov/zabbixapicommunicator/cmd"
+
+	"github.com/av-belyakov/placeholder_misp/v2/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/supportingfunctions"
 )
 
 // WrappersZabbixInteraction обёртка для взаимодействия с модулем zabbixapi

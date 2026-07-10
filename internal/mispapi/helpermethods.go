@@ -1,6 +1,6 @@
 package mispapi
 
-import "github.com/av-belyakov/placeholder_misp/commoninterfaces"
+import "github.com/av-belyakov/placeholder_misp/v2/commoninterfaces"
 
 // NewLogWrite создаёт вспомогательный тип для логирования
 func NewLogWrite(l commoninterfaces.Logger) *LogWrite {

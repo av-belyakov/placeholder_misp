@@ -7,8 +7,9 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/av-belyakov/objectsmispformat"
-	"github.com/av-belyakov/placeholder_misp/cmd/coremodule"
-	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
+
+	"github.com/av-belyakov/placeholder_misp/v2/cmd/coremodule"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/supportingfunctions"
 )
 
 var _ = Describe("Checkstringhase", func() {

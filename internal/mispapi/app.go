@@ -8,9 +8,9 @@ import (
 
 	"github.com/av-belyakov/cachingstoragewithqueue"
 	"github.com/av-belyakov/objectsmispformat"
-	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
-	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
-	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
+	"github.com/av-belyakov/placeholder_misp/v2/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/confighandler"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/supportingfunctions"
 )
 
 // NewStorageAuthorizationDataMISP хранилище с данными пользователей MISP

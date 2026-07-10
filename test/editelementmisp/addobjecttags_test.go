@@ -6,10 +6,12 @@ import (
 	"os"
 	"testing"
 
-	"github.com/av-belyakov/objectsmispformat"
-	"github.com/av-belyakov/placeholder_misp/internal/mispapi"
 	"github.com/stretchr/testify/assert"
 	"github.com/subosito/gotenv"
+
+	"github.com/av-belyakov/objectsmispformat"
+
+	"github.com/av-belyakov/placeholder_misp/v2/internal/mispapi"
 )
 
 // const Event_Id = "44066"

@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/av-belyakov/placeholder_misp/v2/internal/supportingfunctions"
 )
 
 func TestGetRootPath(t *testing.T) {

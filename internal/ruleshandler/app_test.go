@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
 	"github.com/stretchr/testify/assert"
+
+	rules "github.com/av-belyakov/placeholder_misp/v2/internal/ruleshandler"
 )
 
 const fileName = "mispmsgrule.yaml"

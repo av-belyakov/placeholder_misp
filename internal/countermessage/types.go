@@ -1,8 +1,8 @@
 package countermessage
 
 import (
-	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
-	"github.com/av-belyakov/placeholder_misp/internal/informationcountingstorage"
+	"github.com/av-belyakov/placeholder_misp/v2/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/informationcountingstorage"
 )
 
 // CounterMessage счетчик сообщений

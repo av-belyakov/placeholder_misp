@@ -7,8 +7,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	// "placeholder_misp"
-	"github.com/av-belyakov/placeholder_misp/cmd/coremodule"
+	"github.com/av-belyakov/placeholder_misp/v2/cmd/coremodule"
 )
 
 var _ = Describe("Testing/Testdatatime/HandlingDataTime", func() {

@@ -3,7 +3,7 @@ package natsapi
 import (
 	"github.com/nats-io/nats.go"
 
-	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/v2/commoninterfaces"
 )
 
 // ApiNatsModule настройки для API NATS

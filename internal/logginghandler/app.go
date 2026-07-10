@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/v2/commoninterfaces"
 )
 
 // New конструктор обработчиа логов (это просто мост соединяющий несколько сервисов логирования)

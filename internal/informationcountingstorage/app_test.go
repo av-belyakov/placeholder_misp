@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	infocountstor "github.com/av-belyakov/placeholder_misp/internal/informationcountingstorage"
+	infocountstor "github.com/av-belyakov/placeholder_misp/v2/internal/informationcountingstorage"
 )
 
 var (

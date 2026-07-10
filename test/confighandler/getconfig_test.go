@@ -9,8 +9,8 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/av-belyakov/placeholder_misp/constants"
-	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
+	"github.com/av-belyakov/placeholder_misp/v2/constants"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/confighandler"
 )
 
 var (

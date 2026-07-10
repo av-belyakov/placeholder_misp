@@ -3,7 +3,7 @@ package datamodels
 import (
 	"fmt"
 
-	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/supportingfunctions"
 )
 
 // NewResponseMessage формирует новый тип ResponseMessageFromMispToTheHave с предустановленными значениями

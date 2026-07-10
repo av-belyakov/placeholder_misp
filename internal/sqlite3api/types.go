@@ -3,7 +3,7 @@ package sqlite3api
 import (
 	"database/sql"
 
-	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/v2/commoninterfaces"
 )
 
 // ApiSqlite3Module модуль взаимодействия с БД

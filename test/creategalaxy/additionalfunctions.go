@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"runtime"
 
-	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
-	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
+	"github.com/av-belyakov/placeholder_misp/v2/commoninterfaces"
+	rules "github.com/av-belyakov/placeholder_misp/v2/internal/ruleshandler"
 )
 
 // ChanInputCreateMispFormat

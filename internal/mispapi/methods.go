@@ -8,8 +8,8 @@ import (
 	"github.com/av-belyakov/objectsmispformat"
 	"golang.org/x/net/context"
 
-	"github.com/av-belyakov/placeholder_misp/internal/confighandler"
-	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/confighandler"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/supportingfunctions"
 )
 
 //****** каналы *******

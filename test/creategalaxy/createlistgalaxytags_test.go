@@ -11,12 +11,13 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/av-belyakov/placeholder_misp/cmd/coremodule"
-	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
-	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
-	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
-	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 	"github.com/av-belyakov/simplelogger"
+
+	"github.com/av-belyakov/placeholder_misp/v2/cmd/coremodule"
+	"github.com/av-belyakov/placeholder_misp/v2/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/logginghandler"
+	rules "github.com/av-belyakov/placeholder_misp/v2/internal/ruleshandler"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/supportingfunctions"
 )
 
 func addListGalaxyTags(lgt *coremodule.MispGalaxyTags) func(string, any) {
@@ -110,6 +111,10 @@ var _ = Describe("Createlistgalaxytags", Ordered, func() {
 		sc := bufio.NewScanner(f)
 		for sc.Scan() {
 			newResult = append(newResult, sc.Bytes()...)
+		}
+
+		if err := sc.Err(); err != nil {
+			log.Fatalln(err)
 		}
 
 		return newResult, nil

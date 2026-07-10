@@ -6,9 +6,9 @@ import (
 	"slices"
 
 	"github.com/av-belyakov/objectsmispformat"
-	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
-	rules "github.com/av-belyakov/placeholder_misp/internal/ruleshandler"
-	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
+	"github.com/av-belyakov/placeholder_misp/v2/commoninterfaces"
+	rules "github.com/av-belyakov/placeholder_misp/v2/internal/ruleshandler"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/supportingfunctions"
 )
 
 // удаляет элемент из списка атрибутов

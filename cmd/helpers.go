@@ -5,8 +5,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/av-belyakov/placeholder_misp/constants"
-	"github.com/av-belyakov/placeholder_misp/internal/appname"
+	"github.com/av-belyakov/placeholder_misp/v2/constants"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/appname"
 )
 
 func getInformationMessage(version string) string {

@@ -10,13 +10,13 @@ import (
 
 	"golang.org/x/sync/errgroup"
 
-	"github.com/av-belyakov/placeholder_misp/cmd/coremodule"
-	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
-	"github.com/av-belyakov/placeholder_misp/constants"
-	"github.com/av-belyakov/placeholder_misp/internal/appversion"
-	"github.com/av-belyakov/placeholder_misp/internal/dicontainer"
-	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
-	"github.com/av-belyakov/placeholder_misp/internal/wrappers"
+	"github.com/av-belyakov/placeholder_misp/v2/cmd/coremodule"
+	"github.com/av-belyakov/placeholder_misp/v2/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/v2/constants"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/appversion"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/dicontainer"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/supportingfunctions"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/wrappers"
 )
 
 type App struct {

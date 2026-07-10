@@ -7,11 +7,12 @@ import (
 	"log"
 	"time"
 
-	"github.com/av-belyakov/placeholder_misp/constants"
-	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 	"github.com/google/uuid"
 	"github.com/nats-io/nats.go"
 	"golang.org/x/sync/errgroup"
+
+	"github.com/av-belyakov/placeholder_misp/v2/constants"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/supportingfunctions"
 )
 
 // subscriptionCaseHandler обработчик подписок для получения кейсов

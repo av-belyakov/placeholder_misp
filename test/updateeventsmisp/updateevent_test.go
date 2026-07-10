@@ -13,7 +13,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/av-belyakov/objectsmispformat"
-	"github.com/av-belyakov/placeholder_misp/internal/mispapi"
+
+	"github.com/av-belyakov/placeholder_misp/v2/internal/mispapi"
 )
 
 func TestEditElementMisp(t *testing.T) {

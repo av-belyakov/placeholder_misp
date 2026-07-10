@@ -9,10 +9,10 @@ import (
 	"github.com/av-belyakov/simplelogger"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
-	"github.com/av-belyakov/placeholder_misp/constants"
-	"github.com/av-belyakov/placeholder_misp/internal/logginghandler"
-	"github.com/av-belyakov/placeholder_misp/internal/sqlite3api"
+	"github.com/av-belyakov/placeholder_misp/v2/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/v2/constants"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/logginghandler"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/sqlite3api"
 )
 
 var (

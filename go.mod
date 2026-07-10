@@ -1,12 +1,13 @@
-module github.com/av-belyakov/placeholder_misp
+module github.com/av-belyakov/placeholder_misp/v2
 
-go 1.26.1
+go 1.26.5
 
 require (
 	github.com/av-belyakov/cachingstoragewithqueue v0.0.0-20250324142615-a6b53d43d4f1
 	github.com/av-belyakov/objectsmispformat v0.3.5
 	github.com/av-belyakov/simplelogger v0.0.0-20250221120631-077109604215
 	github.com/av-belyakov/zabbixapicommunicator v0.0.0-20250618124251-10a4a23cd7ca
+	github.com/brianvoe/gofakeit/v7 v7.15.0
 	github.com/elastic/go-elasticsearch/v8 v8.17.0
 	github.com/go-playground/validator/v10 v10.24.0
 	github.com/google/uuid v1.6.0
@@ -25,7 +26,6 @@ require (
 )
 
 require (
-	github.com/brianvoe/gofakeit/v7 v7.15.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect

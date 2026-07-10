@@ -1,9 +1,9 @@
 package coremodule
 
 import (
-	"github.com/av-belyakov/placeholder_misp/commoninterfaces"
-	"github.com/av-belyakov/placeholder_misp/internal/dicontainer"
-	"github.com/av-belyakov/placeholder_misp/internal/mispapi"
+	"github.com/av-belyakov/placeholder_misp/v2/commoninterfaces"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/dicontainer"
+	"github.com/av-belyakov/placeholder_misp/v2/internal/mispapi"
 )
 
 // ChanInputCreateMispFormat входные данные для канала приёма информации используемого

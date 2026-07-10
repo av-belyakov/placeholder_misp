@@ -1,6 +1,6 @@
 package logginghandler
 
-import "github.com/av-belyakov/placeholder_misp/commoninterfaces"
+import "github.com/av-belyakov/placeholder_misp/v2/commoninterfaces"
 
 type LoggingChan struct {
 	dataWriter           commoninterfaces.WriterLoggingData
