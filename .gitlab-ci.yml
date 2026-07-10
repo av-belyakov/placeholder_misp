@@ -6,7 +6,7 @@ stages:
   - build
   - deploy
 
-# сборка, это на моем ПК
+# собирает новый образ на моем ПК
 .build-runner-tags: &build-tags
   tags:
     - placeholder_misp.build
