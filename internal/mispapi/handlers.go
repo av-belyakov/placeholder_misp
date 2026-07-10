@@ -31,7 +31,7 @@ func (m *ModuleMISP) addNewEvent(ctx context.Context, userAuthKey string, data I
 
 		m.logger.Send("info", fmt.Sprintf("starting adding the case id:'%s'", data.CaseId))
 
-		// отправляет в API MISP событие в виде типа Event и возвращает результат который содержит
+		// отправляет в API MISP событие типа Event и возвращает результат который содержит
 		// id события в MISP, у MISP свой уникальный id для событий
 		// только с использованием этого id в MISP добавляются все остальные объекты
 		_, resBodyByte, err := rmisp.sendEvent(ctx, data.Data.GetEvent())
@@ -125,9 +125,8 @@ func (m *ModuleMISP) addNewEvent(ctx context.Context, userAuthKey string, data I
 		time.Sleep(5 * time.Second)
 
 		// публикуем добавленное событие
-		// masterKey нужен для публикации события так как пользователь
-		// должен иметь более расшириные права чем могут иметь некоторые
-		// обычные пользователи
+		// masterKey нужен для публикации события так как пользователь должен иметь более расшириные права
+		// чем могут иметь некоторые обычные пользователи
 		resMsg, err := rmisp.sendRequestPublishEvent(ctx, eventId)
 		if err != nil {
 			m.logger.Send("error", supportingfunctions.CustomError(err).Error())
@@ -149,6 +148,7 @@ func (m *ModuleMISP) addNewEvent(ctx context.Context, userAuthKey string, data I
 		}
 		m.SendDataOutput(outMsg)
 
+		// получаем из тегов список сенсоров по которым нужна дополнитеьльная информация
 		listSensors := createListSensors(*data.Data.ObjectTags)
 		if len(listSensors) == 0 {
 			m.logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("the sensor list  on object tags '%+v' for event with id:'%s' (case id:'%s') is empty", data.Data.ObjectTags, eventId, data.CaseId)).Error())
@@ -256,11 +256,96 @@ func (m *ModuleMISP) editEvent(ctx context.Context, userAuthKey string, data Inp
 
 		// event_reports оставляем неизменным, этот объект не должен изменятся
 
-		// удаляем атрибуты и добавляем их заново
+		// удаляем все атрибуты собития
+		for _, v := range oldEvent.Event.Attribute {
+			if err := rmisp.deleteAttributes(ctx, v.Id, data.EventId); err != nil {
+				m.logger.Send("error", supportingfunctions.CustomError(err).Error())
+			}
+		}
+		// добавляем все атрибуты повторно
+		_, _, warning, err := rmisp.sendAttribytes(ctx, data.EventId, data.Data.GetAttributes())
+		if err != nil {
+			m.logger.Send("error", supportingfunctions.CustomError(err).Error())
+		}
+		if warning != "" {
+			m.logger.Send("warning", warning)
+		}
 
-		// удаляем прикрепленные к событию объекты и добавляем их заново
+		m.logger.Send("info", fmt.Sprintf("some elements 'attribytes' successfully added to event with id:'%s' (case id:'%s') again", data.EventId, data.CaseId))
 
-		// удаляем теги и добавялем новые
+		// удаляем все прикрепленные к событию объекты
+		for _, v := range oldEvent.Event.Object {
+			if err := rmisp.deleteObject(ctx, v.Id); err != nil {
+				m.logger.Send("error", supportingfunctions.CustomError(err).Error())
+			}
+		}
+		// добавляем все объекты события повторно
+		if _, _, err = rmisp.sendObjects(ctx, data.EventId, data.Data.GetObjects()); err != nil {
+			m.logger.Send("error", supportingfunctions.CustomError(err).Error())
+		}
+
+		m.logger.Send("info", fmt.Sprintf("elements 'objects' successfully added to event with id:'%s' (case id:'%s') again", data.EventId, data.CaseId))
+
+		// берем небольшой таймаут, нужен для того что бы MISP успел обработать и добавить в БД
+		// всё ранее ему переданное, если обработка переданных объектов не была завершена
+		// возможны накладки или сбои при добавлении данных
+		// это недостаток MISP, с этим я ничего не могу поделать
+		time.Sleep(5 * time.Second)
+
+		// удаляем все теги события
+		for _, v := range oldEvent.Event.Tag {
+			if err := rmisp.deleteTag(ctx, v.Id, data.EventId); err != nil {
+				m.logger.Send("error", supportingfunctions.CustomError(err).Error())
+			}
+		}
+		// добавляем все теги повторно
+		if err := rmisp.sendEventTags(ctx, data.EventId, data.Data.GetObjectTags()); err != nil {
+			m.logger.Send("error", supportingfunctions.CustomError(err).Error())
+		}
+
+		m.logger.Send("info", fmt.Sprintf("elements 'tags' successfully added to event with id:'%s' (case id:'%s')", data.EventId, data.CaseId))
+
+		time.Sleep(5 * time.Second)
+
+		// публикуем добавленное событие
+		// masterKey нужен для публикации события так как пользователь должен иметь более расшириные права
+		// чем могут иметь некоторые обычные пользователи
+		resMsg, err := rmisp.sendRequestPublishEvent(ctx, data.EventId)
+		if err != nil {
+			m.logger.Send("error", supportingfunctions.CustomError(err).Error())
+		}
+		if resMsg != "" {
+			m.logger.Send("info", fmt.Sprintf("event with id:'%s' (case id:'%s') %s", data.EventId, data.CaseId, resMsg))
+		}
+
+		// получаем из тегов список сенсоров по которым нужна дополнитеьльная информация
+		listSensors := createListSensors(*data.Data.ObjectTags)
+		if len(listSensors) == 0 {
+			m.logger.Send("error", supportingfunctions.CustomError(fmt.Errorf("the sensor list  on object tags '%+v' for event with id:'%s' (case id:'%s') is empty", data.Data.ObjectTags, data.EventId, data.CaseId)).Error())
+
+			return true
+		}
+
+		reqSensorId, err := json.Marshal(RequestSensorInformation{
+			Source:      "placeholder_misp",
+			TaskId:      data.CaseId,
+			ListSensors: listSensors,
+		})
+		if err != nil {
+			m.logger.Send("error", supportingfunctions.CustomError(err).Error())
+
+			return true
+		}
+
+		// запрос в ядро на получение информации о сенсорах
+		m.SendDataOutput(OutputSetting{
+			Command: "get sensor information",
+			CaseId:  data.CaseId,
+			RootId:  data.RootId,
+			Data:    reqSensorId,
+		})
+
+		m.logger.Send("info", fmt.Sprintf("event with id:'%s' (case id:'%s') send request 'get sensor information' to core module", data.EventId, data.CaseId))
 
 		return true
 	})

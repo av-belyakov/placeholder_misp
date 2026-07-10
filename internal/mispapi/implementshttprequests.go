@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/av-belyakov/placeholder_misp/constants"
 	"github.com/av-belyakov/placeholder_misp/internal/supportingfunctions"
 )
 
@@ -42,7 +43,7 @@ func (client *ClientMISP) Delete(ctx context.Context, path string) (*http.Respon
 
 // Do выполняет запрос к API MISP и возвращает заголовок ответа и и тело ответа в виде среза байт
 func (client *ClientMISP) Do(ctx context.Context, method, path string, data []byte) (*http.Response, []byte, error) {
-	ctxTimeout, CancelFunc := context.WithTimeout(ctx, time.Second*15)
+	ctxTimeout, CancelFunc := context.WithTimeout(ctx, time.Second*constants.Default_Client_Timeout)
 	defer CancelFunc()
 
 	dataLen := 0
