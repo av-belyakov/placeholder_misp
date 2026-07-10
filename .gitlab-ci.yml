@@ -1,6 +1,6 @@
 variables:
-  BRANCH_MAJOR: master
-  BRANCH_TEST: development
+  BRANCH_MAJOR: master_v2
+  BRANCH_TEST: development_v2
 
 stages:
   - build
@@ -54,14 +54,14 @@ stages:
 .is-branch-master-commit: &master-commit
   - if: $CI_COMMIT_BRANCH == $BRANCH_MAJOR || $CI_COMMIT_REF_NAME == $BRANCH_MAJOR
 
-#выводим версию приложения
+# вывод версии приложения
 get_version:
   stage: .pre
   <<: *deploy-prod-tags
   script:
     - 'V=`awk ''/[0-9].[0-9].[0-9]/; {print $2}'' $CI_PROJECT_DIR/version`; echo "version $V"'
 
-#сборка тестового образа
+# сборка тестового образа
 build-test:
   stage: build
   <<: *build-tags
@@ -71,23 +71,25 @@ build-test:
     - *test-files-no-commit
     - *dev-test-commit
   script:
-    # удаляем старый образ
+    #удаление старого образа
     - docker rmi $CI_REGISTRY_IMAGE:test || true
+    #удаление старого образа (версия 2)
+    - docker rmi $CI_REGISTRY_IMAGE:v2.test || true
     - >
-      docker buildx build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA \
+      docker buildx build -t $CI_REGISTRY_IMAGE:v2.test \
        --provenance=false \
        --platform linux/amd64 \
        --build-arg VERSION=$CI_COMMIT_SHORT_SHA \
        --build-arg BRANCH=$BRANCH_TEST \
        --build-arg STATUS=development .
-    # удаляем промежуточный образ с меткой temporary
+    #удаление промежуточного образа с меткой temporary
     - *docker-image-pure
-    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA $CI_REGISTRY_IMAGE:test
+    #- docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA $CI_REGISTRY_IMAGE:test
     - *docker-login
-    - docker push $CI_REGISTRY_IMAGE:test
-    - docker rmi $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA || true
+    - docker push $CI_REGISTRY_IMAGE:v2.test
+    #- docker rmi $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA || true
 
-#сборка основного образа
+# сборка основного образа
 build-prod:
   stage: build
   <<: *build-tags
@@ -98,19 +100,20 @@ build-prod:
     - *master-commit
   script:
     - docker rmi $CI_REGISTRY_IMAGE:latest || true
+    - docker rmi $CI_REGISTRY_IMAGE:v2.latest || true
     - >
-      docker buildx build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA \
+      docker buildx build -t $CI_REGISTRY_IMAGE:v2.latest \
        --provenance=false \
        --platform linux/amd64 \
        --build-arg VERSION=$CI_COMMIT_SHORT_SHA \
        --build-arg BRANCH=$BRANCH_MAJOR .
     - *docker-image-pure
-    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA $CI_REGISTRY_IMAGE:latest
+    #- docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA $CI_REGISTRY_IMAGE:latest
     - *docker-login
-    - docker push $CI_REGISTRY_IMAGE:latest
-    - docker rmi $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA || true
+    - docker push $CI_REGISTRY_IMAGE:v2.latest
+    #- docker rmi $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA || true
 
-#развёртывание тестовой сборки (GCM.test)
+# развёртывание тестовой сборки (GCM.test)
 deploy-test:
   stage: deploy
   <<: *deploy-test-tags
@@ -118,14 +121,22 @@ deploy-test:
     - *readme-no-commit
     - *dev-test-commit
   before_script:
-    - echo "Start deploy placeholder_misp application for GCM.test"
+    - echo "Start deploy placeholder_misp_v2 application for GCM.test"
   script:
     - *docker-login
-    - docker-compose -f $CI_PROJECT_DIR/docker-compose.test.yml down
+    #удаление нового контейнера если он есть
+    - docker-compose -f $CI_PROJECT_DIR/docker-compose.test.yml down --remove-orphans
+    #удаление контейнера со старой версией
+    - docker stop gitlab.cloud.gcm:5050/a.belyakov/placeholder_misp:test || true
+    - docker rm gitlab.cloud.gcm:5050/a.belyakov/placeholder_misp:test || true
+    #удаление старого образа (версия 1)
     - docker rmi gitlab.cloud.gcm:5050/a.belyakov/placeholder_misp:test || true
+    #удаление старого образа (версия 2)
+    - docker rmi gitlab.cloud.gcm:5050/a.belyakov/placeholder_misp:v2.0.test || true
+    #запуск 2-ой версии приложения
     - docker-compose -f $CI_PROJECT_DIR/docker-compose.test.yml up -d --force-recreate --build
 
-#развёртывание основной сборки (GCM)
+# развёртывание основной сборки (GCM)
 deploy-prod-gcm:
   stage: deploy
   <<: *deploy-prod-tags
@@ -135,9 +146,17 @@ deploy-prod-gcm:
       when: manual
       allow_failure: true
   before_script:
-    - echo "Start deploy placeholder_misp application for GCM"
+    - echo "Start deploy placeholder_misp_v2 application for GCM"
   script:
     - *docker-login
-    - docker-compose -f $CI_PROJECT_DIR/docker-compose.yml down
+    #удаление нового контейнера если он есть
+    - docker-compose -f $CI_PROJECT_DIR/docker-compose.yml down --remove-orphans
+    #удаление контейнера со старой версией
+    - docker stop gitlab.cloud.gcm:5050/a.belyakov/placeholder_misp:latest || true
+    - docker rm gitlab.cloud.gcm:5050/a.belyakov/placeholder_misp:latest || true
+    #удаление старого образа (версия 1)
     - docker rmi gitlab.cloud.gcm:5050/a.belyakov/placeholder_misp:latest || true
+    #удаление старого образа (версия 2)
+    - docker rmi gitlab.cloud.gcm:5050/a.belyakov/placeholder_misp:v2.0.latest || true
+    #запуск 2-ой версии приложения
     - docker-compose -f $CI_PROJECT_DIR/docker-compose.yml up -d --force-recreate --build
