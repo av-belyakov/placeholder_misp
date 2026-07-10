@@ -102,10 +102,10 @@ func TestEditElementMisp(t *testing.T) {
 		var eventUUID string
 
 		t.Run("Тест 1.1. Поиск UUID редактируемого события", func(tt *testing.T) {
-			res, raw, err := rmisp.GetEvent_ForTest(t.Context(), eventId)
+			statusCode, raw, err := rmisp.GetEvent_ForTest(t.Context(), eventId)
 			//		res, raw, err := client.Get(t.Context(), fmt.Sprintf("/events/view/%s", eventId), []byte{})
 			assert.NoError(t, err)
-			assert.Equal(t, res.StatusCode, http.StatusOK)
+			assert.Equal(t, statusCode, http.StatusOK)
 
 			assert.NoError(t, json.Unmarshal(raw, &oldEvents))
 
@@ -115,9 +115,9 @@ func TestEditElementMisp(t *testing.T) {
 
 			fmt.Printf("Events view: %+v", oldEvents)
 
-			res, raw, err = client.Get(t.Context(), "/events/view/any_event", []byte{})
+			statusCode, raw, err = client.Get(t.Context(), "/events/view/any_event", []byte{})
 			assert.Error(t, err)
-			assert.NotEqual(t, res.StatusCode, http.StatusOK)
+			assert.NotEqual(t, statusCode, http.StatusOK)
 
 			fmt.Println("||||||| RAW:", string(raw))
 			fmt.Println("Error:", err)
@@ -144,14 +144,14 @@ func TestEditElementMisp(t *testing.T) {
 				EventCreatorEmail: "a.belyakov-modified-event@cloud.gcm",
 			}
 
-			res, raw, err := rmisp.EditEvent_ForTest(t.Context(), eventId, events)
+			statusCode, raw, err := rmisp.EditEvent_ForTest(t.Context(), eventId, events)
 			assert.NoError(t, err)
 			if err != nil {
 				fmt.Println("---=== Error:", err)
 
 				return
 			}
-			assert.Equal(t, res.StatusCode, 200)
+			assert.Equal(t, statusCode, 200)
 
 			fmt.Println("RAW edit response:", string(raw))
 		})

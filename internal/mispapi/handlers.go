@@ -33,12 +33,14 @@ func (m *ModuleMISP) processingEvent(ctx context.Context, userAuthKey string, da
 	}
 
 	// получаем событие по его event id
-	res, raw, err := rmisp.getEvent(ctx, data.EventId)
+	statusCode, raw, err := rmisp.getEvent(ctx, data.EventId)
 	if err != nil {
 		m.logger.Send("error", supportingfunctions.CustomError(err).Error())
 	}
 
-	if res != nil && res.StatusCode == http.StatusNotFound {
+	fmt.Println("method 'processingEvent', get event status code:", statusCode)
+
+	if statusCode == http.StatusNotFound {
 		m.addNewEvent(ctx, userAuthKey, data)
 
 		return
@@ -126,7 +128,7 @@ func (m *ModuleMISP) addNewEvent(ctx context.Context, userAuthKey string, data I
 		m.logger.Send("info", fmt.Sprintf("element 'event_reports' successfully added to event with id:'%s' (case id:'%s')", eventId, data.CaseId))
 
 		// добавляем атрибуты
-		_, _, warning, err := rmisp.sendAttribytes(ctx, eventId, data.Data.GetAttributes())
+		warning, err := rmisp.sendAttribytes(ctx, eventId, data.Data.GetAttributes())
 		if err != nil {
 			// Тут ошибка может быть при добавлении только одного из многих объектов,
 			// соответственно тормозить весь процесс, только из-за того, что была ошибка
@@ -143,7 +145,7 @@ func (m *ModuleMISP) addNewEvent(ctx context.Context, userAuthKey string, data I
 		m.logger.Send("info", fmt.Sprintf("some elements 'attribytes' successfully added to event with id:'%s' (case id:'%s')", eventId, data.CaseId))
 
 		// добавляем объекты
-		if _, _, err = rmisp.sendObjects(ctx, eventId, data.Data.GetObjects()); err != nil {
+		if err = rmisp.sendObjects(ctx, eventId, data.Data.GetObjects()); err != nil {
 			// тут такая же ситуация что и с ошибками при выполнении метода rmisp.sendAttribytes
 			m.logger.Send("error", supportingfunctions.CustomError(err).Error())
 		}
@@ -309,7 +311,7 @@ func (m *ModuleMISP) editEvent(ctx context.Context, userAuthKey string, data Inp
 			}
 		}
 		// добавляем все атрибуты повторно
-		_, _, warning, err := rmisp.sendAttribytes(ctx, data.EventId, data.Data.GetAttributes())
+		warning, err := rmisp.sendAttribytes(ctx, data.EventId, data.Data.GetAttributes())
 		if err != nil {
 			m.logger.Send("error", supportingfunctions.CustomError(err).Error())
 		}
@@ -326,7 +328,7 @@ func (m *ModuleMISP) editEvent(ctx context.Context, userAuthKey string, data Inp
 			}
 		}
 		// добавляем все объекты события повторно
-		if _, _, err = rmisp.sendObjects(ctx, data.EventId, data.Data.GetObjects()); err != nil {
+		if err = rmisp.sendObjects(ctx, data.EventId, data.Data.GetObjects()); err != nil {
 			m.logger.Send("error", supportingfunctions.CustomError(err).Error())
 		}
 

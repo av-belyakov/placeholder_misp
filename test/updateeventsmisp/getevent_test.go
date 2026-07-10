@@ -29,9 +29,9 @@ func TestGetEventElementMISP(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	res, raw, err := client.Get(t.Context(), fmt.Sprintf("/events/view/%s", eventId), []byte{})
+	statusCode, raw, err := client.Get(t.Context(), fmt.Sprintf("/events/view/%s", eventId), []byte{})
 	assert.NoError(t, err)
-	assert.Equal(t, res.StatusCode, http.StatusOK)
+	assert.Equal(t, statusCode, http.StatusOK)
 
 	//fmt.Println("Get event response:", string(raw))
 
