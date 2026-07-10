@@ -32,7 +32,7 @@ LOGGING:
       msgTypeName: "error",
       writingFile: true,
       pathDirectory: "logs",
-      writingStdout: false,
+      writingStdout: true,
       maxFileSize: 10000000,
       writingDB: true,
     }
@@ -40,7 +40,7 @@ LOGGING:
       msgTypeName: "warning",
       writingFile: true,
       pathDirectory: "logs",
-      writingStdout: false,
+      writingStdout: true,
       maxFileSize: 10000000,
       writingDB: true,
     }
