@@ -67,7 +67,7 @@ build-test:
   <<: *build-tags
   rules:
     - *readme-no-commit
-    - *docker-compose-no-commit
+    #    - *docker-compose-no-commit
     - *test-files-no-commit
     - *dev-test-commit
   script:
