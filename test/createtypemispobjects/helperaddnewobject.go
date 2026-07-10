@@ -95,7 +95,7 @@ func AddNewObject(
 	}
 
 	//добавляем атрибуты
-	_, _, warning, err := rmisp.SendAttribytes_ForTest(ctx, eventId, data.Data.GetAttributes())
+	warning, err := rmisp.SendAttribytes_ForTest(ctx, eventId, data.Data.GetAttributes())
 	if err != nil {
 		// тут ошибка может быть при добавлении только одного из многих объектов
 		// соответственно тормозить весь процесс только из-за того что была ошибка
@@ -110,7 +110,7 @@ func AddNewObject(
 	}
 
 	// добавляем объекты
-	if _, _, err = rmisp.SendObjects_ForTest(ctx, eventId, data.Data.GetObjects()); err != nil {
+	if err = rmisp.SendObjects_ForTest(ctx, eventId, data.Data.GetObjects()); err != nil {
 		//тут такая же ситуация что и с ошибками при выполнении метода rmisp.sendAttribytes
 		log.Println(err)
 	}

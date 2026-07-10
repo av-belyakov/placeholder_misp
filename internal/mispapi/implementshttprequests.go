@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"crypto/tls"
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -29,20 +28,20 @@ func (client *ClientMISP) GetAuthData() string {
 	return client.AuthHash
 }
 
-func (client *ClientMISP) Get(ctx context.Context, path string, data []byte) (*http.Response, []byte, error) {
+func (client *ClientMISP) Get(ctx context.Context, path string, data []byte) (int, []byte, error) {
 	return client.Do(ctx, "GET", path, data)
 }
 
-func (client *ClientMISP) Post(ctx context.Context, path string, data []byte) (*http.Response, []byte, error) {
+func (client *ClientMISP) Post(ctx context.Context, path string, data []byte) (int, []byte, error) {
 	return client.Do(ctx, "POST", path, data)
 }
 
-func (client *ClientMISP) Delete(ctx context.Context, path string) (*http.Response, []byte, error) {
+func (client *ClientMISP) Delete(ctx context.Context, path string) (int, []byte, error) {
 	return client.Do(ctx, "DELETE", path, []byte{})
 }
 
 // Do выполняет запрос к API MISP и возвращает заголовок ответа и и тело ответа в виде среза байт
-func (client *ClientMISP) Do(ctx context.Context, method, path string, data []byte) (*http.Response, []byte, error) {
+func (client *ClientMISP) Do(ctx context.Context, method, path string, data []byte) (int, []byte, error) {
 	ctxTimeout, CancelFunc := context.WithTimeout(ctx, time.Second*constants.Default_Client_Timeout)
 	defer CancelFunc()
 
@@ -52,7 +51,7 @@ func (client *ClientMISP) Do(ctx context.Context, method, path string, data []by
 	reader := bytes.NewReader(data)
 	httpReq, err := http.NewRequestWithContext(ctxTimeout, method, path, reader)
 	if err != nil {
-		return nil, resBodyByte, supportingfunctions.CustomError(err)
+		return 0, resBodyByte, supportingfunctions.CustomError(err)
 	}
 
 	dataLen = reader.Len()
@@ -79,18 +78,14 @@ func (client *ClientMISP) Do(ctx context.Context, method, path string, data []by
 
 	res, err := httpClient.Do(httpReq)
 	if err != nil {
-		return nil, resBodyByte, supportingfunctions.CustomError(err)
+		return 0, resBodyByte, supportingfunctions.CustomError(err)
 	}
 	defer res.Body.Close()
 
 	resBodyByte, err = io.ReadAll(res.Body)
 	if err != nil {
-		return nil, resBodyByte, supportingfunctions.CustomError(err)
+		return 0, resBodyByte, supportingfunctions.CustomError(err)
 	}
 
-	if res.StatusCode != http.StatusOK {
-		return res, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("message from MISP: status '%s', error - %v", res.Status, string(resBodyByte)))
-	}
-
-	return res, resBodyByte, err
+	return res.StatusCode, resBodyByte, err
 }

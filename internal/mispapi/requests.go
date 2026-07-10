@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
 	"strings"
 
 	"github.com/av-belyakov/objectsmispformat"
@@ -64,98 +63,83 @@ func WithMasterAuthKey(v string) RequestMISPOptions {
 	}
 }
 
-func (rmisp requestMISP) GetEvent_ForTest(ctx context.Context, eventId string) (*http.Response, []byte, error) {
+func (rmisp requestMISP) GetEvent_ForTest(ctx context.Context, eventId string) (int, []byte, error) {
 	return rmisp.getEvent(ctx, eventId)
 }
 
 // getEvents поиск события по его идентификатору
-func (rmisp requestMISP) getEvent(ctx context.Context, eventId string) (*http.Response, []byte, error) {
-	var (
-		res         *http.Response
-		resBodyByte = make([]byte, 0)
-	)
-
+func (rmisp requestMISP) getEvent(ctx context.Context, eventId string) (int, []byte, error) {
 	if err := ctx.Err(); err != nil {
-		return nil, resBodyByte, supportingfunctions.CustomError(err)
+		return 0, []byte{}, supportingfunctions.CustomError(err)
 	}
 
 	client, err := NewClientMISP(rmisp.host, rmisp.userAuthKey, false)
 	if err != nil {
-		return nil, resBodyByte, supportingfunctions.CustomError(err)
+		return 0, []byte{}, supportingfunctions.CustomError(err)
 	}
 
-	res, resBodyByte, err = client.Post(ctx, fmt.Sprintf("/events/view/%s", eventId), []byte{})
+	statusCode, resBodyByte, err := client.Post(ctx, fmt.Sprintf("/events/view/%s", eventId), []byte{})
 	if err != nil {
-		return nil, resBodyByte, supportingfunctions.CustomError(err)
+		return statusCode, resBodyByte, supportingfunctions.CustomError(err)
 	}
 
-	return res, resBodyByte, nil
+	return statusCode, resBodyByte, nil
 }
 
-func (rmisp *requestMISP) EditEvent_ForTest(ctx context.Context, eventId string, event objectsmispformat.EventsMispFormat) (*http.Response, []byte, error) {
+func (rmisp *requestMISP) EditEvent_ForTest(ctx context.Context, eventId string, event objectsmispformat.EventsMispFormat) (int, []byte, error) {
 	return rmisp.editEvent(ctx, eventId, event)
 }
 
 // editEvent редактирует событие
-func (rmisp *requestMISP) editEvent(ctx context.Context, eventId string, event objectsmispformat.EventsMispFormat) (*http.Response, []byte, error) {
-	var (
-		res         *http.Response
-		resBodyByte = make([]byte, 0)
-	)
-
+func (rmisp *requestMISP) editEvent(ctx context.Context, eventId string, event objectsmispformat.EventsMispFormat) (int, []byte, error) {
 	if err := ctx.Err(); err != nil {
-		return nil, resBodyByte, supportingfunctions.CustomError(err)
+		return 0, []byte{}, supportingfunctions.CustomError(err)
 	}
 
 	b, err := json.Marshal(event)
 	if err != nil {
-		return nil, resBodyByte, supportingfunctions.CustomError(err)
+		return 0, []byte{}, supportingfunctions.CustomError(err)
 	}
 
 	client, err := NewClientMISP(rmisp.host, rmisp.userAuthKey, false)
 	if err != nil {
-		return nil, resBodyByte, supportingfunctions.CustomError(err)
+		return 0, []byte{}, supportingfunctions.CustomError(err)
 	}
 
-	res, resBodyByte, err = client.Post(ctx, fmt.Sprintf("/events/edit/%s", eventId), b)
+	statusCode, resBodyByte, err := client.Post(ctx, fmt.Sprintf("/events/edit/%s", eventId), b)
 	if err != nil {
-		return nil, resBodyByte, supportingfunctions.CustomError(err)
+		return statusCode, resBodyByte, supportingfunctions.CustomError(err)
 	}
 
-	return res, resBodyByte, nil
+	return statusCode, resBodyByte, nil
 }
 
-func (rmisp *requestMISP) SendEvent_ForTest(ctx context.Context, data *objectsmispformat.EventsMispFormat) (*http.Response, []byte, error) {
+func (rmisp *requestMISP) SendEvent_ForTest(ctx context.Context, data *objectsmispformat.EventsMispFormat) (int, []byte, error) {
 	return rmisp.sendEvent(ctx, data)
 }
 
 // sendEvent добавляет в MISP объект типа 'event'
-func (rmisp *requestMISP) sendEvent(ctx context.Context, data *objectsmispformat.EventsMispFormat) (*http.Response, []byte, error) {
-	var (
-		res         *http.Response
-		resBodyByte = make([]byte, 0)
-	)
-
+func (rmisp *requestMISP) sendEvent(ctx context.Context, data *objectsmispformat.EventsMispFormat) (int, []byte, error) {
 	if err := ctx.Err(); err != nil {
-		return nil, resBodyByte, supportingfunctions.CustomError(err)
+		return 0, []byte{}, supportingfunctions.CustomError(err)
 	}
 
 	b, err := json.Marshal(data)
 	if err != nil {
-		return nil, resBodyByte, supportingfunctions.CustomError(err)
+		return 0, []byte{}, supportingfunctions.CustomError(err)
 	}
 
 	client, err := NewClientMISP(rmisp.host, rmisp.userAuthKey, false)
 	if err != nil {
-		return nil, resBodyByte, supportingfunctions.CustomError(err)
+		return 0, []byte{}, supportingfunctions.CustomError(err)
 	}
 
-	res, resBodyByte, err = client.Post(ctx, "/events/add", b)
+	statusCode, resBodyByte, err := client.Post(ctx, "/events/add", b)
 	if err != nil {
-		return nil, resBodyByte, supportingfunctions.CustomError(err)
+		return statusCode, resBodyByte, supportingfunctions.CustomError(err)
 	}
 
-	return res, resBodyByte, nil
+	return statusCode, resBodyByte, nil
 }
 
 func (rmisp *requestMISP) SendEventReports_ForTest(ctx context.Context, eventId string, data *objectsmispformat.EventReports) error {
@@ -186,27 +170,22 @@ func (rmisp *requestMISP) sendEventReports(ctx context.Context, eventId string, 
 	return nil
 }
 
-func (rmisp *requestMISP) SendAttribytes_ForTest(ctx context.Context, eventId string, data []*objectsmispformat.AttributesMispFormat) (*http.Response, []byte, string, error) {
+func (rmisp *requestMISP) SendAttribytes_ForTest(ctx context.Context, eventId string, data []*objectsmispformat.AttributesMispFormat) (string, error) {
 	return rmisp.sendAttribytes(ctx, eventId, data)
 }
 
 // sendAttribytes отправляет в MISP список атрибутов в виде среза объектов типа 'attribytes'
-func (rmisp *requestMISP) sendAttribytes(ctx context.Context, eventId string, data []*objectsmispformat.AttributesMispFormat) (*http.Response, []byte, string, error) {
-	var (
-		res         *http.Response
-		resBodyByte = make([]byte, 0)
-	)
-
+func (rmisp *requestMISP) sendAttribytes(ctx context.Context, eventId string, data []*objectsmispformat.AttributesMispFormat) (string, error) {
 	warning := strings.Builder{}
 	defer warning.Reset()
 
 	if err := ctx.Err(); err != nil {
-		return nil, resBodyByte, warning.String(), supportingfunctions.CustomError(err)
+		return warning.String(), supportingfunctions.CustomError(err)
 	}
 
 	client, err := NewClientMISP(rmisp.host, rmisp.userAuthKey, false)
 	if err != nil {
-		return nil, resBodyByte, warning.String(), supportingfunctions.CustomError(fmt.Errorf("'attributes' for event id:'%s' add, %w", eventId, err))
+		return warning.String(), supportingfunctions.CustomError(fmt.Errorf("'attributes' for event id:'%s' add, %w", eventId, err))
 	}
 
 	for k := range data {
@@ -225,7 +204,7 @@ func (rmisp *requestMISP) sendAttribytes(ctx context.Context, eventId string, da
 			continue
 		}
 
-		res, resBodyByte, errTmp = client.Post(ctx, "/attributes/add/"+eventId, b)
+		_, _, errTmp = client.Post(ctx, "/attributes/add/"+eventId, b)
 		if errTmp != nil {
 			err = errors.Join(err, supportingfunctions.CustomError(fmt.Errorf("'attributes' id:'%s' add, %w", eventId, errTmp)))
 
@@ -240,28 +219,23 @@ func (rmisp *requestMISP) sendAttribytes(ctx context.Context, eventId string, da
 		}
 	}
 
-	return res, resBodyByte, warning.String(), err
+	return warning.String(), err
 }
 
-func (rmisp *requestMISP) SendObjects_ForTest(ctx context.Context, eventId string, data map[int]*objectsmispformat.ObjectsMispFormat) (*http.Response, []byte, error) {
+func (rmisp *requestMISP) SendObjects_ForTest(ctx context.Context, eventId string, data map[int]*objectsmispformat.ObjectsMispFormat) error {
 	return rmisp.sendObjects(ctx, eventId, data)
 }
 
 // sendObjects отправляет в MISP список объектов содержащихся в свойстве observables.attachment
 // (как правило это описание вложеного файла)
-func (rmisp *requestMISP) sendObjects(ctx context.Context, eventId string, data map[int]*objectsmispformat.ObjectsMispFormat) (*http.Response, []byte, error) {
-	var (
-		res         *http.Response
-		resBodyByte = make([]byte, 0)
-	)
-
+func (rmisp *requestMISP) sendObjects(ctx context.Context, eventId string, data map[int]*objectsmispformat.ObjectsMispFormat) error {
 	if err := ctx.Err(); err != nil {
-		return nil, resBodyByte, supportingfunctions.CustomError(err)
+		return supportingfunctions.CustomError(err)
 	}
 
 	client, err := NewClientMISP(rmisp.host, rmisp.userAuthKey, false)
 	if err != nil {
-		return nil, resBodyByte, supportingfunctions.CustomError(fmt.Errorf("objects for event id:'%s' add, %w", eventId, err))
+		return supportingfunctions.CustomError(fmt.Errorf("objects for event id:'%s' add, %w", eventId, err))
 	}
 
 	for _, v := range data {
@@ -274,7 +248,7 @@ func (rmisp *requestMISP) sendObjects(ctx context.Context, eventId string, data 
 			continue
 		}
 
-		res, resBodyByte, errTmp = client.Post(ctx, "/objects/add/"+eventId, b)
+		_, _, errTmp = client.Post(ctx, "/objects/add/"+eventId, b)
 		if errTmp != nil {
 			err = errors.Join(err, supportingfunctions.CustomError(fmt.Errorf("objects with id:'%s' add, %w", eventId, errTmp)))
 
@@ -282,7 +256,7 @@ func (rmisp *requestMISP) sendObjects(ctx context.Context, eventId string, data 
 		}
 	}
 
-	return res, resBodyByte, err
+	return err
 }
 
 func (rmisp *requestMISP) SendEventTags_ForTest(ctx context.Context, eventId string, data *objectsmispformat.ListEventObjectTags) error {

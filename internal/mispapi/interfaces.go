@@ -2,7 +2,6 @@ package mispapi
 
 import (
 	"context"
-	"net/http"
 
 	"github.com/av-belyakov/objectsmispformat"
 )
@@ -19,9 +18,9 @@ type ConnectMISPHandler interface {
 }
 
 type NetworkSender interface {
-	Get(ctx context.Context, path string, data []byte) (*http.Response, []byte, error)
-	Post(ctx context.Context, path string, data []byte) (*http.Response, []byte, error)
-	Delete(ctx context.Context, path string) (*http.Response, []byte, error)
+	Get(ctx context.Context, path string, data []byte) (int, []byte, error)
+	Post(ctx context.Context, path string, data []byte) (int, []byte, error)
+	Delete(ctx context.Context, path string) (int, []byte, error)
 }
 
 type SetterAuthData interface {
