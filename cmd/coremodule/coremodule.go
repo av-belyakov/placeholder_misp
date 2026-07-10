@@ -42,7 +42,7 @@ func (settings *CoreHandler) Start(
 	ctx context.Context,
 	natsModule dicontainer.NatsConnecter,
 	mispModule dicontainer.MispConnecter,
-	sqlite3Module dicontainer.DB,
+	dbModule dicontainer.DB,
 ) {
 
 	chanNatsReception := natsModule.GetChannelFromModule()
@@ -53,7 +53,7 @@ func (settings *CoreHandler) Start(
 	generatorFormatMISP := NewGenerateObjectsFormatMISP(
 		SettingsGenerateObjectsFormatMISP{
 			MispModule:    mispModule,
-			Sqlite3Module: sqlite3Module,
+			Sqlite3Module: dbModule,
 			ListRule:      settings.rules,
 			Logger:        settings.logger,
 			Counter:       settings.counter,
@@ -90,7 +90,7 @@ func (settings *CoreHandler) Start(
 
 					//поиск eventId в Sqlite3
 					chRes := make(chan sqlite3api.Response)
-					sqlite3Module.SendDataToModule(sqlite3api.Request{
+					dbModule.SendDataToModule(sqlite3api.Request{
 						Command:    "search caseId",
 						ChResponse: chRes,
 						Payload:    fmt.Append(nil, data.MsgId), // data.MsgId == caseId для NATS
@@ -112,7 +112,7 @@ func (settings *CoreHandler) Start(
 			switch data.Command {
 			case "get event id":
 				//отправка eventId в Sqlite3
-				sqlite3Module.SendDataToModule(sqlite3api.Request{
+				dbModule.SendDataToModule(sqlite3api.Request{
 					Command: "set case id",
 					Payload: fmt.Append(nil, fmt.Sprintf("%s:%s", data.CaseId, data.EventId)),
 				})
@@ -131,7 +131,7 @@ func (settings *CoreHandler) Start(
 
 					//поиск старого eventId в Sqlite3
 					chRes := make(chan sqlite3api.Response)
-					sqlite3Module.SendDataToModule(sqlite3api.Request{
+					dbModule.SendDataToModule(sqlite3api.Request{
 						Command:    "search caseId",
 						ChResponse: chRes,
 						Payload:    fmt.Append(nil, data.CaseId),
@@ -148,7 +148,7 @@ func (settings *CoreHandler) Start(
 					}
 
 					//передача нового eventId в Sqlite3
-					sqlite3Module.SendDataToModule(sqlite3api.Request{
+					dbModule.SendDataToModule(sqlite3api.Request{
 						Command: "set case id",
 						Payload: fmt.Append(nil, fmt.Sprintf("%s:%s", data.CaseId, data.EventId)),
 					})

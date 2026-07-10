@@ -38,6 +38,10 @@ func (module *ApiSqlite3Module) SearchCaseId(ctx context.Context, caseId int) (r
 		}
 	}
 
+	if err = rows.Err(); err != nil {
+		return result, err
+	}
+
 	return result, nil
 }
 

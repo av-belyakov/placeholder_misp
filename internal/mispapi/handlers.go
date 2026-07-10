@@ -211,17 +211,22 @@ func (m *ModuleMISP) editEvent(ctx context.Context, userAuthKey string, data Inp
 		if err != nil {
 			m.logger.Send("error", supportingfunctions.CustomError(err).Error())
 
-			return false
+			return true
 		}
 
 		m.logger.Send("info", fmt.Sprintf("starting editing the event id:'%s', case id:'%s'", data.EventId, data.CaseId))
 
 		// получаем событие по его event id
 		_, raw, err := rmisp.getEvent(ctx, data.EventId)
+		if err != nil {
+			m.logger.Send("error", supportingfunctions.CustomError(err).Error())
+
+			return true
+		}
 		if err = json.Unmarshal(raw, &oldEvent); err != nil {
 			m.logger.Send("error", supportingfunctions.CustomError(err).Error())
 
-			return false
+			return true
 		}
 
 		updateEvent := objectsmispformat.EventsMispFormat{
@@ -251,12 +256,12 @@ func (m *ModuleMISP) editEvent(ctx context.Context, userAuthKey string, data Inp
 		if err != nil {
 			m.logger.Send("error", supportingfunctions.CustomError(err).Error())
 
-			return false
+			return true
 		}
 
 		// event_reports оставляем неизменным, этот объект не должен изменятся
 
-		// удаляем все атрибуты собития
+		// удаляем все атрибуты события
 		for _, v := range oldEvent.Event.Attribute {
 			if err := rmisp.deleteAttributes(ctx, v.Id, data.EventId); err != nil {
 				m.logger.Send("error", supportingfunctions.CustomError(err).Error())
