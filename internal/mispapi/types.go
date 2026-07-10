@@ -125,3 +125,20 @@ type RequestSensorInformation struct {
 	TaskId      string   `json:"task_id"`
 	ListSensors []string `json:"list_sensors"`
 }
+
+type EventFromMISP struct {
+	Event struct {
+		UUID      string `json:"uuid"`
+		Attribute []struct {
+			Id string `json:"id"`
+		} `json:"Attribute"`
+		Object []struct {
+			Id string `json:"id"`
+		} `json:"Object"`
+		Tag []struct {
+			Id     string `json:"id"`
+			Name   string `json:"name"`
+			Colour string `json:"colour"`
+		} `json:"tag"`
+	} `json:"Event"`
+}

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/av-belyakov/objectsmispformat"
@@ -12,6 +13,46 @@ import (
 	"github.com/av-belyakov/placeholder_misp/v2/internal/responses"
 	"github.com/av-belyakov/placeholder_misp/v2/internal/supportingfunctions"
 )
+
+func (m *ModuleMISP) processingEvent(ctx context.Context, userAuthKey string, data InputSettings) {
+	// проверяем наличие идентификатора события в MISP
+	if data.EventId == "" {
+		m.addNewEvent(ctx, userAuthKey, data)
+
+		return
+	}
+
+	rmisp, err := NewMispRequest(
+		WithHost(m.host),
+		WithUserAuthKey(userAuthKey),
+		WithMasterAuthKey(m.authKey))
+	if err != nil {
+		m.logger.Send("error", supportingfunctions.CustomError(err).Error())
+
+		return
+	}
+
+	// получаем событие по его event id
+	res, raw, err := rmisp.getEvent(ctx, data.EventId)
+	if err != nil {
+		m.logger.Send("error", supportingfunctions.CustomError(err).Error())
+	}
+
+	if res != nil && res.StatusCode == http.StatusNotFound {
+		m.addNewEvent(ctx, userAuthKey, data)
+
+		return
+	}
+
+	var oldEvent EventFromMISP
+	if err = json.Unmarshal(raw, &oldEvent); err != nil {
+		m.logger.Send("error", supportingfunctions.CustomError(err).Error())
+
+		return
+	}
+
+	m.editEvent(ctx, userAuthKey, data, oldEvent)
+}
 
 // addNewEvent добавление нового события
 func (m *ModuleMISP) addNewEvent(ctx context.Context, userAuthKey string, data InputSettings) {
@@ -182,12 +223,12 @@ func (m *ModuleMISP) addNewEvent(ctx context.Context, userAuthKey string, data I
 }
 
 // editEvent редактирование существующего события
-func (m *ModuleMISP) editEvent(ctx context.Context, userAuthKey string, data InputSettings) {
+func (m *ModuleMISP) editEvent(ctx context.Context, userAuthKey string, data InputSettings, oldEvent EventFromMISP) {
 	specialObject := NewCacheSpecialObject[*objectsmispformat.ListFormatsMISP]()
 	specialObject.SetID(data.RootId)
 	specialObject.SetObject(&data.Data)
 	specialObject.SetFunc(func(i int) bool {
-		oldEvent := struct {
+		/*oldEvent := struct {
 			Event struct {
 				UUID      string `json:"uuid"`
 				Attribute []struct {
@@ -202,7 +243,7 @@ func (m *ModuleMISP) editEvent(ctx context.Context, userAuthKey string, data Inp
 					Colour string `json:"colour"`
 				} `json:"tag"`
 			} `json:"Event"`
-		}{}
+		}{}*/
 
 		rmisp, err := NewMispRequest(
 			WithHost(m.host),
@@ -217,7 +258,7 @@ func (m *ModuleMISP) editEvent(ctx context.Context, userAuthKey string, data Inp
 		m.logger.Send("info", fmt.Sprintf("starting editing the event id:'%s', case id:'%s'", data.EventId, data.CaseId))
 
 		// получаем событие по его event id
-		_, raw, err := rmisp.getEvent(ctx, data.EventId)
+		/*_, raw, err := rmisp.getEvent(ctx, data.EventId)
 		if err != nil {
 			m.logger.Send("error", supportingfunctions.CustomError(err).Error())
 
@@ -227,7 +268,7 @@ func (m *ModuleMISP) editEvent(ctx context.Context, userAuthKey string, data Inp
 			m.logger.Send("error", supportingfunctions.CustomError(err).Error())
 
 			return true
-		}
+		}*/
 
 		updateEvent := objectsmispformat.EventsMispFormat{
 			OrgId:              data.Data.Event.OrgId,

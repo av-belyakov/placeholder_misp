@@ -127,12 +127,7 @@ func (m *ModuleMISP) Start(ctx context.Context) error {
 
 					switch data.Command {
 					case "process event":
-						// проверяем наличие идентификатора события в MISP
-						if data.EventId == "" {
-							m.addNewEvent(ctx, userAuthKey, data)
-						} else {
-							m.editEvent(ctx, userAuthKey, data)
-						}
+						m.processingEvent(ctx, userAuthKey, data)
 
 					case "del event":
 						m.delObject(ctx, data.EventId)
