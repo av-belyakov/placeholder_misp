@@ -40,7 +40,7 @@ func (m *ModuleMISP) processingEvent(ctx context.Context, userAuthKey string, da
 
 	fmt.Println("method 'processingEvent', get event status code:", statusCode)
 
-	if statusCode == http.StatusNotFound {
+	if statusCode != http.StatusOK {
 		m.addNewEvent(ctx, userAuthKey, data)
 
 		return
