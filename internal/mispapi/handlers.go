@@ -230,23 +230,6 @@ func (m *ModuleMISP) editEvent(ctx context.Context, userAuthKey string, data Inp
 	specialObject.SetID(data.RootId)
 	specialObject.SetObject(&data.Data)
 	specialObject.SetFunc(func(i int) bool {
-		/*oldEvent := struct {
-			Event struct {
-				UUID      string `json:"uuid"`
-				Attribute []struct {
-					Id string `json:"id"`
-				} `json:"Attribute"`
-				Object []struct {
-					Id string `json:"id"`
-				} `json:"Object"`
-				Tag []struct {
-					Id     string `json:"id"`
-					Name   string `json:"name"`
-					Colour string `json:"colour"`
-				} `json:"tag"`
-			} `json:"Event"`
-		}{}*/
-
 		rmisp, err := NewMispRequest(
 			WithHost(m.host),
 			WithUserAuthKey(userAuthKey),
@@ -259,19 +242,6 @@ func (m *ModuleMISP) editEvent(ctx context.Context, userAuthKey string, data Inp
 
 		m.logger.Send("info", fmt.Sprintf("starting editing the event id:'%s', case id:'%s'", data.EventId, data.CaseId))
 
-		// получаем событие по его event id
-		/*_, raw, err := rmisp.getEvent(ctx, data.EventId)
-		if err != nil {
-			m.logger.Send("error", supportingfunctions.CustomError(err).Error())
-
-			return true
-		}
-		if err = json.Unmarshal(raw, &oldEvent); err != nil {
-			m.logger.Send("error", supportingfunctions.CustomError(err).Error())
-
-			return true
-		}*/
-
 		updateEvent := objectsmispformat.EventsMispFormat{
 			OrgId:              data.Data.Event.OrgId,
 			OrgcId:             data.Data.Event.OrgcId,
@@ -283,7 +253,7 @@ func (m *ModuleMISP) editEvent(ctx context.Context, userAuthKey string, data Inp
 			AttributeCount:     data.Data.Event.AttributeCount,
 			SharingGroupId:     data.Data.Event.SharingGroupId,
 			ThreatLevelId:      data.Data.Event.ThreatLevelId,
-			Timestamp:          data.Data.Event.Timestamp, // ВЫЖНЫЙ ПАРАМЕТР, если это значение меньше значения в MISP событие не будет обноавлено
+			Timestamp:          data.Data.Event.Timestamp, // ВАЖНЫЙ ПАРАМЕТР, если это значение меньше значения в MISP событие не будет обноавлено
 			PublishTimestamp:   data.Data.Event.PublishTimestamp,
 			SightingTimestamp:  data.Data.Event.SightingTimestamp,
 			ExtendsUuid:        data.Data.Event.ExtendsUuid,
@@ -321,6 +291,12 @@ func (m *ModuleMISP) editEvent(ctx context.Context, userAuthKey string, data Inp
 
 		m.logger.Send("info", fmt.Sprintf("some elements 'attribytes' successfully added to event with id:'%s' (case id:'%s') again", data.EventId, data.CaseId))
 
+		// берем небольшой таймаут, нужен для того что бы MISP успел обработать и добавить в БД
+		// всё ранее ему переданное, если обработка переданных объектов не была завершена
+		// возможны накладки или сбои при добавлении данных
+		// это недостаток MISP, с этим я ничего не могу поделать
+		time.Sleep(3 * time.Second)
+
 		// удаляем все прикрепленные к событию объекты
 		for _, v := range oldEvent.Event.Object {
 			if err := rmisp.deleteObject(ctx, v.Id); err != nil {
@@ -334,10 +310,6 @@ func (m *ModuleMISP) editEvent(ctx context.Context, userAuthKey string, data Inp
 
 		m.logger.Send("info", fmt.Sprintf("elements 'objects' successfully added to event with id:'%s' (case id:'%s') again", data.EventId, data.CaseId))
 
-		// берем небольшой таймаут, нужен для того что бы MISP успел обработать и добавить в БД
-		// всё ранее ему переданное, если обработка переданных объектов не была завершена
-		// возможны накладки или сбои при добавлении данных
-		// это недостаток MISP, с этим я ничего не могу поделать
 		time.Sleep(5 * time.Second)
 
 		// удаляем все теги события
@@ -374,6 +346,7 @@ func (m *ModuleMISP) editEvent(ctx context.Context, userAuthKey string, data Inp
 			return true
 		}
 
+		// формируем запрос на обогащении инфрмации по сенсорам
 		reqSensorId, err := json.Marshal(RequestSensorInformation{
 			Source:      "placeholder_misp",
 			TaskId:      data.CaseId,
@@ -385,7 +358,7 @@ func (m *ModuleMISP) editEvent(ctx context.Context, userAuthKey string, data Inp
 			return true
 		}
 
-		// запрос в ядро на получение информации о сенсорах
+		// отправляем запрос в ядро на получение информации о сенсорах
 		m.SendDataOutput(OutputSetting{
 			Command: "get sensor information",
 			CaseId:  data.CaseId,
@@ -458,8 +431,10 @@ func (m *ModuleMISP) addSensorInformation(ctx context.Context, userAuthKey strin
 			continue
 		}
 
-		if _, err = rmisp.sendRequestPublishEvent(ctx, eventId); err != nil {
-			m.logger.Send("error", supportingfunctions.CustomError(err).Error())
-		}
+	}
+
+	// публикация события
+	if _, err = rmisp.sendRequestPublishEvent(ctx, eventId); err != nil {
+		m.logger.Send("error", supportingfunctions.CustomError(err).Error())
 	}
 }
