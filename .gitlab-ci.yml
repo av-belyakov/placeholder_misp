@@ -6,17 +6,17 @@ stages:
   - build
   - deploy
 
-# собирает новый образ на моем ПК
+# соборка нового образа на моем ПК
 .build-runner-tags: &build-tags
   tags:
     - placeholder_misp.build
 
-# разворачивает тестовую сборку
+# разворачивание тестовой сборки
 .deploy-test-runner-tags: &deploy-test-tags
   tags:
     - placeholder_misp.test
 
-# разворачивает продуктовую сборку
+# разворачивание продуктовой сборки
 .deploy-prod-runner-tags: &deploy-prod-tags
   tags:
     - placeholder_misp.prod
@@ -27,20 +27,20 @@ stages:
 .docker-image-prune: &docker-image-pure
   - docker image prune -a --force --filter="label=temporary"
 
-# запретить выполнение если изменился README
+# запрет на выполнение если изменился README
 .change-readme-never-commit: &readme-no-commit
   - if: $CI_COMMIT_BRANCH == $BRANCH_MAJOR || $CI_COMMIT_BRANCH == $BRANCH_TEST
     changes:
       - README.md
     when: never
 
-# запретить выполнение если изменился какой либо из файлов в директории test
+# запретить на выполнение если изменился какой либо из файлов в директории test
 .change-test-files-never-commit: &test-files-no-commit
   - if: $CI_COMMIT_BRANCH == $BRANCH_MAJOR || $CI_COMMIT_BRANCH == $BRANCH_TEST
     changes:
       - test/**/*
     when: never
-
+# запретить на выполнение если изменился какой либо из файлов docker-conpose
 .change-docker-compose-never-commit: &docker-compose-no-commit
   - if: $CI_COMMIT_BRANCH == $BRANCH_MAJOR || $CI_COMMIT_BRANCH == $BRANCH_TEST
     changes:
@@ -84,10 +84,8 @@ build-test:
        --build-arg STATUS=development .
     #удаление промежуточного образа с меткой temporary
     - *docker-image-pure
-    #- docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA $CI_REGISTRY_IMAGE:test
     - *docker-login
     - docker push $CI_REGISTRY_IMAGE:v2.test
-    #- docker rmi $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA || true
 
 # сборка основного образа
 build-prod:
@@ -108,10 +106,8 @@ build-prod:
        --build-arg VERSION=$CI_COMMIT_SHORT_SHA \
        --build-arg BRANCH=$BRANCH_MAJOR .
     - *docker-image-pure
-    #- docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA $CI_REGISTRY_IMAGE:latest
     - *docker-login
     - docker push $CI_REGISTRY_IMAGE:v2.latest
-    #- docker rmi $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA || true
 
 # развёртывание тестовой сборки (GCM.test)
 deploy-test:
