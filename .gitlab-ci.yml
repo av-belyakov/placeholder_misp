@@ -153,6 +153,6 @@ deploy-prod-gcm:
     #удаление старого образа (версия 1)
     - docker rmi gitlab.cloud.gcm:5050/a.belyakov/placeholder_misp:latest || true
     #удаление старого образа (версия 2)
-    - docker rmi gitlab.cloud.gcm:5050/a.belyakov/placeholder_misp:v2.0.latest || true
+    - docker rmi gitlab.cloud.gcm:5050/a.belyakov/placeholder_misp:v2.latest || true
     #запуск 2-ой версии приложения
     - docker-compose -f $CI_PROJECT_DIR/docker-compose.yml up -d --force-recreate --build
