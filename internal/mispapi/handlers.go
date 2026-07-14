@@ -338,19 +338,6 @@ func (m *ModuleMISP) editEvent(ctx context.Context, userAuthKey string, data Inp
 			m.logger.Send("info", fmt.Sprintf("event with id:'%s' (case id:'%s') %s", data.EventId, data.CaseId, resMsg))
 		}
 
-		// отправляем в ядро информацию по event Id, при этом новый eventId
-		// передаётся для отправки в NATS, а так же передается в Sqlite3 для
-		// обновления или создания новой связки caseId - eventId
-		/*outMsg := OutputSetting{
-			Command:    "send event id",
-			EventId:    eventId,
-			CaseId:     data.CaseId,
-			RootId:     data.RootId,
-			TaskId:     data.TaskId,
-			CaseSource: data.CaseSource,
-		}
-		m.SendDataOutput(outMsg)*/
-
 		// получаем из тегов список сенсоров по которым нужна дополнитеьльная информация
 		listSensors := createListSensors(*data.Data.ObjectTags)
 		if len(listSensors) == 0 {
