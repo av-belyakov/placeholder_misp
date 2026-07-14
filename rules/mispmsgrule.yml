@@ -130,6 +130,10 @@ RULES:
         - searchField: "observables.data"
           searchValue: "arkime"
           accurateComparison: false
+    - listAnd:
+        - searchField: "observables.message"
+          searchValue: "Ссылка на Arkime"
+          accurateComparison: false
   #    - listAnd:
   #        - searchField: "observables.ioc"
   #          searchValue: "true"
