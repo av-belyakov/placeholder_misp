@@ -15,8 +15,10 @@ services:
     volumes:
       - /var/log/placeholder_misp_v2.test:/opt/placeholder_misp/logs:rw
       - ./config:/opt/placeholder_misp/config:rw
-      - ./sqlite3:/opt/placeholder_misp/sqlite3:rw
+      - db_data:/opt/placeholder_misp/sqlite3:rw
       #выполняем для корректного отображения даты с учетом временной зоны
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     network_mode: "host"
+volumes:
+  db_data:
