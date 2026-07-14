@@ -243,7 +243,7 @@ func TestCreateMispObjects(t *testing.T) {
 		//assert.NoError(t, err)
 
 		chRes := make(chan sqlite3api.Response)
-		sqlite3Module.SendDataToModule(sqlite3api.Request{
+		sqlite3Module.SendData(sqlite3api.Request{
 			Command:    "search caseId",
 			ChResponse: chRes,
 			Payload:    fmt.Append(nil, 39100),

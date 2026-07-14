@@ -90,7 +90,7 @@ func (settings *CoreHandler) Start(
 
 					//поиск eventId в Sqlite3
 					chRes := make(chan sqlite3api.Response)
-					dbModule.SendDataToModule(sqlite3api.Request{
+					dbModule.SendData(sqlite3api.Request{
 						Command:    "search caseId",
 						ChResponse: chRes,
 						Payload:    fmt.Append(nil, data.MsgId), // data.MsgId == caseId для NATS
@@ -112,7 +112,7 @@ func (settings *CoreHandler) Start(
 			switch data.Command {
 			case "get event id":
 				//отправка eventId в Sqlite3
-				dbModule.SendDataToModule(sqlite3api.Request{
+				dbModule.SendData(sqlite3api.Request{
 					Command: "set case id",
 					Payload: fmt.Append(nil, fmt.Sprintf("%s:%s", data.CaseId, data.EventId)),
 				})
@@ -131,7 +131,7 @@ func (settings *CoreHandler) Start(
 
 					//поиск старого eventId в Sqlite3
 					chRes := make(chan sqlite3api.Response)
-					dbModule.SendDataToModule(sqlite3api.Request{
+					dbModule.SendData(sqlite3api.Request{
 						Command:    "search caseId",
 						ChResponse: chRes,
 						Payload:    fmt.Append(nil, data.CaseId),
@@ -148,7 +148,7 @@ func (settings *CoreHandler) Start(
 					}
 
 					//передача нового eventId в Sqlite3
-					dbModule.SendDataToModule(sqlite3api.Request{
+					dbModule.SendData(sqlite3api.Request{
 						Command: "set case id",
 						Payload: fmt.Append(nil, fmt.Sprintf("%s:%s", data.CaseId, data.EventId)),
 					})

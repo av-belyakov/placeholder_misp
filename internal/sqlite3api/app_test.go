@@ -42,7 +42,7 @@ func TestSqlite3Api(t *testing.T) {
 	t.Run("Тест 1. Получаем существующую запись", func(t *testing.T) {
 		chRes := make(chan sqlite3api.Response)
 
-		module.SendDataToModule(sqlite3api.Request{
+		module.SendData(sqlite3api.Request{
 			Command:    "search caseId",
 			ChResponse: chRes,
 			Payload:    []byte("852"),
@@ -55,7 +55,7 @@ func TestSqlite3Api(t *testing.T) {
 
 	t.Run("Тест 2. Добавляем информацию если её нет", func(t *testing.T) {
 		//добавляем информацию
-		module.SendDataToModule(sqlite3api.Request{
+		module.SendData(sqlite3api.Request{
 			Command:    "set case id",
 			ChResponse: make(chan sqlite3api.Response),
 			Payload:    []byte("999999:989898"),
@@ -63,7 +63,7 @@ func TestSqlite3Api(t *testing.T) {
 
 		//проверяем её наличие
 		chRes := make(chan sqlite3api.Response)
-		module.SendDataToModule(sqlite3api.Request{
+		module.SendData(sqlite3api.Request{
 			Command:    "search caseId",
 			ChResponse: chRes,
 			Payload:    []byte("999999"),
@@ -76,7 +76,7 @@ func TestSqlite3Api(t *testing.T) {
 
 	t.Run("Тест 3. Обновляем существующую информацию", func(t *testing.T) {
 		// обновляем информацию
-		module.SendDataToModule(sqlite3api.Request{
+		module.SendData(sqlite3api.Request{
 			Command:    "set case id",
 			ChResponse: make(chan sqlite3api.Response),
 			Payload:    []byte("999999:898989"),
@@ -84,7 +84,7 @@ func TestSqlite3Api(t *testing.T) {
 
 		//проверяем результат
 		chRes := make(chan sqlite3api.Response)
-		module.SendDataToModule(sqlite3api.Request{
+		module.SendData(sqlite3api.Request{
 			Command:    "search caseId",
 			ChResponse: chRes,
 			Payload:    []byte("999999"),
@@ -97,7 +97,7 @@ func TestSqlite3Api(t *testing.T) {
 
 	t.Run("Тест 4. Удаляем существующую информацию", func(t *testing.T) {
 		// удаляем информацию
-		module.SendDataToModule(sqlite3api.Request{
+		module.SendData(sqlite3api.Request{
 			Command:    "delete case id",
 			ChResponse: make(chan sqlite3api.Response),
 			Payload:    []byte("999999"),
@@ -105,7 +105,7 @@ func TestSqlite3Api(t *testing.T) {
 
 		//проверяем наличие
 		chRes := make(chan sqlite3api.Response)
-		module.SendDataToModule(sqlite3api.Request{
+		module.SendData(sqlite3api.Request{
 			Command:    "search caseId",
 			ChResponse: chRes,
 			Payload:    []byte("999999"),

@@ -59,7 +59,7 @@ type MispConnecter interface {
 
 type DB interface {
 	GetChRequest() <-chan sqlite3api.Request
-	SendDataToModule(req sqlite3api.Request)
+	SendData(req sqlite3api.Request)
 	SearchCaseId(ctx context.Context, caseId int) (int, error)
 	UpdateCaseId(ctx context.Context, caseId, eventId int) error
 	DeleteCaseId(ctx context.Context, caseId int) error

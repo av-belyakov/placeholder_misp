@@ -268,7 +268,7 @@ func (g *GenerateObjectsFormatMISP) Start(chDecodeJSON <-chan ChanInputCreateMis
 		//выполняем поиск события MISP по caseId в СУБД Sqlite3
 		var eventId string
 		chRes := make(chan sqlite3api.Response)
-		g.sqlite3Module.SendDataToModule(sqlite3api.Request{
+		g.sqlite3Module.SendData(sqlite3api.Request{
 			Command:    "search caseId",
 			ChResponse: chRes,
 			Payload:    fmt.Append(nil, caseIdStr),
@@ -279,6 +279,8 @@ func (g *GenerateObjectsFormatMISP) Start(chDecodeJSON <-chan ChanInputCreateMis
 		} else {
 			eventId = string(res.Payload)
 		}
+
+		g.logger.Send("info", fmt.Sprintf("the case with id:'%s' event search performed in the database, an event id:'%s' was received", caseIdStr, eventId))
 
 		//тут отправляем сформированные по формату MISP пользовательские структуры
 		g.mispModule.SendDataInput(mispapi.InputSettings{
