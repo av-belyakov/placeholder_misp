@@ -151,7 +151,7 @@ func AddNewObject(
 
 	//вместо этого, в тестах, отправляем информацию напрямую в
 	// модуль взаимодействия с sqlite3
-	sqlite3Client.SendDataToModule(sqlite3api.Request{
+	sqlite3Client.SendData(sqlite3api.Request{
 		Command: "set case id",
 		Payload: fmt.Append(nil, fmt.Sprintf("%v:%s", data.CaseId, eventId)),
 	})

@@ -19,8 +19,8 @@ func (module *ApiSqlite3Module) GetChRequest() <-chan Request {
 	return module.chRequest
 }
 
-// SendDataToModule передача данных в модуль
-func (module *ApiSqlite3Module) SendDataToModule(req Request) {
+// SendData передача данных в модуль
+func (module *ApiSqlite3Module) SendData(req Request) {
 	module.chRequest <- req
 }
 
