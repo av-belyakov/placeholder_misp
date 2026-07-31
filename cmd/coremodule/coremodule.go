@@ -154,6 +154,17 @@ func (settings *CoreHandler) Start(
 					})
 				}()
 
+			case "set tags and custom field":
+				//отправка eventId в NATS
+				natsModule.SendingDataInput(natsapi.InputSettings{
+					Command:    "send event id",
+					EventId:    data.EventId,
+					TaskId:     data.TaskId,
+					RootId:     data.RootId,
+					CaseId:     data.CaseId,
+					CaseSource: data.CaseSource,
+				})
+
 			case "get sensor information":
 				settings.logger.Send("info", fmt.Sprintf("received request 'get sensor information' event with id:'%s' (case id:'%s') and passed on to natsapi module", data.EventId, data.CaseId))
 

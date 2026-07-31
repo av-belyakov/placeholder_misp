@@ -358,6 +358,18 @@ func (m *ModuleMISP) editEvent(ctx context.Context, userAuthKey string, data Inp
 			return true
 		}
 
+		// отправляем в ядро информацию по event Id для дальнейшего формирования
+		// команд добавления тегов и настраиваемых полей
+		outMsg := OutputSetting{
+			Command:    "set tags and custom field",
+			EventId:    data.EventId,
+			CaseId:     data.CaseId,
+			RootId:     data.RootId,
+			TaskId:     data.TaskId,
+			CaseSource: data.CaseSource,
+		}
+		m.SendDataOutput(outMsg)
+
 		// отправляем запрос в ядро на получение информации о сенсорах
 		m.SendDataOutput(OutputSetting{
 			Command: "get sensor information",
