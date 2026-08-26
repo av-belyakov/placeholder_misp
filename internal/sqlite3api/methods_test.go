@@ -15,7 +15,10 @@ import (
 	"github.com/av-belyakov/placeholder_misp/v2/internal/sqlite3api"
 )
 
-const Case_Id int = 711711
+const (
+	Case_Id     int = 711711
+	Source_Name     = "test-source"
+)
 
 func TestMethods(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
@@ -47,19 +50,19 @@ func TestMethods(t *testing.T) {
 	defer module.ConnectionClose()
 
 	t.Run("Тест 1. Добавляем запись", func(t *testing.T) {
-		err := module.UpdateCaseId(ctx, Case_Id, 700001)
+		err := module.UpdateCaseId(ctx, Source_Name, Case_Id, 700001)
 		assert.NoError(t, err)
 
-		eventId, err := module.SearchCaseId(ctx, Case_Id)
+		eventId, err := module.SearchCaseId(ctx, Source_Name, Case_Id)
 		assert.NoError(t, err)
 		assert.Equal(t, eventId, 700001)
 	})
 
 	t.Run("Тест 2. Обновляем запись", func(t *testing.T) {
-		err := module.UpdateCaseId(ctx, Case_Id, 7000221)
+		err := module.UpdateCaseId(ctx, Source_Name, Case_Id, 7000221)
 		assert.NoError(t, err)
 
-		eventId, err := module.SearchCaseId(ctx, Case_Id)
+		eventId, err := module.SearchCaseId(ctx, Source_Name, Case_Id)
 		assert.NoError(t, err)
 		assert.Equal(t, eventId, 7000221)
 	})
@@ -68,7 +71,7 @@ func TestMethods(t *testing.T) {
 		err := module.DeleteCaseId(ctx, Case_Id)
 		assert.NoError(t, err)
 
-		eventId, err := module.SearchCaseId(ctx, Case_Id)
+		eventId, err := module.SearchCaseId(ctx, Source_Name, Case_Id)
 		assert.NoError(t, err)
 		assert.Equal(t, eventId, 0)
 	})

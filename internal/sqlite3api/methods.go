@@ -25,8 +25,8 @@ func (module *ApiSqlite3Module) SendData(req Request) {
 }
 
 // SearchCaseId поиск информации по caseId
-func (module *ApiSqlite3Module) SearchCaseId(ctx context.Context, caseId int) (result int, err error) {
-	rows, err := module.db.QueryContext(ctx, "SELECT eventId FROM placeholder_misp WHERE caseId=?", caseId)
+func (module *ApiSqlite3Module) SearchCaseId(ctx context.Context, source string, caseId int) (result int, err error) {
+	rows, err := module.db.QueryContext(ctx, "SELECT eventId FROM placeholder_misp WHERE caseId=? AND source=?", caseId, source)
 	if err != nil {
 		return result, err
 	}
@@ -46,19 +46,19 @@ func (module *ApiSqlite3Module) SearchCaseId(ctx context.Context, caseId int) (r
 }
 
 // UpdateCaseId обнавляет содержимое таблицы по caseId, если caseId не найдено, добавляет
-func (module *ApiSqlite3Module) UpdateCaseId(ctx context.Context, caseId, eventId int) error {
-	id, err := module.SearchCaseId(ctx, caseId)
+func (module *ApiSqlite3Module) UpdateCaseId(ctx context.Context, source string, caseId, eventId int) error {
+	id, err := module.SearchCaseId(ctx, source, caseId)
 	if err != nil {
 		return err
 	}
 
 	if id == 0 {
-		if _, err := module.db.ExecContext(ctx, "INSERT INTO placeholder_misp (caseId, eventId) VALUES (?,?)", caseId, eventId); err != nil {
+		if _, err := module.db.ExecContext(ctx, "INSERT INTO placeholder_misp (caseId, eventId, source) VALUES (?,?,?)", caseId, eventId, source); err != nil {
 			return err
 		}
 
 	} else {
-		if _, err := module.db.ExecContext(ctx, "UPDATE placeholder_misp SET eventId=? WHERE caseId=?", eventId, caseId); err != nil {
+		if _, err := module.db.ExecContext(ctx, "UPDATE placeholder_misp SET eventId=? WHERE caseId=? AND source=?", eventId, caseId, source); err != nil {
 			return err
 		}
 	}

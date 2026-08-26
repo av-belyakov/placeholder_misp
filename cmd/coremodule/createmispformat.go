@@ -271,7 +271,7 @@ func (g *GenerateObjectsFormatMISP) Start(chDecodeJSON <-chan ChanInputCreateMis
 		g.sqlite3Module.SendData(sqlite3api.Request{
 			Command:    "search caseId",
 			ChResponse: chRes,
-			Payload:    fmt.Append(nil, caseIdStr),
+			Payload:    fmt.Append(nil, fmt.Sprintf("%s:%s", caseIdStr, caseSource)),
 		})
 		res := <-chRes
 		if res.Error != nil {

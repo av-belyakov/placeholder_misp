@@ -56,8 +56,14 @@ func (module *ApiSqlite3Module) route(ctx context.Context) {
 			case data := <-module.GetChRequest():
 				switch data.Command {
 				case "search caseId":
-					str := string(data.Payload)
-					caseId, err := strconv.Atoi(str)
+					tmp := strings.Split(string(data.Payload), ":")
+					if len(tmp) < 2 {
+						module.logger.Send("error", supportingfunctions.CustomError(errors.New("incorrect number of accepted parameters for the search query")).Error())
+
+						continue
+					}
+
+					caseId, err := strconv.Atoi(tmp[0])
 					if err != nil {
 						data.ChResponse <- Response{Error: err}
 						module.logger.Send("error", supportingfunctions.CustomError(err).Error())
@@ -65,7 +71,9 @@ func (module *ApiSqlite3Module) route(ctx context.Context) {
 						continue
 					}
 
-					res, err := module.SearchCaseId(ctx, caseId)
+					source := tmp[1]
+
+					res, err := module.SearchCaseId(ctx, source, caseId)
 					if err != nil {
 						data.ChResponse <- Response{Error: err}
 						module.logger.Send("error", supportingfunctions.CustomError(err).Error())
@@ -77,7 +85,7 @@ func (module *ApiSqlite3Module) route(ctx context.Context) {
 
 				case "set case id":
 					tmp := strings.Split(string(data.Payload), ":")
-					if len(tmp) == 0 {
+					if len(tmp) < 3 {
 						module.logger.Send("warning", supportingfunctions.CustomError(errors.New("it is not possible to split a string")).Error())
 
 						continue
@@ -97,7 +105,7 @@ func (module *ApiSqlite3Module) route(ctx context.Context) {
 						continue
 					}
 
-					if err = module.UpdateCaseId(ctx, caseId, eventId); err != nil {
+					if err = module.UpdateCaseId(ctx, tmp[2], caseId, eventId); err != nil {
 						module.logger.Send("warning", supportingfunctions.CustomError(err).Error())
 					}
 

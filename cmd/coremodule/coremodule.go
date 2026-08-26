@@ -134,7 +134,7 @@ func (settings *CoreHandler) Start(
 					dbModule.SendData(sqlite3api.Request{
 						Command:    "search caseId",
 						ChResponse: chRes,
-						Payload:    fmt.Append(nil, data.CaseId),
+						Payload:    fmt.Append(nil, fmt.Sprintf("%s:%s", data.CaseId, data.CaseSource)),
 					})
 					res := <-chRes
 					oldEventId := string(res.Payload)
@@ -150,7 +150,7 @@ func (settings *CoreHandler) Start(
 					//передача нового eventId в Sqlite3
 					dbModule.SendData(sqlite3api.Request{
 						Command: "set case id",
-						Payload: fmt.Append(nil, fmt.Sprintf("%s:%s", data.CaseId, data.EventId)),
+						Payload: fmt.Append(nil, fmt.Sprintf("%s:%s:%s", data.CaseId, data.EventId, data.CaseSource)),
 					})
 				}()
 
