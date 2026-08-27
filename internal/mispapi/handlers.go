@@ -16,7 +16,7 @@ import (
 
 func (m *ModuleMISP) processingEvent(ctx context.Context, userAuthKey string, data InputSettings) {
 	// проверяем наличие идентификатора события в MISP
-	if data.EventId == "" {
+	if data.EventId == "" || data.EventId == "0" {
 		m.addNewEvent(ctx, userAuthKey, data)
 
 		return
@@ -253,7 +253,7 @@ func (m *ModuleMISP) editEvent(ctx context.Context, userAuthKey string, data Inp
 			AttributeCount:     data.Data.Event.AttributeCount,
 			SharingGroupId:     data.Data.Event.SharingGroupId,
 			ThreatLevelId:      data.Data.Event.ThreatLevelId,
-			Timestamp:          data.Data.Event.Timestamp, // ВАЖНЫЙ ПАРАМЕТР, если это значение меньше значения в MISP событие не будет обноавлено
+			Timestamp:          data.Data.Event.Timestamp, // ВАЖНЫЙ ПАРАМЕТР, если это значение меньше значения в MISP событие не будет обновлено
 			PublishTimestamp:   data.Data.Event.PublishTimestamp,
 			SightingTimestamp:  data.Data.Event.SightingTimestamp,
 			ExtendsUuid:        data.Data.Event.ExtendsUuid,

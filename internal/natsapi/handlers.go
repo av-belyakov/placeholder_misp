@@ -85,9 +85,10 @@ func (api *ApiNatsModule) incomingInformationHandler(ctx context.Context) {
 						api.logger.Send("info", fmt.Sprintf("a response was received to a request for sensor information for an object with rootId:'%s', caseId:'%s'", incomingData.RootId, incomingData.CaseId))
 
 						api.SendingDataOutput(OutputSettings{
-							MsgType: "sensor information",
-							MsgId:   incomingData.CaseId,
-							Data:    res.Data,
+							MsgType:       "sensor information",
+							MsgId:         incomingData.CaseId,     // id кейса TheHive
+							MsgAdditional: incomingData.CaseSource, // дополнительно отправляется источник для корректного поиска в БД
+							Data:          res.Data,
 						})
 					}()
 

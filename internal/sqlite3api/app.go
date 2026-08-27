@@ -63,6 +63,8 @@ func (module *ApiSqlite3Module) route(ctx context.Context) {
 						continue
 					}
 
+					source := tmp[1]
+
 					caseId, err := strconv.Atoi(tmp[0])
 					if err != nil {
 						data.ChResponse <- Response{Error: err}
@@ -70,8 +72,6 @@ func (module *ApiSqlite3Module) route(ctx context.Context) {
 
 						continue
 					}
-
-					source := tmp[1]
 
 					res, err := module.SearchCaseId(ctx, source, caseId)
 					if err != nil {

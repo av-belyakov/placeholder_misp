@@ -88,12 +88,17 @@ func (settings *CoreHandler) Start(
 				go func() {
 					settings.logger.Send("info", fmt.Sprintf("information about sensors for case id:'%s' has been received", data.MsgId))
 
+					//где:
+					// data.MsgId - это caseId кейса TheHive
+					// data.MsgMsgAdditional - это source, источник кейса TheHive
+					//всё это нужно для корректного поиска в БД
+
 					//поиск eventId в Sqlite3
 					chRes := make(chan sqlite3api.Response)
 					dbModule.SendData(sqlite3api.Request{
 						Command:    "search caseId",
 						ChResponse: chRes,
-						Payload:    fmt.Append(nil, data.MsgId), // data.MsgId == caseId для NATS
+						Payload:    fmt.Append(nil, fmt.Sprintf("%s:%s", data.MsgId, data.MsgAdditional)),
 					})
 					res := <-chRes
 					eventId := string(res.Payload)
@@ -169,10 +174,12 @@ func (settings *CoreHandler) Start(
 				settings.logger.Send("info", fmt.Sprintf("received request 'get sensor information' event with id:'%s' (case id:'%s') and passed on to natsapi module", data.EventId, data.CaseId))
 
 				natsModule.SendingDataInput(natsapi.InputSettings{
-					Data:    data.Data,
-					Command: data.Command,
-					CaseId:  data.CaseId,
-					RootId:  data.RootId,
+					Data:       data.Data,
+					Command:    data.Command,
+					CaseId:     data.CaseId,
+					EventId:    data.EventId,
+					RootId:     data.RootId,
+					CaseSource: data.CaseSource,
 				})
 
 			}

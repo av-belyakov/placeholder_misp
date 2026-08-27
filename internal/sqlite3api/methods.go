@@ -39,11 +39,7 @@ func (module *ApiSqlite3Module) SearchCaseId(ctx context.Context, source string,
 		}
 	}
 
-	if err = rows.Err(); err != nil {
-		return result, err
-	}
-
-	return result, nil
+	return result, rows.Err()
 }
 
 // UpdateCaseId обнавляет содержимое таблицы по caseId, если caseId не найдено, добавляет

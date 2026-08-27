@@ -31,9 +31,10 @@ type NatsApiOptions func(*ApiNatsModule) error
 
 // OutputSettings параметры для канала отправки данных из модуля
 type OutputSettings struct {
-	Data    []byte
-	MsgId   string
-	MsgType string
+	Data          []byte
+	MsgId         string
+	MsgType       string
+	MsgAdditional string
 }
 
 // InputSettings параметры для канала приема данных в модуль
