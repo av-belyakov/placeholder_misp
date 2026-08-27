@@ -371,12 +371,9 @@ func (m *ModuleMISP) editEvent(ctx context.Context, userAuthKey string, data Inp
 		m.SendDataOutput(outMsg)
 
 		// отправляем запрос в ядро на получение информации о сенсорах
-		m.SendDataOutput(OutputSetting{
-			Command: "get sensor information",
-			CaseId:  data.CaseId,
-			RootId:  data.RootId,
-			Data:    reqSensorId,
-		})
+		outMsg.Command = "get sensor information"
+		outMsg.Data = reqSensorId
+		m.SendDataOutput(outMsg)
 
 		m.logger.Send("info", fmt.Sprintf("event with id:'%s' (case id:'%s') send request 'get sensor information' to core module", data.EventId, data.CaseId))
 
